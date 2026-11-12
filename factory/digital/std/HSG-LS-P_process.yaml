@@ -1,4 +1,4 @@
-# 第 138 轮 G5.1：WQ-LS 机壳机械加工工艺规程（由 tools/wqls/g5_process.py 生成，不要手改）
+# 第 138 轮 G5.1、G5.2：WQ-LS 机壳机械加工工艺规程（由 tools/wqls/g5_process.py 生成，不要手改）
 version: 2
 item: HSG-LS-P
 material: HT250
@@ -9,7 +9,7 @@ doc:
   product_model: WQ-LS
   product_name: WQ-LS 工业平缝机
   drawing_no: WQLS-HSG-P
-  part_name: 机壳部件（上件＋下件，配对）
+  part_name: 机壳合件（上件＋下件，配对）
   per_unit: 1
   per_blank: 1
   batch: 200
@@ -31,152 +31,368 @@ doc:
 part:
   kind: housing
   mass_kg: 24.2
-  source: tools/wqls/cad/housing.py（G4.4）
+  source: tools/wqls/cad/housing.py（G5.2）
 blank:
-  kind: 上件 HSG-LS-U ＋ 下件 HSG-LS-L（各自加工完）
+  kind: 上件 HSG-LS-U ＋ 下件 HSG-LS-L（各自粗加工、时效、精铣接合面后）
   spec: ''
   length_mm: ''
   material_item: CS-HSG-LS-P
   drawing: docs/设计/WQ-LS/G5/机壳铸造工艺.md
 chains:
-- name: 针杆孔对针板孔基准（装配找正后配铰锥销）
+- name: 针杆孔对旋梭轴孔（合件：测出针杆轴线后镗旋梭轴孔）
   char: P1
   links:
-  - name: 找正检棒在针杆孔里的间隙
+  - name: 两个涨紧塞规在针杆孔里的定心（液压涨紧，零间隙）各 ±0.002，外推到 z −21.5（放大 1.36）
     nominal: 0.0
-    es: 0.013
-    ei: -0.013
+    es: 0.0027
+    ei: -0.0027
     sense: 1
-  - name: 下件检具基准
+  - name: 测头：每个塞规 3 点定圆心 ±0.0015（单点重复性 1 μm，含测针偏置标定），外推后
     nominal: 0.0
-    es: 0.01
-    ei: -0.01
+    es: 0.0021
+    ei: -0.0021
     sense: 1
-  - name: 调整分辨率
+  - name: 镗旋梭轴孔时 X 轴定位重复性 ±0.002
     nominal: 0.0
-    es: 0.005
-    ei: -0.005
+    es: 0.002
+    ei: -0.002
     sense: 1
-  - name: 配铰、打锥销的拉动
+  - name: 阶梯镗杆（Ø18 杆、Ø12 颈，伸出 175）：切削力随刀转动，主要让孔变小（按实测孔径补偿），轴线偏移按 ±0.002
     nominal: 0.0
-    es: 0.005
-    ei: -0.005
+    es: 0.002
+    ei: -0.002
+    sense: 1
+  - name: 热漂移（测量到镗完约 10 min）
+    nominal: 0.0
+    es: 0.002
+    ei: -0.002
+    sense: 1
+  - name: 夹紧变形：压板压在支承正上方，只有局部压缩
+    nominal: 0.0
+    es: 0.001
+    ei: -0.001
     sense: 1
 characteristics:
 - id: P1
-  name: 针杆孔轴线对针板孔基准的位置
-  spec: Ø0.1，即 ±0.05（找正检棒能顺利插进针板孔基准检具的 Ø12 H6 衬套）
+  name: 针杆孔轴线对旋梭轴孔轴线的位置度
+  spec: Ø0.05，即 y 向偏离 ±0.025（针杆轴线与旋梭轴线垂直相交）
   nominal: 0.0
-  es: 0.05
-  ei: -0.05
+  es: 0.025
+  ei: -0.025
   kind: geo
   key: true
 - id: P2
-  name: 接合面贴合
-  spec: 0.02 塞尺塞不进
-  kind: other
+  name: 针杆孔轴线对上轴孔公共轴线 B 的位置度
+  spec: Ø0.05（针杆轴线与 B 垂直相交，x = 0）
+  nominal: 0.0
+  es: 0.05
+  ei: 0.0
+  kind: geo
+  key: true
 - id: P3
-  name: M10 螺钉拧紧力矩
-  spec: 4 × M10（10.9 级）45 N·m，对角分两次拧紧
-  kind: other
+  name: 前轴承孔（6202）
+  spec: Ø35 H7（+0.025/0），Ra 1.6
+  nominal: 35
+  es: 0.025
+  ei: 0.0
+  kind: dim
   key: true
+  qms: 前轴承孔 Front bearing bore Ø35 H7 (mm)
 - id: P4
-  name: 锥销孔
-  spec: 2 × 锥销 10 × 40（GB/T 117，1:50），红丹检查接触 ≥ 75%，锥销打入后露出 3–4 mm
+  name: 后轴承孔（6201）
+  spec: Ø32 H7（+0.025/0），Ra 1.6
+  nominal: 32
+  es: 0.025
+  ei: 0.0
+  kind: dim
+  key: true
+  qms: 后轴承孔 Rear bearing bore Ø32 H7 (mm)
+- id: P5
+  name: 上轴两孔同轴度
+  spec: Ø0.02（公共轴线 B）
+  nominal: 0.0
+  es: 0.02
+  ei: 0.0
+  kind: geo
+  key: true
+- id: P6
+  name: 上轴中心高（B 到底面 A）
+  spec: 262 ± 0.05
+  nominal: 262
+  es: 0.05
+  ei: -0.05
+  kind: dim
+  key: true
+  qms: 上轴中心高 Shaft height above A (mm)
+- id: P7
+  name: 下轴两孔（6201）
+  spec: 2 × Ø32 H7（+0.025/0），Ra 1.6
+  nominal: 32
+  es: 0.025
+  ei: 0.0
+  kind: dim
+  key: true
+- id: P8
+  name: 下轴两孔同轴度
+  spec: Ø0.02（公共轴线 D）
+  nominal: 0.0
+  es: 0.02
+  ei: 0.0
+  kind: geo
+  key: true
+- id: P9
+  name: 旋梭轴孔
+  spec: Ø14 H7（+0.018/0），Ra 1.6（压两个铜套）
+  nominal: 14
+  es: 0.018
+  ei: 0.0
+  kind: dim
+  key: true
+- id: P10
+  name: 旋梭轴孔中心高（到底面 A）
+  spec: 40.5 ± 0.05
+  nominal: 40.5
+  es: 0.05
+  ei: -0.05
+  kind: dim
+- id: P11
+  name: 齿轮中心距（旋梭轴孔—下轴孔）
+  spec: 31.058 ± 0.015
+  nominal: 31.058
+  es: 0.015
+  ei: -0.015
+  kind: dim
+  key: true
+- id: P12
+  name: 旋梭轴孔对下轴公共轴线 D 的平行度
+  spec: 0.012/100（斜齿轮 6 级的轴线平行度）
+  nominal: 0.0
+  es: 0.012
+  ei: 0.0
+  kind: geo
+- id: P13
+  name: 上轴 B 对下轴 D 的平行度
+  spec: 0.03/300（同步带两轮对齐）
+  nominal: 0.0
+  es: 0.03
+  ei: 0.0
+  kind: geo
+- id: P14
+  name: 电机止口
+  spec: Ø52 h7（0/−0.030），Ra 1.6
+  nominal: 52
+  es: 0.0
+  ei: -0.03
+  kind: dim
+  key: true
+- id: P15
+  name: 电机止口对 B 的同轴度
+  spec: Ø0.03
+  nominal: 0.0
+  es: 0.03
+  ei: 0.0
+  kind: geo
+- id: P16
+  name: 电机法兰端面对 B 的垂直度
+  spec: '0.02'
+  nominal: 0.0
+  es: 0.02
+  ei: 0.0
+  kind: geo
+- id: P17
+  name: 针杆轴线对针板座（合箱找正）
+  spec: Ø0.1：找正检棒插进针板孔基准检具的 Ø12 H6 衬套
+  nominal: 0.0
+  es: 0.1
+  ei: 0.0
+  kind: geo
+- id: P18
+  name: 合箱：接合面贴合、螺钉、锥销
+  spec: 0.02 塞尺塞不进；4 × M10（10.9 级）45 N·m 对角两次拧紧；2 × 锥销 10 × 40（GB/T 117，1:50）红丹接触 ≥ 75%、露出 3–4 mm
   kind: other
   key: true
-- id: P5
+- id: P19
   name: 配对编号
   spec: 上、下件在立柱脚打同一配对编号，此后不得与别的件互换
+  kind: other
+- id: P20
+  name: 螺纹孔
+  spec: 电机座 4 × M5-6H ↧9（PCD 40）；面板口 4 × M4-6H、前窗口 6 × M4-6H、顶盖 4 × M4-6H
+  kind: other
+- id: P21
+  name: 轴过孔、面板口端面
+  spec: 轴过孔 Ø20 H11；面板口端面平面度 0.1，Ra 3.2
   kind: other
 tool_list:
 - id: T01
   name: 直角铣头
-  spec: 90° 直角铣头（同上件工序 50）
+  spec: 90° 直角铣头（HSK-A63，回转定位 ±0.005）：机座底下向上钻铰锥销孔（工序 70）；从上面钻攻顶盖螺孔（工序 80）
   ops:
-  - 20
+  - 70
+  - 80
 - id: T02
   name: 钻头 Ø8.5
-  spec: 整体硬质合金钻 Ø8.5（穿过下件顶板进上件凸台，扩通上件工艺孔下面那一段）
+  spec: 整体硬质合金钻 Ø8.5，加长（从机座底下穿过下件凸台，进上件工艺孔）
   ops:
-  - 20
+  - 70
 - id: T03
   name: 锥度铰刀 1:50
   spec: 1:50 锥度铰刀（粗、精两把），按 GB/T 117 锥销 10 × 40 的小端 Ø10 铰到锥销打入后露出 3–4 mm
   ops:
-  - 20
+  - 70
+- id: T04
+  name: 测头
+  spec: 主轴测头（单点重复性 1 μm），曲柄测针 Ø3 球、杆长 50；测针偏置每班在标准环上标定
+  ops:
+  - 70
+- id: T05
+  name: 面铣刀 Ø63
+  spec: Ø63 五刃可转位面铣刀（K20，修光刃），面板口端面、电机法兰端面
+  ops:
+  - 70
+- id: T06
+  name: 旋梭轴孔阶梯精镗杆
+  spec: Ø18 硬质合金杆 ＋ Ø12 颈部，半精镗刀 Ø13.7、微调精镗刀 Ø14（调整精度 0.002）
+  ops:
+  - 70
+- id: T07
+  name: 上轴同轴镗杆（半精、精）
+  spec: Ø28 减振杆，前刀 Ø34.7 / Ø35、后刀 Ø31.7 / Ø32 相距 344，尾部 Ø17 导向柱进右支架旋转导向套
+  ops:
+  - 70
+- id: T08
+  name: 下轴同轴镗杆（半精、精）
+  spec: Ø26 减振杆，两刀 Ø31.7 / Ø32 相距 276，尾部 Ø17 导向柱穿过左端壁 Ø20 孔进左支架旋转导向套
+  ops:
+  - 70
+- id: T09
+  name: 精镗刀 Ø20
+  spec: 微调精镗刀 Ø16–Ø22（轴过孔）
+  ops:
+  - 70
+- id: T10
+  name: 立铣刀 Ø20
+  spec: Ø20 四刃硬质合金立铣刀，圆弧插补精铣电机止口外圆
+  ops:
+  - 70
+- id: T11
+  name: 钻头 Ø4.2、丝锥 M5
+  spec: 硬质合金钻 Ø4.2；M5 丝锥（6H）
+  ops:
+  - 80
+- id: T12
+  name: 钻头 Ø3.3、丝锥 M4
+  spec: 硬质合金钻 Ø3.3；M4 丝锥（6H）
+  ops:
+  - 80
+- id: T13
+  name: 中心钻
+  spec: Ø6 90° 定心钻
+  ops:
+  - 80
 gauges:
 - id: G01
-  name: 三坐标测量机
+  name: 三坐标测量机（MPE_E = 1.8 + L/300 μm）
 - id: G02
-  name: 找正检棒 Ø12 h5 × 260（插进针杆两个孔，下端伸到针板座）
+  name: 气动量仪 + Ø35 H7、Ø32 H7、Ø14 H7 气动塞规
 - id: G03
-  name: 针板孔基准检具：装在针板座里，用针板的 4 个 M3 孔和两侧边定位，中间 Ø12 H6 衬套
+  name: 内径千分表 10–35 mm（0.001）
 - id: G04
-  name: 扭力扳手 20–100 N·m
+  name: Ø20 H11 塞规
 - id: G05
+  name: 外径千分尺 50–75 mm（0.001）
+- id: G06
+  name: 螺纹塞规 M5-6H、M4-6H
+- id: G07
+  name: 表面粗糙度仪
+- id: G09
+  name: 大理石平板 00 级 + 杠杆千分表（0.002）
+- id: G13
+  name: 液压涨紧测量塞规 Ø12 两个（零间隙，测量段 Ø12 h4 × 20，经检定）：工序 70 测针杆轴线用
+- id: G14
+  name: 合箱找正检棒 Ø12 h5 × 260（插进针杆两孔，下端伸到针板座）＋ 针板孔基准检具（装在针板座里，中间 Ø12 H6 衬套）
+- id: G15
+  name: 扭力扳手 20–100 N·m
+- id: G16
   name: 锥销接触检查（红丹）
+- id: G17
+  name: 0.02 塞尺
 operations:
-- seq: 10
+- seq: 60
   operation: 部件装配 Sub-assembly
   workstation: 装配工位 ASM-01
   shop: 装配
-  content: 下件以底面 A 和两个工艺孔装在找正台上；针板座里装针板孔基准检具。接合面清洁后放上上件，套上 4 个 M10 螺钉（不拧紧）。找正检棒从机头上面的针杆孔插入，用立柱脚两侧的顶丝微调上件，直到检棒下端顺利插进检具的 Ø12 H6 衬套；对角分两次拧紧 4 个 M10 到 45 N·m，再插一次检棒复查
+  content: 下件以底面 A 和两个工艺孔装在合箱台上，针板座里装针板孔基准检具；两接合面清洁后放上上件，套上 4 个 M10 螺钉（不拧紧）。找正检棒从机头上面的针杆孔插入，用立柱脚两侧的顶丝微调上件，直到检棒下端顺利插进检具的 Ø12 H6 衬套；对角分两次拧紧 4 个 M10 到 45 N·m，再插一次检棒复查。锥销孔在工序 70 钻铰（只能从机座底下往上钻，见细则 G5.2 偏差 2）
   datum: 下件底面 A、两工艺孔；上件针杆孔（找正）
-  clamping: 找正台 3 点压板压下件底边法兰
-  fixture: 找正台 FX-HSG-P-10 ＋ 针板孔基准检具
+  clamping: 合箱台 3 点压板压下件底边法兰
+  fixture: 合箱台 FX-HSG-P-60 ＋ 针板孔基准检具
   minutes: 14.0
   setup_min: 5
   steps:
   - step: 1
-    content: 清洁接合面，下件装上找正台，装针板孔基准检具
+    content: 清洁接合面，下件装上合箱台，装针板孔基准检具
     tool: ''
-    gauge: G03
+    gauge: G14
     tb_min: 0
     ta_min: 3.0
   - step: 2
     content: 放上上件，插找正检棒，微调到检棒插进衬套
     tool: ''
-    gauge: G02
+    gauge: G14
     tb_min: 0
     ta_min: 5.0
   - step: 3
-    content: 4 × M10 对角分两次拧到 45 N·m，复查检棒
+    content: 4 × M10 对角分两次拧到 45 N·m，复查检棒；0.02 塞尺查接合面
     tool: ''
-    gauge: G04
+    gauge: G15
     tb_min: 0
     ta_min: 2.5
   inspect:
-  - char: 找正检棒插进衬套（P1）
-    gauge: G02
+  - char: 找正检棒插进衬套（P17）
+    gauge: G14
     freq: 每件
-  - char: M10 拧紧力矩 45 N·m（P3）
-    gauge: G04
+  - char: M10 拧紧力矩、接合面贴合（P18）
+    gauge: G15
     freq: 每件
-- seq: 20
-  operation: 合箱钻铰销孔 Pin-hole reaming
+- seq: 70
+  operation: 镗轴承孔 Bearing-bore boring
   workstation: 卧式加工中心 HMC-01
   shop: 机加
-  content: 合好的部件立在夹具 FX-HSG-P-20 上（底面 A、两个工艺孔；夹具中间开窗）。直角铣头从机座里面向上：钻 Ø8.5 穿过下件顶板，扩通到上件工艺孔；锥度铰刀粗铰、精铰两个锥销孔；打入锥销；在立柱脚打配对编号
-  datum: 下件底面 A、两工艺孔
-  clamping: 液压 4 点压底边法兰
-  fixture: 专用夹具 FX-HSG-P-20（中间开窗，放直角铣头）
-  coolant: 干切
-  setup_min: 30
+  content: 合件以下件底面 A ＋ 两个工艺孔 Ø10 H7 定位（液压圆柱涨销 ＋ 削边涨销，零间隙），4 个液压回转压板压在机座顶面四角，正对支承钉。① 直角铣头在夹具框里、机座底下，向上钻、铰两个锥销孔，打锥销，打配对编号；② 针杆上、下孔各插一个液压涨紧测量塞规，测头在 B 0° 测两个塞规（下塞规在机座和机头之间的空当里，上塞规经面板口），算出针杆轴线，写进工件坐标系（旋梭轴孔、上轴两孔的
+    y 坐标取这条轴线外推到 z −21.5、z 200 处的值），取下塞规；③ B 0°：精铣面板口端面，阶梯镗杆半精镗、精镗旋梭轴孔 Ø14 H7，同轴镗杆（右支架导向套）半精镗、精镗上轴两孔；④ B 180°：镗轴过孔 Ø20、精铣电机法兰端面、圆弧插补精铣止口 Ø52 h7，同轴镗杆（左支架导向套）半精镗、精镗下轴两孔。精镗前夹紧力降到 40%
+  datum: 下件底面 A、两工艺孔（一面两销）
+  clamping: 4 个液压回转压板压在机座顶面四角，正对 4 个支承钉；精镗时油压降到 40%
+  fixture: 专用夹具 FX-HSG-P-70（框架式，带左、右两个可翻导向套支架）
+  coolant: 干切；精镗用油雾；铰锥销孔用切削油
+  setup_min: 50
+  fixture_id: FX-HSG-P-70
+  locate:
+  - surface: 下件底面 A
+    symbol: plane
+    dof: 3
+  - surface: 工艺孔 1（圆柱涨销）
+    symbol: pin
+    dof: 2
+  - surface: 工艺孔 2（削边涨销）
+    symbol: pin_diamond
+    dof: 1
+  clamp:
+  - surface: 机座顶面四角（液压回转压板）
+    kind: hydraulic
   steps:
   - step: 1
-    content: 直角铣头：钻 2 × Ø8.5 穿过下件顶板（约 9.6 mm），与上件工艺孔对通
+    content: 直角铣头（机座底下，向上）：钻 2 × Ø8.5 穿过下件销孔凸台（16），与上件工艺孔 Ø9 对通
     tool: T02
     vc: 60
     f: 0.15
     ap: null
     passes: 1
-    tb_min: 0.16
+    tb_min: 0.19
     ta_min: 0.3
   - step: 2
     content: 粗铰、精铰 1:50 锥销孔（两孔）
     tool: T03
-    gauge: G05
+    gauge: G16
     vc: 8
     f: 0.15
     ap: null
@@ -186,28 +402,314 @@ operations:
   - step: 3
     content: 打入锥销 10 × 40，检查露出 3–4 mm；打配对编号
     tool: ''
-    gauge: G05
+    gauge: G16
     vc: null
     f: null
     ap: null
     passes: 1
     tb_min: 0.0
     ta_min: 1.5
-  inspect:
-  - char: 锥销孔接触 ≥ 75%（红丹）
+  - step: 4
+    content: 插两个测量塞规（上塞规经面板口放进上导套孔）；测头 B 0° 测下塞规（z 30）、上塞规（z 190）各 3 点，算针杆轴线，写入工件坐标系；取下塞规
+    tool: T04
+    gauge: G13
+    vc: null
+    f: null
+    ap: null
+    passes: 1
+    tb_min: 0.6
+    ta_min: 3.0
+  - step: 5
+    content: B 0°（机头端）：精铣面板口端面（0.5），平面度 0.1
+    tool: T05
+    gauge: G09
+    vc: 200
+    f: 0.4
+    ap: 0.5
+    passes: 1
+    tb_min: 1.39
+    ta_min: 0.3
+  - step: 6
+    content: B 0°：阶梯镗杆从左端壁 Ø20 孔伸进去，半精镗旋梭轴孔 Ø13.0 → Ø13.7（+0.027/0）
+    tool: T06
+    gauge: G03
+    vc: 120
+    f: 0.1
+    ap: 0.35
+    passes: 1
+    tb_min: 0.16
+    ta_min: 0.3
+  - step: 7
+    content: B 0°：精镗旋梭轴孔 Ø14 H7，Ra 1.6（测孔径后微调到中差）
+    tool: T06
+    gauge: G02
+    vc: 140
+    f: 0.05
+    ap: 0.15
+    passes: 1
+    tb_min: 0.28
+    ta_min: 0.8
+  - step: 8
+    content: B 0°：翻上右导向套支架，压板油压降到 40%；同轴镗杆两孔一刀半精镗 Ø34.7、Ø31.7（+0.039/0）
+    tool: T07
+    gauge: G03
+    vc: 140
+    f: 0.12
+    ap: 0.35
+    passes: 1
+    tb_min: 0.16
+    ta_min: 1.0
+  - step: 9
+    content: B 0°：同轴精镗杆两孔一刀精镗 Ø35 H7、Ø32 H7，Ra 1.6（进、退刀时主轴定向、刀尖朝上，抬高 1 mm）；支架翻下，油压恢复
+    tool: T07
+    gauge: G02
+    vc: 150
+    f: 0.06
+    ap: 0.15
+    passes: 1
+    tb_min: 0.31
+    ta_min: 1.0
+  - step: 10
+    content: B 180°（电机端）：镗轴过孔 Ø18 → Ø20 H11
+    tool: T09
+    gauge: G04
+    vc: 120
+    f: 0.12
+    ap: 1.0
+    passes: 1
+    tb_min: 0.19
+    ta_min: 0.3
+  - step: 11
+    content: B 180°：精铣电机法兰端面（0.5），对 B 垂直度 0.02
+    tool: T05
+    gauge: G09
+    vc: 200
+    f: 0.4
+    ap: 0.5
+    passes: 1
+    tb_min: 0.61
+    ta_min: 0.3
+  - step: 12
+    content: B 180°：圆弧插补精铣止口 Ø52 h7（0/−0.030），Ra 1.6
+    tool: T10
     gauge: G05
+    vc: 180
+    f: 0.2
+    ap: 0.5
+    passes: 1
+    tb_min: 0.57
+    ta_min: 0.3
+  - step: 13
+    content: B 180°：翻上左导向套支架，油压降到 40%；下轴镗杆从右端壁 Ø34 孔伸进去，两孔一刀半精镗 Ø31.0 → Ø31.7（+0.039/0）
+    tool: T08
+    gauge: G03
+    vc: 140
+    f: 0.12
+    ap: 0.35
+    passes: 1
+    tb_min: 0.11
+    ta_min: 1.0
+  - step: 14
+    content: B 180°：精镗下轴两孔 Ø32 H7，Ra 1.6，位置取旋梭轴孔（测出的针杆轴线）＋ 中心距 31.058；支架翻下，油压恢复
+    tool: T08
+    gauge: G02
+    vc: 150
+    f: 0.06
+    ap: 0.15
+    passes: 1
+    tb_min: 0.21
+    ta_min: 1.0
+  accuracy:
+  - char: P1
+    T: 0.05
+    items:
+    - name: 两个涨紧塞规在针杆孔里的定心（液压涨紧，零间隙）各 ±0.002，外推到 z −21.5（放大 1.36）
+      range: 0.0054
+      kind: rand
+    - name: 测头：每个塞规 3 点定圆心 ±0.0015（单点重复性 1 μm，含测针偏置标定），外推后
+      range: 0.0041
+      kind: rand
+    - name: 镗旋梭轴孔时 X 轴定位重复性 ±0.002
+      range: 0.004
+      kind: rand
+    - name: 阶梯镗杆（Ø18 杆、Ø12 颈，伸出 175）：切削力随刀转动，主要让孔变小（按实测孔径补偿），轴线偏移按 ±0.002
+      range: 0.004
+      kind: rand
+    - name: 热漂移（测量到镗完约 10 min）
+      range: 0.004
+      kind: sys
+    - name: 夹紧变形：压板压在支承正上方，只有局部压缩
+      range: 0.002
+      kind: sys
+  - char: P2
+    T: 0.05
+    items:
+    - name: 两个塞规定心各 ±0.002，外推到 z 200（放大 1.06）
+      range: 0.0043
+      kind: rand
+    - name: 测头定圆心 ±0.0015，外推后
+      range: 0.0032
+      kind: rand
+    - name: 同轴镗杆定位：X 轴重复性 ±0.002、导向套对主轴 0.002
+      range: 0.0057
+      kind: rand
+    - name: 热漂移
+      range: 0.004
+      kind: sys
+  - char: P5
+    T: 0.02
+    items:
+    - name: 旋转导向套（预紧轴承，零间隙）轴线对主轴轴线：夹具装上后在机用检棒调到 0.002
+      range: 0.004
+      kind: sys
+    - name: 旋转导向套径向跳动 0.002
+      range: 0.004
+      kind: rand
+    - name: 主轴径向跳动（精镗区 0.002）
+      range: 0.004
+      kind: rand
+    - name: 镗杆弯曲（两端支承；尾部导向柱 Ø17，按 0.0015 计）
+      range: 0.003
+      kind: sys
+    - name: 精镗前夹紧力降到 40%，夹紧变形残余（估 0.001）
+      range: 0.002
+      kind: sys
+  - char: P8
+    T: 0.02
+    items:
+    - name: 旋转导向套轴线对主轴轴线：在机用检棒调到 0.002
+      range: 0.004
+      kind: sys
+    - name: 旋转导向套径向跳动 0.002
+      range: 0.004
+      kind: rand
+    - name: 主轴径向跳动 0.002
+      range: 0.004
+      kind: rand
+    - name: 镗杆弯曲（杆身 Ø26，两刀相距 276，按 0.001 计）
+      range: 0.002
+      kind: sys
+    - name: 夹紧变形残余（估 0.001）
+      range: 0.002
+      kind: sys
+  - char: P11
+    T: 0.03
+    items:
+    - name: 转台分度 180° ±3″：下轴孔离转台中心最远 218（x 371）
+      range: 0.0063
+      kind: rand
+    - name: X、Y 轴定位精度 ±0.004（两个孔各一次，投影到中心连线上）
+      range: 0.0113
+      kind: rand
+    - name: 两次对刀（镗杆偏心标定）±0.002
+      range: 0.0057
+      kind: rand
+    - name: 热漂移
+      range: 0.004
+      kind: sys
+  - char: P6
+    T: 0.1
+    items:
+    - name: 夹具支承钉顶面对托盘的高度，标定后 0.005
+      range: 0.005
+      kind: sys
+    - name: Y 轴定位精度 ±0.004
+      range: 0.008
+      kind: rand
+    - name: 底面 A 平面度 0.05 与支承钉贴合（4 点，取 0.02）
+      range: 0.02
+      kind: rand
+    - name: 热漂移 Y 向
+      range: 0.006
+      kind: sys
+  - char: P13
+    T: 0.03
+    items:
+    - name: 上轴两孔在 B 0° 镗、下轴两孔在 B 180° 镗：分度 ±3″ 在 300 长度上
+      range: 0.0087
+      kind: rand
+    - name: 两根镗杆各自的导向套对主轴 0.002
+      range: 0.0057
+      kind: rand
+    - name: 两根镗杆弯曲之差
+      range: 0.002
+      kind: sys
+  inspect:
+  - char: 前、后轴承孔 Ø35 H7、Ø32 H7（P3、P4）
+    gauge: G02
+    freq: 每件
+  - char: 下轴两孔 Ø32 H7（P7）
+    gauge: G02
+    freq: 每件
+  - char: 旋梭轴孔 Ø14 H7（P9）
+    gauge: G02
+    freq: 每件
+  - char: 止口 Ø52 h7（P14）
+    gauge: G05
+    freq: 每件
+  - char: 锥销孔接触 ≥ 75%（P18）
+    gauge: G16
     freq: 首件、每 10 件
-  minutes: 9.0
-- seq: 30
+  - char: 针杆轴线测量值（在机，留记录）；两孔同轴度、中心距（在机测头抽检）
+    gauge: G01
+    freq: 首件、每 10 件
+  minutes: 25.5
+- seq: 80
+  operation: 钻攻螺纹孔 Drilling & tapping
+  workstation: 卧式加工中心 HMC-01
+  shop: 机加
+  content: 同工序 70 的夹具。B 180° 钻攻电机座 4 × M5（PCD 40）；B 0° 钻攻面板口 4 × M4；B 270° 钻攻前窗口 6 × M4；直角铣头从上面钻攻顶盖 4 × M4
+  datum: 下件底面 A、两工艺孔（一面两销）
+  clamping: 同工序 70
+  fixture: 专用夹具 FX-HSG-P-70
+  coolant: 攻丝用切削油
+  setup_min: 10
+  fixture_id: FX-HSG-P-70
+  steps:
+  - step: 1
+    content: 定心全部 18 个孔
+    tool: T13
+    vc: 60
+    f: 0.08
+    ap: null
+    passes: 1
+    tb_min: 0.37
+    ta_min: 0.3
+  - step: 2
+    content: 钻 4 × Ø4.2 深 14、攻 M5-6H 深 10
+    tool: T11
+    gauge: G06
+    vc: 60
+    f: 0.1
+    ap: null
+    passes: 1
+    tb_min: 0.38
+    ta_min: 0.3
+  - step: 3
+    content: 钻 14 × Ø3.3 深 12、攻 M4-6H 深 8
+    tool: T12
+    gauge: G06
+    vc: 60
+    f: 0.08
+    ap: null
+    passes: 1
+    tb_min: 1.04
+    ta_min: 0.3
+  inspect:
+  - char: M5-6H、M4-6H（P20）
+    gauge: G06
+    freq: 每件
+  minutes: 5.0
+- seq: 90
   operation: 零件检验 Part inspection
   workstation: 检验站 QC-01
   shop: 检验
   final_inspection: true
-  content: 部件三坐标检测：以下件 A 与工艺孔建坐标系，测针杆孔轴线、上轴 B 对针板座的位置；检查配对编号
-  datum: 下件底面 A、两工艺孔
-  clamping: 三坐标测量夹具
-  minutes: 12
-  setup_min: 5
+  content: 清洗后在恒温室（20 ± 1 ℃，工件等温 4 h）三坐标全检：按《机壳三坐标检测计划》以下件 A 与两工艺孔建坐标系，测针杆孔、旋梭轴孔、上轴两孔、下轴两孔的位置与相互关系（P1–P16）；检查配对编号
+  datum: 下件底面 A、两工艺孔（与精加工同一基准）
+  clamping: 三坐标测量夹具（一面两销）
+  minutes: 30
+  setup_min: 10
   steps: []
   inspect:
   - char: P1
@@ -217,15 +719,133 @@ operations:
     gauge: G01
     freq: 每件
   - char: P3
-    gauge: G04
+    gauge: G01
     freq: 每件
   - char: P4
-    gauge: G05
+    gauge: G01
     freq: 每件
   - char: P5
     gauge: G01
     freq: 每件
-hole_sizes: {}
+  - char: P6
+    gauge: G01
+    freq: 每件
+  - char: P7
+    gauge: G01
+    freq: 每件
+  - char: P8
+    gauge: G01
+    freq: 每件
+  - char: P9
+    gauge: G01
+    freq: 每件
+  - char: P10
+    gauge: G01
+    freq: 每 5 件
+  - char: P11
+    gauge: G01
+    freq: 每件
+  - char: P12
+    gauge: G01
+    freq: 每 5 件
+  - char: P13
+    gauge: G01
+    freq: 每 5 件
+  - char: P14
+    gauge: G01
+    freq: 每件
+  - char: P15
+    gauge: G01
+    freq: 每 5 件
+  - char: P16
+    gauge: G01
+    freq: 每 5 件
+  - char: P17
+    gauge: G01
+    freq: 每 5 件
+  - char: P18
+    gauge: G16
+    freq: 每件
+  - char: P19
+    gauge: G01
+    freq: 每 5 件
+  - char: P20
+    gauge: G06
+    freq: 每 5 件
+  - char: P21
+    gauge: G01
+    freq: 每 5 件
+hole_sizes:
+  前轴承孔:
+  - op: 20
+    d: 34.0
+    es: 0.1
+    ei: 0.0
+  - op: 70
+    d: 34.7
+    es: 0.039
+    ei: 0.0
+  - op: 70
+    d: 35.0
+    es: 0.025
+    ei: 0.0
+  后轴承孔:
+  - op: 20
+    d: 31.0
+    es: 0.1
+    ei: 0.0
+  - op: 70
+    d: 31.7
+    es: 0.039
+    ei: 0.0
+  - op: 70
+    d: 32.0
+    es: 0.025
+    ei: 0.0
+  下轴孔:
+  - op: 30
+    d: 31.0
+    es: 0.1
+    ei: 0.0
+  - op: 70
+    d: 31.7
+    es: 0.039
+    ei: 0.0
+  - op: 70
+    d: 32.0
+    es: 0.025
+    ei: 0.0
+  旋梭轴孔:
+  - op: 30
+    d: 13.0
+    es: 0.1
+    ei: 0.0
+  - op: 70
+    d: 13.7
+    es: 0.027
+    ei: 0.0
+  - op: 70
+    d: 14.0
+    es: 0.018
+    ei: 0.0
+  电机止口（外圆）:
+  - op: 20
+    d: 53.0
+    es: 0.0
+    ei: -0.1
+  - op: 70
+    d: 52.0
+    es: 0.0
+    ei: -0.03
+  轴过孔:
+  - op: 20
+    d: 18.0
+    es: 0.2
+    ei: 0.0
+  - op: 70
+    d: 20.0
+    es: 0.13
+    ei: 0.0
 attachments:
 - kind: calc
   name: 机壳机械加工工艺计算（tools/wqls/g5_process.py，切削用量、机动时间、余量、功率）

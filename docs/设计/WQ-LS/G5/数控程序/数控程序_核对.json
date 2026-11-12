@@ -1,22 +1,24 @@
 {
  "O1201": {
-  "title": "上件 工序 10 粗、半精铣接合面、钻工艺孔、攻 M10",
+  "title": "上件 工序 10 粗、半精铣接合面、钻铰工艺孔、攻 M10",
   "machine": "VMC-01",
-  "lines": 110,
+  "lines": 138,
   "tools": [
    1,
    8,
+   9,
    12,
-   17
+   17,
+   19
   ],
   "b_indexes": 0,
-  "time_min": 3.18,
-  "cut_min": 2.82,
+  "time_min": 3.95,
+  "cut_min": 3.43,
   "checks": [],
   "sim": [
    {
     "frame": "C_UP",
-    "steps": 5,
+    "steps": 7,
     "issues": [],
     "over_cells": 0,
     "dev_min": 0.0,
@@ -27,17 +29,18 @@
  "O1202": {
   "title": "上件 工序 20 卧加粗加工",
   "machine": "HMC-01",
-  "lines": 270,
+  "lines": 286,
   "tools": [
    2,
    3,
    5,
    7,
-   14
+   14,
+   18
   ],
   "b_indexes": 2,
-  "time_min": 3.76,
-  "cut_min": 2.97,
+  "time_min": 4.09,
+  "cut_min": 3.21,
   "checks": [],
   "sim": [
    {
@@ -58,7 +61,7 @@
    },
    {
     "frame": "DOWN_HEAD",
-    "steps": 1,
+    "steps": 2,
     "issues": [],
     "over_cells": 0,
     "dev_min": 0.0,
@@ -66,18 +69,18 @@
    }
   ]
  },
- "O1204": {
-  "title": "上件 工序 40 精铣接合面、铰工艺孔",
+ "O1205": {
+  "title": "上件 工序 50 精铣接合面、扩铰针杆孔",
   "machine": "VMC-01",
-  "lines": 66,
+  "lines": 64,
   "tools": [
    1,
-   8,
-   9
+   7,
+   20
   ],
   "b_indexes": 0,
-  "time_min": 2.84,
-  "cut_min": 2.59,
+  "time_min": 7.62,
+  "cut_min": 7.37,
   "checks": [],
   "sim": [
    {
@@ -87,60 +90,6 @@
     "over_cells": 0,
     "dev_min": -0.0,
     "ap_max": 3.0
-   }
-  ]
- },
- "O1205": {
-  "title": "上件 工序 50、60 卧加精加工、钻攻",
-  "machine": "HMC-01",
-  "lines": 313,
-  "tools": [
-   2,
-   4,
-   5,
-   7,
-   10,
-   11,
-   13,
-   15,
-   16
-  ],
-  "b_indexes": 5,
-  "time_min": 9.77,
-  "cut_min": 8.29,
-  "checks": [],
-  "sim": [
-   {
-    "frame": "B0",
-    "steps": 3,
-    "issues": [],
-    "over_cells": 0,
-    "dev_min": 0.0,
-    "ap_max": 3.0
-   },
-   {
-    "frame": "B180",
-    "steps": 5,
-    "issues": [],
-    "over_cells": 0,
-    "dev_min": 0.0,
-    "ap_max": 8.0
-   },
-   {
-    "frame": "B270",
-    "steps": 2,
-    "issues": [],
-    "over_cells": 0,
-    "dev_min": 0.0,
-    "ap_max": 0.5
-   },
-   {
-    "frame": "DOWN_HEAD",
-    "steps": 1,
-    "issues": [],
-    "over_cells": 0,
-    "dev_min": 0.0,
-    "ap_max": 0.5
    }
   ]
  },
@@ -168,20 +117,21 @@
   ]
  },
  "O1302": {
-  "title": "下件 工序 20 粗铣顶面",
+  "title": "下件 工序 20 粗铣顶面、过孔",
   "machine": "VMC-01",
-  "lines": 47,
+  "lines": 63,
   "tools": [
-   1
+   1,
+   4
   ],
   "b_indexes": 0,
-  "time_min": 4.31,
-  "cut_min": 4.18,
+  "time_min": 4.73,
+  "cut_min": 4.5,
   "checks": [],
   "sim": [
    {
     "frame": "TOP",
-    "steps": 1,
+    "steps": 2,
     "issues": [],
     "over_cells": 0,
     "dev_min": 0.0,
@@ -189,29 +139,131 @@
    }
   ]
  },
- "O1304": {
-  "title": "下件 工序 40、50 精铣顶面、针板座、过孔、M3",
+ "O1303": {
+  "title": "下件 工序 30 卧加粗镗（左端壁过孔、旋梭轴孔、下轴两孔）",
+  "machine": "HMC-01",
+  "lines": 517,
+  "tools": [
+   2,
+   9,
+   10
+  ],
+  "b_indexes": 1,
+  "time_min": 1.12,
+  "cut_min": 0.72,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "LB0",
+    "steps": 2,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 2.5
+   }
+  ]
+ },
+ "O1305": {
+  "title": "下件 工序 50 精铣底面、顶面、针板座、M3",
   "machine": "VMC-01",
-  "lines": 158,
+  "lines": 164,
   "tools": [
    1,
    2,
-   4,
    6,
    18
   ],
   "b_indexes": 0,
-  "time_min": 7.5,
-  "cut_min": 7.01,
+  "time_min": 11.67,
+  "cut_min": 11.27,
   "checks": [],
   "sim": [
    {
+    "frame": "A_UP",
+    "steps": 1,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 3.0
+   },
+   {
     "frame": "TOP",
-    "steps": 6,
+    "steps": 5,
     "issues": [],
     "over_cells": 0,
     "dev_min": -0.0,
     "ap_max": 4.0
+   }
+  ]
+ },
+ "O1401": {
+  "title": "合件 工序 70、80 锥销、测针杆轴线、精加工、钻攻",
+  "machine": "HMC-01",
+  "lines": 494,
+  "tools": [
+   2,
+   4,
+   5,
+   10,
+   11,
+   13,
+   15,
+   16,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   30,
+   31,
+   32
+  ],
+  "b_indexes": 4,
+  "time_min": 12.26,
+  "cut_min": 9.78,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "B0",
+    "steps": 3,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 3.0
+   },
+   {
+    "frame": "B180",
+    "steps": 5,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 8.0
+   },
+   {
+    "frame": "B270",
+    "steps": 2,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   },
+   {
+    "frame": "TOPARM",
+    "steps": 2,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   },
+   {
+    "frame": "UNDER",
+    "steps": 2,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
    }
   ]
  },

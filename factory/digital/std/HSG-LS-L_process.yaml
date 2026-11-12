@@ -1,4 +1,4 @@
-# 第 138 轮 G5.1：WQ-LS 机壳机械加工工艺规程（由 tools/wqls/g5_process.py 生成，不要手改）
+# 第 138 轮 G5.1、G5.2：WQ-LS 机壳机械加工工艺规程（由 tools/wqls/g5_process.py 生成，不要手改）
 version: 2
 item: HSG-LS-L
 material: HT250
@@ -30,11 +30,11 @@ doc:
   changes: []
 part:
   kind: housing
-  mass_kg: 8.38
-  source: tools/wqls/cad/housing.py（G4.4）
+  mass_kg: 8.65
+  source: tools/wqls/cad/housing.py（G5.2）
 blank:
   kind: 铸件
-  spec: HT250 砂型铸件 11.28 kg
+  spec: HT250 砂型铸件 11.57 kg
   length_mm: ''
   material_item: CS-HSG-LS-L
   drawing: docs/设计/WQ-LS/G5/机壳铸造工艺.md
@@ -82,11 +82,12 @@ characteristics:
   kind: dim
 - id: C6
   name: 工艺孔（底边法兰）
-  spec: 2 × Ø10 H7（+0.015/0）：加工、检测、装配找正共用的基准
+  spec: 2 × Ø10 H7（+0.015/0），中心距 507.9 ± 0.02：合件精加工（工序 70）和检测的基准
   nominal: 10
   es: 0.015
   ei: 0.0
   kind: dim
+  key: true
 - id: C7
   name: 螺钉过孔与锪平
   spec: 4 × Ø11，背面锪平 Ø18 深 1.5
@@ -96,8 +97,12 @@ characteristics:
   spec: 4 × M3-6H（针板）；2 × Ø8.2 H11 铰链销孔
   kind: other
 - id: C9
+  name: 孔系（粗镗）
+  spec: 下轴两孔 Ø31.0、旋梭轴孔 Ø13.0（+0.1/0）；左端壁 2 × Ø20 过孔；合箱后在合件工序 70 精镗
+  kind: other
+- id: C10
   name: 铸件质量
-  spec: HT250：硬度 190–240 HBW；首件 X 光检查立柱脚 4 个凸台无缩松
+  spec: HT250：硬度 190–240 HBW；首件 X 光检查立柱脚凸台、轴承座、旋梭轴座无缩松
   kind: other
 tool_list:
 - id: T01
@@ -106,34 +111,35 @@ tool_list:
   ops:
   - 10
   - 20
-  - 40
+  - 50
 - id: T02
   name: 立铣刀 Ø16
-  spec: Ø16 四刃硬质合金立铣刀，铣针板座、滑板座
+  spec: Ø16 四刃硬质合金立铣刀：针板座、滑板座（工序 50）；左端壁两个 Ø20 孔螺旋插补（工序 30）
   ops:
-  - 40
+  - 30
+  - 50
 - id: T03
-  name: 钻头 Ø9.5 / 铰刀 Ø10 H7
-  spec: 整体硬质合金钻 Ø9.5；铰刀 Ø10 H7（底边法兰上的两个工艺孔）
+  name: 钻头 Ø9.5 / 扩孔钻 Ø9.85 / 铰刀 Ø10 H7
+  spec: 整体硬质合金钻 Ø9.5、扩孔钻 Ø9.85、铰刀 Ø10 H7（底边法兰上的两个工艺孔）
   ops:
   - 10
 - id: T04
   name: 钻头 Ø11
   spec: 硬质合金钻 Ø11（M10 螺钉过孔）
   ops:
-  - 40
+  - 20
 - id: T05
   name: 反锪刀 Ø18
   spec: 反向锪平刀 Ø18（从上面穿过 Ø11 孔，在凸台下端锪平面）
   ops:
-  - 40
+  - 20
 - id: T06
   name: 钻头 Ø2.5、丝锥 M3
   spec: 硬质合金钻 Ø2.5；M3 丝锥（6H），针板螺孔
   ops:
   - 50
 - id: T07
-  name: 钻头 Ø8.2
+  name: 钻头 Ø8.0 / 铰刀 Ø8.2
   spec: 硬质合金钻 Ø8.0 ＋ 铰刀 Ø8.2 H11（铰链销孔）
   ops:
   - 50
@@ -142,17 +148,27 @@ tool_list:
   spec: Ø6 90° 定心钻
   ops:
   - 10
-  - 40
+  - 20
   - 50
+- id: T09
+  name: 下轴粗镗杆
+  spec: Ø26 钢制减振杆，两个 Ø31 双刃刀夹相距 276，尾部 Ø17 导向柱（与合件工序 70 的下轴镗杆同一结构）
+  ops:
+  - 30
+- id: T10
+  name: 旋梭轴孔阶梯粗镗杆
+  spec: Ø18 硬质合金杆 ＋ Ø12 颈部（长 46），单刃粗镗刀 Ø13
+  ops:
+  - 30
 gauges:
 - id: G01
   name: 三坐标测量机（MPE_E = 1.8 + L/300 μm）
+- id: G03
+  name: 内径千分表 10–35 mm（0.001）
 - id: G04
   name: Ø10 H7 塞规（通端 / 止端）
 - id: G06
   name: 螺纹塞规 M3-6H
-- id: G07
-  name: 表面粗糙度仪
 - id: G08
   name: 游标卡尺 0–600 mm（0.02）
 - id: G09
@@ -166,7 +182,7 @@ operations:
   operation: 铣结合面 Face milling
   workstation: 立式加工中心 VMC-01
   shop: 机加
-  content: 工件倒放（顶面朝下）。粗基准：机座顶面铸面三点＋前侧面两点＋左端面一点。粗、半精铣底面 A（余量 3 → 0.3）；在底边法兰上钻铰两个工艺孔 Ø10 H7（对角）
+  content: 工件倒放（顶面朝下）。粗基准：机座顶面铸面三点＋前侧面两点＋左端面一点。粗、半精铣底面 A（余量 3 → 0.3）；在底边法兰上钻、扩、铰两个工艺孔 Ø10 H7（对角）——它们和 A 面是以后各道（直到合件精加工）的统一基准
   datum: 机座顶面铸面、前侧面、左端面（粗基准）
   clamping: 手动压板 4 点压在底边法兰上
   fixture: 专用夹具 FX-HSG-L-10
@@ -207,28 +223,31 @@ operations:
     tb_min: 2.95
     ta_min: 0.3
   - step: 3
-    content: 钻、扩、铰两个工艺孔 Ø10 H7（底边法兰对角）
+    content: 定心、钻、扩、铰两个工艺孔 Ø10 H7（底边法兰对角，中心距 507.9 ± 0.02）
     tool: T03
     gauge: G04
     vc: 70
     f: 0.2
     ap: null
     passes: 1
-    tb_min: 0.25
+    tb_min: 0.32
     ta_min: 0.3
   inspect:
   - char: 底面 A 平面度 0.05
     gauge: G09
     freq: 首件、每 10 件
+  - char: 工艺孔 Ø10 H7（C6）
+    gauge: G04
+    freq: 每件
   minutes: 9.0
 - seq: 20
   operation: 铣结合面 Face milling
   workstation: 立式加工中心 VMC-01
   shop: 机加
-  content: 一面两销（底面 A ＋ 两工艺孔）。粗铣机座顶面（余量 4 → 0.5），粗铣针板座、滑板座（留 0.3）
+  content: 一面两销（底面 A ＋ 两工艺孔）。粗铣机座顶面（余量 4 → 0.5）；钻 4 × Ø11 螺钉过孔，反锪 Ø18
   datum: 底面 A、两工艺孔（精基准）
   clamping: 液压 4 点
-  fixture: 专用夹具 FX-HSG-L-20（一面两销，与工序 40 共用）
+  fixture: 专用夹具 FX-HSG-L-20（一面两销，与工序 50 共用）
   coolant: 干切
   setup_min: 30
   fixture_id: FX-HSG-L-20
@@ -243,16 +262,87 @@ operations:
     passes: 1
     tb_min: 4.1
     ta_min: 0.3
+  - step: 2
+    content: 定心、钻 4 × Ø11 通孔，反锪 Ø18 深 1.5
+    tool: T04
+    gauge: G08
+    vc: 70
+    f: 0.2
+    ap: null
+    passes: 1
+    tb_min: 1.55
+    ta_min: 0.3
   inspect:
   - char: 顶面到 A 62.5 ± 0.1
     gauge: G08
     freq: 首件、每 10 件
-  minutes: 7.0
+  minutes: 9.0
 - seq: 30
+  operation: 镗轴承孔 Bearing-bore boring
+  workstation: 卧式加工中心 HMC-01
+  shop: 机加
+  content: 下件单独装在合件夹具 FX-HSG-P-70 上（底面 A ＋ 两工艺孔，与合件精加工同一基准）。B 0°：螺旋插补铣出左端壁两个 Ø20 过孔（旋梭轴孔、下轴的镗杆导向柱从这里过；铸件上是实心的）；阶梯镗杆粗镗旋梭轴孔 Ø9（铸出）→ Ø13.0。B 180°：下轴粗镗杆从右端壁 Ø34 孔伸进去，经两道横筋的 Ø34 孔，尾部导向柱穿过左端壁 Ø20 孔进左支架的导向套，两孔一刀粗镗
+    Ø27 → Ø31.0。单边留 0.5
+  datum: 底面 A、两工艺孔（一面两销）
+  clamping: 4 个液压回转压板压在机座顶面四角（正对支承钉）
+  fixture: 专用夹具 FX-HSG-P-70（合件精加工夹具，这里只装下件）
+  coolant: 干切
+  setup_min: 30
+  fixture_id: FX-HSG-P-70
+  locate:
+  - surface: 底面 A
+    symbol: plane
+    dof: 3
+  - surface: 工艺孔 1（圆柱涨销）
+    symbol: pin
+    dof: 2
+  - surface: 工艺孔 2（削边涨销）
+    symbol: pin_diamond
+    dof: 1
+  clamp:
+  - surface: 机座顶面四角（液压回转压板）
+    kind: hydraulic
+  steps:
+  - step: 1
+    content: B 0°：螺旋插补铣左端壁 2 × Ø20 过孔（壁厚约 6）
+    tool: T02
+    gauge: G08
+    vc: 150
+    f: 0.2
+    ap: null
+    passes: 1
+    tb_min: 1.2
+    ta_min: 0.3
+  - step: 2
+    content: B 0°：阶梯粗镗杆粗镗旋梭轴孔 Ø9 → Ø13.0（+0.1/0），长 42
+    tool: T10
+    gauge: G03
+    vc: 100
+    f: 0.12
+    ap: 2.0
+    passes: 1
+    tb_min: 0.15
+    ta_min: 0.3
+  - step: 3
+    content: B 180°：翻上左支架；下轴粗镗杆两孔一刀粗镗 Ø27 → Ø31.0（+0.1/0）（进刀时主轴定向、刀尖朝上，抬高 1 mm 穿过右端壁和横筋孔）
+    tool: T09
+    gauge: G03
+    vc: 110
+    f: 0.25
+    ap: 2.0
+    passes: 1
+    tb_min: 0.07
+    ta_min: 1.0
+  inspect:
+  - char: 下轴两孔 Ø31.0、旋梭轴孔 Ø13.0（C9）
+    gauge: G03
+    freq: 首件、每 5 件
+  minutes: 5.5
+- seq: 40
   operation: 时效 Stress relieving
   workstation: 热处理炉 HT-01
   shop: 热处理
-  content: 第二次去应力退火（规范同上件工序 30）
+  content: 第二次去应力退火（与上件同炉，规范同上件工序 40）
   datum: —
   clamping: 料架平放，底面朝下
   minutes: 6
@@ -262,15 +352,15 @@ operations:
   - char: 炉温曲线记录
     gauge: 炉温记录仪
     freq: 每炉
-- seq: 40
+- seq: 50
   operation: 铣结合面 Face milling
   workstation: 立式加工中心 VMC-01
   shop: 机加
-  content: 一面两销（底面 A ＋ 两工艺孔）。精铣底面 A 前先翻面精铣 A（以顶面粗铣面定位，0.3），再回到一面两销：精铣机座顶面保证高度 62 ± 0.05、平面度 0.02、对 A 平行度 0.03；精铣针板座、滑板座；钻 4 × Ø11 过孔，反锪 Ø18。立柱脚的两个锥销孔不在这里加工，装配找正后与上件配铰
+  content: 先翻面：以顶面粗铣面定位精铣底面 A（0.3），平面度 0.05；再回到一面两销（A ＋ 两工艺孔）：精铣机座顶面保证高度 62 ± 0.05、平面度 0.02、对 A 平行度 0.03；精铣针板座、滑板座；钻攻针板 4 × M3；夹具侧转 90°（附加角度板）钻铰两个铰链销孔 Ø8.2 H11
   datum: 底面 A、两工艺孔
   clamping: 液压 4 点
   fixture: 专用夹具 FX-HSG-L-20
-  coolant: 干切
+  coolant: 干切；攻丝用切削油
   setup_min: 40
   fixture_id: FX-HSG-L-20
   steps:
@@ -305,38 +395,6 @@ operations:
     tb_min: 4.0
     ta_min: 0.3
   - step: 4
-    content: 钻 4 × Ø11 通孔，反锪 Ø18 深 1.5
-    tool: T04
-    gauge: G08
-    vc: 70
-    f: 0.2
-    ap: null
-    passes: 1
-    tb_min: 1.55
-    ta_min: 0.3
-  inspect:
-  - char: 机座高度 62 ± 0.05
-    gauge: G01
-    freq: 首件、每 5 件
-  - char: 顶面平面度 0.02、对 A 平行度 0.03
-    gauge: G09
-    freq: 每件
-  - char: 针板座深 2.5 ± 0.03
-    gauge: G12
-    freq: 每件
-  minutes: 20.0
-- seq: 50
-  operation: 钻攻螺纹孔 Drilling & tapping
-  workstation: 立式加工中心 VMC-01
-  shop: 机加
-  content: 同工序 40 夹具：钻攻针板 4 × M3；夹具侧转 90°（附加角度板）钻铰两个铰链销孔 Ø8.2 H11
-  datum: 底面 A、两工艺孔
-  clamping: 同工序 40
-  fixture: 专用夹具 FX-HSG-L-20
-  coolant: 攻丝用切削油
-  setup_min: 15
-  steps:
-  - step: 1
     content: 钻 4 × Ø2.5 深 8、攻 M3-6H 深 6
     tool: T06
     gauge: G06
@@ -346,7 +404,7 @@ operations:
     passes: 1
     tb_min: 0.29
     ta_min: 0.3
-  - step: 2
+  - step: 5
     content: 钻 Ø8.0、铰 Ø8.2 H11 铰链销孔（两个耳）
     tool: T07
     gauge: G08
@@ -357,19 +415,28 @@ operations:
     tb_min: 0.45
     ta_min: 0.3
   inspect:
+  - char: 机座高度 62 ± 0.05（C3）
+    gauge: G01
+    freq: 首件、每 5 件
+  - char: 顶面平面度 0.02、对 A 平行度 0.03（C2）
+    gauge: G09
+    freq: 每件
+  - char: 针板座深 2.5 ± 0.03（C4）
+    gauge: G12
+    freq: 每件
   - char: M3-6H
     gauge: G06
     freq: 每件
-  minutes: 3.5
+  minutes: 19.5
 - seq: 60
   operation: 零件检验 Part inspection
   workstation: 检验站 QC-01
   shop: 检验
   final_inspection: true
-  content: 清洗后在恒温室三坐标全检：A–工艺孔坐标系；首件 X 光（立柱脚凸台）
+  content: 下件到合箱之前的检验：A–工艺孔坐标系测底面、顶面、高度、针板座、工艺孔；首件 X 光。孔系在合件（WQLS-HSG-P）上检验
   datum: 底面 A、两工艺孔
   clamping: 三坐标测量夹具
-  minutes: 15
+  minutes: 12
   setup_min: 10
   steps: []
   inspect:
@@ -390,7 +457,7 @@ operations:
     freq: 每 5 件
   - char: C6
     gauge: G01
-    freq: 每 5 件
+    freq: 每件
   - char: C7
     gauge: G01
     freq: 每 5 件
@@ -398,6 +465,9 @@ operations:
     gauge: G01
     freq: 每 5 件
   - char: C9
+    gauge: G01
+    freq: 每 5 件
+  - char: C10
     gauge: G10
     freq: 每 5 件
 hole_sizes:
@@ -413,6 +483,24 @@ hole_sizes:
   - op: 10
     d: 10.0
     es: 0.015
+    ei: 0.0
+  下轴孔（粗）:
+  - op: 铸出
+    d: 27.0
+    es: 0.6
+    ei: -0.6
+  - op: 30
+    d: 31.0
+    es: 0.1
+    ei: 0.0
+  旋梭轴孔（粗）:
+  - op: 铸出
+    d: 9.0
+    es: 0.6
+    ei: -0.6
+  - op: 30
+    d: 13.0
+    es: 0.1
     ei: 0.0
 attachments:
 - kind: calc

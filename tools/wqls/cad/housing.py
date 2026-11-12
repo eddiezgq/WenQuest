@@ -323,7 +323,9 @@ def lower_seats(hollow, solid, info):
     zh, zl, yl = sp.ZH, sp.ZL, sp.YL
     top = Part.makeBox(600, 400, 3.0, V(-200, -200, -BEDWALL - 1.0))       # 筋伸进顶板 1 mm，保证连上
     feats = []
-    hb = Part.makeCylinder(12, 42, V(24, 0, zh), V(1, 0, 0)).fuse(Part.makeBox(42, 5, -zh, V(24, -2.5, zh)))   # 筋厚 5（凝固仿真：12、8 厚时筋、座、顶板交接处是热节）
+    # 筋厚 5（凝固仿真：12、8 厚时筋、座、顶板交接处是热节）；G5.2：筋从 x 34 开始——原来从 x 24 起，伸进了针板座下面的开口
+    # （x −32…32），顶到 z 0，针板放不平，数控仿真铣针板座时查出
+    hb = Part.makeCylinder(12, 42, V(24, 0, zh), V(1, 0, 0)).fuse(Part.makeBox(32, 5, -zh, V(34, -2.5, zh)))
     feats.append(hb)
     for x0, L in ((88.0, 16.0), (364.0, 14.0)):
         # 筋厚 6（凝固仿真：14 厚时筋和顶板交接处是热节）
@@ -376,7 +378,7 @@ def joint(hollow, solid, info):
         hollow = hollow.cut(Part.makeCylinder(5.5, 26, V(x_, y_, -25), V(0, 0, 1)))                       # 下件 Ø11 通孔
         hollow = hollow.cut(Part.makeCylinder(9, 1.5, V(x_, y_, -25), V(0, 0, 1)))                         # 锪平 Ø18
     for x_, y_ in ([] if FEA_SIMPLE else pins):
-        hollow = hollow.cut(Part.makeCylinder(4.5, 24, V(x_, y_, -12), V(0, 0, 1)))                        # G5.1：工艺孔 Ø9 H7；装配找正后两件配铰成 1:50 锥销孔（GB/T 117 10 × 40）
+        hollow = hollow.cut(Part.makeCylinder(4.5, 29, V(x_, y_, -17), V(0, 0, 1)))                        # 锥销孔（GB/T 117 10 × 40）：上件 Ø9 H7 工艺孔深 12，下件凸台（z −16…0）钻通；合件工序 70 配铰 1:50
     belt = Part.makeBox(24, 50, 20, V(S_BELT_X - 12, 0, -15))                    # G4.5：带的两边在 z 0 处 y 约 8…39（下轴在后面）
     belt = belt.makeFillet(6, [e for e in belt.Edges if e.BoundBox.ZLength > 19])
     hollow = hollow.cut(belt)                                                                                  # 同步带、电线过孔

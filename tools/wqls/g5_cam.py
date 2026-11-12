@@ -1,4 +1,7 @@
-"""第 138 轮 G5.1 第 7 步：机壳的数控程序（数字工厂 cae/cam.py、cam_post.py、cam_sim.py）。
+"""第 138 轮 G5.1 第 7 步、G5.2：机壳的数控程序（数字工厂 cae/cam.py、cam_post.py、cam_sim.py）。
+
+G5.2：上件 O1201、O1202、O1205，下件 O1301、O1302、O1303、O1305，合件 O1401（锥销、测针杆轴线、全部孔系精加工、钻攻）。
+镗杆伸进机壳里面的工步（同轴镗杆、阶梯镗杆，kind = linebar）不做高度图仿真，它们能不能进去由 cad/access_check.py 在三维里查。
 
     python3 tools/wqls/g5_cam.py <毛坯与零件网格目录> <输出目录>
 
@@ -35,9 +38,15 @@ FRAMES = {   # 名称: (n, X 方向, Y 方向, 原点 p0（整机坐标，成品
     "C_UP": ((0, 0, -1), (1, 0, 0), (0, -1, 0), (348.0, 27.0, 0.0)),      # 上件倒放在立加上，接合面 C 朝上
     "A_UP": ((0, 0, -1), (1, 0, 0), (0, -1, 0), (153.0, 34.0, -62.0)),    # 下件倒放，底面 A 朝上
     "TOP": ((0, 0, 1), (1, 0, 0), (0, 1, 0), (153.0, 34.0, 0.0)),         # 下件正放，顶面朝上
+    "TOPARM": ((0, 0, 1), (1, 0, 0), (0, 1, 0), (185.0, 12.0, 259.0)),    # G5.2 合件：直角铣头从上面钻攻顶盖螺孔（机臂顶面 z 259）
+    "UNDER": ((0, 0, -1), (1, 0, 0), (0, -1, 0), (348.0, 36.5, -16.0)),   # G5.2 合件：直角铣头在机座底下向上（销孔凸台下端 z −16）
+    "LB0": ((-1, 0, 0), (0, -1, 0), (0, 0, 1), (-105.0, 0.0, 0.0)),       # G5.2 下件 / 合件：机座左端壁外面（x −105），B 0°
 }
-WCS = {"B0": "G54", "B180": "G55", "B270": "G56", "UP": "G57", "DOWN_HEAD": "G58", "C_UP": "G54", "A_UP": "G54", "TOP": "G54"}
-BVAL = {"B0": 0, "B180": 180, "B270": 270, "UP": 0, "DOWN_HEAD": 0}
+WCS = {"B0": "G54", "B180": "G55", "B270": "G56", "UP": "G57", "DOWN_HEAD": "G58", "C_UP": "G54", "A_UP": "G54", "TOP": "G54",
+       "TOPARM": "G57", "UNDER": "G58", "LB0": "G59"}
+BVAL = {"B0": 0, "B180": 180, "B270": 270, "UP": 0, "DOWN_HEAD": 0, "TOPARM": 0, "UNDER": 0, "LB0": 0}
+PINS = ((315.8, 7.0), (380.2, 66.0))          # 工艺孔 / 锥销孔（G5.2 第二个由 y 47 移到 66）
+YL, ZL, ZH = 27.791774943072237, -35.36485983577417, -21.5
 
 
 def to_frame(frame, p):
@@ -114,34 +123,70 @@ def op(title, frame, n_tool, name, d, vc, moves, kind="endmill", machine="HMC-01
 
 
 # ---------------------------------------------------------------- 程序
-def upper_hmc_finish():
-    """上件工序 50（精加工）、60（钻攻）——卧加，一面两销"""
+def pair_hmc():
+    """合件工序 70（锥销、测针杆轴线、精加工）、80（钻攻）——卧加，下件 A ＋ 两工艺孔"""
     ops = []
+    pu = [to_frame("UNDER", (x, y, -16.0))[:2] for x, y in PINS]
+    r = rpm(60, 8.5)
+    ops.append(op("直角铣头（机座底下向上）钻锥销底孔 Ø8.5，穿过下件凸台进上件工艺孔", "UNDER", 21, "钻头 Ø8.5", 8.5, 60, cam.drill(pu, 28, 0, 0.15 * r, r_plane=2, safe=55),
+                  kind="drill"))
+    ops.append(op("直角铣头 粗铰、精铰 1:50 锥销孔（仿真按小端 Ø10）", "UNDER", 22, "锥度铰刀 1:50", 10, 8, cam.bore(pu, 28, 0.15 * rpm(8, 10), r_plane=2, safe=55)))
+    # 测针杆轴线：测头 B 0°，下塞规 z 30、上塞规 z 190，各 3 点（−x、−y、+y 三个方向接近）
+    mv = [{"t": "comment", "text": "测针杆轴线：针杆上、下孔已插液压涨紧测量塞规 Ø12；测头 B 0°，每个塞规 3 点定圆心"},
+          {"t": "comment", "text": "两个圆心连线外推到 z -21.5、z 200，结果写入 G54 / G58 的 Y 偏置（宏程序 O9811 / O9812）"}]
+    for zt in (30.0, 190.0):
+        X0, Y0, Z0 = to_frame("B0", (0.0, 0.0, zt))
+        for dx, dy in ((0.0, -1.0), (1.0, 0.0), (-1.0, 0.0)):      # 帧内：X = −y（零件），Z = −(x + 62)
+            ax, ay = X0 + dx * (6 + 1.5 + 4), Y0
+            az = (Z0 + 62 - 6 - 1.5 - 4) if dy < 0 else Z0
+            mv += [{"t": "rapid", "x": ax, "y": ay, "z": 70.0}, {"t": "rapid", "x": ax, "y": ay, "z": az},
+                   {"t": "feed", "x": X0 + dx * 7.5, "y": ay, "z": (Z0 + 62 - 7.5) if dy < 0 else az, "f": 100},
+                   {"t": "rapid", "x": ax, "y": ay, "z": az}, {"t": "rapid", "x": ax, "y": ay, "z": 70.0}]
+    ops.append(op("B0 测头测两个塞规（针杆轴线）", "B0", 30, "测头（测针 Ø3）", 3, 1, mv, kind="probe"))
+    r = rpm(200, 63)
+    ops.append(op("B0 精铣面板口端面", "B0", 2, "面铣刀 Ø63", 63, 200, face_rows(-72, 50, -82, 60, 63, 0.0, 0.08 * 5 * r)))
+    hx, hy, _ = to_frame("LB0", (-105.0, 0.0, ZH))
+    r = rpm(120, 13.7)
+    ops.append(op("B0 阶梯镗杆半精镗旋梭轴孔 Ø13.7（从左端壁 Ø20 孔伸进去，孔在 x 24…66）", "LB0", 23, "阶梯镗杆 Ø13.7", 13.7, 120,
+                  cam.bore([(hx, hy)], 66 + 105, 0.10 * r, r_plane=-(24 + 105 - 2)), kind="linebar"))
+    r = rpm(140, 14)
+    ops.append(op("B0 精镗旋梭轴孔 Ø14 H7", "LB0", 24, "阶梯精镗杆 Ø14", 14, 140, cam.bore([(hx, hy)], 66 + 105, 0.05 * r, r_plane=-(24 + 105 - 2)),
+                  kind="linebar"))
+    r = rpm(140, 34.7)
+    ops.append(op("B0 同轴半精镗上轴两孔 Ø34.7 / Ø31.7（程序按前刀编）", "B0", 25, "同轴半精镗杆", 31.7, 140,
+                  [{"t": "comment", "text": "右导向套支架翻上；压板油压降到 40%（M 代码由夹具 PLC 处理）"}]
+                  + cam.bore([(0.0, 0.0)], 62 + 44 + 1, 0.12 * r, r_plane=-(62 + 31 - 2)), kind="linebar"))
+    r = rpm(150, 35)
+    ops.append(op("B0 同轴精镗上轴两孔 Ø35 H7 / Ø32 H7（前刀走完 6202 孔时后刀正好走完 6201 孔）", "B0", 13, "同轴精镗杆", 32, 150,
+                  cam.bore([(0.0, 0.0)], 62 + 44 + 1, 0.06 * r, r_plane=-(62 + 31 - 2)), kind="linebar"))
     r = rpm(120, 20)
     ops.append(op("B180 镗轴过孔 Ø20 H11", "B180", 4, "精镗刀 Ø20", 20, 120, cam.bore([(0.0, 0.0)], 36, 0.12 * r, r_plane=2)))
     r = rpm(200, 63)
     ops.append(op("B180 精铣电机法兰端面", "B180", 2, "面铣刀 Ø63", 63, 200, face_rows(-1, 1, -1, 1, 63, 0.0, 0.08 * 5 * r)))
     r = rpm(180, 20)
     ops.append(op("B180 圆弧插补精铣止口 Ø52 h7", "B180", 5, "立铣刀 Ø20", 20, 180, circle(0, 0, 26 - 0.015 + 10, -8, 0.05 * 4 * r)))
-    r = rpm(200, 63)
-    ops.append(op("B0 精铣面板口端面", "B0", 2, "面铣刀 Ø63", 63, 200, face_rows(-72, 50, -82, 60, 63, 0.0, 0.08 * 5 * r)))
-    r = rpm(150, 35)
-    ops.append(op("B0 同轴精镗两轴承孔（镗杆：前刀 Ø35、后刀 Ø32 相距 342.5；刀长补偿到前刀，程序按前刀编，前刀走完 6202 孔时后刀正好走完 6201 孔）", "B0", 13, "同轴精镗杆", 32, 150,
-                  [{"t": "comment", "text": "导向套支架翻上；精镗前夹紧力降到 40%（M 代码由夹具 PLC 处理）"}]
-                  + cam.bore([(0.0, 0.0)], 62 + 44 + 1, 0.06 * r, r_plane=-(62 + 31 - 2)), kind="linebar"))
-    r = rpm(12, 12)
-    ops.append(op("直角铣头 铰针杆孔 Ø12 H7（上下两孔一次铰通）", "DOWN_HEAD", 7, "铰刀 Ø12 H7", 12, 12, cam.bore([(0.0, 0.0)], 150, 0.25 * r, r_plane=8, safe=15)))
-    # 工序 60：螺纹孔
+    lx, ly, lz = to_frame("B180", (412.0, YL, ZL))
+    r = rpm(140, 31.7)
+    ops.append(op("B180 下轴同轴半精镗 Ø31.7（两刀相距 276，程序按前刀编：前刀在左孔 x 88…104）", "B180", 26, "下轴半精镗杆", 31.7, 140,
+                  [{"t": "comment", "text": "左导向套支架翻上；压板油压降到 40%"}]
+                  + cam.bore([(lx, ly)], 408 - 88 + 1, 0.12 * r, r_plane=-(408 - 106), safe=10), kind="linebar"))
+    r = rpm(150, 32)
+    ops.append(op("B180 下轴同轴精镗两孔 Ø32 H7", "B180", 27, "下轴精镗杆", 32, 150,
+                  cam.bore([(lx, ly)], 408 - 88 + 1, 0.06 * r, r_plane=-(408 - 106), safe=10), kind="linebar"))
+    # 工序 80：螺纹孔
     r = rpm(60, 4.2)
     mh = [to_frame("B180", p)[:2] for p in [(408.0, 14.142, 214.142), (408.0, -14.142, 214.142), (408.0, -14.142, 185.858), (408.0, 14.142, 185.858)]]
-    ops.append(op("B180 钻 M5 底孔 Ø4.2", "B180", 10, "钻头 Ø4.2", 4.2, 60, cam.drill(mh, 11, 0, 0.1 * r)))
-    ops.append(op("B180 攻 M5", "B180", 15, "丝锥 M5（仿真按底孔 Ø4.2）", 4.2, 8, cam.tap(mh, 9, 0.8, rpm(8, 5))))
+    ops.append(op("B180 钻 M5 底孔 Ø4.2", "B180", 10, "钻头 Ø4.2", 4.2, 60, cam.drill(mh, 11, 0, 0.1 * r), kind="drill"))
+    ops.append(op("B180 攻 M5", "B180", 15, "丝锥 M5（仿真按底孔 Ø4.2）", 4.2, 8, cam.tap(mh, 9, 0.8, rpm(8, 5)), kind="drill"))
     fh = [to_frame("B0", p)[:2] for p in [(-62.0, -33.5, 143.36), (-62.0, -33.5, 203.36), (-62.0, 55.5, 143.36), (-62.0, 55.5, 203.36)]]
-    ops.append(op("B0 钻面板口 M4 底孔", "B0", 11, "钻头 Ø3.3", 3.3, 60, cam.drill(fh, 9, 0, 0.08 * rpm(60, 3.3))))
-    ops.append(op("B0 攻 M4", "B0", 16, "丝锥 M4（仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(fh, 7, 0.7, rpm(8, 4))))
+    ops.append(op("B0 钻面板口 M4 底孔", "B0", 11, "钻头 Ø3.3", 3.3, 60, cam.drill(fh, 9, 0, 0.08 * rpm(60, 3.3)), kind="drill"))
+    ops.append(op("B0 攻 M4", "B0", 16, "丝锥 M4（仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(fh, 7, 0.7, rpm(8, 4)), kind="drill"))
     wh = [to_frame("B270", p)[:2] for p in [(-42, -48, 132), (-42, -48, 169), (-42, -48, 220), (32, -48, 132), (32, -48, 169), (32, -48, 220)]]
-    ops.append(op("B270 钻前窗口 M4 底孔", "B270", 11, "钻头 Ø3.3", 3.3, 60, cam.drill(wh, 9, 0, 0.08 * rpm(60, 3.3))))
-    ops.append(op("B270 攻 M4", "B270", 16, "丝锥 M4（仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(wh, 7, 0.7, rpm(8, 4))))
+    ops.append(op("B270 钻前窗口 M4 底孔", "B270", 11, "钻头 Ø3.3", 3.3, 60, cam.drill(wh, 9, 0, 0.08 * rpm(60, 3.3)), kind="drill"))
+    ops.append(op("B270 攻 M4", "B270", 16, "丝锥 M4（仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(wh, 7, 0.7, rpm(8, 4)), kind="drill"))
+    th = [to_frame("TOPARM", (x, y, 259.0))[:2] for x in (118.0, 252.0) for y in (-6.0, 30.0)]
+    ops.append(op("直角铣头（从上面）钻顶盖 M4 底孔", "TOPARM", 31, "钻头 Ø3.3（直角铣头）", 3.3, 60, cam.drill(th, 5, 0, 0.08 * rpm(60, 3.3)), kind="drill"))
+    ops.append(op("直角铣头 攻顶盖 M4", "TOPARM", 32, "丝锥 M4（直角铣头，仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(th, 3.5, 0.7, rpm(8, 4)), kind="drill"))
     return ops
 
 
@@ -160,6 +205,9 @@ def upper_hmc_rough():
     r = rpm(110, 34)
     ops.append(op("B0 同轴粗镗两轴承孔 Ø34 / Ø31（程序按前刀编）", "B0", 3, "同轴粗镗杆", 31, 110,
                   cam.bore([(0.0, 0.0)], 62 + 44 + 1, 0.25 * r, r_plane=-(62 + 31 - 2)), kind="linebar"))
+    r = rpm(60, 14)
+    ops.append(op("直角铣头 锪针杆孔下端沉孔 Ø14 深 4", "DOWN_HEAD", 18, "锪钻 Ø14", 14, 60, cam.bore([(0.0, 0.0)], 5, 0.08 * r, r_plane=8, safe=15),
+                  kind="drill"))
     r = rpm(60, 11.5)
     ops.append(op("直角铣头 钻针杆孔 Ø11.5（钻通上下两个导套座）", "DOWN_HEAD", 7, "钻头 Ø11.5", 11.5, 60, cam.drill([(0.0, 0.0)], 150, 10, 0.15 * r, r_plane=8, safe=15),
                   kind="drill"))
@@ -169,7 +217,7 @@ def upper_hmc_rough():
 def upper_vmc(finish):
     """上件工序 10（粗、半精铣 C、钻工艺孔）/ 40（精铣 C、铰工艺孔、攻 M10）——立加，工件倒放"""
     ops = []
-    pins = [to_frame("C_UP", (x, y, 0.0))[:2] for x, y in ((315.8, 7.0), (380.2, 47.0))]
+    pins = [to_frame("C_UP", (x, y, 0.0))[:2] for x, y in PINS]
     bolts = [to_frame("C_UP", (x, y, 0.0))[:2] for x, y in ((319.8, -42.2), (376.2, -42.2), (319.8, 96.2), (376.2, 96.2))]
     if not finish:
         r = rpm(160, 80, "VMC-01")
@@ -178,15 +226,21 @@ def upper_vmc(finish):
         ops.append(op("半精铣接合面 C（留 0.5）", "C_UP", 1, "面铣刀 Ø80", 80, 200, face_rows(-56, 56, -98, 98, 80, 0.5, 0.10 * 8 * r, 10), machine="VMC-01"))
         r = rpm(70, 8.5, "VMC-01")
         ops.append(op("钻两个工艺孔 Ø8.5", "C_UP", 8, "钻头 Ø8.5", 8.5, 70, cam.drill(pins, 12, 0, 0.2 * r), machine="VMC-01", kind="drill"))
+        ops.append(op("扩工艺孔 Ø8.85", "C_UP", 19, "扩孔钻 Ø8.85", 8.85, 60, cam.bore(pins, 12, 0.15 * rpm(60, 8.85, "VMC-01")), machine="VMC-01"))
+        ops.append(op("铰工艺孔 Ø9 H7", "C_UP", 9, "铰刀 Ø9 H7", 9, 12, cam.bore(pins, 12, 0.3 * rpm(12, 9, "VMC-01")), machine="VMC-01"))
         ops.append(op("钻 M10 底孔 Ø8.5", "C_UP", 12, "钻头 Ø8.5", 8.5, 70, cam.drill(bolts, 22, 0, 0.18 * rpm(70, 8.5, "VMC-01")), machine="VMC-01",
                       kind="drill"))
         ops.append(op("攻 M10（卧加夹具的拉杆也拧在这里）", "C_UP", 17, "丝锥 M10（仿真按底孔 Ø8.5）", 8.5, 10, cam.tap(bolts, 18, 1.5, rpm(10, 10, "VMC-01")),
                       machine="VMC-01", kind="drill"))
     else:
         r = rpm(220, 80, "VMC-01")
-        ops.append(op("精铣接合面 C（中心高 200 ± 0.03）", "C_UP", 1, "面铣刀 Ø80", 80, 220, face_rows(-56, 56, -98, 98, 80, 0.0, 0.06 * 8 * r, 10), machine="VMC-01"))
-        ops.append(op("扩工艺孔 Ø8.85", "C_UP", 8, "扩孔钻 Ø8.85", 8.85, 60, cam.bore(pins, 12, 0.15 * rpm(60, 8.85, "VMC-01")), machine="VMC-01"))
-        ops.append(op("铰工艺孔 Ø9 H7", "C_UP", 9, "铰刀 Ø9 H7", 9, 12, cam.bore(pins, 12, 0.3 * rpm(12, 9, "VMC-01")), machine="VMC-01"))
+        ops.append(op("精铣接合面 C（平面度 0.02）", "C_UP", 1, "面铣刀 Ø80", 80, 220, face_rows(-56, 56, -98, 98, 80, 0.0, 0.06 * 8 * r, 10), machine="VMC-01"))
+        nd = [to_frame("C_UP", (0.0, 0.0, 0.0))[:2]]
+        # 机头底面比 C 低 46（倒放时在 C 下面）：快移到 R 点 −30（机头底面前 16，空当里），铰到 z 182（上导套座顶面）
+        ops.append(op("扩针杆孔 Ø11.85（上、下两孔一次扩通）", "C_UP", 20, "扩孔钻 Ø11.85（加长）", 11.85, 60,
+                      cam.bore(nd, 182, 0.12 * rpm(60, 11.85, "VMC-01"), r_plane=-30, safe=5), machine="VMC-01", kind="drill"))
+        ops.append(op("铰针杆孔 Ø12 H7（一次铰通）", "C_UP", 7, "铰刀 Ø12 H7（加长）", 12, 12, cam.bore(nd, 182, 0.25 * rpm(12, 12, "VMC-01"), r_plane=-30, safe=5),
+                      machine="VMC-01", kind="drill"))
     return ops
 
 
@@ -204,9 +258,31 @@ def lower_vmc(stage):
         ops.append(op("粗铣机座顶面（4 → 0.5，两刀）", "TOP", 1, "面铣刀 Ø100", 100, 160,
                       face_rows(-262, 262, -100, 100, 100, 2.25, 0.18 * 10 * r, 10) + face_rows(-262, 262, -100, 100, 100, 0.5, 0.18 * 10 * r, 10),
                       machine="VMC-01"))
+        bh = [to_frame("TOP", (x, y, 0.0))[:2] for x, y in ((319.8, -42.2), (376.2, -42.2), (319.8, 96.2), (376.2, 96.2))]
+        ops.append(op("钻 4 × Ø11 通孔", "TOP", 4, "钻头 Ø11", 11, 70, cam.drill(bh, 30, 0, 0.2 * rpm(70, 11, "VMC-01")), machine="VMC-01", kind="drill"))
+    elif stage == 30:
+        # 下件单独装在 FX-HSG-P-70 上（卧加）：左端壁两个 Ø20 过孔、粗镗旋梭轴孔、粗镗下轴两孔
+        for (yy, zz) in ((0.0, ZH), (YL, ZL)):
+            cx, cy, _ = to_frame("LB0", (-105.0, yy, zz))
+            r = rpm(150, 16)
+            mv = []
+            for k, zc in enumerate((-2.0, -4.0, -6.5)):
+                mv += circle(cx, cy, 10 - 8, zc, 0.05 * 4 * r)[2 if k else 0:]
+            ops.append(op("B0 螺旋插补铣左端壁 Ø20 过孔", "LB0", 2, "立铣刀 Ø16", 16, 150, mv, machine="HMC-01"))
+        hx, hy, _ = to_frame("LB0", (-105.0, 0.0, ZH))
+        r = rpm(100, 13)
+        ops.append(op("B0 阶梯粗镗杆粗镗旋梭轴孔 Ø9 → Ø13", "LB0", 10, "阶梯粗镗杆 Ø13", 13, 100,
+                      cam.bore([(hx, hy)], 66 + 105, 0.12 * r, r_plane=-(24 + 105 - 2)), machine="HMC-01", kind="linebar"))
+        lx, ly, lz = to_frame("B180", (412.0, YL, ZL))
+        r = rpm(110, 31)
+        ops.append(op("B180 下轴粗镗杆两孔一刀粗镗 Ø27 → Ø31", "B180", 9, "下轴粗镗杆", 31, 110,
+                      [{"t": "comment", "text": "左导向套支架翻上；进刀时主轴定向、刀尖朝上，抬高 1 mm 穿过右端壁、横筋 Ø34 孔"}]
+                      + cam.bore([(lx, ly)], 408 - 88 + 1, 0.25 * r, r_plane=-(408 - 106), safe=10), machine="HMC-01", kind="linebar"))
     else:
         r = rpm(220, 100, "VMC-01")
-        ops.append(op("精铣机座顶面（高 62 ± 0.05）", "TOP", 1, "面铣刀 Ø100", 100, 220, face_rows(-262, 262, -100, 100, 100, 0.0, 0.06 * 10 * r, 10),
+        ops.append(op("（第一次装夹：翻面，顶面定位）精铣底面 A（平面度 0.05）", "A_UP", 1, "面铣刀 Ø100", 100, 220,
+                      face_rows(-262, 262, -100, 100, 100, 0.0, 0.06 * 10 * r, 10), machine="VMC-01"))
+        ops.append(op("（第二次装夹：A ＋ 两工艺孔）精铣机座顶面（高 62 ± 0.05）", "TOP", 1, "面铣刀 Ø100", 100, 220, face_rows(-262, 262, -100, 100, 100, 0.0, 0.06 * 10 * r, 10),
                       machine="VMC-01"))
         r = rpm(180, 16, "VMC-01")
         pk = cam.mill_pocket([(-32 - 153, -22 - 34), (32 - 153, -22 - 34), (32 - 153, 22 - 34), (-32 - 153, 22 - 34)], 2.5, 16, 0.45, 1.25,
@@ -215,8 +291,6 @@ def lower_vmc(stage):
         ps = cam.mill_pocket([(-23 - 153, -58 - 34), (23 - 153, -58 - 34), (23 - 153, -22 - 34), (-23 - 153, -22 - 34)], 1.5, 16, 0.45, 1.5,
                              0.05 * 4 * r, 0.02 * 4 * r)
         ops.append(op("铣滑板座（深 1.5）", "TOP", 2, "立铣刀 Ø16", 16, 180, ps, machine="VMC-01"))
-        bh = [to_frame("TOP", (x, y, 0.0))[:2] for x, y in ((319.8, -42.2), (376.2, -42.2), (319.8, 96.2), (376.2, 96.2))]
-        ops.append(op("钻 4 × Ø11 通孔", "TOP", 4, "钻头 Ø11", 11, 70, cam.drill(bh, 30, 0, 0.2 * rpm(70, 11, "VMC-01")), machine="VMC-01", kind="drill"))
         nh = [to_frame("TOP", (x, y, -2.5))[:2] for x, y in ((-27, -17), (27, -17), (-27, 17), (27, 17))]
         ops.append(op("钻 M3 底孔 Ø2.5", "TOP", 6, "钻头 Ø2.5", 2.5, 50, cam.drill(nh, 9.5, 0, 0.06 * rpm(50, 2.5, "VMC-01")), machine="VMC-01",
                       kind="drill"))
@@ -224,14 +298,15 @@ def lower_vmc(stage):
     return ops
 
 
-PROGRAMS = {   # 程序号: (标题, 零件, 工序, 机床, 生成函数)
-    1201: ("上件 工序 10 粗、半精铣接合面、钻工艺孔、攻 M10", "upper", 10, "VMC-01", lambda: upper_vmc(False)),
+PROGRAMS = {   # 程序号: (标题, 零件, 工序, 机床, 生成函数)（G5.2：上件粗、下件粗、合件精）
+    1201: ("上件 工序 10 粗、半精铣接合面、钻铰工艺孔、攻 M10", "upper", 10, "VMC-01", lambda: upper_vmc(False)),
     1202: ("上件 工序 20 卧加粗加工", "upper", 20, "HMC-01", upper_hmc_rough),
-    1204: ("上件 工序 40 精铣接合面、铰工艺孔", "upper", 40, "VMC-01", lambda: upper_vmc(True)),
-    1205: ("上件 工序 50、60 卧加精加工、钻攻", "upper", 50, "HMC-01", upper_hmc_finish),
+    1205: ("上件 工序 50 精铣接合面、扩铰针杆孔", "upper", 50, "VMC-01", lambda: upper_vmc(True)),
     1301: ("下件 工序 10 铣底面 A、工艺孔", "lower", 10, "VMC-01", lambda: lower_vmc(10)),
-    1302: ("下件 工序 20 粗铣顶面", "lower", 20, "VMC-01", lambda: lower_vmc(20)),
-    1304: ("下件 工序 40、50 精铣顶面、针板座、过孔、M3", "lower", 40, "VMC-01", lambda: lower_vmc(40)),
+    1302: ("下件 工序 20 粗铣顶面、过孔", "lower", 20, "VMC-01", lambda: lower_vmc(20)),
+    1303: ("下件 工序 30 卧加粗镗（左端壁过孔、旋梭轴孔、下轴两孔）", "lower", 30, "HMC-01", lambda: lower_vmc(30)),
+    1305: ("下件 工序 50 精铣底面、顶面、针板座、M3", "lower", 50, "VMC-01", lambda: lower_vmc(50)),
+    1401: ("合件 工序 70、80 锥销、测针杆轴线、精加工、钻攻", "pair", 70, "HMC-01", pair_hmc),
 }
 
 
@@ -239,7 +314,7 @@ def simulate(ops, text, machine, tris_blank, tris_part, frames, tol=0.02):
     """按面仿真：每个面单独解析（只含这个面的工步），毛坯高度图作起始，成品高度图比对"""
     out = []
     for fr in frames:
-        sub = [o for o in ops if o["frame"] == fr and o.get("kind") != "linebar"]
+        sub = [o for o in ops if o["frame"] == fr and o.get("kind") not in ("linebar", "probe")]
         if not sub:
             continue
         prog = dict(machine=machine, title=fr, number=1, ops=[{k: v for k, v in o.items() if k not in ("frame", "kind", "b")} for o in sub])
@@ -301,10 +376,12 @@ def main():
     src, out = Path(sys.argv[1]), Path(sys.argv[2])
     out.mkdir(parents=True, exist_ok=True)
     tri = {k: CST.read_stl(src / f"{k}.stl") for k in ("blank_upper", "blank_lower", "part_upper", "part_lower")}
+    tri["blank_pair"] = np.concatenate([tri["blank_upper"], tri["blank_lower"]])
+    tri["part_pair"] = np.concatenate([tri["part_upper"], tri["part_lower"]])
     report = {}
     for num, (title, part, seq, machine, fn) in PROGRAMS.items():
         ops = fn()
-        prog = dict(machine=machine, title=title, number=num, header=dict(item={"upper": "HSG-LS-U", "lower": "HSG-LS-L"}[part],
+        prog = dict(machine=machine, title=title, number=num, header=dict(item={"upper": "HSG-LS-U", "lower": "HSG-LS-L", "pair": "HSG-LS-P"}[part],
                                                                           operation=str(seq), author="问渠数字工厂（AI 编程，人工审核）", date="2026-11-11"),
                     ops=[{k: v for k, v in o.items() if k not in ("frame", "kind")} for o in ops])
         text = cam_post.post(prog)
@@ -312,7 +389,7 @@ def main():
         parsed = cam_sim.parse(text, machine)
         checks = cam_sim.machine_checks(parsed, machine)
         tm = cam_sim.timing(parsed, machine)
-        frames = sorted({o["frame"] for o in ops})
+        frames = sorted({o["frame"] for o in ops if o.get("kind") != "probe"})
         sim = simulate(ops, text, machine, tri[f"blank_{part}"], tri[f"part_{part}"], frames)
         report[f"O{num}"] = dict(title=title, machine=machine, lines=len(text.splitlines()), tools=parsed["tools"],
                                  b_indexes=tm.get("b_indexes", 0), time_min=round(tm["total_s"] / 60, 2), cut_min=round(tm["cut_s"] / 60, 2),

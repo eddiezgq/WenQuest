@@ -280,8 +280,8 @@
    "X1": 0.003,
    "X2": 0.004,
    "note": "液压涨销定位，间隙按 0.003–0.004 计（产品样本量级）",
-   "rot_rad": 9.233446549063386e-05,
-   "at_needle_mm": 0.0292
+   "rot_rad": 8.014611032714908e-05,
+   "at_needle_mm": 0.0253
   },
   "aux_supports": {
    "supports": [
@@ -348,15 +348,15 @@
  "g51_record": {
   "scheme_I": {
    "R_mm": 315.9,
-   "pin_L_mm": 75.8,
+   "pin_L_mm": 87.3,
    "X1_fixture": 0.026,
    "X2_fixture": 0.0314,
-   "rot_fixture_rad": 0.0007571426170232138,
+   "rot_fixture_rad": 0.0006571981046826366,
    "X_assembly": 0.024,
    "links": [
     {
      "name": "针杆孔对上件销孔：夹具定位",
-     "half": 0.1326
+     "half": 0.1168
     },
     {
      "name": "针杆孔对上件销孔：机床",
@@ -364,15 +364,15 @@
     },
     {
      "name": "装配：定位销间隙（含转角）",
-     "half": 0.112
+     "half": 0.0988
     },
     {
      "name": "旋梭轴孔对下件销孔",
-     "half": 0.1406
+     "half": 0.1248
     }
    ],
-   "extreme_half": 0.3932,
-   "statistical_half": 0.2235,
+   "extreme_half": 0.3484,
+   "statistical_half": 0.1976,
    "required_half": 0.05,
    "ok_extreme": false,
    "ok_statistical": false
