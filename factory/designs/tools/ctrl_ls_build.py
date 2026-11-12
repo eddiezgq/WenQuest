@@ -186,8 +186,8 @@ def _circle(cx, cy, r, n=24):
     return [(cx + r * math.cos(2 * math.pi * k / n), cy + r * math.sin(2 * math.pi * k / n)) for k in range(n)]
 
 
-def rule_area(board, pts, name):
-    """禁布区：所有铜层不走线、不打过孔、不铺铜（KiCad 规则区，导出给布线器时一起带上）"""
+def rule_area(board, pts, name, inner_only=False):
+    """禁布区：铜层不走线、不打过孔、不铺铜（KiCad 规则区，导出给布线器时一起带上）；inner_only 只管两个内层"""
     m = pcbnew()
     z = m.ZONE(board)
     z.SetIsRuleArea(True)
@@ -198,7 +198,7 @@ def rule_area(board, pts, name):
     z.SetDoNotAllowFootprints(False)
     z.SetZoneName(name)
     ls = m.LSET()
-    for lay in (m.F_Cu, m.In1_Cu, m.In2_Cu, m.B_Cu):
+    for lay in (m.In1_Cu, m.In2_Cu) if inner_only else (m.F_Cu, m.In1_Cu, m.In2_Cu, m.B_Cu):
         ls.AddLayer(lay)
     z.SetLayerSet(ls)
     ol = z.Outline()
@@ -226,7 +226,8 @@ def planes(board, nets):
     w_, h_ = D.X["board_mm"]
     r = b["w"] / 2
     inner = [(x - r, y - r), (w_, y - r), (w_, y + r), (x + r, y + r), (x + r, h_), (x - r, h_)]
-    rule_area(board, inner, "隔离带（内层）")
+    # 只管内层（第十八次查出：原来四层都管，表层收窄处被它盖住，隔离电源 2、3 脚等于压在禁布区里，+5V 一直接不上）
+    rule_area(board, inner, "隔离带（内层）", inner_only=True)
     for k, (hx, hy) in enumerate(D.X["holes"]):
         if k == 0:  # H1 接 PE：它周围不设禁布区（保护地线要接进来；别的网络离它多远由 PE 的布线间距 4.2 mm 管）
             continue
@@ -279,7 +280,8 @@ def board_build(route, jar):
         lays = {n: c.get("layers") or ["F.Cu", "In2.Cu", "B.Cu"] for c in D.X["net_classes"] for n in c["nets"]}
         w_, h_ = D.X["board_mm"]
         ox, oy = gb.ORIGIN
-        kos = [RF._poly(z.Outline()) for z in board.Zones() if z.GetIsRuleArea() and z.GetDoNotAllowTracks()]
+        kos = [(RF._poly(z.Outline()), set(z.GetLayerSet().CuStack())) for z in board.Zones()
+               if z.GetIsRuleArea() and z.GetDoNotAllowTracks()]
         n_stub = RF.stubs(board, class_of, clearance, lambda n: width.get(n, 0.25),
                           lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"]), box(ox, oy, ox + w_, oy + h_),
                           kos)

@@ -63,7 +63,7 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline, keepouts=())
     """给“比布线间距还近”的焊盘各引一小段固定线（锁定）：从焊盘中心朝最空的方向引出，长到离开相邻焊盘的间距范围，
     布线器从线头接（它接不上这种焊盘本身，见上面第 1 条）。返回加的段数。
     width_of(网络) → 布线线宽；layers_of(网络) → 允许的铜层名；outline = 板框（shapely 多边形，mm，KiCad 坐标）；
-    keepouts = 禁布区（shapely 多边形）：焊盘压着禁布区边的（隔离带收窄处的隔离电源脚），布线器同样接不上，
+    keepouts = 禁布区 [(shapely 多边形, 铜层号集合)]：焊盘压着禁布区边的（隔离带收窄处的隔离电源脚），布线器同样接不上，
     也引一段出来，引出线本身不进禁布区"""
     import math
 
@@ -77,7 +77,7 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline, keepouts=())
             need[k] = (a, max(c, need.get(k, (a, 0))[1]))
     pads = [(p, _poly(p.GetEffectivePolygon())) for fp in board.GetFootprints() for p in fp.Pads() if p.GetNetname()]
     for p, g in pads:
-        if any(g.intersects(k) for k in keepouts):
+        if any(g.intersects(kp) and lays & set(p.GetLayerSet().CuStack()) for kp, lays in keepouts):
             k = (p.GetParent().GetReference(), p.GetNumber())
             need.setdefault(k, (p, 0.6))
     lid = {"F.Cu": pcbnew.F_Cu, "B.Cu": pcbnew.B_Cu, "In2.Cu": pcbnew.In2_Cu}
@@ -97,7 +97,7 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline, keepouts=())
                 seg = LineString([(x0, y0), end])
                 if not outline.buffer(-(w / 2 + 0.5)).contains(LineString([seg.interpolate(0.5), end])):
                     continue
-                if any(seg.buffer(w / 2).intersects(kp) for kp in keepouts):
+                if any(lid[ln] in lays and seg.buffer(w / 2).intersects(kp) for kp, lays in keepouts):
                     continue
                 tip = LineString([seg.interpolate(max(sx, sy) / 2 + c), end]).buffer(w / 2)
                 score = 99.0
@@ -253,7 +253,7 @@ def widen(board, targets, clearance):
 def finish(board, class_of, clearance, width_of, layers_of, skip=("GND", "GND_ISO"), keepouts=()):
     """布线器两遍都没接上的几根：同一网络还分成几块时，在两块最近的两点之间试一段直线或一个拐角（两段），
     哪一层、哪条路上离别的网络的铜都够远就加上。器件自己引脚之间的间距照旧不算（与 stubs 同一口径）。
-    skip = 平面网络（由内层平面连通，不在这里补）；keepouts = 禁布区（shapely 多边形），补的线不进去。
+    skip = 平面网络（由内层平面连通，不在这里补）；keepouts = 禁布区 [(多边形, 铜层号集合)]，补的线不进去。
     返回 [(网络, 层, 段数)]"""
     from shapely.geometry import LineString, Point
     from shapely.ops import unary_union
@@ -315,7 +315,7 @@ def finish(board, class_of, clearance, width_of, layers_of, skip=("GND", "GND_IS
                     for path in ([pa, pb], [pa, (pb[0], pa[1]), pb], [pa, (pa[0], pb[1]), pb]):
                         legs = zip(path, path[1:], strict=False)
                         shape = unary_union([LineString([u, v]).buffer(w / 2) for u, v in legs])
-                        ok = not any(shape.intersects(k) for k in keepouts)
+                        ok = not any(lid[ln] in lays and shape.intersects(k) for k, lays in keepouts)
                         for onet, olay, og, oref, _c in its if ok else ():
                             if onet == net or lid[ln] not in olay:
                                 continue

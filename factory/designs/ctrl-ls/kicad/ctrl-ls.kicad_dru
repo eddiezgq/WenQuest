@@ -164,14 +164,14 @@
 (rule "pins_R216_VSENSE_VSENSE_2"
   (condition "((A.NetName == 'VSENSE' && B.NetName == 'VSENSE_2') || (A.NetName == 'VSENSE_2' && B.NetName == 'VSENSE')) && A.intersectsCourtyard('R216') && B.intersectsCourtyard('R216')")
   (constraint clearance (min 1.75mm)))
+(rule "pins_J101_L_IN_N_IN"
+  (condition "((A.NetName == 'L_IN' && B.NetName == 'N_IN') || (A.NetName == 'N_IN' && B.NetName == 'L_IN')) && A.intersectsCourtyard('J101') && B.intersectsCourtyard('J101')")
+  (constraint clearance (min 2.4mm)))
+(rule "pins_R220_OVP_OVP_2"
+  (condition "((A.NetName == 'OVP' && B.NetName == 'OVP_2') || (A.NetName == 'OVP_2' && B.NetName == 'OVP')) && A.intersectsCourtyard('R220') && B.intersectsCourtyard('R220')")
+  (constraint clearance (min 1.7mm)))
 (rule "pins_R212_BOP_BRO_B"
   (condition "((A.NetName == 'BOP' && B.NetName == 'BRO_B') || (A.NetName == 'BRO_B' && B.NetName == 'BOP')) && A.intersectsCourtyard('R212') && B.intersectsCourtyard('R212')")
-  (constraint clearance (min 1.75mm)))
-(rule "pins_R422_VBUS_SNS_VBUS_SNS_2"
-  (condition "((A.NetName == 'VBUS_SNS' && B.NetName == 'VBUS_SNS_2') || (A.NetName == 'VBUS_SNS_2' && B.NetName == 'VBUS_SNS')) && A.intersectsCourtyard('R422') && B.intersectsCourtyard('R422')")
-  (constraint clearance (min 1.75mm)))
-(rule "pins_R302_TOP_V_TOP_V1"
-  (condition "((A.NetName == 'TOP_V' && B.NetName == 'TOP_V1') || (A.NetName == 'TOP_V1' && B.NetName == 'TOP_V')) && A.intersectsCourtyard('R302') && B.intersectsCourtyard('R302')")
   (constraint clearance (min 1.75mm)))
 (rule "pins_BR101_L_R_N_C"
   (condition "((A.NetName == 'L_R' && B.NetName == 'N_C') || (A.NetName == 'N_C' && B.NetName == 'L_R')) && A.intersectsCourtyard('BR101') && B.intersectsCourtyard('BR101')")
@@ -179,12 +179,6 @@
 (rule "pins_BR101_N_C_RECT_N"
   (condition "((A.NetName == 'N_C' && B.NetName == 'RECT_N') || (A.NetName == 'RECT_N' && B.NetName == 'N_C')) && A.intersectsCourtyard('BR101') && B.intersectsCourtyard('BR101')")
   (constraint clearance (min 1.8mm)))
-(rule "pins_R220_OVP_OVP_2"
-  (condition "((A.NetName == 'OVP' && B.NetName == 'OVP_2') || (A.NetName == 'OVP_2' && B.NetName == 'OVP')) && A.intersectsCourtyard('R220') && B.intersectsCourtyard('R220')")
-  (constraint clearance (min 1.7mm)))
-(rule "pins_J101_L_IN_N_IN"
-  (condition "((A.NetName == 'L_IN' && B.NetName == 'N_IN') || (A.NetName == 'N_IN' && B.NetName == 'L_IN')) && A.intersectsCourtyard('J101') && B.intersectsCourtyard('J101')")
-  (constraint clearance (min 2.4mm)))
 (rule "pins_U401_IN_UL_VB_U"
   (condition "((A.NetName == 'IN_UL' && B.NetName == 'VB_U') || (A.NetName == 'VB_U' && B.NetName == 'IN_UL')) && A.intersectsCourtyard('U401') && B.intersectsCourtyard('U401')")
   (constraint clearance (min 1.75mm)))
@@ -212,6 +206,12 @@
 (rule "pins_U401_MOT_U_N_U"
   (condition "((A.NetName == 'MOT_U' && B.NetName == 'N_U') || (A.NetName == 'N_U' && B.NetName == 'MOT_U')) && A.intersectsCourtyard('U401') && B.intersectsCourtyard('U401')")
   (constraint clearance (min 1.65mm)))
+(rule "pins_R422_VBUS_SNS_VBUS_SNS_2"
+  (condition "((A.NetName == 'VBUS_SNS' && B.NetName == 'VBUS_SNS_2') || (A.NetName == 'VBUS_SNS_2' && B.NetName == 'VBUS_SNS')) && A.intersectsCourtyard('R422') && B.intersectsCourtyard('R422')")
+  (constraint clearance (min 1.75mm)))
+(rule "pins_R302_TOP_V_TOP_V1"
+  (condition "((A.NetName == 'TOP_V' && B.NetName == 'TOP_V1') || (A.NetName == 'TOP_V1' && B.NetName == 'TOP_V')) && A.intersectsCourtyard('R302') && B.intersectsCourtyard('R302')")
+  (constraint clearance (min 1.75mm)))
 (rule "same_footprint_pads"
   (condition "A.Type == 'Pad' && B.Type == 'Pad' && A.Parent.Reference == B.Parent.Reference")
   (constraint clearance (min 0.15mm)))
