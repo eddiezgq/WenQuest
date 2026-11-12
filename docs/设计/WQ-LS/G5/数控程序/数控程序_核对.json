@@ -189,9 +189,11 @@
    {
     "frame": "TOP",
     "steps": 5,
-    "issues": [],
-    "over_cells": 0,
-    "dev_min": -0.0,
+    "issues": [
+     "过切：8 格比目标低，最多 7.000 mm"
+    ],
+    "over_cells": 8,
+    "dev_min": -7.0,
     "ap_max": 4.0
    }
   ]
@@ -199,7 +201,7 @@
  "O1401": {
   "title": "合件 工序 70、80 锥销、测针杆轴线、精加工、钻攻",
   "machine": "HMC-01",
-  "lines": 494,
+  "lines": 654,
   "tools": [
    2,
    4,
@@ -218,11 +220,17 @@
    27,
    30,
    31,
-   32
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38
   ],
   "b_indexes": 4,
-  "time_min": 12.26,
-  "cut_min": 9.78,
+  "time_min": 14.96,
+  "cut_min": 11.57,
   "checks": [],
   "sim": [
    {
