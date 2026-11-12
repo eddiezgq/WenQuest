@@ -361,7 +361,7 @@ def feed_seats(hollow, solid, info):
     ② 抬牙摆轴（y −45、z −28）：两个座 x 25…37（Ø24 凸台，孔 Ø16 H7）、x 96…106（Ø20 凸台，孔 Ø14 H7），各一道 6 mm 的筋接前壁；
        前孔比后孔大一档，后孔的镗刀才能从前孔（铸出 Ø15）里穿过去；
     ③ 调节器轴（y 0、z −50）：左横筋上 Ø18 凸台 x 297…310，孔 Ø10 H7 装含油轴套 Ø8 × Ø10；
-    ④ 机座顶板在立柱脚里开送布连杆过孔 x 325.5…339.5、y −10…12；
+    ④ 机座顶板在立柱脚里开送布连杆过孔 x 326…339、y −10…12；
     ⑤ 机座顶板底面在抬牙叉子上方 x 17…24.5、y −42…−21 铸出 1.3 深的让位槽；
     ⑥ 工艺孔（合件工序 70 的镗杆、铰刀从这里伸进去，加工完压碗形堵盖、涂密封胶）：
        左端壁 Ø16（送布摆轴前孔）、Ø18（抬牙摆轴两孔）；右横筋和右端壁 Ø16（送布摆轴后孔）、Ø14（调节器孔）。"""
@@ -389,13 +389,15 @@ def feed_seats(hollow, solid, info):
             hollow = hollow.cut(Part.makeCylinder(r_, 10, V(-107, y_, z_), V(1, 0, 0)))
         hollow = hollow.cut(Part.makeCylinder(8.0, 27, V(387, fy, fz), V(1, 0, 0)))
         hollow = hollow.cut(Part.makeCylinder(7.0, 27, V(387, gy, gz), V(1, 0, 0)))
-    rod = Part.makeBox(14, 22, 20, V(325.5, -10, -15))                  # 送布连杆 x 327…335，两边各让 1.5
+    # 送布连杆杆身 x 327.3…335（cad/feed.py：杆身左面收进 0.3，离过孔左边 1.3）。过孔左边不能往左挪：
+    # 挪到 325.5、324.5 时毛坯的布尔运算都报“不可定向”、做不下去
+    rod = Part.makeBox(13, 22, 20, V(326, -10, -15))
     rod = rod.makeFillet(4, [e for e in rod.Edges if e.BoundBox.ZLength > 19])
     hollow = hollow.cut(rod)                                                                    # 送布连杆过孔
     # 一转干涉检查：抬牙叉子头最高到 z −5.5，机座顶板底面 −5.6 → 顶板底面在叉子上方铸出 1.3 深的让位槽（顶板这里剩 4.3）
     hollow = hollow.cut(Part.makeBox(7.5, 21.0, 1.3, V(17.0, -42.0, -BEDWALL - 0.01)))     # x 17…24.5、y −42…−21
     info["feed_seats"] = dict(feed_rock=dict(axis=(fy, fz), x=[(34, 46), (297, 310)], d=14), lift_rock=dict(axis=(ly, lz), x=[(25, 37), (96, 106)], d=[16, 14]),
-                              regulator=dict(axis=(gy, gz), x=(297, 310), d=10), rod_hole=dict(x=(325.5, 339.5), y=(-10, 12)),
+                              regulator=dict(axis=(gy, gz), x=(297, 310), d=10), rod_hole=dict(x=(326, 339), y=(-10, 12)),
                               fork_relief=dict(x=(17, 24.5), y=(-42, -21), depth=1.3),
                               process_holes=dict(left_wall=dict(d16=(fy, fz), d18=(ly, lz)), right=dict(d16=(fy, fz), d14=(gy, gz))))
     return hollow

@@ -55,7 +55,8 @@ def build():
     ecc = xcyl(13.0, *X["ecc"], *E).cut(xcyl(8.0, X["ecc"][0] - 1, X["ecc"][1] + 1, *O1))   # Ø26：孔 Ø16 偏 3，最薄处壁厚 2（Ø22 时为 0）
     P["feed_ecc"] = (ecc, "metal", "steel", "upper")
     # ---- 送布连杆：大头套在偏心上（外 r17、内 r13.05），杆身 8 宽，小头 r6 带 Ø6 销孔
-    rod = bar2d(E, Pp, 8.0, X["ecc"]).fuse(xcyl(17.0, *X["ecc"], *E)).fuse(xcyl(6.0, *X["ecc"], *Pp))
+    # 杆身左面收进 0.3（x 327.3…335）：穿机座顶板过孔（x 326…339）时离孔左边 1.3（贴着 327 时一转检查 0.999）
+    rod = bar2d(E, Pp, 8.0, (X["ecc"][0] + 0.3, X["ecc"][1])).fuse(xcyl(17.0, *X["ecc"], *E)).fuse(xcyl(6.0, *X["ecc"], *Pp))
     rod = rod.cut(xcyl(13.05, X["ecc"][0] - 1, X["ecc"][1] + 1, *E)).cut(xcyl(3.0, X["ecc"][0] - 1, X["ecc"][1] + 1, *Pp))
     P["feed_rod"] = (rod, "metal", "alu", "plane")          # 铝合金压铸（ADC12），杆长 250，钢的 141 g 惯性力太大
     # ---- 调节器板：绕 G 转到调节器角（这一档），中间滑槽沿 u；板 20 × 16，槽 7 宽

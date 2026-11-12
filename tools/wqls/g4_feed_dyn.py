@@ -138,7 +138,8 @@ def strength(FD, FP, KIN, dog, vd, above, w, dphi, P_foot, mu, F_rod):
     # ---- 校核（材料：送布连杆 ADC12 压铸铝 σ0.2 150、疲劳极限取 60；其余 45 钢调质 σs 355、σ−1 270、τ−1 155；缺口 Kf 2）
     out = {}
     Fr_max = float(np.nanmax(np.abs(F_rod)))
-    A_r, I_r, L_r = 8.0 * 8.0, 8.0 ** 4 / 12, float(np.mean(np.linalg.norm(mm("P") - mm("E"), axis=1))) * 1000
+    A_r, I_r = 7.7 * 8.0, 8.0 * 7.7 ** 3 / 12                        # 杆身 7.7（x，左面收进 0.3）× 8，取弱轴
+    L_r = float(np.mean(np.linalg.norm(mm("P") - mm("E"), axis=1))) * 1000
     out["feed_rod"] = dict(F_max_N=round(Fr_max, 1), sigma_MPa=round(Fr_max / A_r, 2), L_mm=round(L_r, 1),
                            P_euler_N=round(math.pi ** 2 * 71000 * I_r / L_r ** 2, 0),
                            SF_buckling=round(math.pi ** 2 * 71000 * I_r / L_r ** 2 / Fr_max, 1),
