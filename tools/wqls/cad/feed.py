@@ -21,7 +21,7 @@ FEED = json.load(open(os.path.join(ROOT, "docs", "设计", "WQ-LS", "G4", "送�
 SET = os.environ.get("WQ_FEED", "s3")
 P0 = FEED["poses"][SET]
 GEO, PAR = FEED["geo"], FEED["params"]
-X = dict(ecc=(327.0, 335.0), reg=(318.0, 326.0), link=(336.0, 342.0), farm=(28.0, 32.0), bar=(23.5, 27.5),
+X = dict(ecc=(327.0, 335.0), reg=(318.0, 326.0), link=(335.6, 341.6), farm=(28.0, 32.0), bar=(23.5, 27.5),
          lecc=(108.0, 116.0), lcrank=(116.0, 122.0), fork=(19.0, 23.0), rock=(22.0, 342.0), lrock=(15.0, 122.0))
 
 
@@ -55,7 +55,7 @@ def build():
     # ---- 送布连杆：大头套在偏心上（外 r15、内 r11.05），杆身 8 宽，小头 r6 带 Ø6 销孔
     rod = bar2d(E, Pp, 8.0, X["ecc"]).fuse(xcyl(15.0, *X["ecc"], *E)).fuse(xcyl(6.0, *X["ecc"], *Pp))
     rod = rod.cut(xcyl(11.05, X["ecc"][0] - 1, X["ecc"][1] + 1, *E)).cut(xcyl(3.0, X["ecc"][0] - 1, X["ecc"][1] + 1, *Pp))
-    P["feed_rod"] = (rod, "metal", "steel", "plane")
+    P["feed_rod"] = (rod, "metal", "alu", "plane")          # 铝合金压铸（ADC12），杆长 250，钢的 141 g 惯性力太大
     # ---- 调节器板：绕 G 转到调节器角（这一档），中间滑槽沿 u；板 20 × 16，槽 7 宽
     u = P0["u"]
     ang = math.degrees(math.atan2(u[1], u[0]))
@@ -64,7 +64,7 @@ def build():
     plate = plate.cut(slot)
     plate.rotate(V(0, 0, 0), V(1, 0, 0), ang)
     plate.translate(V(0, *G))
-    plate = plate.fuse(xcyl(4.0, X["reg"][0] - 6, X["reg"][0], *G))            # 调节器轴（从机座侧壁的座里伸过来）
+    plate = plate.fuse(xcyl(4.0, 298.0, X["reg"][0], *G))            # 调节器轴 Ø8（装在立柱下左横筋的座里，x 297…310）
     P["regulator"] = (plate, "metal", "steel", None)
     # ---- 滑块（在调节器槽里）＋ 销（穿过送布连杆小头、L2 一端）
     blk = Part.makeBox(X["reg"][1] - X["reg"][0], 9.0, 6.6, V(X["reg"][0], -4.5, -3.3))
@@ -91,15 +91,17 @@ def build():
     for x0, x1 in ((-6.5, -3.5), (3.5, 6.5), (9.0, 12.0)):
         r_ = Part.makeBox(x1 - x0, 24.0, 2.5, V(x0, yd - 12.0, zt - 2.5))
         rows = r_ if rows is None else rows.fuse(r_)
-    # 侧梁：y ±(12…15)，z 牙顶下 5.0…9.0（平均位置 −4.7…−8.7 附近），x −6.5 到牙架
-    zb0, zb1 = zt - 9.0, zt - 5.0
+    # 侧梁：在旋梭和针板之间，y ±(11.3…14.3)（送布行程 ±2.7 后最里到 8.6、最外到 17，针板下开口 ±18），
+    # 高 2.5：平均位置顶 −4.6、底 −7.1（最高时离针板底 1.1，最低时离旋梭 1.1）；牙顶平均 −0.3 → 侧梁顶 = 牙顶 − 4.3
+    zb1, zb0 = zt - 4.3, zt - 6.8
     for s_ in (-1, 1):
-        y0 = yd + (12.0 if s_ > 0 else -15.0)
+        y0 = yd + (11.3 if s_ > 0 else -14.3)
         rows = rows.fuse(Part.makeBox(X["bar"][1] + 6.5, 3.0, zb1 - zb0, V(-6.5, y0, zb0)))
-        rows = rows.fuse(Part.makeBox(X["bar"][1] + 6.5, 3.0, (zt - 2.5) - zb1 + 0.2, V(-6.5, y0, zb1 - 0.1)).common(
-            Part.makeBox(30, 3, 20, V(-6.5, y0, zb1 - 0.1))).common(Part.makeBox(30, 3, 20, V(-6.5, y0, -40))))
-    # 侧梁接到牙架：牙架在侧梁处往上加高
-    rows = rows.fuse(Part.makeBox(X["bar"][1] - X["bar"][0], 30.0, zb1 - (T[1] - 2.5), V(X["bar"][0], yd - 15.0, T[1] - 2.5)))
+        yl_ = yd + (11.3 if s_ > 0 else -12.0)                     # 牙排两端往下接侧梁的“腿”（y 11.3…12）
+        rows = rows.fuse(Part.makeBox(X["bar"][1] + 6.5, 0.7, (zt - 2.5) - zb1 + 0.1, V(-6.5, yl_, zb1)).common(
+            Part.makeBox(19.0, 1.0, 10.0, V(-6.5, yl_ - 0.1, zb1 - 1))))
+    # 侧梁接到牙架：牙架在 y −14.3…14.3 处往上加高到侧梁顶
+    rows = rows.fuse(Part.makeBox(X["bar"][1] - X["bar"][0], 28.6, zb1 - (T[1] - 2.5), V(X["bar"][0], yd - 14.3, T[1] - 2.5)))
     P["feed_bar"] = (bar.fuse(rows), "chrome", "steel", "plane")
     # ---- 抬牙偏心（下轴上，孔 Ø12）
     lec = xcyl(10.0, *X["lecc"], *EL).cut(xcyl(6.0, X["lecc"][0] - 1, X["lecc"][1] + 1, *O2))
@@ -107,18 +109,19 @@ def build():
     # ---- 抬牙连杆 L3（EL → D）：大头套偏心（外 r13.5、内 r10.05）
     l3 = bar2d(EL, D, 7.0, X["lecc"]).fuse(xcyl(13.5, *X["lecc"], *EL)).fuse(xcyl(5.5, *X["lecc"], *D))
     l3 = l3.cut(xcyl(10.05, X["lecc"][0] - 1, X["lecc"][1] + 1, *EL)).cut(xcyl(2.5, X["lecc"][0] - 1, X["lecc"][1] + 1, *D))
-    P["lift_link"] = (l3, "metal", "steel", "plane")
+    P["lift_link"] = (l3, "metal", "alu", "plane")
     # ---- 抬牙摆轴：轴 Ø10、曲柄（到 D）、叉子（到 K，槽沿牙架方向）
     lr = xcyl(5.0, *X["lrock"], *Lr)
     lr = lr.fuse(bar2d(Lr, D, 8.0, X["lcrank"])).fuse(xcyl(2.45, X["lecc"][0], X["lcrank"][1], *D))
     Kp = (K[0], T[1] + (K[1] - T[1]))
-    fork = bar2d(Lr, Kp, 9.0, X["fork"]).fuse(xcyl(7.0, *X["fork"], *Kp))
-    fork = fork.cut(Part.makeBox(X["fork"][1] - X["fork"][0] + 2, 18.0, 5.0, V(X["fork"][0] - 1, Kp[0] - 9.0, Kp[1] - 2.5)))
+    # 叉子：头部高 10（滑块销 Ø4.9 在 5 宽的槽里沿牙架方向滑），顶离机座顶板 ≥ 1
+    fork = bar2d(Lr, (Kp[0] - 4.0, Kp[1]), 8.0, X["fork"]).fuse(Part.makeBox(X["fork"][1] - X["fork"][0], 14.0, 10.0, V(X["fork"][0], Kp[0] - 7.0, Kp[1] - 5.0)))
+    fork = fork.cut(Part.makeBox(X["fork"][1] - X["fork"][0] + 2, 16.0, 5.0, V(X["fork"][0] - 1, Kp[0] - 8.0, Kp[1] - 2.5)))
     P["lift_rock"] = (lr.fuse(fork), "metal", "steel", "plane")
     return P
 
 
-RHO = dict(steel=7.85e-6)
+RHO = dict(steel=7.85e-6, alu=2.75e-6)
 
 
 def inertia_x(s, rho, yc, zc):

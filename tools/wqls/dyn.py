@@ -214,11 +214,35 @@ class Machine:
         F_shake = -(ms["m_bar"] * a(nb) + ms["m_rod"] * a(rod) + ms["m_tk"] * a(tkg)) + F_cent
         F_shake[:, 0] += -ms["m_feed"] * a(fd)[:, 0]
         F_shake[:, 1] += -ms["m_feed"] * a(fd)[:, 1]
+        # G4.6 起：送布组有了实体机构，用 g4_feed_dyn.py 算出的送布组惯性力矩、送布阻力矩、送布连杆的力、惯性力替换上面的“送布牙集中质量”估计
+        FDY = _feed_dyn(n)
+        if FDY is not None:
+            ip = lambda arr: np.interp(phi, FDY["phi"], arr, period=360.0)   # noqa: E731
+            T_fd, T_feed = ip(FDY["T_inertia"]), ip(FDY["T_resist"])
+            F_fe = ip(FDY["F_fe"])
+            F_shake[:, 0] = F_shake[:, 0] + ms["m_feed"] * a(fd)[:, 0] + ip(FDY["F_in"][:, 0])     # 端视坐标 u = −y
+            F_shake[:, 1] = F_shake[:, 1] + ms["m_feed"] * a(fd)[:, 1] - ip(FDY["F_in"][:, 1])
+            T_sew = T_needle + T_thread + T_feed + T_fric
+            T = T_bar + T_rod + T_tk + T_fd + T_grav + T_sew
 
         return dict(phi=phi, n=n, w=w, T=T, T_bar=T_bar, T_rod=T_rod, T_tk=T_tk, T_fd=T_fd, T_grav=T_grav,
                     T_needle=T_needle, T_thread=T_thread, T_feed=T_feed, T_fric=T_fric, T_sew=T_sew,
                     F_crank=F_crank_total, F_rod=F_crank, F_cent=F_cent, F_tk=F_tk, F_fe=F_fe, N_guide=N_guide, F_shake=F_shake, cw=cw,
                     m_recip=m_recip, m_rot=m_rot)
+
+
+def _feed_dyn(n):
+    """G4/送布动力.json（5 mm 正缝，送布最重的一档）按转速平方缩放惯性项；没有这个文件时返回 None"""
+    f = ROOT / "docs" / "设计" / "WQ-LS" / "G4" / "送布动力.json"
+    if not f.exists():
+        return None
+    d = __import__("json").loads(f.read_text())["s5"]
+    k = (n / d["n_rpm"]) ** 2
+    Fv = np.array([np.nan if v is None else v for v in d["F_fe_vertical_N"]], float)
+    ok = np.isfinite(Fv)
+    Fv = np.interp(np.arange(len(Fv)), np.flatnonzero(ok), Fv[ok], period=len(Fv))
+    return dict(phi=np.array(d["phi"]), T_inertia=np.array(d["T_inertia_Nm"]) * k, T_resist=np.array(d["T_resist_Nm"]),
+                F_fe=Fv * k, F_in=np.array(d["F_inertia_N"]) * k)
 
 
 def summary(R):

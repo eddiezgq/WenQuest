@@ -172,15 +172,15 @@
    "material": "metal"
   },
   "feed_rod": {
-   "mass_g": 141.0,
+   "mass_g": 49.4,
    "material": "metal"
   },
   "regulator": {
-   "mass_g": 17.9,
+   "mass_g": 23.4,
    "material": "metal"
   },
   "reg_slider": {
-   "mass_g": 7.2,
+   "mass_g": 7.1,
    "material": "metal"
   },
   "feed_link": {
@@ -188,11 +188,11 @@
    "material": "metal"
   },
   "feed_rock": {
-   "mass_g": 211.1,
+   "mass_g": 209.9,
    "material": "metal"
   },
   "feed_bar": {
-   "mass_g": 28.5,
+   "mass_g": 31.9,
    "material": "chrome"
   },
   "lift_ecc": {
@@ -200,11 +200,11 @@
    "material": "metal"
   },
   "lift_link": {
-   "mass_g": 45.2,
+   "mass_g": 15.8,
    "material": "metal"
   },
   "lift_rock": {
-   "mass_g": 77.8,
+   "mass_g": 76.2,
    "material": "metal"
   }
  },

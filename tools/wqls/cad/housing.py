@@ -270,7 +270,7 @@ def details(solid, hollow, info):
     op = op.removeSplitter()
     op, _ = try_fillet(op, [e for e in op.Edges if e.BoundBox.ZLength > 19], (4.0, 3.0, 2.0))
     hollow = hollow.cut(op)
-    npts = [(-27, -17, -2.5), (27, -17, -2.5), (-27, 17, -2.5), (27, 17, -2.5)]
+    npts = [(-27, -19.5, -2.5), (27, -19.5, -2.5), (-27, 19.5, -2.5), (27, 19.5, -2.5)]      # G4.6：y ±17 → ±19.5（原来右边两个落在针板下开口里）
     hollow = tap_holes(hollow, npts, 2.5, 8, V(0, 0, -1))                                    # 针板螺钉 M3
     # ⑤ 机座底边法兰（内侧一圈，宽 10、厚 6，底面加工）和后面两个铰链耳
     bw = BEDWALL
@@ -298,6 +298,7 @@ def details(solid, hollow, info):
     hollow = tap_holes(hollow, tpts, M4_TAP, 5, V(0, 0, -1))
     if os.environ.get("WQ_NOHOOK") != "1":
         hollow = lower_seats(hollow, solid, info)
+        hollow = feed_seats(hollow, solid, info)
     if SPLIT and os.environ.get("WQ_NOJOINT") != "1" and not FEA_SIMPLE:   # 有限元模型：接合面按刚性连接，凸台、螺孔、销孔不进网格
         hollow = joint(hollow, solid, info)
     return hollow.removeSplitter()
@@ -347,6 +348,39 @@ def lower_seats(hollow, solid, info):
         hollow = hollow.cut(Part.makeCylinder(10.0, 20, V(BED["x0"] - 8, yl, zl), V(1, 0, 0)))  # G5.2：左端壁下轴轴线上 Ø20（同轴镗下轴两孔时镗杆导向柱穿过）
     info["lower_seats"] = dict(hook_bore=dict(axis=(0.0, zh), x=(30, 66), d=14), lower_bores=dict(axis=(yl, zl), x=[(88, 104), (364, 378)], d=32),
                                end_holes=dict(right=34, left=20, left_lower=20), rib_hole=dict(x=[PIL["x0"], PIL["x1"] - RIB_T], d=34))
+    return hollow
+
+
+def feed_seats(hollow, solid, info):
+    """G4.6 机座里的送布组支承（cad/feed.py 的零件装在这里；位置来自 G4/送布机构.json 的 geo）：
+    ① 送布摆轴（y 76、z −40）：前座 x 34…46（Ø20 凸台，一道 6 mm 的筋接机座顶板），后座在立柱下的左横筋（x 300…307）上，
+       筋上加 Ø20 凸台 x 297…310；孔 Ø14 H7 装含油轴套 Ø10 × Ø14；
+    ② 抬牙摆轴（y −45、z −28）：两个座 x 25…37、x 96…106（Ø20 凸台，一道 6 mm 的筋接前壁）；孔 Ø14 H7；
+    ③ 调节器轴（y 0、z −50）：左横筋上 Ø18 凸台 x 297…310，孔 Ø10 H7 装含油轴套 Ø8 × Ø10；
+    ④ 机座顶板在立柱脚里开送布连杆过孔 x 326…339、y −10…12。"""
+    g = json.load(open(os.path.join(os.path.dirname(_tkj), "送布机构.json"), encoding="utf-8"))["geo"]
+    (fy, fz), (ly, lz), (gy, gz) = g["Fr"], g["Lr"], g["G"]
+    top = Part.makeBox(600, 400, 3.0, V(-200, -200, -BEDWALL - 1.0))
+    feats = []
+    feats.append(Part.makeCylinder(10, 12, V(34, fy, fz), V(1, 0, 0)).fuse(Part.makeBox(12, 6, -fz, V(34, fy - 3, fz))))
+    feats.append(Part.makeCylinder(10, 13, V(297, fy, fz), V(1, 0, 0)))
+    feats.append(Part.makeCylinder(9, 13, V(297, gy, gz), V(1, 0, 0)))
+    for x0, L in ((25.0, 12.0), (96.0, 10.0)):
+        feats.append(Part.makeCylinder(10, L, V(x0, ly, lz), V(1, 0, 0)).fuse(Part.makeBox(L, ly - (BED["y0"] - 1.0), 6, V(x0, BED["y0"] - 1.0, lz - 3))))
+    for f_ in feats:
+        hollow = fuse_fillet(hollow, f_.fuse(top.common(Part.makeBox(f_.BoundBox.XLength, f_.BoundBox.YLength, 3.0,
+                                                                     V(f_.BoundBox.XMin, f_.BoundBox.YMin, -BEDWALL - 1.0)))).common(solid))
+    if not FEA_SIMPLE:
+        for x0, L in ((33.0, 14.0), (296.0, 15.0)):
+            hollow = hollow.cut(Part.makeCylinder(7.0, L, V(x0, fy, fz), V(1, 0, 0)))          # 送布摆轴孔 Ø14 H7
+        for x0, L in ((24.0, 14.0), (95.0, 12.0)):
+            hollow = hollow.cut(Part.makeCylinder(7.0, L, V(x0, ly, lz), V(1, 0, 0)))          # 抬牙摆轴孔 Ø14 H7
+        hollow = hollow.cut(Part.makeCylinder(5.0, 15, V(296, gy, gz), V(1, 0, 0)))             # 调节器轴孔 Ø10 H7
+    rod = Part.makeBox(13, 22, 20, V(326, -10, -15))
+    rod = rod.makeFillet(4, [e for e in rod.Edges if e.BoundBox.ZLength > 19])
+    hollow = hollow.cut(rod)                                                                    # 送布连杆过孔
+    info["feed_seats"] = dict(feed_rock=dict(axis=(fy, fz), x=[(34, 46), (297, 310)], d=14), lift_rock=dict(axis=(ly, lz), x=[(25, 37), (96, 106)], d=14),
+                              regulator=dict(axis=(gy, gz), x=(297, 310), d=10), rod_hole=dict(x=(326, 339), y=(-10, 12)))
     return hollow
 
 
@@ -680,7 +714,9 @@ def casting():
             rb.append(sl.common(cav).cut(hole))
         for z in (55.0, 115.0):
             sl = Part.makeBox(PIL["x1"] - PIL["x0"] + 20, 300, RIB_T, V(PIL["x0"] - 10, -150, z))
-            slot = Part.makeBox(34, 80, RIB_T + 2, V(S_BELT_X - 17, -30, z - 1))   # G4.5：y −30…50（下轴在后面，带的后边在 z 55 处到 y 约 34）.fuse(Part.makeCylinder(10, RIB_T + 2, V(330, 45, z - 1), V(0, 0, 1)))
+            # G4.5：槽 y −30…50（下轴在后面，带的后边在 z 55 处到 y 约 34）；G4.6：往左加宽到 x 325，送布连杆（x 327…335）
+            # 从这里竖着穿过；电线、油管孔挪到 (378, 85)。（G4.5 改这一行时把注释写到了 .fuse 前面，电线孔被注释掉了，这次一并改正）
+            slot = Part.makeBox(44, 80, RIB_T + 2, V(325.0, -30, z - 1)).fuse(Part.makeCylinder(10, RIB_T + 2, V(378, 85, z - 1), V(0, 0, 1)))
             rb.append(sl.common(cav).cut(slot))
         for y in ((-20.0, 50.0) if BED_RIB_H > 1 else ()):
             sl = Part.makeBox(BED["x1"] - 80, RIB_T, BED_RIB_H, V(80, y - RIB_T / 2, -BED_RIB_H))
