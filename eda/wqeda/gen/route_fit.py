@@ -3,7 +3,8 @@
 
 1. 一个焊盘离同一器件上另一网络的焊盘比“两类网络之间的布线间距”还近时，布线器接不上这个焊盘
    （例：1206 分压电阻两脚 1.8 mm、要求 2.2 mm；整流桥两个交流脚 1.9 mm、相线↔零线要求 2.6 mm）。
-   引脚间距是器件自己的事（由它的额定管），所以布线时两类之间的间距取“要求”和“这类器件引脚最小间距 − 0.05 mm”里小的那个；
+   引脚间距是器件自己的事（由它的额定管），所以布线时两类之间的间距取“要求”和
+   “这类器件引脚最小间距 − 0.05 mm”里小的那个；
    真正的安全要求另由安全距离检查（checks/safety.py）按铜间距量，过不了就在那里报。 → clamp_pairs
 2. 布线器不会在引脚旁边把粗线收细：大电流线（交流 7.9 A 用 2.5 mm）进不了 5 mm 脚距的端子。
    分类可以写 route_mm（布线时的线宽，比 track_mm 细），布完再把每段线在有空的地方加宽到 track_mm，
@@ -77,12 +78,18 @@ def widen(board, targets, clearance):
     for t in board.GetTracks():
         lid, net = t.GetLayer(), t.GetNetname()
         if t.GetClass() == "PCB_VIA":
-            g = Point(pcbnew.ToMM(t.GetPosition().x), pcbnew.ToMM(t.GetPosition().y)).buffer(pcbnew.ToMM(t.GetWidth()) / 2)
+            g = Point(pcbnew.ToMM(t.GetPosition().x), pcbnew.ToMM(t.GetPosition().y)).buffer(
+                pcbnew.ToMM(t.GetWidth()) / 2
+            )
             for l2 in t.GetLayerSet().CuStack():
                 add(l2, net, g)
             continue
-        line = LineString([(pcbnew.ToMM(t.GetStart().x), pcbnew.ToMM(t.GetStart().y)),
-                           (pcbnew.ToMM(t.GetEnd().x), pcbnew.ToMM(t.GetEnd().y))])
+        line = LineString(
+            [
+                (pcbnew.ToMM(t.GetStart().x), pcbnew.ToMM(t.GetStart().y)),
+                (pcbnew.ToMM(t.GetEnd().x), pcbnew.ToMM(t.GetEnd().y)),
+            ]
+        )
         w = pcbnew.ToMM(t.GetWidth())
         add(lid, net, line.buffer(max(w, targets.get(net, w)) / 2))
         if net in targets and targets[net] > w + 1e-6:

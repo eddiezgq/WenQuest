@@ -223,7 +223,8 @@ def _drop_classes(txt):
 
 def dsn_rules(dsn_text, classes, pairs=()):
     """改 DSN 的线宽 / 间距类别：classes = {类名: (线宽 mm, 间距 mm, [网络], [层]?)}；这些网络从缺省类别里拿出来。
-    pairs = [(类名 A, 类名 B, 间距 mm)]：两个分类之间另定的间距（Specctra class_class；Default 即缺省类别 kicad_default）"""
+    pairs = [(类名 A, 类名 B, 间距 mm)]：两个分类之间另定的间距
+    （Specctra class_class；Default 即缺省类别 kicad_default）"""
     dsn_text = _drop_classes(dsn_text)
     i = dsn_text.index("(class kicad_default")
     j = dsn_text.index("(circuit", i)
@@ -381,7 +382,8 @@ def fill_zones(board):
 
 
 def classes_of(x):
-    """L4 网络分类 → 布线器要的 {类名: (线宽, 间距, [网络], [层]?)}；分类写了 route_mm 时布线按它（布完再加宽，见 route_fit）"""
+    """L4 网络分类 → 布线器要的 {类名: (线宽, 间距, [网络], [层]?)}；
+    分类写了 route_mm 时布线按它（布完再加宽，见 route_fit）"""
     out = {}
     for c in x.get("net_classes") or []:
         spec = (c.get("route_mm") or c["track_mm"], c["clearance_mm"], list(c["nets"]))

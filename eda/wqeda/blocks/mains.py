@@ -465,7 +465,8 @@ def calc_flyback_aux(block, spec, d, parts):
     ic, dout = p["ic"], p["out_diode"]
     outs = p["outputs"]
     fl = fly(spec, p)
-    po, pin, vmin, vmax, vor, f, dmax, i_pk, lp = (fl[k] for k in ("po", "pin", "vmin", "vmax", "vor", "f", "dmax", "i_pk", "lp"))
+    keys = ("po", "pin", "vmin", "vmax", "vor", "f", "dmax", "i_pk", "lp")
+    po, pin, vmin, vmax, vor, f, dmax, i_pk, lp = (fl[k] for k in keys)
     main = outs[0]
     n = vor / (main["v"] + p["vf_out"])
     v_ds = vmax + p["v_clamp"]

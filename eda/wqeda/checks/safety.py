@@ -78,9 +78,17 @@ def _nearest(fa, fb, window, board=None, bridges=None):
                 p, q = nearest_points(f.geom, g.geom)
                 if bridges and _inside_bridge(board, bridges, ((p.x + q.x) / 2, (p.y + q.y) / 2), f.net, g.net):
                     continue
-                best, where = d, [round((p.x + q.x) / 2, 2), round(-(p.y + q.y) / 2, 2), f.layer,
-                                  "{} {}{} ↔ {} {}{}".format(f.kind, f.net, " " + f.ref if f.ref else "", g.kind, g.net,
-                                                           " " + g.ref if g.ref else "")]
+                best, where = (
+                    d,
+                    [
+                        round((p.x + q.x) / 2, 2),
+                        round(-(p.y + q.y) / 2, 2),
+                        f.layer,
+                        "{} {}{} ↔ {} {}{}".format(
+                            f.kind, f.net, " " + f.ref if f.ref else "", g.kind, g.net, " " + g.ref if g.ref else ""
+                        ),
+                    ],
+                )
     return best, where
 
 
@@ -102,11 +110,23 @@ def run(board, rules):
             st = PASS if best >= need - EPS else FAIL
             detail = "最近 {:.2f} mm（{} 层，{}）".format(best, where[2], where[3])
             best_txt = round(best, 3)
-        out.append({
-            "key": "S-" + r["key"], "name": "安全距离：" + r["name"], "status": st, "value": best_txt,
-            "limit": need, "unit": "mm", "at": [where] if where else [], "detail": detail,
-            "rule": "电气间隙 ≥ {:g} mm、爬电距离 ≥ {:g} mm（直线距离量，偏保守）".format(r["clearance_mm"], r["creepage_mm"]),
-            "insulation": r.get("insulation", ""), "example": bool(r.get("example")),
-            "source": r.get("source", ""), "groups": [sorted(a), sorted(b)],
-        })
+        out.append(
+            {
+                "key": "S-" + r["key"],
+                "name": "安全距离：" + r["name"],
+                "status": st,
+                "value": best_txt,
+                "limit": need,
+                "unit": "mm",
+                "at": [where] if where else [],
+                "detail": detail,
+                "rule": "电气间隙 ≥ {:g} mm、爬电距离 ≥ {:g} mm（直线距离量，偏保守）".format(
+                    r["clearance_mm"], r["creepage_mm"]
+                ),
+                "insulation": r.get("insulation", ""),
+                "example": bool(r.get("example")),
+                "source": r.get("source", ""),
+                "groups": [sorted(a), sorted(b)],
+            }
+        )
     return out

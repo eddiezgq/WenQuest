@@ -85,7 +85,8 @@ def gen_ac_input(block, spec, d):
             k,
             {"1": "L_IN", "2": "N_IN"},
             "CONN-AC",
-            "交流输入：1 相线、2 零线。保护地线不上板：直接接电控箱的接地螺柱；板上的 Y 电容经安装孔 H1 接箱体（159d2b）",
+            "交流输入：1 相线、2 零线。保护地线不上板：直接接电控箱的接地螺柱；"
+            "板上的 Y 电容经安装孔 H1 接箱体（159d2b）",
         ),
         c.part(
             "F101",
@@ -454,13 +455,16 @@ def gen_flyback_aux(block, spec, d):
             "FLY-24/15/5",
             "Transformer_THT:Transformer_EPCOS_B66359A1013T_Horizontal",
             k,
-            {"1": "VBUS", "3": "FLY_D", "8": "FLY_24", "9": "GND", "10": "FLY_15", "11": "GND", "12": "FLY_5", "13": "GND"},
+            {"1": "VBUS", "3": "FLY_D", "8": "FLY_24", "9": "GND", "10": "FLY_15", "11": "GND", "12": "FLY_5",
+             "13": "GND"},
             "XFMR-FLY-CUSTOM",
-            "反激变压器（定制：ETD29 + 卧式骨架 B66359A1013T，匝数、气隙见计算书“按理论”；三路次级共地，不要求加强绝缘）",
+            "反激变压器（定制：ETD29 + 卧式骨架 B66359A1013T，匝数、气隙见计算书“按理论”；"
+            "三路次级共地，不要求加强绝缘）",
         ),
         # 初级钳位（RCD，按理论：漏感取初级电感的比例，见计算书）
         _d("D301", "US1M", "FLY_D", "CLAMP", k, "Diode_SMD:D_SMA", "DIO-US1M", "钳位二极管（快恢复 1000 V）"),
-        _r("R303", rc, "VBUS", "CLAMP_M", k, "RCD 钳位电阻：两只 2512 串联 = {}（计算书 R ≤ {:.3g} kΩ，功耗 {:.2g} W 两只分担）".format(
+        _r("R303", rc, "VBUS", "CLAMP_M", k,
+           "RCD 钳位电阻：两只 2512 串联 = {}（计算书 R ≤ {:.3g} kΩ，功耗 {:.2g} W 两只分担）".format(
             c.fmt(2 * c.parse(rc)), cl["r"] / 1e3, cl["p"]), FP_R2512, "RES-2512"),
         _r("R310", rc, "CLAMP_M", "CLAMP", k, fp=FP_R2512, item="RES-2512"),
         c.part("C303", "Device:C", "{}/1kV".format(c.fmt(cc)), FP_C1812, k, {"1": "VBUS", "2": "CLAMP"}, "CAP-1812-1KV",

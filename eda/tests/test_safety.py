@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """第 159 轮 159d2b：安全距离检查（checks/safety.py）——用手搭的板子模型，距离手算"""
+
 from shapely.geometry import box
 
 from wqeda.checks import safety
@@ -9,7 +10,15 @@ from wqeda.model import Board, Feature
 RULES = {
     "groups": {"hv": ["VBUS"], "iso": ["GND_ISO"], "low": "rest"},
     "rules": [
-        {"key": "iso", "name": "隔离", "a": ["iso"], "b": ["hv", "low"], "clearance_mm": 3.0, "creepage_mm": 4.0, "example": True},
+        {
+            "key": "iso",
+            "name": "隔离",
+            "a": ["iso"],
+            "b": ["hv", "low"],
+            "clearance_mm": 3.0,
+            "creepage_mm": 4.0,
+            "example": True,
+        },
         {"key": "bus", "name": "母线", "a": ["hv"], "b": ["low"], "clearance_mm": 2.0, "creepage_mm": 2.0},
     ],
 }
@@ -51,7 +60,7 @@ def test_bridge_component_courtyard_is_exempt():
         Feature("F", box(2, 0, 3, 1), "pth", "GND_ISO", "U2", "3"),
         Feature("F", box(2.2, 0.2, 6, 0.6), "track", "GND_ISO"),  # 从 3 脚引出的线，离 2 脚 1.2 mm，但在外框里
         Feature("F", box(0, 10, 1, 11), "track", "GND"),
-        Feature("F", box(3, 10, 4, 11), "track", "GND_ISO"),       # 外框外 2 mm：不够 4 mm
+        Feature("F", box(3, 10, 4, 11), "track", "GND_ISO"),  # 外框外 2 mm：不够 4 mm
     ]
     b.courtyards = {"U2": ("F", box(-0.5, -1, 3.5, 2))}
     r = {x["key"]: x for x in safety.run(b, RULES)}
