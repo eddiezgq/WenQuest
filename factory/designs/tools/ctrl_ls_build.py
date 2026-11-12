@@ -257,9 +257,8 @@ def board_build(route, jar):
     hole_nets(board, nets)
     planes(board, nets)
     keep = gb.tie_keepouts(board)
-    for net, layer, pts in D.X["pours"]:            # 功率铺铜（设计描述 board.pours），布线器把它当禁布区
-        gb.add_pour(board, nets[net], layer, pts)
-        keep.append((layer, pts))
+    for net, layer, pts in D.X["pours"]:            # 功率铺铜（设计描述 board.pours）：导出给布线器时它自己就是这一网络的平面，
+        gb.add_pour(board, nets[net], layer, pts)   # 不再另加禁布区（两样叠在一起 Freerouting 一遍也走不完，159d2b 试出来的）
     os.makedirs(TMP, exist_ok=True)
     stats = None
     if route:
