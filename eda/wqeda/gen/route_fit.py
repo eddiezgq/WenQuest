@@ -3,9 +3,9 @@
 
 1. 一个焊盘离同一器件上另一网络的焊盘比“两类网络之间的布线间距”还近时，布线器接不上这个焊盘
    （例：1206 分压电阻两脚 1.8 mm、要求 2.2 mm；整流桥两个交流脚 1.9 mm、相线↔零线要求 2.6 mm）。
-   引脚间距是器件自己的事（由它的额定管），所以布线时两类之间的间距取“要求”和
-   “这类器件引脚最小间距 − 0.05 mm”里小的那个；
-   真正的安全要求另由安全距离检查（checks/safety.py）按铜间距量，过不了就在那里报。 → clamp_pairs
+   引脚间距是器件自己的事（由它的额定管）：布线前给这种焊盘各引一小段锁定的线，朝最空的方向、长到离开相邻焊盘的
+   间距范围，布线器从线头接；全板的布线间距不放宽（第十一次试过整体放宽，别处的线也跟着挤近了）。 → stubs
+   设计规则检查和安全距离检查对这几段同样按“器件自己引脚间距”处理（只限这个器件外框里、这两个网络之间）。
 2. 布线器不会在引脚旁边把粗线收细：大电流线（交流 7.9 A 用 2.5 mm）进不了 5 mm 脚距的端子。
    分类可以写 route_mm（布线时的线宽，比 track_mm 细），布完再把每段线在有空的地方加宽到 track_mm，
    旁边没空的那几段保持细（只在引脚附近）。 → widen
@@ -43,18 +43,95 @@ def pad_gaps(board, class_of):
     return out
 
 
-def clamp_pairs(pairs, gaps, floor=0.2, margin=STEP):
-    """[(A, B, 间距)] → (布线用的 [(A, B, 间距)], 说明 [(A, B, 要求, 布线用, 卡在哪个器件)])"""
-    out, notes = [], []
-    for a, b, c in pairs:
-        g = gaps.get(frozenset((a, b)))
-        if g and g[0] - margin < c:
-            r = max(floor, round((g[0] - margin) // STEP * STEP, 2))
-            out.append((a, b, r))
-            notes.append((a, b, c, r, g[1]))
+def conflicts(board, class_of, clearance):
+    """同一器件上、比布线间距还近的两类焊盘：[(器件, 焊盘 A, 焊盘 B, 间距 mm, 要求 mm)]"""
+    out = []
+    for fp in board.GetFootprints():
+        pads = [p for p in fp.Pads() if p.GetNetname()]
+        for p, q in itertools.combinations(pads, 2):
+            na, nb = p.GetNetname(), q.GetNetname()
+            if na == nb or class_of(na) == class_of(nb):
+                continue
+            need = clearance(na, nb)
+            g = _poly(p.GetEffectivePolygon()).distance(_poly(q.GetEffectivePolygon()))
+            if g < need - 1e-6:
+                out.append((fp.GetReference(), p, q, g, need))
+    return out
+
+
+def stubs(board, class_of, clearance, width_of, layers_of, outline):
+    """给“比布线间距还近”的焊盘各引一小段固定线（锁定）：从焊盘中心朝最空的方向引出，长到离开相邻焊盘的间距范围，
+    布线器从线头接（它接不上这种焊盘本身，见上面第 1 条）。返回加的段数。
+    width_of(网络) → 布线线宽；layers_of(网络) → 允许的铜层名；outline = 板框（shapely 多边形，mm，KiCad 坐标）"""
+    import math
+
+    from shapely.geometry import LineString
+
+    cons = conflicts(board, class_of, clearance)
+    need = {}
+    for _, p, q, _, c in cons:
+        for a in (p, q):
+            k = (a.GetParent().GetReference(), a.GetNumber())
+            need[k] = (a, max(c, need.get(k, (a, 0))[1]))
+    pads = [(p, _poly(p.GetEffectivePolygon())) for fp in board.GetFootprints() for p in fp.Pads() if p.GetNetname()]
+    lid = {"F.Cu": pcbnew.F_Cu, "B.Cu": pcbnew.B_Cu, "In2.Cu": pcbnew.In2_Cu}
+    n = 0
+    for (_ref, _num), (p, c) in sorted(need.items(), key=lambda kv: (kv[0][0], kv[0][1])):
+        net = p.GetNetname()
+        w = width_of(net)
+        x0, y0 = pcbnew.ToMM(p.GetPosition().x), pcbnew.ToMM(p.GetPosition().y)
+        sx, sy = pcbnew.ToMM(p.GetSize().x), pcbnew.ToMM(p.GetSize().y)
+        length = max(sx, sy) / 2 + c + w / 2 + 0.3
+        on = [ln for ln in layers_of(net) if ln in lid and p.IsOnLayer(lid[ln])]
+        best = None
+        for ln in on:
+            for k in range(16):
+                a = k * math.pi / 8
+                end = (x0 + length * math.cos(a), y0 + length * math.sin(a))
+                seg = LineString([(x0, y0), end])
+                if not outline.buffer(-(w / 2 + 0.5)).contains(LineString([seg.interpolate(0.5), end])):
+                    continue
+                tip = LineString([seg.interpolate(max(sx, sy) / 2 + c), end]).buffer(w / 2)
+                score = 99.0
+                for q, g in pads:
+                    if q.GetNetname() == net or not q.IsOnLayer(lid[ln]):
+                        continue
+                    d = g.distance(tip) - clearance(net, q.GetNetname())
+                    other = q.GetParent().GetReference() != p.GetParent().GetReference()
+                    if other and g.distance(seg.buffer(w / 2)) < clearance(net, q.GetNetname()):
+                        d = min(d, -1.0)
+                    score = min(score, d)
+                if best is None or score > best[0]:
+                    best = (score, ln, end)
+        if not best or best[0] < 0:
+            continue
+        t = pcbnew.PCB_TRACK(board)
+        t.SetStart(p.GetPosition())
+        t.SetEnd(pcbnew.VECTOR2I(pcbnew.FromMM(best[2][0]), pcbnew.FromMM(best[2][1])))
+        t.SetWidth(pcbnew.FromMM(w))
+        t.SetLayer(lid[best[1]])
+        t.SetNet(p.GetNet())
+        t.SetLocked(True)
+        board.Add(t)
+        n += 1
+    return n
+
+
+def dedupe(board):
+    """布线器的结果里会带回固定线（与板上已有的一样）：同网络、同层、同起止点的重复段删掉。返回删的段数"""
+    seen, drop = set(), []
+    for t in board.GetTracks():
+        if t.GetClass() == "PCB_VIA":
+            k = ("v", t.GetNetname(), t.GetPosition().x, t.GetPosition().y)
         else:
-            out.append((a, b, c))
-    return out, notes
+            a, b = (t.GetStart().x, t.GetStart().y), (t.GetEnd().x, t.GetEnd().y)
+            k = ("t", t.GetNetname(), t.GetLayer(), min(a, b), max(a, b))
+        if k in seen:
+            drop.append(t)
+        seen.add(k)
+    for t in drop:
+        board.Remove(t)
+    return len(drop)
 
 
 def widen(board, targets, clearance):

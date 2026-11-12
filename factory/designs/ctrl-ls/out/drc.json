@@ -1,111 +1,9 @@
 {
- "errors": 42,
+ "errors": 75,
  "items": [
   {
    "at": [
     [
-     151.94,
-     93.45,
-     "Reference 'Q507'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     171.47,
-     29.82,
-     "Reference 'C407'"
-    ],
-    [
-     198.46,
-     29.21,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     77.28,
-     7.03,
-     "Reference 'C104'"
-    ],
-    [
-     79.37,
-     6.18,
-     "Reference 'BR101'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     48.91,
-     63.95,
-     "Reference 'Q101'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     14.19,
-     117.0,
-     "Reference 'U302'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     212.0,
-     126.56,
-     "Line on F.Silkscreen"
-    ],
-    [
-     212.0,
-     126.0,
-     "Reference 'U602'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
      212.0,
      126.0,
      "Reference 'U602'"
@@ -123,115 +21,13 @@
   {
    "at": [
     [
-     164.56,
-     85.5,
-     "Reference 'Q505'"
+     212.0,
+     126.0,
+     "Reference 'U602'"
     ],
     [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     206.18,
-     85.5,
-     "Reference 'Q506'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     215.73,
-     93.23,
-     "Reference 'D508'"
-    ],
-    [
-     213.59,
-     92.63,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     193.56,
-     93.45,
-     "Reference 'Q508'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     174.12,
-     93.23,
-     "Reference 'D507'"
-    ],
-    [
-     171.98,
-     92.63,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     199.97,
-     29.82,
-     "Reference 'R402'"
-    ],
-    [
-     198.46,
-     29.21,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     199.97,
-     29.82,
-     "Reference 'R402'"
-    ],
-    [
-     198.46,
-     1.06,
+     212.0,
+     126.56,
      "Line on F.Silkscreen"
     ]
    ],
@@ -276,14 +72,14 @@
   {
    "at": [
     [
-     194.94,
-     30.15,
-     "Reference 'C401'"
+     198.46,
+     29.21,
+     "Line on F.Silkscreen"
     ],
     [
-     196.11,
-     30.65,
-     "Reference 'U401'"
+     171.47,
+     29.82,
+     "Reference 'C407'"
     ]
    ],
    "code": "silk_overlap",
@@ -293,14 +89,184 @@
   {
    "at": [
     [
-     197.6,
-     36.93,
+     198.46,
+     29.21,
      "Line on F.Silkscreen"
     ],
     [
-     199.24,
-     37.52,
-     "Reference 'C222'"
+     199.97,
+     29.82,
+     "Reference 'R402'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     144.03,
+     20.87,
+     "Reference 'Q202'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ],
+    [
+     151.94,
+     93.45,
+     "Reference 'Q507'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ],
+    [
+     14.19,
+     117.0,
+     "Reference 'U302'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     77.28,
+     7.03,
+     "Reference 'C104'"
+    ],
+    [
+     79.37,
+     6.18,
+     "Reference 'BR101'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     48.91,
+     63.95,
+     "Reference 'Q101'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     193.56,
+     93.45,
+     "Reference 'Q508'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     206.18,
+     85.5,
+     "Reference 'Q506'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     164.56,
+     85.5,
+     "Reference 'Q505'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     171.98,
+     92.63,
+     "Line on F.Silkscreen"
+    ],
+    [
+     174.12,
+     93.23,
+     "Reference 'D507'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     194.94,
+     30.15,
+     "Reference 'C401'"
+    ],
+    [
+     196.11,
+     30.65,
+     "Reference 'U401'"
     ]
    ],
    "code": "silk_overlap",
@@ -327,19 +293,65 @@
   {
    "at": [
     [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
+     198.46,
+     1.06,
+     "Line on F.Silkscreen"
     ],
     [
-     144.03,
-     20.87,
-     "Reference 'Q202'"
+     199.97,
+     29.82,
+     "Reference 'R402'"
     ]
    ],
    "code": "silk_overlap",
    "severity": "warning",
    "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     197.6,
+     36.93,
+     "Line on F.Silkscreen"
+    ],
+    [
+     199.24,
+     37.52,
+     "Reference 'C222'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     215.73,
+     93.23,
+     "Reference 'D508'"
+    ],
+    [
+     213.59,
+     92.63,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     196.11,
+     30.65,
+     "Reference 'U401'"
+    ]
+   ],
+   "code": "silk_over_copper",
+   "severity": "warning",
+   "text": "Silkscreen clipped by solder mask"
   },
   {
    "at": [
@@ -356,14 +368,19 @@
   {
    "at": [
     [
-     196.11,
-     30.65,
-     "Reference 'U401'"
+     2.0,
+     0.0,
+     "Line on Edge.Cuts"
+    ],
+    [
+     119.27,
+     0.15,
+     "Reference 'D201'"
     ]
    ],
-   "code": "silk_over_copper",
+   "code": "silk_edge_clearance",
    "severity": "warning",
-   "text": "Silkscreen clipped by solder mask"
+   "text": "Silkscreen clipped by board edge"
   },
   {
    "at": [
@@ -402,133 +419,1051 @@
   {
    "at": [
     [
-     2.0,
-     0.0,
-     "Line on Edge.Cuts"
+     67.21,
+     8.58,
+     "Track [+15V] on In2.Cu, length 12.9807 mm"
     ],
     [
-     119.27,
-     0.15,
-     "Reference 'D201'"
+     69.78,
+     12.28,
+     "PTH pad 1 [VRECT] of C104"
     ]
    ],
-   "code": "silk_edge_clearance",
-   "severity": "warning",
-   "text": "Silkscreen clipped by board edge"
-  },
-  {
-   "at": [
-    [
-     187.82,
-     34.9,
-     "Track [+15V] on F.Cu, length 2.9000 mm"
-    ],
-    [
-     185.46,
-     28.05,
-     "PTH pad 5 [+15V] of U401"
-    ]
-   ],
-   "code": "unconnected_items",
+   "code": "clearance",
    "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     200.7,
-     90.09,
-     "Track [+15V] on F.Cu, length 3.3369 mm"
-    ],
-    [
-     187.12,
-     35.6,
-     "Track [+15V] on F.Cu, length 0.9899 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
+   "text": "Clearance violation (rule HV-Vcc15 clearance 2.2000 mm; actual 2.1958 mm)"
   },
   {
    "at": [
     [
      185.46,
+     27.61,
+     "Track [+15V] on B.Cu, length 22.4074 mm"
+    ],
+    [
+     181.86,
      28.05,
-     "PTH pad 5 [+15V] of U401"
-    ],
-    [
-     132.01,
-     12.38,
-     "Track [+15V] on F.Cu, length 2.6511 mm"
+     "PTH pad 6 [OUT_V] of U401"
     ]
    ],
-   "code": "unconnected_items",
+   "code": "clearance",
    "severity": "error",
-   "text": "Missing connection between items"
+   "text": "Clearance violation (rule Boot-Vcc15 clearance 2.2000 mm; actual 1.7577 mm)"
   },
   {
    "at": [
     [
-     218.04,
-     96.07,
-     "Track [+24V] on F.Cu, length 1.6097 mm"
+     80.92,
+     125.59,
+     "Track [+3V3] on F.Cu, length 1.3529 mm"
     ],
     [
-     221.65,
-     96.16,
-     "Pad 3 [+24V] of U501 on F.Cu"
+     79.46,
+     122.69,
+     "Pad 2 [OVP_2] of R219 on F.Cu"
     ]
    ],
-   "code": "unconnected_items",
+   "code": "clearance",
    "severity": "error",
-   "text": "Missing connection between items"
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.9002 mm)"
   },
   {
    "at": [
     [
-     227.4,
-     96.16,
-     "Pad 26 [+24V] of U501 on F.Cu"
+     79.57,
+     125.59,
+     "Track [+3V3] on F.Cu, length 1.1700 mm"
     ],
     [
-     221.65,
-     96.16,
-     "Pad 3 [+24V] of U501 on F.Cu"
+     79.46,
+     122.69,
+     "Pad 2 [OVP_2] of R219 on F.Cu"
     ]
    ],
-   "code": "unconnected_items",
+   "code": "clearance",
    "severity": "error",
-   "text": "Missing connection between items"
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.9002 mm)"
   },
   {
    "at": [
     [
-     194.85,
-     38.57,
-     "Track [+3V3] on F.Cu, length 3.0601 mm"
+     81.81,
+     126.48,
+     "Track [+3V3] on F.Cu, length 1.2584 mm"
+    ],
+    [
+     79.46,
+     122.69,
+     "Pad 2 [OVP_2] of R219 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.1722 mm)"
+  },
+  {
+   "at": [
+    [
+     91.89,
+     119.37,
+     "Track [BRO_A] on F.Cu, length 3.8810 mm"
+    ],
+    [
+     89.76,
+     116.78,
+     "Pad 2 [N_C] of D204 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_N-HVSig clearance 1.5000 mm; actual 1.4425 mm)"
+  },
+  {
+   "at": [
+    [
+     91.89,
+     119.37,
+     "Track [BRO_A] on F.Cu, length 3.8810 mm"
+    ],
+    [
+     93.18,
+     121.02,
+     "Track [OVP] on F.Cu, length 17.0964 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.7170 mm)"
+  },
+  {
+   "at": [
+    [
+     91.89,
+     119.37,
+     "Track [BRO_A] on F.Cu, length 3.8810 mm"
+    ],
+    [
+     91.9,
+     122.3,
+     "Track [OVP] on F.Cu, length 1.8113 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.7170 mm)"
+  },
+  {
+   "at": [
+    [
+     75.67,
+     115.82,
+     "Track [BRO_A] on F.Cu, length 4.3255 mm"
+    ],
+    [
+     79.67,
+     115.04,
+     "Track [L_R] on F.Cu, length 1.7434 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_L-HVSig clearance 1.5000 mm; actual 1.4260 mm)"
+  },
+  {
+   "at": [
+    [
+     75.67,
+     115.82,
+     "Track [BRO_A] on F.Cu, length 4.3255 mm"
+    ],
+    [
+     84.79,
+     110.34,
+     "Track [PFC_OFF] on F.Cu, length 10.6162 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.0432 mm)"
+  },
+  {
+   "at": [
+    [
+     78.73,
+     112.76,
+     "Track [BRO_A] on F.Cu, length 3.0107 mm"
+    ],
+    [
+     79.67,
+     115.04,
+     "Track [L_R] on F.Cu, length 1.7434 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_L-HVSig clearance 1.5000 mm; actual 1.4273 mm)"
+  },
+  {
+   "at": [
+    [
+     78.73,
+     112.76,
+     "Track [BRO_A] on F.Cu, length 3.0107 mm"
+    ],
+    [
+     84.79,
+     110.34,
+     "Track [PFC_OFF] on F.Cu, length 10.6162 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.0432 mm)"
+  },
+  {
+   "at": [
+    [
+     88.01,
+     119.37,
+     "Track [BRO_A] on F.Cu, length 3.1845 mm"
+    ],
+    [
+     89.76,
+     116.78,
+     "Pad 2 [N_C] of D204 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_N-HVSig clearance 1.5000 mm; actual 1.4026 mm)"
+  },
+  {
+   "at": [
+    [
+     95.13,
+     116.14,
+     "Track [BRO_A] on F.Cu, length 4.5714 mm"
+    ],
+    [
+     93.18,
+     121.02,
+     "Track [OVP] on F.Cu, length 17.0964 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.7170 mm)"
+  },
+  {
+   "at": [
+    [
+     95.13,
+     116.14,
+     "Track [BRO_A] on F.Cu, length 4.5714 mm"
+    ],
+    [
+     91.9,
+     122.3,
+     "Track [OVP] on F.Cu, length 1.8113 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.7170 mm)"
+  },
+  {
+   "at": [
+    [
+     81.74,
+     112.76,
+     "Track [BRO_A] on F.Cu, length 5.6861 mm"
+    ],
+    [
+     84.79,
+     110.34,
+     "Track [PFC_OFF] on F.Cu, length 10.6162 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.0432 mm)"
+  },
+  {
+   "at": [
+    [
+     98.05,
+     116.14,
+     "Track [BRO_B] on F.Cu, length 4.6850 mm"
+    ],
+    [
+     105.66,
+     116.14,
+     "Pad 2 [BOP] of R212 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.1125 mm)"
+  },
+  {
+   "at": [
+    [
+     190.61,
+     30.85,
+     "Track [IN_UH] on In1.Cu, length 16.7830 mm"
+    ],
+    [
+     196.11,
+     28.05,
+     "PTH pad 1 [OUT_U] of U401"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule Boot-IpmIn clearance 2.2000 mm; actual 1.7517 mm)"
+  },
+  {
+   "at": [
+    [
+     190.61,
+     30.85,
+     "Track [IN_UH] on In1.Cu, length 16.7830 mm"
+    ],
+    [
+     193.76,
+     28.05,
+     "PTH pad 2 [VB_U] of U401"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule Boot-IpmIn clearance 2.2000 mm; actual 1.7517 mm)"
+  },
+  {
+   "at": [
+    [
+     192.51,
+     25.25,
+     "Track [IN_UL] on In1.Cu, length 19.3969 mm"
+    ],
+    [
+     196.11,
+     28.05,
+     "PTH pad 1 [OUT_U] of U401"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule Boot-IpmIn clearance 2.2000 mm; actual 1.7517 mm)"
+  },
+  {
+   "at": [
+    [
+     192.51,
+     25.25,
+     "Track [IN_UL] on In1.Cu, length 19.3969 mm"
+    ],
+    [
+     193.76,
+     28.05,
+     "PTH pad 2 [VB_U] of U401"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule Boot-IpmIn clearance 2.2000 mm; actual 1.7517 mm)"
+  },
+  {
+   "at": [
+    [
+     190.16,
+     27.6,
+     "Track [IN_UL] on In1.Cu, length 3.3244 mm"
+    ],
+    [
+     193.76,
+     28.05,
+     "PTH pad 2 [VB_U] of U401"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule Boot-IpmIn clearance 2.2000 mm; actual 1.8145 mm)"
+  },
+  {
+   "at": [
+    [
+     228.47,
+     25.25,
+     "Track [IN_VL] on F.Cu, length 52.1116 mm"
+    ],
+    [
+     193.76,
+     28.05,
+     "PTH pad 2 [VB_U] of U401"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule Boot-IpmIn clearance 2.2000 mm; actual 1.7517 mm)"
+  },
+  {
+   "at": [
+    [
+     228.47,
+     25.25,
+     "Track [IN_VL] on F.Cu, length 52.1116 mm"
+    ],
+    [
+     179.51,
+     28.05,
+     "PTH pad 7 [VB_V] of U401"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule Boot-IpmIn clearance 2.2000 mm; actual 1.7517 mm)"
+  },
+  {
+   "at": [
+    [
+     228.47,
+     25.25,
+     "Track [IN_VL] on F.Cu, length 52.1116 mm"
+    ],
+    [
+     181.86,
+     28.05,
+     "PTH pad 6 [OUT_V] of U401"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule Boot-IpmIn clearance 2.2000 mm; actual 1.7517 mm)"
+  },
+  {
+   "at": [
+    [
+     228.47,
+     25.25,
+     "Track [IN_VL] on F.Cu, length 52.1116 mm"
+    ],
+    [
+     196.11,
+     28.05,
+     "PTH pad 1 [OUT_U] of U401"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule Boot-IpmIn clearance 2.2000 mm; actual 1.7517 mm)"
+  },
+  {
+   "at": [
+    [
+     28.68,
+     30.77,
+     "Track [L_C] on F.Cu, length 27.8044 mm"
+    ],
+    [
+     36.83,
+     27.82,
+     "PTH pad 2 [N_IN] of RV101"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_L-AC_N clearance 2.6000 mm; actual 2.1735 mm)"
+  },
+  {
+   "at": [
+    [
+     28.68,
+     30.77,
+     "Track [L_C] on F.Cu, length 27.8044 mm"
+    ],
+    [
+     36.83,
+     27.82,
+     "Track [N_IN] on F.Cu, length 15.0755 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_L-AC_N clearance 2.6000 mm; actual 2.4735 mm)"
+  },
+  {
+   "at": [
+    [
+     29.33,
+     25.62,
+     "Track [L_F] on B.Cu, length 2.8426 mm"
+    ],
+    [
+     26.06,
+     17.05,
+     "Track [N_IN] on B.Cu, length 15.2369 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_L-AC_N clearance 2.6000 mm; actual 2.5477 mm)"
+  },
+  {
+   "at": [
+    [
+     6.74,
+     10.15,
+     "Track [L_IN] on B.Cu, length 7.8300 mm"
+    ],
+    [
+     3.04,
+     7.85,
+     "Track [N_IN] on B.Cu, length 4.6158 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_L-AC_N clearance 2.6000 mm; actual 2.5017 mm)"
+  },
+  {
+   "at": [
+    [
+     194.53,
+     7.72,
+     "Via [MOT_W] on F.Cu - B.Cu"
+    ],
+    [
+     186.46,
+     3.25,
+     "Track [N_U] on In2.Cu, length 12.5156 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HV-Shunt clearance 2.2000 mm; actual 1.7480 mm)"
+  },
+  {
+   "at": [
+    [
+     85.8,
+     125.45,
+     "Track [NRST] on F.Cu, length 1.2966 mm"
+    ],
+    [
+     84.15,
+     122.69,
+     "Pad 1 [OVP_2] of R220 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.1435 mm)"
+  },
+  {
+   "at": [
+    [
+     86.0,
+     125.45,
+     "Track [NRST] on F.Cu, length 0.2004 mm"
+    ],
+    [
+     84.15,
+     122.69,
+     "Pad 1 [OVP_2] of R220 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.1435 mm)"
+  },
+  {
+   "at": [
+    [
+     86.0,
+     125.45,
+     "Via [NRST] on F.Cu - B.Cu"
+    ],
+    [
+     84.15,
+     122.69,
+     "Pad 1 [OVP_2] of R220 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.0803 mm)"
+  },
+  {
+   "at": [
+    [
+     49.83,
+     33.06,
+     "Track [N_C] on B.Cu, length 14.2979 mm"
+    ],
+    [
+     60.63,
+     35.36,
+     "Via [XDIS] on F.Cu - B.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_N-HVSig clearance 1.5000 mm; actual 1.4018 mm)"
+  },
+  {
+   "at": [
+    [
+     49.83,
+     33.06,
+     "Track [N_C] on B.Cu, length 14.2979 mm"
+    ],
+    [
+     60.63,
+     48.79,
+     "Track [XDIS] on B.Cu, length 13.4323 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_N-HVSig clearance 1.5000 mm; actual 1.4518 mm)"
+  },
+  {
+   "at": [
+    [
+     26.06,
+     17.05,
+     "Track [N_IN] on B.Cu, length 15.2369 mm"
+    ],
+    [
+     29.33,
+     25.62,
+     "PTH pad 1 [L_F] of RV101"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_L-AC_N clearance 2.6000 mm; actual 2.2477 mm)"
+  },
+  {
+   "at": [
+    [
+     5.81,
+     5.07,
+     "Track [N_IN] on B.Cu, length 3.9268 mm"
+    ],
+    [
+     6.74,
+     10.15,
+     "PTH pad 1 [L_IN] of J101"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_L-AC_N clearance 2.6000 mm; actual 1.8077 mm)"
+  },
+  {
+   "at": [
+    [
+     3.04,
+     7.85,
+     "Track [N_IN] on B.Cu, length 4.6158 mm"
+    ],
+    [
+     6.74,
+     10.15,
+     "PTH pad 1 [L_IN] of J101"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_L-AC_N clearance 2.6000 mm; actual 1.8017 mm)"
+  },
+  {
+   "at": [
+    [
+     3.04,
+     12.46,
+     "Track [N_IN] on B.Cu, length 6.4819 mm"
+    ],
+    [
+     6.74,
+     10.15,
+     "PTH pad 1 [L_IN] of J101"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_L-AC_N clearance 2.6000 mm; actual 1.8142 mm)"
+  },
+  {
+   "at": [
+    [
+     186.46,
+     3.25,
+     "Track [N_U] on In2.Cu, length 12.5156 mm"
+    ],
+    [
+     191.16,
+     2.82,
+     "PTH pad 24 [MOT_U] of U401"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HV-Shunt clearance 2.2000 mm; actual 1.6284 mm)"
+  },
+  {
+   "at": [
+    [
+     158.11,
+     39.37,
+     "Track [N_V] on In2.Cu, length 29.7715 mm"
+    ],
+    [
+     162.24,
+     53.77,
+     "PTH pad 1 [VBUS] of C221"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HV-Shunt clearance 2.2000 mm; actual 1.6302 mm)"
+  },
+  {
+   "at": [
+    [
+     151.52,
+     5.96,
+     "Track [N_W] on In2.Cu, length 58.4368 mm"
+    ],
+    [
+     149.08,
+     30.82,
+     "Via [VBUS] on F.Cu - B.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HV-Shunt clearance 2.2000 mm; actual 1.6471 mm)"
+  },
+  {
+   "at": [
+    [
+     79.46,
+     122.69,
+     "Track [OVP_2] on F.Cu, length 4.6850 mm"
+    ],
+    [
+     87.07,
+     122.69,
+     "Pad 2 [OVP] of R220 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.1125 mm)"
+  },
+  {
+   "at": [
+    [
+     57.6,
+     48.49,
+     "Via [RLY_K] on F.Cu - B.Cu"
+    ],
+    [
+     57.67,
+     51.75,
+     "Track [XDIS] on B.Cu, length 4.1883 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.8057 mm)"
+  },
+  {
+   "at": [
+    [
+     57.6,
+     48.49,
+     "Track [RLY_K] on In2.Cu, length 3.0425 mm"
+    ],
+    [
+     57.67,
+     51.75,
+     "Via [XDIS] on F.Cu - B.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.9307 mm)"
+  },
+  {
+   "at": [
+    [
+     55.44,
+     50.65,
+     "Track [RLY_K] on In2.Cu, length 16.1142 mm"
+    ],
+    [
+     57.67,
+     51.75,
+     "Via [XDIS] on F.Cu - B.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.7987 mm)"
+  },
+  {
+   "at": [
+    [
+     52.29,
+     92.13,
+     "Track [TOP_C] on F.Cu, length 8.9509 mm"
+    ],
+    [
+     61.8,
+     84.62,
+     "Track [TOP_V1] on F.Cu, length 7.5038 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.8301 mm)"
+  },
+  {
+   "at": [
+    [
+     52.29,
+     92.13,
+     "Track [TOP_C] on F.Cu, length 8.9509 mm"
+    ],
+    [
+     56.5,
+     89.93,
+     "Track [TOP_V1] on F.Cu, length 5.8965 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.8301 mm)"
+  },
+  {
+   "at": [
+    [
+     51.02,
+     93.4,
+     "Track [TOP_C] on F.Cu, length 1.8017 mm"
+    ],
+    [
+     56.5,
+     89.93,
+     "Track [TOP_V1] on F.Cu, length 5.8965 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.8301 mm)"
+  },
+  {
+   "at": [
+    [
+     45.65,
+     91.89,
+     "Track [TOP_V] on F.Cu, length 1.3481 mm"
+    ],
+    [
+     44.75,
+     88.25,
+     "Track [TOP_V1] on F.Cu, length 2.8571 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.8879 mm)"
+  },
+  {
+   "at": [
+    [
+     45.65,
+     91.89,
+     "Track [TOP_V] on F.Cu, length 1.3481 mm"
+    ],
+    [
+     48.92,
+     88.25,
+     "Track [TOP_V1] on F.Cu, length 4.1736 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.9205 mm)"
+  },
+  {
+   "at": [
+    [
+     45.65,
+     90.54,
+     "Via [TOP_V] on F.Cu - B.Cu"
+    ],
+    [
+     44.75,
+     88.25,
+     "Track [TOP_V1] on F.Cu, length 2.8571 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.7129 mm)"
+  },
+  {
+   "at": [
+    [
+     45.65,
+     90.54,
+     "Via [TOP_V] on F.Cu - B.Cu"
+    ],
+    [
+     48.92,
+     88.25,
+     "Track [TOP_V1] on F.Cu, length 4.1736 mm"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.7455 mm)"
+  },
+  {
+   "at": [
+    [
+     45.65,
+     90.54,
+     "Via [TOP_V] on F.Cu - B.Cu"
+    ],
+    [
+     42.73,
+     91.89,
+     "Pad 1 [TOP_V1] of R302 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.1607 mm)"
+  },
+  {
+   "at": [
+    [
+     44.75,
+     88.25,
+     "Track [TOP_V1] on F.Cu, length 2.8571 mm"
+    ],
+    [
+     45.65,
+     91.89,
+     "Pad 2 [TOP_V] of R302 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.0532 mm)"
+  },
+  {
+   "at": [
+    [
+     42.73,
+     90.27,
+     "Track [TOP_V1] on F.Cu, length 1.6233 mm"
+    ],
+    [
+     45.65,
+     91.89,
+     "Pad 2 [TOP_V] of R302 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.1125 mm)"
+  },
+  {
+   "at": [
+    [
+     192.05,
+     73.38,
+     "Track [VBUS_SNS] on F.Cu, length 12.2827 mm"
+    ],
+    [
+     189.13,
+     72.34,
+     "Pad 1 [VBUS_SNS_2] of R422 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 1.7646 mm)"
+  },
+  {
+   "at": [
+    [
+     186.24,
+     72.34,
+     "Track [VBUS_SNS_2] on F.Cu, length 2.8850 mm"
+    ],
+    [
+     192.05,
+     72.34,
+     "Pad 2 [VBUS_SNS] of R422 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.1125 mm)"
+  },
+  {
+   "at": [
+    [
+     133.34,
+     116.14,
+     "Track [VSENSE_2] on F.Cu, length 4.6850 mm"
+    ],
+    [
+     140.95,
+     116.14,
+     "Pad 2 [VSENSE] of R216 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule HVSig-Default clearance 2.2000 mm; actual 2.1125 mm)"
+  },
+  {
+   "at": [
+    [
+     50.2,
+     51.75,
+     "Track [XDIS] on F.Cu, length 3.3811 mm"
+    ],
+    [
+     50.73,
+     48.65,
+     "Pad 2 [N_IN] of R102 on F.Cu"
+    ]
+   ],
+   "code": "clearance",
+   "severity": "error",
+   "text": "Clearance violation (rule AC_N-HVSig clearance 1.5000 mm; actual 1.4091 mm)"
+  },
+  {
+   "at": [
+    [
+     194.83,
+     38.59,
+     "Track [+3V3] on F.Cu, length 3.0879 mm"
     ],
     [
      199.14,
      31.25,
      "Pad 1 [+3V3] of R402 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     199.14,
-     31.25,
-     "Pad 1 [+3V3] of R402 on F.Cu"
-    ],
-    [
-     208.78,
-     36.31,
-     "Track [+3V3] on In2.Cu, length 0.6691 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -543,9 +1478,9 @@
      "PTH pad 2 [+5V] of U602"
     ],
     [
-     153.75,
+     203.0,
      129.47,
-     "Track [+5V] on F.Cu, length 49.2469 mm"
+     "Track [+5V] on F.Cu, length 7.1842 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -555,60 +1490,9 @@
   {
    "at": [
     [
-     98.05,
-     116.14,
-     "Pad 2 [BRO_B] of R211 on F.Cu"
-    ],
-    [
-     102.74,
-     116.14,
-     "Pad 1 [BRO_B] of R212 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     227.4,
-     97.46,
-     "Pad 24 [GND] of U501 on F.Cu"
-    ],
-    [
-     227.4,
-     98.75,
-     "Pad 22 [GND] of U501 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     119.42,
-     136.34,
-     "Pad 19 [GND] of U10 on F.Cu"
-    ],
-    [
-     121.42,
-     136.34,
-     "Pad 23 [GND] of U10 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     155.08,
-     32.48,
-     "Track [GND] on F.Cu, length 1.7038 mm"
+     156.29,
+     33.69,
+     "Track [GND] on F.Cu, length 1.7084 mm"
     ],
     [
      152.28,
@@ -623,99 +1507,14 @@
   {
    "at": [
     [
-     123.33,
-     129.93,
-     "Pad 35 [GND] of U10 on F.Cu"
-    ],
-    [
-     128.57,
-     126.77,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     121.42,
-     136.34,
-     "Pad 23 [GND] of U10 on F.Cu"
-    ],
-    [
-     123.33,
-     129.93,
-     "Pad 35 [GND] of U10 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     123.33,
-     129.93,
-     "Pad 35 [GND] of U10 on F.Cu"
-    ],
-    [
-     116.92,
-     128.02,
-     "Pad 47 [GND] of U10 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     174.58,
-     73.14,
-     "Pad 2 [GND] of R413 on F.Cu"
-    ],
-    [
-     165.69,
-     73.02,
-     "Track [GND] on F.Cu, length 0.1218 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     52.76,
-     81.58,
-     "Via [GND] on F.Cu - B.Cu"
-    ],
-    [
-     43.26,
-     79.95,
-     "Pad 2 [GND] of U301 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     173.56,
-     28.05,
-     "Track [IN_VL] on F.Cu, length 5.1663 mm"
-    ],
-    [
      150.72,
      36.41,
      "Pad 1 [IN_VL] of C412 on F.Cu"
+    ],
+    [
+     176.36,
+     25.25,
+     "Track [IN_VL] on F.Cu, length 3.9622 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -724,134 +1523,15 @@
   },
   {
    "at": [
-    [
-     170.69,
-     31.25,
-     "Pad 1 [IPM_SD] of C407 on F.Cu"
-    ],
     [
      159.57,
      30.66,
      "Track [IPM_SD] on F.Cu, length 0.5850 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     16.34,
-     8.38,
-     "PTH pad 1 [L_IN] of F101"
     ],
     [
-     16.34,
-     3.38,
-     "PTH pad 1 [L_IN] of F101"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     6.74,
-     10.15,
-     "PTH pad 1 [L_IN] of J101"
-    ],
-    [
-     16.34,
-     8.38,
-     "PTH pad 1 [L_IN] of F101"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     49.64,
-     19.17,
-     "Track [L_R] on F.Cu, length 23.0042 mm"
-    ],
-    [
-     76.75,
-     2.88,
-     "PTH pad 2 [L_R] of BR101"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     191.16,
-     2.82,
-     "PTH pad 24 [MOT_U] of U401"
-    ],
-    [
-     243.24,
-     17.23,
-     "PTH pad 1 [MOT_U] of J401"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     159.36,
-     2.82,
-     "PTH pad 18 [MOT_W] of U401"
-    ],
-    [
-     243.24,
-     7.07,
-     "PTH pad 3 [MOT_W] of J401"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     58.65,
-     52.45,
-     "Track [N_C] on B.Cu, length 44.2995 mm"
-    ],
-    [
-     81.83,
-     2.88,
-     "PTH pad 3 [N_C] of BR101"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     36.83,
-     27.82,
-     "PTH pad 2 [N_IN] of RV101"
-    ],
-    [
-     6.74,
-     5.07,
-     "PTH pad 2 [N_IN] of J101"
+     170.69,
+     31.25,
+     "Pad 1 [IPM_SD] of C407 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -895,26 +1575,9 @@
   {
    "at": [
     [
-     79.46,
-     122.69,
-     "Pad 2 [OVP_2] of R219 on F.Cu"
-    ],
-    [
-     84.15,
-     122.69,
-     "Pad 1 [OVP_2] of R220 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
      18.77,
      23.27,
-     "PTH pad 2 [PE] of C102"
+     "Track [PE] on F.Cu, length 9.1190 mm"
     ],
     [
      5.0,
@@ -929,14 +1592,14 @@
   {
    "at": [
     [
-     18.77,
-     39.27,
-     "PTH pad 2 [PE] of C103"
+     110.0,
+     1.0,
+     "Zone [VBUS] on B.Cu"
     ],
     [
-     18.77,
-     23.27,
-     "PTH pad 2 [PE] of C102"
+     110.0,
+     1.0,
+     "Zone [VBUS] on B.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -946,99 +1609,14 @@
   {
    "at": [
     [
-     221.65,
-     95.5,
-     "Pad 2 [STP_BRB] of U501 on F.Cu"
+     110.0,
+     1.0,
+     "Zone [VBUS] on B.Cu"
     ],
     [
-     238.16,
-     95.56,
-     "Pad 1 [STP_BRB] of R510 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     192.97,
-     144.88,
-     "PTH pad 1 [STP_OA1] of J502"
-    ],
-    [
-     227.4,
-     94.85,
-     "Pad 28 [STP_OA1] of U501 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     195.47,
-     144.88,
-     "PTH pad 2 [STP_OA2] of J502"
-    ],
-    [
-     227.4,
-     96.81,
-     "Pad 25 [STP_OA2] of U501 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     197.97,
-     144.88,
-     "PTH pad 3 [STP_OB1] of J502"
-    ],
-    [
-     221.65,
-     94.85,
-     "Pad 1 [STP_OB1] of U501 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     200.47,
-     144.88,
-     "PTH pad 4 [STP_OB2] of J502"
-    ],
-    [
-     221.65,
-     96.81,
-     "Pad 4 [STP_OB2] of U501 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     43.26,
-     78.17,
-     "Pad 1 [TOP_V] of U301 on F.Cu"
-    ],
-    [
-     45.65,
-     91.89,
-     "Pad 2 [TOP_V] of R302 on F.Cu"
+     110.0,
+     1.0,
+     "Zone [VBUS] on B.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -1082,14 +1660,14 @@
   {
    "at": [
     [
-     110.0,
-     1.0,
-     "Zone [VBUS] on B.Cu"
+     177.51,
+     72.34,
+     "Pad 1 [VBUS] of R420 on F.Cu"
     ],
     [
-     110.0,
-     1.0,
-     "Zone [VBUS] on B.Cu"
+     194.24,
+     53.77,
+     "PTH pad 1 [VBUS] of C222"
     ]
    ],
    "code": "unconnected_items",
@@ -1099,31 +1677,14 @@
   {
    "at": [
     [
-     186.24,
-     72.34,
-     "Pad 2 [VBUS_SNS_2] of R421 on F.Cu"
+     110.0,
+     1.0,
+     "Zone [VBUS] on B.Cu"
     ],
     [
-     189.13,
-     72.34,
-     "Pad 1 [VBUS_SNS_2] of R422 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     133.34,
-     116.14,
-     "Pad 2 [VSENSE_2] of R215 on F.Cu"
-    ],
-    [
-     138.03,
-     116.14,
-     "Pad 1 [VSENSE_2] of R216 on F.Cu"
+     110.0,
+     1.0,
+     "Zone [VBUS] on B.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -1131,6 +1692,6 @@
    "text": "Missing connection between items"
   }
  ],
- "unconnected": 42,
+ "unconnected": 14,
  "warnings": 25
 }

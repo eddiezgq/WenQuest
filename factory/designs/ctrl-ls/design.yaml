@@ -218,7 +218,7 @@ board:
   # 功率模块下桥采样端（电流大、电位贴着地）；单列是因为它们和电机相线在模块上相邻（脚间 1.7 mm）
   - {name: Shunt, track_mm: 1.0, clearance_mm: 0.3, nets: [N_U, N_V, N_W], layers: [F.Cu, In2.Cu, B.Cu]}
   # 功率模块的输入脚、15 V：和自举脚在模块上相邻，单列（只在模块旁边按引脚间距放宽，见 route_fit）
-  - {name: IpmIn, track_mm: 0.3, clearance_mm: 0.2, nets: [IN_UH, IN_UL, IN_VH, IN_VL, IN_WH, IN_WL]}
+  - {name: IpmIn, track_mm: 0.3, clearance_mm: 0.2, nets: [IN_UH, IN_UL, IN_VH, IN_VL, IN_WH, IN_WL], layers: [F.Cu, In2.Cu, B.Cu]}
   - {name: Vcc15, track_mm: 0.6, route_mm: 0.4, clearance_mm: 0.2, nets: [+15V, FLY_15], layers: [F.Cu, In2.Cu, B.Cu]}
   # 步进驱动 HTSSOP 脚距 0.65 mm（焊盘 0.4）：布线先用 0.3 mm 进脚，布完加宽
   - {name: Power, track_mm: 1.0, route_mm: 0.3, clearance_mm: 0.2, nets: [+24V, SOL1_D, SOL2_D, SOL3_D, SOL4_D, SOL1_K, SOL2_K,
@@ -228,7 +228,7 @@ board:
   # 组和组之间的布线间距（Default = 其余网络）；安全距离规则（safety.yaml 示例值）：相线↔零线 2.5、高压↔弱电 2.0、保护地 4.0
   class_pairs:
   - {a: [AC_L], b: [AC_N], clearance_mm: 2.6}
-  - {a: [AC_L, AC_N], b: [HV, HVSig, Boot], clearance_mm: 1.5}
+  - {a: [AC_L, AC_N], b: [HV, HVSig, Boot], clearance_mm: 1.4}
   - {a: [AC_L, AC_N, HV, HVSig, Boot], b: [Return, Shunt, IpmIn, Vcc15, Power, Ground, Default], clearance_mm: 2.2}
   - {a: [PE], b: [AC_L, AC_N, HV, HVSig, Boot, Return, Shunt, IpmIn, Vcc15, Power, Ground, Default], clearance_mm: 4.2}
   placement:

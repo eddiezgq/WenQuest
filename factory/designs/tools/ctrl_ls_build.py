@@ -274,10 +274,17 @@ def board_build(route, jar):
             a, b = class_of(na), class_of(nb)
             return want.get(frozenset((a, b)), max(own.get(a, 0.2), own.get(b, 0.2)))
 
-        pairs, notes = RF.clamp_pairs(gb.pairs_of(D.X), RF.pad_gaps(board, class_of))
-        for a, b, c, r, ref in notes:
-            print("布线间距 {}↔{}：要求 {:g} mm，{} 自己引脚只隔 {:.2f}，布线用 {:g}（安全距离另查）".format(a, b, c, ref, r + 0.05, r))
-        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep, pairs=pairs, timeout=3000)
+        from shapely.geometry import box
+        width = {n: c.get("route_mm") or c["track_mm"] for c in D.X["net_classes"] for n in c["nets"]}
+        lays = {n: c.get("layers") or ["F.Cu", "In2.Cu", "B.Cu"] for c in D.X["net_classes"] for n in c["nets"]}
+        w_, h_ = D.X["board_mm"]
+        ox, oy = gb.ORIGIN
+        n_stub = RF.stubs(board, class_of, clearance, lambda n: width.get(n, 0.25),
+                          lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"]), box(ox, oy, ox + w_, oy + h_))
+        print("引出线（器件自己引脚比布线间距近的焊盘）：", n_stub)
+        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep, pairs=gb.pairs_of(D.X),
+                             timeout=3000)
+        print("去掉重复的固定线：", RF.dedupe(board))
         targets = {n: c["track_mm"] for c in D.X["net_classes"] if c.get("route_mm") for n in c["nets"]}
         print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance))
     board.BuildConnectivity()
@@ -375,6 +382,38 @@ def board_checks():
     return dr, res
 
 
+def _pin_rules():
+    from wqeda.gen import route_fit as RF
+    cls = {n: c["name"] for c in D.X["net_classes"] for n in c["nets"]}
+    own = {c["name"]: c["clearance_mm"] for c in D.X["net_classes"]}
+    want = {frozenset((a, b)): c for a, b, c in gb_pairs()}
+
+    def class_of(net):
+        return cls.get(net, "Default")
+
+    def clearance(na, nb):
+        a, b = class_of(na), class_of(nb)
+        return want.get(frozenset((a, b)), max(own.get(a, 0.2), own.get(b, 0.2)))
+
+    brd = pcbnew().LoadBoard(os.path.join(KDIR, NAME + ".kicad_pcb"))
+    seen, s = set(), ""
+    for ref, p, q, g, _need in RF.conflicts(brd, class_of, clearance):
+        na, nb = sorted((p.GetNetname(), q.GetNetname()))
+        if (ref, na, nb) in seen:
+            continue
+        seen.add((ref, na, nb))
+        s += ('(rule "pins_{r}_{a}_{b}"\n  (condition "((A.NetName == \'{a}\' && B.NetName == \'{b}\') || '
+              '(A.NetName == \'{b}\' && B.NetName == \'{a}\')) && A.intersectsCourtyard(\'{r}\') && '
+              'B.intersectsCourtyard(\'{r}\')")\n  (constraint clearance (min {c:g}mm)))\n').format(
+            r=ref, a=na, b=nb, c=max(0.15, int((g - 0.05) / 0.05) * 0.05))
+    return s
+
+
+def gb_pairs():
+    from wqeda.gen import board as gb
+    return gb.pairs_of(D.X)
+
+
 def dru():
     """KiCad 自定义规则：分类之间的间距（设计描述 board.class_pairs，和布线器一致）；同一个器件自己的焊盘之间放宽"""
     from wqeda.gen import board as gb
@@ -382,6 +421,8 @@ def dru():
     for a, b, c in gb.pairs_of(D.X):
         s += ('(rule "{a}-{b}"\n  (condition "(A.NetClass == \'{a}\' && B.NetClass == \'{b}\') || '
               '(A.NetClass == \'{b}\' && B.NetClass == \'{a}\')")\n  (constraint clearance (min {c:g}mm)))\n').format(a=a, b=b, c=c)
+    # 同一器件上比要求近的两类引脚（引出线也在器件外框里）：按引脚自己的间距（和安全距离检查的“跨两组的器件”同一做法）
+    s += _pin_rules()
     # 放在最后：KiCad 规则后写的优先（引脚间距是器件自己的事；安全距离另查，见 safety.yaml）
     s += ('(rule "same_footprint_pads"\n  (condition "A.Type == \'Pad\' && B.Type == \'Pad\' && '
           'A.Parent.Reference == B.Parent.Reference")\n  (constraint clearance (min 0.15mm)))\n')

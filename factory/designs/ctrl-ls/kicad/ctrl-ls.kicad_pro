@@ -288,6 +288,23 @@
       },
       {
         "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "IpmIn",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.3,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
         "clearance": 0.5,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
@@ -305,7 +322,7 @@
       },
       {
         "bus_width": 12,
-        "clearance": 0.3,
+        "clearance": 0.2,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -333,6 +350,40 @@
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 2.0,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.3,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Shunt",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 1.0,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Vcc15",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.6,
         "via_diameter": 0.6,
         "via_drill": 0.3,
         "wire_width": 6
@@ -414,10 +465,6 @@
       },
       {
         "netclass": "HVSig",
-        "pattern": "TOP_V"
-      },
-      {
-        "netclass": "HVSig",
         "pattern": "FLY_D"
       },
       {
@@ -481,24 +528,52 @@
         "pattern": "RECT_N"
       },
       {
-        "netclass": "Power",
-        "pattern": "+24V"
-      },
-      {
-        "netclass": "Power",
-        "pattern": "+15V"
-      },
-      {
-        "netclass": "Power",
+        "netclass": "Shunt",
         "pattern": "N_U"
       },
       {
-        "netclass": "Power",
+        "netclass": "Shunt",
         "pattern": "N_V"
       },
       {
-        "netclass": "Power",
+        "netclass": "Shunt",
         "pattern": "N_W"
+      },
+      {
+        "netclass": "IpmIn",
+        "pattern": "IN_UH"
+      },
+      {
+        "netclass": "IpmIn",
+        "pattern": "IN_UL"
+      },
+      {
+        "netclass": "IpmIn",
+        "pattern": "IN_VH"
+      },
+      {
+        "netclass": "IpmIn",
+        "pattern": "IN_VL"
+      },
+      {
+        "netclass": "IpmIn",
+        "pattern": "IN_WH"
+      },
+      {
+        "netclass": "IpmIn",
+        "pattern": "IN_WL"
+      },
+      {
+        "netclass": "Vcc15",
+        "pattern": "+15V"
+      },
+      {
+        "netclass": "Vcc15",
+        "pattern": "FLY_15"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "+24V"
       },
       {
         "netclass": "Power",
@@ -551,10 +626,6 @@
       {
         "netclass": "Power",
         "pattern": "FLY_24"
-      },
-      {
-        "netclass": "Power",
-        "pattern": "FLY_15"
       },
       {
         "netclass": "Power",

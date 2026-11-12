@@ -68,24 +68,24 @@
  "date": "2026-11-12",
  "disclaimer": "示例设计，未经硬件验证，不能直接投产",
  "drc": {
-  "errors": 42,
-  "unconnected": 42,
+  "errors": 75,
+  "unconnected": 14,
   "warnings": 25
  },
  "files": {
   "bom.csv": "9f20a8bc3946c9f2",
-  "drc.json": "98b61ca29a7b950e",
-  "gerber.zip": "08edc05ca668b431",
-  "kicad-project.zip": "b9c209da29ff22c2",
+  "drc.json": "bd2c6206d317b0ef",
+  "gerber.zip": "268cd4c39f54712e",
+  "kicad-project.zip": "8e3042986c4bbe70",
   "netcheck.json": "9eddaa8fe06de745",
-  "pcb/B_Cu.svg": "a92d3ef1a54ff683",
-  "pcb/B_Silk.svg": "d66214055e73e12e",
-  "pcb/F_Cu.svg": "7c3c9a5bcde2a342",
-  "pcb/F_Silk.svg": "711fe288d510af8f",
-  "pcb/In1_Cu.svg": "f1ada12d1a0a5a6e",
-  "pcb/In2_Cu.svg": "94847aca00d04c63",
+  "pcb/B_Cu.svg": "ef099d535209a48e",
+  "pcb/B_Silk.svg": "02ebe9ceff66e472",
+  "pcb/F_Cu.svg": "a3cfd015b162a706",
+  "pcb/F_Silk.svg": "c8fa4d5ecaa63019",
+  "pcb/In1_Cu.svg": "a5025dfd24512fab",
+  "pcb/In2_Cu.svg": "d49e50eefd253daa",
   "pos.csv": "bf5b7a00e6622e2e",
-  "safety.json": "cda0376e9f520957",
+  "safety.json": "22b6c7ff2a4fe9a8",
   "schematic/ctrl-ls-1 交流输入、浪涌与整流.svg": "e0142d35c4b2b912",
   "schematic/ctrl-ls-2 功率因数校正与母线.svg": "d0b0075d62408796",
   "schematic/ctrl-ls-3 辅助电源.svg": "4fc48a7082c416a7",
@@ -2163,8 +2163,8 @@
    "key": "S-ln",
    "limit": 2.5,
    "name": "安全距离：相线 ↔ 零线（保险丝之后）",
-   "status": "pass",
-   "value": 2.612
+   "status": "fail",
+   "value": 2.175
   },
   {
    "example": true,
@@ -2172,7 +2172,7 @@
    "limit": 2.0,
    "name": "安全距离：390 V 母线与电机相线 ↔ 弱电",
    "status": "fail",
-   "value": 1.75
+   "value": 1.63
   }
  ],
  "sheets": [
