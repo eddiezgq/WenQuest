@@ -21,21 +21,21 @@
         <div class="card-head"><h2>{{ $t('{a} · {b}', { a: $td(cur.item), b: $td(cur.name) }) }}</h2>
           <span class="muted small">{{ $t('工艺路线 {a}', { a: $td(cur.routing) }) }}</span></div>
         <h3 class="sub">{{ $t('物料清单（每件）') }}</h3>
-        <table class="t">
+        <div class="tw"><table class="t">
           <thead><tr><th>{{ $t('物料') }}</th><th>{{ $t('名称') }}</th><th class="num">{{ $t('用量') }}</th><th>{{ $t('单位') }}</th><th>{{ $t('来源') }}</th></tr></thead>
           <tbody><tr v-for="b in cur.bom" :key="b.item_code">
             <td class="mono">{{ $td(b.item_code) }}</td><td>{{ $td(b.name) }}</td><td class="num">{{ $td(b.qty) }}</td><td>{{ $td(b.uom) }}</td>
             <td><button v-if="b.made" class="btn ghost small" @click="sel = b.item_code">{{ $t('自制 · 看它的清单') }}</button><span v-else class="muted">{{ $t('外购') }}</span></td>
           </tr></tbody>
-        </table>
+        </table></div>
         <h3 class="sub">{{ $t('工艺路线') }}</h3>
-        <table v-if="cur.operations.length" class="t">
+        <div v-if="cur.operations.length" class="tw"><table class="t">
           <thead><tr><th>{{ $t('工序') }}</th><th class="num">{{ $t('分钟/件') }}</th><th>{{ $t('设备') }}</th><th class="num">{{ $t('一次装几件') }}</th></tr></thead>
           <tbody><tr v-for="o in cur.operations" :key="o.operation">
             <td>{{ $td(o.operation.split(' ')[0]) }}</td><td class="num">{{ $td(o.minutes) }}</td>
             <td class="mono small">{{ o.units.map((u) => u.toUpperCase()).join(' / ') }}</td><td class="num">{{ $td(o.batch) }}</td>
           </tr></tbody>
-        </table>
+        </table></div>
         <p v-else class="muted small">{{ $t('这个物料没有登记工艺路线。') }}</p>
         <p class="small muted">{{ $t('标准成本：材料 ${a} + 加工 ${b} / 件', { a: $td(cur.std_cost.material), b: $td(cur.std_cost.operations) }) }}</p>
         <p class="small muted">{{ $t('只读。改物料清单和工艺路线：企业在“产品登记”或“按单设计”里改；接单时“订单与计划”的算料用的就是这份清单。') }}</p>
@@ -283,6 +283,7 @@ onMounted(async () => {
 .pbtn { display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: transparent; color: inherit; border-radius: 6px; padding: 6px 8px; margin-bottom: 4px; cursor: pointer; }
 .pbtn.on { border-color: var(--accent); background: var(--accent-bg); }
 .sub { font-size: 15px; margin: 14px 0 6px; }
+.tw { overflow-x: auto; }
 @media (max-width: 900px) { .plist { width: auto; } }
 .side { width: 360px; flex-shrink: 0; }
 .b { font-weight: 600; }
