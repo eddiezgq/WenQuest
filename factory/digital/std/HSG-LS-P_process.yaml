@@ -223,6 +223,47 @@ characteristics:
   name: 轴过孔、面板口端面
   spec: 轴过孔 Ø20 H11；面板口端面平面度 0.1，Ra 3.2
   kind: other
+- id: P22
+  name: 送布摆轴两孔
+  spec: 2 × Ø14 H7（+0.018/0），Ra 1.6，压含油轴套 Ø10 × Ø14
+  nominal: 14
+  es: 0.018
+  ei: 0.0
+  kind: dim
+  key: true
+- id: P23
+  name: 送布摆轴两孔同轴度
+  spec: Ø0.04（公共轴线 F）
+  nominal: 0.0
+  es: 0.04
+  ei: 0.0
+  kind: geo
+- id: P24
+  name: 抬牙摆轴孔
+  spec: 前 Ø16 H7（+0.018/0）、后 Ø14 H7（+0.018/0），Ra 1.6
+  nominal: 14
+  es: 0.018
+  ei: 0.0
+  kind: dim
+  key: true
+- id: P25
+  name: 抬牙摆轴两孔同轴度
+  spec: Ø0.03（公共轴线 L）
+  nominal: 0.0
+  es: 0.03
+  ei: 0.0
+  kind: geo
+- id: P26
+  name: 调节器轴孔
+  spec: Ø10 H7（+0.015/0），Ra 1.6
+  nominal: 10
+  es: 0.015
+  ei: 0.0
+  kind: dim
+- id: P27
+  name: 送布摆轴、抬牙摆轴、调节器轴的位置
+  spec: 对旋梭轴孔 ± 0.1（y、z）；F、L 对下轴公共轴线 D 的平行度 0.05/100
+  kind: other
 tool_list:
 - id: T01
   name: 直角铣头
@@ -288,6 +329,21 @@ tool_list:
 - id: T13
   name: 中心钻
   spec: Ø6 90° 定心钻
+  ops:
+  - 80
+- id: T14
+  name: 摆轴孔镗杆（半精、精）
+  spec: Ø12 硬质合金减振杆，有效伸出 230；微调镗头 Ø13.7 / Ø14、Ø15.7 / Ø16（调整精度 0.002）
+  ops:
+  - 70
+- id: T15
+  name: 加长钻头 Ø9.7、加长铰刀 Ø10 H7
+  spec: 硬质合金，有效长 125（从右端壁、右横筋的 Ø14 工艺孔伸进去）
+  ops:
+  - 70
+- id: T16
+  name: 碗形堵盖压装工具
+  spec: Ø14、Ø16、Ø18 碗形堵盖（DIN 443，涂厌氧密封胶）的压头
   ops:
   - 80
 gauges:
@@ -359,7 +415,8 @@ operations:
   workstation: 卧式加工中心 HMC-01
   shop: 机加
   content: 合件以下件底面 A ＋ 两个工艺孔 Ø10 H7 定位（液压圆柱涨销 ＋ 削边涨销，零间隙），4 个液压回转压板压在机座顶面四角，正对支承钉。① 直角铣头在夹具框里、机座底下，向上钻、铰两个锥销孔，打锥销，打配对编号；② 针杆上、下孔各插一个液压涨紧测量塞规，测头在 B 0° 测两个塞规（下塞规在机座和机头之间的空当里，上塞规经面板口），算出针杆轴线，写进工件坐标系（旋梭轴孔、上轴两孔的
-    y 坐标取这条轴线外推到 z −21.5、z 200 处的值），取下塞规；③ B 0°：精铣面板口端面，阶梯镗杆半精镗、精镗旋梭轴孔 Ø14 H7，同轴镗杆（右支架导向套）半精镗、精镗上轴两孔；④ B 180°：镗轴过孔 Ø20、精铣电机法兰端面、圆弧插补精铣止口 Ø52 h7，同轴镗杆（左支架导向套）半精镗、精镗下轴两孔。精镗前夹紧力降到 40%
+    y 坐标取这条轴线外推到 z −21.5、z 200 处的值），取下塞规；③ B 0°：精铣面板口端面，阶梯镗杆半精镗、精镗旋梭轴孔 Ø14 H7，同轴镗杆（右支架导向套）半精镗、精镗上轴两孔；④ B 180°：镗轴过孔 Ø20、精铣电机法兰端面、圆弧插补精铣止口 Ø52 h7，同轴镗杆（左支架导向套）半精镗、精镗下轴两孔；⑤ 送布组的孔（G4.6）：B 180° 送布摆轴后孔、调节器孔，B
+    0° 送布摆轴前孔、抬牙摆轴两孔，镗杆都从端壁的工艺孔伸进去。精镗前夹紧力降到 40%
   datum: 下件底面 A、两工艺孔（一面两销）
   clamping: 4 个液压回转压板压在机座顶面四角，正对 4 个支承钉；精镗时油压降到 40%
   fixture: 专用夹具 FX-HSG-P-70（框架式，带左、右两个可翻导向套支架）
@@ -519,6 +576,56 @@ operations:
     passes: 1
     tb_min: 0.21
     ta_min: 1.0
+  - step: 15
+    content: B 180°：摆轴镗杆从右端壁、右横筋的 Ø16 工艺孔伸进去，半精镗、精镗送布摆轴后孔 Ø14 H7（x 296…311）
+    tool: T14
+    gauge: G02
+    vc: 140
+    f: 0.05
+    ap: 0.15
+    passes: 1
+    tb_min: 0.18
+    ta_min: 0.8
+  - step: 16
+    content: B 180°：加长钻、铰调节器轴孔 Ø10 H7（x 296…311，从 Ø14 工艺孔进）
+    tool: T15
+    gauge: G03
+    vc: 12
+    f: 0.2
+    ap: null
+    passes: 1
+    tb_min: 0.31
+    ta_min: 0.3
+  - step: 17
+    content: B 0°：摆轴镗杆从左端壁 Ø16 工艺孔伸进去，半精镗、精镗送布摆轴前孔 Ø14 H7（x 33…47），与后孔同一轴线 F
+    tool: T14
+    gauge: G02
+    vc: 140
+    f: 0.05
+    ap: 0.15
+    passes: 1
+    tb_min: 0.17
+    ta_min: 0.8
+  - step: 18
+    content: B 0°：从左端壁 Ø18 工艺孔进，镗刀穿过抬牙摆轴前孔（铸出 Ø15）半精镗、精镗后孔 Ø14 H7（x 95…107）
+    tool: T14
+    gauge: G02
+    vc: 140
+    f: 0.05
+    ap: 0.15
+    passes: 1
+    tb_min: 0.15
+    ta_min: 0.8
+  - step: 19
+    content: B 0°：半精镗、精镗抬牙摆轴前孔 Ø16 H7（x 24…38）
+    tool: T14
+    gauge: G02
+    vc: 140
+    f: 0.05
+    ap: 0.15
+    passes: 1
+    tb_min: 0.19
+    ta_min: 0.8
   accuracy:
   - char: P1
     T: 0.05
@@ -634,6 +741,39 @@ operations:
     - name: 两根镗杆弯曲之差
       range: 0.002
       kind: sys
+  - char: P23
+    T: 0.04
+    items:
+    - name: 转台分度 180° ±3″：后孔离转台中心 150
+      range: 0.0044
+      kind: rand
+    - name: X、Y 轴定位精度 ±0.004（两孔各一次）
+      range: 0.0113
+      kind: rand
+    - name: 两次对刀（镗杆偏心标定）±0.002
+      range: 0.0057
+      kind: rand
+    - name: 镗杆让刀（Ø12 硬质合金减振杆，前孔伸出 152、后孔 116；半精镗后精镗余量 0.15，按 0.003 计）
+      range: 0.006
+      kind: sys
+    - name: 热漂移（两次镗孔间隔约 8 min）
+      range: 0.004
+      kind: sys
+  - char: P25
+    T: 0.03
+    items:
+    - name: X、Y 轴定位重复性 ±0.002（两把刀各一次）
+      range: 0.0057
+      kind: rand
+    - name: 两次对刀 ±0.002
+      range: 0.0057
+      kind: rand
+    - name: 后孔镗杆让刀（Ø12 杆伸出 212，按 0.004 计）
+      range: 0.008
+      kind: sys
+    - name: 热漂移
+      range: 0.002
+      kind: sys
   inspect:
   - char: 前、后轴承孔 Ø35 H7、Ø32 H7（P3、P4）
     gauge: G02
@@ -647,13 +787,19 @@ operations:
   - char: 止口 Ø52 h7（P14）
     gauge: G05
     freq: 每件
+  - char: 送布摆轴、抬牙摆轴孔 Ø14 / Ø16 H7（P22、P24）
+    gauge: G02
+    freq: 每件
+  - char: 调节器轴孔 Ø10 H7（P26）
+    gauge: G03
+    freq: 每件
   - char: 锥销孔接触 ≥ 75%（P18）
     gauge: G16
     freq: 首件、每 10 件
   - char: 针杆轴线测量值（在机，留记录）；两孔同轴度、中心距（在机测头抽检）
     gauge: G01
     freq: 首件、每 10 件
-  minutes: 25.5
+  minutes: 30.5
 - seq: 80
   operation: 钻攻螺纹孔 Drilling & tapping
   workstation: 卧式加工中心 HMC-01
@@ -695,11 +841,20 @@ operations:
     passes: 1
     tb_min: 1.04
     ta_min: 0.3
+  - step: 4
+    content: 卸下后清洗，压 4 个碗形堵盖：左端壁 Ø16、Ø18，右端壁 Ø16、Ø14（右横筋上的两个工艺孔在机座里面，不堵）
+    tool: T16
+    vc: null
+    f: null
+    ap: null
+    passes: 1
+    tb_min: 0.0
+    ta_min: 2.5
   inspect:
   - char: M5-6H、M4-6H（P20）
     gauge: G06
     freq: 每件
-  minutes: 5.0
+  minutes: 8.0
 - seq: 90
   operation: 零件检验 Part inspection
   workstation: 检验站 QC-01
@@ -775,6 +930,24 @@ operations:
   - char: P21
     gauge: G01
     freq: 每 5 件
+  - char: P22
+    gauge: G01
+    freq: 每件
+  - char: P23
+    gauge: G01
+    freq: 每 5 件
+  - char: P24
+    gauge: G01
+    freq: 每件
+  - char: P25
+    gauge: G01
+    freq: 每 5 件
+  - char: P26
+    gauge: G01
+    freq: 每 5 件
+  - char: P27
+    gauge: G01
+    freq: 每 5 件
 hole_sizes:
   前轴承孔:
   - op: 20
@@ -845,6 +1018,33 @@ hole_sizes:
   - op: 70
     d: 20.0
     es: 0.13
+    ei: 0.0
+  送布摆轴孔:
+  - op: 70
+    d: 13.7
+    es: 0.027
+    ei: 0.0
+  - op: 70
+    d: 14.0
+    es: 0.018
+    ei: 0.0
+  抬牙摆轴前孔:
+  - op: 70
+    d: 15.7
+    es: 0.027
+    ei: 0.0
+  - op: 70
+    d: 16.0
+    es: 0.018
+    ei: 0.0
+  调节器轴孔:
+  - op: 70
+    d: 9.7
+    es: 0.036
+    ei: 0.0
+  - op: 70
+    d: 10.0
+    es: 0.015
     ei: 0.0
 attachments:
 - kind: calc
