@@ -101,7 +101,7 @@ def compile_story(S, tts):
                 k["lookAt"] = c["lookAt"]
             chars[n] = [k]
         props = {pid: [{"t": t0 - 0.001, "set": s}] for pid, s in sh.get("props", {}).items()}
-        bubbles, subs = [], []
+        bubbles, subs, cuts = [], [], []
         cur = t0 + LEAD
         for b in sh["beats"]:
             start = cur + b.get("pre", PRE)
@@ -117,6 +117,13 @@ def compile_story(S, tts):
                 if b.get("style"):
                     bb.update(style=b["style"], at=b.get("at"), label=b.get("label"))
                 bubbles.append(bb)
+            cams = b.get("cams") or ([dict(b["cam"], at=0)] if b.get("cam") else [])
+            for c in cams:
+                spec = {k: v for k, v in c.items() if k != "at"}
+                ct = start - 0.12 + c.get("at", 0) * dur
+                if spec.get("wide"):
+                    spec = {"wide": True}
+                cuts.append({"t": ct, "spec": spec})
             for d in sorted(b.get("do", []), key=lambda d: d.get("delay", 0)):
                 at = start + d.get("delay", 0)
                 if "prop" in d:
@@ -124,7 +131,7 @@ def compile_story(S, tts):
                     continue
                 n = d["who"]
                 k = {"t": at}
-                for key in ("pose", "expr", "lookAt", "show"):
+                for key in ("pose", "expr", "lookAt", "show", "mark"):
                     if key in d:
                         k[key] = d[key]
                 if "pos" in d:
@@ -146,7 +153,11 @@ def compile_story(S, tts):
         for p in props:
             props[p].sort(key=lambda k: k["t"])
         cam = [{"t": t0 + c["at"] * (t1 - t0), "pos": c["pos"], "look": c["look"], "fov": c.get("fov", 42)} for c in sh["cam"]]
-        shots.append({"t0": t0, "t1": t1, "scene": sh["scene"], "chars": chars, "props": props, "cam": cam, "bubbles": bubbles, "subs": subs})
+        cuts = [c for c in sorted(cuts, key=lambda c: c["t"])]
+        # a {wide: true} cut returns to the shot's own camera path
+        cuts = [c if not c["spec"].get("wide") else {"t": c["t"], "spec": {"wide": True}} for c in cuts]
+        shots.append({"t0": t0, "t1": t1, "scene": sh["scene"], "chars": chars, "props": props, "cam": cam, "bubbles": bubbles, "subs": subs,
+                      "cuts": cuts, "mood": sh.get("mood")})
         t = t1
     end = 3.2
     shots.append({"t0": t, "t1": t + end, "title": {"zh": "（完）", "sub": S["title"], "note": S.get("note", "")}})
@@ -175,19 +186,19 @@ def font_css(text):
 
 
 def all_text(S):
-    out = [S["title"], S.get("sub", ""), S.get("note", ""), "（完）问渠 WenQuest · 原创故事"]
-    for sc in S["scenes"].values():
-        for p in sc:
-            out += [str(p.get("text", "")), str(p.get("note", ""))]
-    for sh in S["shots"]:
-        for b in sh.get("beats", []):
-            out += [b["text"], b.get("label", "") or "", b["say"]]
-        for s in (sh.get("props") or {}).values():
-            out += s.get("lines", [])
-        for b in sh.get("beats", []):
-            for d in b.get("do", []):
-                out += (d.get("set") or {}).get("lines", [])
-    return "".join(out) + "菜谱"
+    out = ["（完）问渠 WenQuest · 原创故事菜谱十一月发布关节角度"]
+
+    def walk(x):
+        if isinstance(x, str):
+            out.append(x)
+        elif isinstance(x, dict):
+            for k, v in x.items():
+                walk(k); walk(v)
+        elif isinstance(x, list):
+            for v in x:
+                walk(v)
+    walk(S)
+    return "".join(out)
 
 
 PAGE = """<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

@@ -80,10 +80,14 @@
       blob(z, pts2, o) { if (pts2.length >= 3) api.shape(z, o.poly ? polyD(pts2) : smoothD(pts2), o); },
       line(z, pts2, o) { if (pts2.length >= 2) items.push({ z, d: o.smooth ? smoothD(pts2, false) : polyD(pts2, false), o: Object.assign({ fill: null }, o), n: order++ }); },
       svg(z, raw, layer) { items.push({ z, raw, o: { layer: layer || 0 }, n: order++ }); },
-      render(reveal) {
+      render(reveal, focus) {
         items.sort((a, b) => (a.o.layer || 0) - (b.o.layer || 0) || b.z - a.z || a.n - b.n);
-        const N = items.length; let out = '';
+        const N = items.length; let out = '', blurOpen = false;
+        const far = focus == null ? 1e9 : focus + 1.1;
         items.forEach((it, i) => {
+          const bl = it.z > far;
+          if (bl && !blurOpen) { out += '<g filter="url(#wq-dof)">'; blurOpen = true; }
+          if (!bl && blurOpen) { out += '</g>'; blurOpen = false; }
           let f = 1;
           if (reveal < 1) f = clamp((reveal * (N + 12) - i) / 12);
           if (f <= 0) return;
@@ -105,6 +109,8 @@
             for (const d of ds) out += `<path d="${d}" fill="none" stroke="${o.stroke}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"${o.dash ? ` stroke-dasharray="${o.dash}"` : dash}${o.salpha ? ` stroke-opacity="${o.salpha}"` : ''}/>`;
           }
         });
+        if (blurOpen) out += '</g>';
+        if (focus != null) out = '<defs><filter id="wq-dof" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.6"/></filter></defs>' + out;
         return out;
       },
     };
@@ -174,7 +180,7 @@
     talk: { ls: [8, 8, 25], rs: [28, 12, 75], g: 'talk' },
     talk2: { ls: [30, 14, 70], rs: [30, 14, 70], g: 'talk2' },
     point: { rs: [78, 14, 6], ls: [4, 7, 15] },
-    phone: { rs: [22, 30, 150], ls: [4, 7, 15], hp: -4, prop: 'phone' },
+    phone: { rs: [38, 42, 140], ls: [4, 7, 15], hp: -4, hr: -8, prop: 'phone' },
     type: { ls: [32, -6, 78], rs: [32, -6, 78], lean: 10, hp: 12, g: 'type' },
     sit_type: { ls: [36, -6, 72], rs: [36, -6, 72], lean: 6, hp: 10, sit: 1, g: 'type' },
     sit: { ls: [20, 4, 60], rs: [20, 4, 60], sit: 1 },
@@ -215,7 +221,7 @@
   // state of a character at time t from its keyframes
   function charState(keys, t) {
     // keys: [{t, pos, face, pose, expr, look(target name/point), walk:{to,dur}, speak}]
-    let st = { pos: [0, 0], face: 0, pose: 'stand', expr: 'neutral', poseT: -9, prevPose: 'stand', faceT: -9, prevFace: 0, walkFrom: null, show: true };
+    let st = { prevExpr: 'neutral', exprT: -9, mark: null, markT: -9, pos: [0, 0], face: 0, pose: 'stand', expr: 'neutral', poseT: -9, prevPose: 'stand', faceT: -9, prevFace: 0, walkFrom: null, show: true };
     for (const k of keys) {
       if (k.t > t) break;
       if (k.pos) { st.pos = k.pos.slice(); st.walkFrom = null; }
@@ -232,13 +238,58 @@
       }
       if (k.face != null && !k.walk) { st.prevFace = curFace(st, k.t); st.face = k.face; st.faceT = k.t; }
       if (k.pose) { st.prevPose = st.pose; st.prevPoseK = curPoseK(st, k.t); st.pose = k.pose; st.poseT = k.t; }
-      if (k.expr) st.expr = k.expr;
+      if (k.expr && k.expr !== st.expr) { st.prevExpr = st.expr; st.expr = k.expr; st.exprT = k.t; }
+      if (k.mark !== undefined) { st.mark = k.mark; st.markT = k.t; }
       if (k.lookAt !== undefined) st.lookAt = k.lookAt;
     }
     return st;
   }
   function curFace(st, t) { let d = ((st.face - st.prevFace) % 360 + 540) % 360 - 180; return st.prevFace + d * ease((t - st.faceT) / 0.5); }
   function curPoseK(st, t) { return ease((t - st.poseT) / 0.45); }
+
+  const HAND = { type: ['type', 'type'], sit_type: ['type', 'type'], point: ['relax', 'point'], cross: ['fist', 'fist'], thumbs: ['relax', 'thumb'],
+    shake: ['relax', 'shake'], clap: ['flat', 'flat'], phone: ['relax', 'grip'], stir: ['grip', 'grip'], write: ['relax', 'grip'], cheer: ['spread', 'spread'],
+    wave: ['relax', 'spread'], talk: ['relax', 'open'], talk2: ['open', 'open'], think: ['fist', 'grip'], surprised: ['spread', 'spread'], shrug: ['open', 'open'], hold_paper: ['grip', 'grip'] };
+  function handKind(pose, s, gk) { const k = (HAND[pose] || [])[s > 0 ? 0 : 1] || 'relax'; return gk < 0.5 ? 'relax' : k; }
+  function drawHand(cv, parts, name, look, s, wrist, fu, ax, kind, h, t, z) {
+    const cam = cv.cam;
+    let pn;   // palm normal
+    if (kind === 'type' || kind === 'flat') pn = norm(sub([0, -1, 0], mul(fu, dot([0, -1, 0], fu))));
+    else pn = norm(sub(mul(ax, -s), mul(fu, dot(mul(ax, -s), fu))));
+    if (kind === 'flat') pn = mul(pn, -1);
+    if (kind === 'shake') pn = norm(sub(mul(ax, -s), mul(fu, dot(mul(ax, -s), fu))));
+    const sp = norm(cross(fu, pn)), th = mul(sp, -s);
+    const L = 0.048 * h, pw = 0.019 * h;
+    const P1 = add(wrist, mul(fu, L));
+    const corners = [add(wrist, mul(sp, pw * 0.75)), add(wrist, mul(sp, -pw * 0.75)), add(P1, mul(sp, pw)), add(P1, mul(sp, -pw))];
+    const palmPts = hull([].concat(...corners.map((c) => sphere2(cv, c, 0.008 * h, 8))));
+    const skin = look.skin, o = { stroke: INK, w: 1.6, rough: 0.25 };
+    const curlOf = { relax: 30, open: 12, spread: 5, fist: 115, point: 110, thumb: 115, grip: 95, type: 38, flat: 5, shake: 55 };
+    const items = [];
+    items.push({ z: cam.depth(mul(add(wrist, P1), 0.5)), fn: () => cv.blob(0, palmPts, Object.assign({ fill: skin, seed: hash(name + 'palm' + s) }, o)) });
+    for (let i = 0; i < 4; i++) {
+      let c = curlOf[kind] == null ? 30 : curlOf[kind];
+      if (kind === 'point' && i === 0) c = 4;
+      if (kind === 'type') c += 22 * max(0, sin(t * 13 + i * 1.9 + s));
+      const spread = kind === 'spread' ? (i - 1.5) * 0.12 : 0;
+      const off = (1.5 - i) * pw * 0.62;
+      const base = add(add(P1, mul(th, off)), mul(fu, -0.004 * h));
+      const fl = (i === 3 ? 0.75 : i === 0 ? 0.92 : 1) * 0.044 * h;
+      const dir = (a) => norm(add(add(mul(fu, cos(a)), mul(pn, sin(a))), mul(th, spread)));
+      const m = add(base, mul(dir(c * 0.5 * D), fl * 0.55)), tip = add(m, mul(dir(c * D), fl * 0.45));
+      const r = 0.0072 * h;
+      items.push({ z: cam.depth(m) - (c > 70 ? 0.004 : 0), fn: () => { cv.blob(0, capsule2(cv, base, r, m, r * 0.95), Object.assign({ fill: skin, seed: hash(name + 'f' + i + s) }, o)); cv.blob(0, capsule2(cv, m, r * 0.95, tip, r * 0.85), Object.assign({ fill: skin, seed: hash(name + 'g' + i + s) }, o)); } });
+    }
+    // thumb
+    let tdir = norm(add(add(mul(fu, 0.55), mul(th, 0.7)), mul(pn, 0.35)));
+    if (kind === 'thumb') tdir = [0, 1, 0];
+    if (kind === 'fist' || kind === 'point' || kind === 'grip') tdir = norm(add(add(mul(fu, 0.6), mul(pn, 0.6)), mul(th, 0.3)));
+    if (kind === 'type') tdir = norm(add(add(mul(fu, 0.7), mul(pn, 0.5)), mul(th, 0.4)));
+    const tb = add(add(wrist, mul(fu, 0.012 * h)), mul(th, pw * 0.8)), tt2 = add(tb, mul(tdir, 0.04 * h));
+    items.push({ z: cam.depth(tt2) - 0.003, fn: () => cv.blob(0, capsule2(cv, tb, 0.0095 * h, tt2, 0.0078 * h), Object.assign({ fill: skin, seed: hash(name + 'th' + s) }, o)) });
+    items.sort((a, b) => b.z - a.z);
+    items.forEach((it, i) => parts.push({ z: z - i * 0.00001, fn: it.fn }));
+  }
 
   function drawPerson(cv, name, look, st, t, speaking, ctx) {
     look = Object.assign({}, LOOK0, look);
@@ -332,7 +383,7 @@
       part(torsoZ + 0.004, hull(proj(cv, sk)), look.skirt, 'sk');
     }
     const topLen = look.top === 'coat' ? -0.16 : look.top === 'suit' ? -0.02 : 0.02;
-    const torsoPts = lvl(topLen, hipW * (look.top === 'coat' ? 1.12 : 1.02), 0.072 * h * bw).concat(lvl(0.09, waistW, 0.066 * h * bw), lvl(0.19, chestW, (fem ? 0.075 : 0.072) * h * bw), lvl(0.255, sw * 0.95, 0.058 * h * bw));
+    const torsoPts = lvl(topLen, hipW * (look.top === 'coat' ? 1.12 : 1.02), 0.072 * h * bw).concat(lvl(0.09, waistW, 0.066 * h * bw), lvl(0.19, chestW, (fem ? 0.075 : 0.072) * h * bw), lvl(0.25, sw * 0.95, 0.058 * h * bw), lvl(0.292, 0.062 * h * bw, 0.042 * h * bw));
     part(torsoZ, hull(proj(cv, torsoPts)), look.topColor, 'to');
     // torso front details (visible from front)
     const fwd = M.v(UR, [0, 0, 1]);
@@ -371,7 +422,7 @@
     const hands = {};
     for (const s of [1, -1]) {
       const A = s > 0 ? P.ls : P.rs;
-      const S = U([s * sw * 0.98, 0.255 * h, -0.005 * h]);
+      const S = U([s * sw * 0.9, 0.238 * h, -0.005 * h]);
       const fl = A[0] * D, ab = s * A[1] * D, el = A[2] * D;
       const R0 = M.m(M.z(ab), M.x(-fl));
       const u = M.v(UR, M.v(R0, [0, -1, 0]));
@@ -384,9 +435,12 @@
       const zE = zOf(E), zH = zOf(Hc);
       const bias = -0.035;   // arms in front of the torso unless clearly behind
       const sleeve = look.short ? look.skin : look.topColor;
-      part(zE + bias, capsule2(cv, S, 0.036 * h * bw, E, 0.03 * h * bw), look.topColor, 'ua' + s);
+      part(zE + bias, capsule2(cv, S, 0.033 * h * bw, E, 0.029 * h * bw), look.topColor, 'ua' + s);
       part((zE + zH) / 2 + bias - 0.001, capsule2(cv, E, 0.029 * h * bw, Hn, 0.023 * h), sleeve, 'fa' + s);
-      part(zH + bias - 0.002, sphere2(cv, Hc, 0.024 * h, 12), look.skin, 'hd' + s);
+      const hk = handKind(st.pose, s, gk);
+      const hz = zH + bias - 0.002;
+      if (cam.k(Hc) * 0.1 * h < 22) part(hz, sphere2(cv, Hc, 0.024 * h, 12), look.skin, 'hd' + s);
+      else drawHand(cv, parts, name, look, s, add(E, mul(fu, 0.15 * h)), fu, ax, hk, h, t, hz);
       if (A[2] > 40) {   // elbow folds
         const inner = norm(sub(fu, mul(u, dot(fu, u))));
         const p0 = add(E, mul(inner, 0.022 * h)), q = cam.p(p0);
@@ -406,23 +460,19 @@
       const Q = [add(cc, add(mul(side, -0.1), mul(up, 0.07))), add(cc, add(mul(side, 0.1), mul(up, 0.07))), add(cc, add(mul(side, 0.1), add(mul(up, -0.07), mul(fw, 0.04)))), add(cc, add(mul(side, -0.1), add(mul(up, -0.07), mul(fw, 0.04))))];
       parts.push({ z: zOf(cc) - 0.06, fn: () => cv.blob(0, proj(cv, Q), { poly: true, fill: '#fffdf2', stroke: INK, w: 1.6, rough: 0.4, seed: 21 }) });
     }
-    if (pr === 'thumb' && gk > 0.6) {
-      const Hh = hands[-1].H, q = add(Hh, [0, 0.035 * h, 0]);
-      parts.push({ z: zOf(Hh) - 0.04, fn: () => cv.blob(0, capsule2(cv, Hh, 0.01 * h, q, 0.009 * h), { fill: look.skin, stroke: INK, w: 1.6, rough: 0.3, seed: 22 }) });
-    }
     ctx.hands[name] = hands;
 
     // neck + head
     const neckA = U([0, 0.26 * h, -0.004 * h]), neckB = U([0, 0.32 * h, 0.004 * h]);
-    part(zOf(neckA) - 0.004, capsule2(cv, neckA, 0.024 * h, neckB, 0.023 * h), look.skin, 'nk');
-    const hr = { x: 0.056 * h, y: 0.07 * h, z: 0.063 * h };
-    const Hc = U([0, 0.385 * h, 0.008 * h]);
+    part(zOf(neckA) - 0.004, capsule2(cv, neckA, 0.03 * h, neckB, 0.028 * h), look.skin, 'nk');
+    const hs = look.head || 1.08, hr = { x: 0.056 * h * hs, y: 0.07 * h * hs, z: 0.063 * h * hs };
+    const Hc = U([0, (0.385 + (hs - 1) * 0.05) * h, 0.008 * h]);
     const RH = M.m(UR, M.m(M.y(hy * D), M.m(M.x((P.hp) * D), M.z(P.hr * D))));
     const HP = (l) => add(Hc, M.v(RH, l));
     const zHead = zOf(Hc) - 0.03;
     const headPts = ellipsoidPts(Hc, RH, hr.x, hr.y, hr.z, 8, 14);
     // jaw a bit narrower: add chin point
-    headPts.push(HP([0, -hr.y * 1.08, hr.z * 0.45]));
+    headPts.push(HP([0, -hr.y * 1.02, hr.z * 0.35]));
     const headPoly = hull(proj(cv, headPts));
     parts.push({ z: zHead, fn: () => cv.blob(0, headPoly, Object.assign({ fill: look.skin, seed: hash(name + 'hd') }, outline)) });
     ctx.heads[name] = { top: HP([0, hr.y * 1.25, 0]), c: Hc };
@@ -430,8 +480,8 @@
     const shell = (filter, n = 9, m = 16, s = 1.1) => ellipsoidPts(Hc, RH, hr.x * s, hr.y * s, hr.z * s, n, m, filter);
     const hc = look.hairColor;
     const hairPieces = [];
-    const fr = look.fringe == null ? 0.42 : look.fringe;
-    if (look.hair !== 'bald') hairPieces.push(['top', shell((l) => l[1] > fr * hr.y * 1.1 || (l[1] > 0.1 * hr.y && l[2] < 0))]);
+    const fr = look.fringe == null ? 0.66 : look.fringe;
+    if (look.hair !== 'bald') { hairPieces.push(['top', shell((l) => l[1] > fr * hr.y * 1.1 || (l[1] > 0.25 * hr.y && l[2] < -0.35 * hr.z))]); hairPieces.push(['crown', shell((l) => l[1] > 0.2 * hr.y && l[2] < 0.15 * hr.z && l[1] > fr * hr.y * 1.1 - 0.5 * hr.y * (0.15 - l[2] / hr.z))]); }
     const backLow = look.hair === 'long' ? -2.3 : look.hair === 'bob' ? -1.0 : look.hair === 'bald' ? -0.3 : -0.55;
     const backPts = shell((l) => l[2] < -0.25 * hr.z && l[1] > -0.6 * hr.y * 1.1 && (look.hair !== 'bald' || l[1] < 0.5 * hr.y), 9, 16, 1.12);
     if (backLow < -0.6) { for (const x of [-1, -0.5, 0, 0.5, 1]) backPts.push(HP([x * hr.x * (look.hair === 'long' ? 1.25 : 1.15), backLow * hr.y, -0.35 * hr.z])); }
@@ -439,7 +489,7 @@
     for (const s of [1, -1]) {
       const low = look.hair === 'long' ? -1.6 : look.hair === 'bob' ? -0.9 : -0.1;
       if (look.hair === 'bald') continue;
-      const P2 = shell((l) => s * l[0] > 0.72 * hr.x * 1.1 && l[1] > -0.2 * hr.y && l[2] < 0.5 * hr.z, 9, 16, 1.12);
+      const P2 = shell((l) => s * l[0] > 0.78 * hr.x * 1.1 && l[1] > -0.2 * hr.y && l[2] < (look.hair === 'short' ? 0.45 : 0.1) * hr.z, 9, 16, 1.12);
       P2.push(HP([s * hr.x * 1.12, low * hr.y, (look.hair === 'short' ? 0.0 : -0.2) * hr.z]));
       if (look.hair !== 'short') P2.push(HP([s * hr.x * 1.15, low * hr.y, -0.5 * hr.z]));
       hairPieces.push(['side' + s, P2]);
@@ -452,8 +502,24 @@
       const behind = zOf(cc) > zOf(Hc) + 0.012;
       parts.push({ z: behind ? zHead + 0.01 + (id === 'back' && look.hair === 'long' ? 0.08 : 0) : zHead - 0.004, fn: () => cv.blob(0, hull(proj(cv, pts)), { fill: hc, stroke: INK, w: 2, rough: 0.5, seed: hash(name + id) }) });
     }
+    // face patch: re-paint the face below the hairline over any hair hull that bridged across it
+    if (look.hair !== 'bald') {
+      const fp = ellipsoidPts(Hc, RH, hr.x * 0.97, hr.y * 0.97, hr.z * 0.97, 10, 18, (l) => l[2] > 0.3 * hr.z && l[1] < (fr - 0.08) * hr.y && abs(l[0]) < 0.78 * hr.x && l[1] > -0.92 * hr.y);
+      const fn = M.v(RH, [0, 0, 1]);
+      if (fp.length > 3 && dot(fn, norm(sub(cam.pos, Hc))) > 0.1) parts.push({ z: zHead - 0.0065, fn: () => cv.blob(0, hull(proj(cv, fp)), { fill: look.skin, off: false }) });
+    }
+    // hair strands (close shots)
+    if (look.hair !== 'bald' && cam.k(Hc) * h > 700) parts.push({ z: zHead - 0.005, fn: () => {
+      for (let i = 0; i < 5; i++) {
+        const ax2 = -0.6 + i * 0.3, pts = [];
+        for (let j = 0; j <= 4; j++) { const th = (0.15 + j * 0.13) * PI, x = hr.x * 1.1 * sin(th) * sin(ax2), y = hr.y * 1.1 * cos(th), z = hr.z * 1.1 * sin(th) * cos(ax2); if (y < fr * hr.y * 1.1) break; pts.push([x, y, z]); }
+        if (pts.length < 3) continue;
+        const n = M.v(RH, norm(pts[1])); if (dot(n, norm(sub(cam.pos, HP(pts[1])))) < 0.2) continue;
+        cv.line(0, pts.map((q) => cam.p(HP(q))), { stroke: shade(hc, 0.35), w: 1.6, smooth: true, rough: 0 });
+      }
+    } });
     // face
-    parts.push({ z: zHead - 0.008, fn: () => drawFace(cv, name, look, HP, RH, hr, h, st, t, speaking) });
+    parts.push({ z: zHead - 0.008, fn: () => drawFace(cv, name, look, HP, RH, hr, h * hs, st, t, speaking, ctx) });
 
     // order within the person
     parts.sort((a, b) => b.z - a.z);
@@ -461,71 +527,163 @@
     return { z: zc, draw: () => parts.forEach((p) => p.fn()) };
   }
 
+  // expression: bh brow height, bi inner brow raise (−: frown), bo outer brow, lid eye openness, sq lower-lid squint, sm smile,
+  // op mouth open, tw teeth, mw mouth width, tg tongue, bl blush, sw sweat, he happy closed eyes, asy smirk, ly look up; mk comic mark
+  const E0 = { bh: 0, bi: 0, bo: 0, lid: 1, sq: 0, sm: 0.08, op: 0, tw: 0, mw: 1, tg: 0, bl: 0, sw: 0, he: 0, asy: 0, ly: 0 };
   const EXPR = {
-    neutral: { brow: 0, mouth: 0.15, open: 0, browY: 0 },
-    smile: { brow: 0.1, mouth: 0.8, open: 0, blush: 1 },
-    laugh: { brow: 0.2, mouth: 1, open: 0.6, blush: 1, browY: 0.004 },
-    surprised: { brow: 0.4, mouth: 0, open: 0.8, browY: 0.009, eyes: 1.3 },
-    worried: { brow: -0.6, mouth: -0.4, open: 0, browY: 0.003 },
-    serious: { brow: 0.55, mouth: -0.1, open: 0, browY: -0.002, angry: 1 },
-    thinking: { brow: -0.2, mouth: -0.15, open: 0, browY: 0.004, side: 1 },
-    happy: { brow: 0.1, mouth: 0.9, open: 0.3, blush: 1 },
+    neutral: {},
+    smile: { bh: 0.05, bi: 0.1, lid: 0.95, sq: 0.35, sm: 0.8, mw: 1.1, bl: 0.35 },
+    happy: { bh: 0.15, bi: 0.2, lid: 0.95, sq: 0.5, sm: 1, op: 0.35, tw: 1, mw: 1.2, bl: 0.6 },
+    laugh: { bh: 0.25, bi: 0.2, sq: 1, sm: 1, op: 0.75, tw: 1, tg: 1, mw: 1.25, bl: 0.9, he: 1 },
+    surprised: { bh: 0.9, bi: 0.5, bo: 0.6, lid: 1.35, op: 0.7, mw: 0.5, sm: 0, mk: '!' },
+    shocked: { bh: 1, bi: 0.7, bo: 0.5, lid: 1.4, op: 0.9, mw: 0.6, sm: -0.2, sw: 1, mk: '!' },
+    worried: { bh: 0.3, bi: 1, bo: -0.35, lid: 0.9, sm: -0.5, mw: 0.85, sw: 1 },
+    nervous: { bh: 0.3, bi: 0.9, bo: -0.25, lid: 1.05, sm: 0.7, op: 0.22, tw: 1, mw: 1.3, sw: 1 },
+    serious: { bh: -0.25, bi: -1, bo: 0.25, lid: 0.82, sm: -0.2, mw: 0.9 },
+    determined: { bh: -0.1, bi: -0.8, bo: 0.3, lid: 0.95, sm: 0.25, mw: 1, asy: 0.3 },
+    thinking: { bh: 0.25, bi: 0.4, bo: -0.1, lid: 0.85, sm: -0.12, mw: 0.6, asy: 0.6, ly: 1, mk: '?' },
+    idea: { bh: 0.75, bi: 0.4, bo: 0.4, lid: 1.25, sm: 0.8, op: 0.45, tw: 1, mw: 1.15, bl: 0.4, mk: 'idea' },
+    sad: { bh: 0.1, bi: 0.9, bo: -0.5, lid: 0.78, sm: -0.6, mw: 0.85 },
+    proud: { bh: 0.1, bi: -0.2, bo: 0.2, lid: 0.85, sq: 0.3, sm: 0.85, mw: 1.1, asy: 0.4, bl: 0.3 },
   };
-  function drawFace(cv, name, look, HP, RH, hr, h, st, t, speaking) {
+  function exprAt(st, t) {
+    const a = Object.assign({}, E0, EXPR[st.prevExpr] || {}), b = Object.assign({}, E0, EXPR[st.expr] || {});
+    const k = ease((t - st.exprT) / 0.28), o = {};
+    for (const q in E0) o[q] = lerp(a[q], b[q], k);
+    o.mk = st.mark !== undefined && st.mark !== null ? st.mark : b.mk; o.mkT = st.mark ? st.markT : st.exprT;
+    return o;
+  }
+  function drawFace(cv, name, look, HP, RH, hr, h, st, t, speaking, ctx) {
     const cam = cv.cam;
-    const E = EXPR[st.expr] || EXPR.neutral;
-    const surf = (x, y, out = 0) => { const zz = hr.z * sqrt(max(0.02, 1 - (x / hr.x) ** 2 - (y / hr.y) ** 2)); const l = [x, y, zz + out]; const n = norm([x / (hr.x * hr.x), y / (hr.y * hr.y), zz / (hr.z * hr.z)]); return { p: HP(l), n: M.v(RH, n) }; };
-    const vis = (s) => dot(s.n, norm(sub(cam.pos, s.p)));
+    const E = exprAt(st, t);
+    const surf = (x, y, out = 0) => { const zz = hr.z * sqrt(max(0.02, 1 - (x / hr.x) ** 2 - (y / hr.y) ** 2)); const n = norm([x / (hr.x * hr.x), y / (hr.y * hr.y), zz / (hr.z * hr.z)]); return { p: HP([x, y, zz + out]), n: M.v(RH, n) }; };
+    const vis = (q) => dot(q.n, norm(sub(cam.pos, q.p)));
+    const P2 = (x, y, out) => cam.p(surf(x, y, out).p);
     const ink = INK;
+    const kc = cam.k(HP([0, 0, hr.z]));
+    const lw = clamp(kc * h / 900, 1.2, 5);   // line width grows in close-ups
+    let svg = '';
+    const path = (pts, closed) => (closed ? smoothD(pts) : smoothD(pts, false));
+    const uid = name.charCodeAt(0) + '_' + Math.round(t * 1000);
     // ears
     for (const sx of [1, -1]) {
       const c = HP([sx * hr.x * 0.98, -0.005 * h, -0.004 * h]), n = M.v(RH, [sx, 0, 0]);
-      if (dot(n, norm(sub(cam.pos, c))) > 0.15 && look.hair !== 'long' && look.hair !== 'bob') {
-        const k = cam.k(c); const q = cam.p(c);
-        const v = dot(n, norm(sub(cam.pos, c)));
-        cv.blob(0, ring([0, 0, 0], [1, 0, 0], [0, 1, 0], 0.012 * h * k * v, 0.02 * h * k, 10).map((p) => [q[0] + p[0], q[1] + p[1]]), { fill: shade(look.skin, -0.04), stroke: ink, w: 1.6, rough: 0.3, seed: hash(name + 'ear' + sx), off: false });
+      const v = dot(n, norm(sub(cam.pos, c)));
+      if (v > 0.15 && look.hair !== 'long' && look.hair !== 'bob') {
+        const k = cam.k(c), q = cam.p(c);
+        const pts = ring([0, 0, 0], [1, 0, 0], [0, 1, 0], 0.012 * h * k * v, 0.021 * h * k, 12).map((p) => [q[0] + p[0], q[1] + p[1]]);
+        svg += `<path d="${smoothD(pts)}" fill="${shade(look.skin, -0.05)}" stroke="${ink}" stroke-width="${f1(lw * 0.8)}"/>`;
+        if (k * h > 900) svg += `<path d="${smoothD([[q[0], q[1] - 0.012 * h * k], [q[0] - 0.004 * h * k * v * sx, q[1]], [q[0], q[1] + 0.01 * h * k]], false)}" fill="none" stroke="${shade(look.skin, -0.35)}" stroke-width="${f1(lw * 0.6)}"/>`;
       }
     }
-    const blink = ((t * 0.37 + hash(name) % 7) % 3.1) < 0.12;
-    const eyeY = 0.006 * h, eyeX = 0.021 * h;
+    // gaze: toward the look-at target if any
+    let gx = 0, gy = E.ly * 0.35;
+    if (st.lookAt && ctx) {
+      const tp = typeof st.lookAt === 'string' ? (ctx.heads[st.lookAt] ? ctx.heads[st.lookAt].c : (ctx.pos[st.lookAt] ? [ctx.pos[st.lookAt][0], 1.5, ctx.pos[st.lookAt][1]] : null)) : [st.lookAt[0], 1.0, st.lookAt[1]];
+      if (tp) { const d = norm(sub(tp, HP([0, 0, 0]))); const RT = [RH[0], RH[3], RH[6], RH[1], RH[4], RH[7], RH[2], RH[5], RH[8]]; const l = M.v(RT, d); gx = clamp(l[0] * 1.6, -1, 1); gy = clamp(l[1] * 1.6, -0.6, 0.6); }
+    }
+    if (E.asy > 0.4) gx = lerp(gx, 0.7, 0.5);
+    const blink = ((t + (hash(name) % 17) * 0.23) % 3.9) < 0.11;
+    const eyeY = 0.007 * h, eyeX = 0.0215 * h, ew = 0.0118 * h;
     for (const sx of [1, -1]) {
-      const s = surf(sx * eyeX, eyeY), v = vis(s);
+      const c0 = surf(sx * eyeX, eyeY), v = vis(c0);
       if (v < 0.12) continue;
-      const q = cam.p(s.p), k = cam.k(s.p);
-      const rx = 0.0062 * h * k * clamp(v * 1.2, 0.35, 1) * (E.eyes || 1), ry = (blink ? 0.0012 : 0.0085) * h * k * (E.eyes || 1);
-      const look2 = E.side ? 0.3 * rx : 0;
-      cv.blob(0, ring([0, 0, 0], [1, 0, 0], [0, 1, 0], rx, ry, 10).map((p) => [q[0] + p[0] + look2, q[1] + p[1]]), { fill: ink, off: false });
-      if (!blink && rx > 2.5) cv.blob(0, ring([0, 0, 0], [1, 0, 0], [0, 1, 0], rx * 0.35, rx * 0.35, 6).map((p) => [q[0] + p[0] + rx * 0.3 + look2, q[1] + p[1] - ry * 0.35]), { fill: '#fff', off: false });
-      // brow
-      const by = eyeY + 0.021 * h + (E.browY || 0) * h;
-      const inner = surf(sx * 0.008 * h, by + E.brow * -0.004 * h * (E.angry ? -1 : 1) * (E.angry ? 1 : -1)), outer = surf(sx * 0.032 * h, by - 0.002 * h);
-      const bi = surf(sx * 0.009 * h, by - (E.angry ? 0.004 : 0) * h + (E.brow < 0 ? 0.004 * h * -E.brow : 0));
-      cv.line(0, [cam.p(bi.p), cam.p(surf(sx * 0.02 * h, by + 0.0015 * h).p), cam.p(outer.p)], { stroke: shade(look.hairColor, -0.2), w: 2.6 * clamp(k / 400, 0.6, 1.4), rough: 0.2, smooth: true, seed: hash(name + 'br' + sx) });
-      void inner;
+      const lid = blink ? 0.06 : E.lid;
+      const eh = 0.0082 * h;
+      const up = [], lo = [];
+      for (let i = 0; i <= 8; i++) {
+        const u = -1 + i / 4; const x = sx * eyeX + u * ew;
+        const tilt = sx * u * 0.0012 * h;   // outer corner a little higher
+        up.push(P2(x, eyeY + tilt + eh * lid * Math.pow(max(0, 1 - u * u), 0.7) * (1 + 0.15 * u * sx)));
+        lo.push(P2(x, eyeY + tilt - eh * 0.7 * (1 - u * u) * (1 - E.sq * 0.75) + E.sq * 0.0018 * h));
+      }
+      if (E.he > 0.5 || (E.sq > 0.95 && lid < 1)) {   // happy closed eyes ∩
+        const arc = []; for (let i = 0; i <= 8; i++) { const u = -1 + i / 4; arc.push(P2(sx * eyeX + u * ew, eyeY + eh * 0.9 * (1 - u * u) - 0.002 * h)); }
+        svg += `<path d="${path(arc)}" fill="none" stroke="${ink}" stroke-width="${f1(lw * 1.3)}" stroke-linecap="round"/>`;
+      } else if (blink || lid < 0.15) {
+        svg += `<path d="${path(lo)}" fill="none" stroke="${ink}" stroke-width="${f1(lw * 1.2)}" stroke-linecap="round"/>`;
+      } else {
+        const outline = up.concat(lo.slice().reverse());
+        const id = `e${uid}_${sx > 0 ? 'l' : 'r'}`;
+        const qc = cam.p(surf(sx * eyeX + gx * ew * 0.42, eyeY + gy * eh * 0.4 - 0.0008 * h).p), k = cam.k(c0.p);
+        const ir = 0.0068 * h * k * min(1, 0.85 + 0.15 * lid);
+        svg += `<clipPath id="${id}"><path d="${polyD(outline)}"/></clipPath><path d="${polyD(outline)}" fill="#fffdf8"/>`;
+        svg += `<g clip-path="url(#${id})"><ellipse cx="${f1(qc[0])}" cy="${f1(qc[1])}" rx="${f1(ir * clamp(v * 1.15, 0.4, 1))}" ry="${f1(ir)}" fill="${look.eye || '#4a3426'}"/>`;
+        svg += `<ellipse cx="${f1(qc[0])}" cy="${f1(qc[1])}" rx="${f1(ir * 0.52 * clamp(v * 1.15, 0.4, 1))}" ry="${f1(ir * 0.52)}" fill="#111"/>`;
+        svg += `<circle cx="${f1(qc[0] + ir * 0.35)}" cy="${f1(qc[1] - ir * 0.38)}" r="${f1(ir * 0.28)}" fill="#fff"/></g>`;
+        svg += `<path d="${path(up, false)}" fill="none" stroke="${ink}" stroke-width="${f1(lw * 1.45)}" stroke-linecap="round"/>`;
+        svg += `<path d="${path(lo.slice(2, 7), false)}" fill="none" stroke="${ink}" stroke-width="${f1(lw * 0.55)}" stroke-opacity="0.7"/>`;
+        if (look.sex === 'f') { const oc = up[sx > 0 ? 8 : 0], q1 = up[sx > 0 ? 7 : 1]; svg += `<path d="M${f1(q1[0])} ${f1(q1[1])}L${f1(oc[0] + sx * 0.006 * h * k)} ${f1(oc[1] - 0.004 * h * k)}" stroke="${ink}" stroke-width="${f1(lw)}"/>`; }
+        if (kc * h > 700) { const cr = []; for (let i = 1; i <= 7; i++) { const u = -1 + i / 4; cr.push(P2(sx * eyeX + u * ew * 0.9, eyeY + eh * lid * 1.25 + 0.0025 * h)); } svg += `<path d="${path(cr, false)}" fill="none" stroke="${shade(look.skin, -0.3)}" stroke-width="${f1(lw * 0.5)}"/>`; }
+      }
+      // brow: tapered, inner and outer ends move separately
+      const by = eyeY + 0.0215 * h + E.bh * 0.0055 * h;
+      const bp = [[0.0075, E.bi * 0.0065, 0.0042], [0.016, E.bi * 0.003 + 0.0016, 0.0036], [0.025, E.bo * 0.003 + 0.001, 0.0026], [0.033, E.bo * 0.0055 - 0.002, 0.0012]];
+      const top = bp.map(([x, dy, w]) => P2(sx * x * h, by + dy * h + w * h * 0.5)), bot = bp.map(([x, dy, w]) => P2(sx * x * h, by + dy * h - w * h * 0.5));
+      if (vis(surf(sx * 0.02 * h, by)) > 0.1) svg += `<path d="${smoothD(top.concat(bot.reverse()))}" fill="${shade(look.hairColor, -0.15)}" stroke="${shade(look.hairColor, -0.3)}" stroke-width="${f1(lw * 0.4)}"/>`;
       if (look.glasses) {
-        const gr = ring([0, 0, 0], [1, 0, 0], [0, 1, 0], 0.016 * h * k * clamp(v, 0.3, 1), 0.014 * h * k, 14).map((p) => [q[0] + p[0], q[1] + p[1] + 0.002 * h * k]);
-        cv.blob(0, gr, { fill: null, stroke: ink, w: 1.8, rough: 0.2, seed: hash(name + 'gl' + sx) });
+        const q = cam.p(c0.p), k = cam.k(c0.p);
+        const gr = ring([0, 0, 0], [1, 0, 0], [0, 1, 0], 0.0165 * h * k * clamp(v, 0.3, 1), 0.0145 * h * k, 16).map((p) => [q[0] + p[0], q[1] + p[1] + 0.0015 * h * k]);
+        svg += `<path d="${smoothD(gr)}" fill="#dfeaf2" fill-opacity="0.18" stroke="${ink}" stroke-width="${f1(lw * 0.9)}"/>`;
       }
     }
-    if (look.glasses) { const a = surf(0.006 * h, eyeY + 0.003 * h, 0.003 * h), b = surf(-0.006 * h, eyeY + 0.003 * h, 0.003 * h); if (vis(a) > 0.1 || vis(b) > 0.1) cv.line(0, [cam.p(a.p), cam.p(b.p)], { stroke: ink, w: 1.8, rough: 0 }); }
+    if (look.glasses) { const a = surf(0.006 * h, eyeY + 0.003 * h, 0.003 * h), b = surf(-0.006 * h, eyeY + 0.003 * h, 0.003 * h); if (vis(a) > 0.1 || vis(b) > 0.1) { const A = cam.p(a.p), B = cam.p(b.p); svg += `<path d="M${f1(A[0])} ${f1(A[1])}Q${f1((A[0] + B[0]) / 2)} ${f1((A[1] + B[1]) / 2 - 2)} ${f1(B[0])} ${f1(B[1])}" fill="none" stroke="${ink}" stroke-width="${f1(lw * 0.9)}"/>`; } }
     // nose
-    const nb = surf(0, -0.002 * h), nt = surf(0, -0.016 * h, 0.011 * h), nl = surf(0.004 * h, -0.02 * h, 0.002 * h);
-    if (vis(nb) > -0.3) cv.line(0, [cam.p(nb.p), cam.p(nt.p), cam.p(nl.p)], { stroke: shade(look.skin, -0.45), w: 1.6, rough: 0.2, smooth: true, seed: hash(name + 'ns') });
-    // mouth
-    const my = -0.035 * h, mw = 0.016 * h;
-    const mc = surf(0, my), ml = surf(-mw, my + E.mouth * 0.006 * h), mr = surf(mw, my + E.mouth * 0.006 * h);
-    if (vis(mc) > 0.05) {
-      let open = E.open;
-      if (speaking) open = max(open, 0.25 + 0.45 * abs(sin(t * 11 + sin(t * 4.3) * 2)));
-      const k = cam.k(mc.p), up = M.v(RH, [0, 1, 0]);
-      const down = cam.p(add(mc.p, mul(up, -(0.004 + 0.012 * open) * h - E.mouth * 0.002 * h))), upP = cam.p(add(mc.p, mul(up, (E.mouth > 0 ? -0.003 : 0.002) * h + (open > 0 ? 0.002 * h : 0))));
-      const L = cam.p(ml.p), R = cam.p(mr.p);
-      if (open > 0.05) cv.blob(0, [L, upP, R, down], { fill: '#8f3b3b', stroke: ink, w: 1.6, rough: 0.2, seed: hash(name + 'mo'), off: false });
-      else cv.line(0, [L, mul(add(upP, down), 0.5).slice(0, 2).map((x, i) => x + (i === 1 ? E.mouth * 0.004 * h * k : 0)), R], { stroke: ink, w: 2, rough: 0.2, smooth: true, seed: hash(name + 'mo') });
-      if (E.blush) for (const sx of [1, -1]) { const s = surf(sx * 0.032 * h, -0.016 * h); if (vis(s) > 0.3) { const q = cam.p(s.p), kk = cam.k(s.p); cv.blob(0, ring([0, 0, 0], [1, 0, 0], [0, 1, 0], 0.009 * h * kk, 0.005 * h * kk, 10).map((p) => [q[0] + p[0], q[1] + p[1]]), { fill: '#f08a8a', alpha: 0.35, off: false }); } }
+    const nb = surf(0, -0.001 * h), nt = surf(0, -0.019 * h, 0.012 * h);
+    if (vis(nb) > -0.3) {
+      const side = dot(M.v(RH, [1, 0, 0]), norm(sub(cam.pos, nb.p))) > 0 ? -1 : 1;   // draw the shadow side of the nose
+      const pts = [cam.p(surf(side * 0.004 * h, 0.006 * h).p), cam.p(surf(side * 0.005 * h, -0.008 * h, 0.004 * h).p), cam.p(nt.p), cam.p(surf(-side * 0.008 * h, -0.024 * h, 0.003 * h).p)];
+      svg += `<path d="${smoothD(pts, false)}" fill="none" stroke="${shade(look.skin, -0.45)}" stroke-width="${f1(lw * 0.85)}" stroke-linecap="round"/>`;
+      for (const sx of [1, -1]) { const nn = surf(sx * 0.0055 * h, -0.023 * h, 0.004 * h); if (vis(nn) > 0.25 && kc * h > 500) { const q = cam.p(nn.p); svg += `<circle cx="${f1(q[0])}" cy="${f1(q[1])}" r="${f1(lw * 0.7)}" fill="${shade(look.skin, -0.5)}"/>`; } }
     }
-    if (look.wrinkles) { const a = surf(-0.018 * h, 0.042 * h), b = surf(0.018 * h, 0.042 * h); if (vis(a) > 0.3 && vis(b) > 0.3) cv.line(0, [cam.p(a.p), cam.p(surf(0, 0.044 * h).p), cam.p(b.p)], { stroke: shade(look.skin, -0.35), w: 1.2, rough: 0.3, smooth: true, seed: 3 }); }
-    if (look.beard) { const pts = [surf(-0.03 * h, -0.03 * h), surf(0, -0.07 * h), surf(0.03 * h, -0.03 * h)]; if (pts.every((s) => vis(s) > 0)) cv.line(0, pts.map((s) => cam.p(s.p)), { stroke: shade(look.hairColor, 0.2), w: 1.4, rough: 0.6, smooth: true, dash: '2 4' }); }
+    // mouth
+    const my = -0.039 * h, mw0 = 0.016 * h * E.mw;
+    const mc = surf(0, my);
+    let open = E.op;
+    if (speaking) open = max(open, 0.18 + 0.42 * abs(sin(t * 11 + sin(t * 4.3) * 2)) * (0.6 + 0.4 * abs(sin(t * 2.7))));
+    if (vis(mc) > 0.05) {
+      const cy = E.sm * 0.0062 * h;
+      const L = P2(-mw0, my + cy - E.asy * 0.003 * h), R = P2(mw0, my + cy + E.asy * 0.003 * h);
+      const midUp = my + 0.0015 * h - max(0, E.sm) * 0.002 * h, midLo = my - (0.003 + open * 0.017 + max(0, E.sm) * open * 0.005) * h;
+      const U1 = P2(-mw0 * 0.45, midUp + cy * 0.4), U2 = P2(mw0 * 0.45, midUp + cy * 0.4), UM = P2(0, midUp);
+      const D1 = P2(-mw0 * 0.5, midLo + cy * 0.3), D2 = P2(mw0 * 0.5, midLo + cy * 0.3), DM = P2(0, midLo);
+      if (open > 0.06) {
+        const shape = [L, U1, UM, U2, R, D2, DM, D1];
+        const id = `m${uid}`;
+        svg += `<clipPath id="${id}"><path d="${smoothD(shape)}"/></clipPath><path d="${smoothD(shape)}" fill="#7a2e33"/>`;
+        svg += `<g clip-path="url(#${id})">`;
+        if (E.tw > 0.3) { const tL = P2(-mw0, midUp - 0.006 * h), tR = P2(mw0, midUp - 0.006 * h); svg += `<path d="M${f1(L[0])} ${f1(L[1] - 20)}L${f1(R[0])} ${f1(R[1] - 20)}L${f1(tR[0])} ${f1(tR[1])}L${f1(tL[0])} ${f1(tL[1])}Z" fill="#fff"/>`; }
+        if (E.tg > 0.3 || open > 0.5) { const tc = P2(0, midLo + 0.004 * h), kk = cam.k(mc.p); svg += `<ellipse cx="${f1(tc[0])}" cy="${f1(tc[1])}" rx="${f1(mw0 * 0.6 * kk)}" ry="${f1(0.006 * h * kk)}" fill="#d9707a"/>`; }
+        svg += `</g><path d="${smoothD(shape)}" fill="none" stroke="${ink}" stroke-width="${f1(lw * 1.1)}" stroke-linejoin="round"/>`;
+      } else {
+        const mid = P2(0, my - E.sm * 0.004 * h + (E.sm < 0 ? -E.sm * 0.003 * h : 0));
+        svg += `<path d="${smoothD([L, P2(-mw0 * 0.5, my + cy * 0.25 - E.sm * 0.003 * h), mid, P2(mw0 * 0.5, my + cy * 0.25 - E.sm * 0.003 * h), R], false)}" fill="none" stroke="${ink}" stroke-width="${f1(lw * 1.15)}" stroke-linecap="round"/>`;
+        if (kc * h > 600 && E.sm < 0.5) { const lp = P2(0, my - 0.0085 * h); svg += `<path d="M${f1(lp[0] - lw * 3)} ${f1(lp[1])}Q${f1(lp[0])} ${f1(lp[1] + lw * 1.4)} ${f1(lp[0] + lw * 3)} ${f1(lp[1])}" fill="none" stroke="${shade(look.skin, -0.3)}" stroke-width="${f1(lw * 0.6)}"/>`; }
+      }
+      if (E.sm > 0.55 && kc * h > 500) for (const sx of [1, -1]) { const a = P2(sx * (mw0 + 0.004 * h), my + cy + 0.006 * h), b = P2(sx * (mw0 + 0.006 * h), my + cy - 0.002 * h), c = P2(sx * (mw0 + 0.003 * h), my + cy - 0.007 * h); svg += `<path d="${smoothD([a, b, c], false)}" fill="none" stroke="${shade(look.skin, -0.35)}" stroke-width="${f1(lw * 0.6)}"/>`; }
+    }
+    if (E.bl > 0.05) for (const sx of [1, -1]) { const q0 = surf(sx * 0.033 * h, -0.017 * h); if (vis(q0) > 0.3) { const q = cam.p(q0.p), kk = cam.k(q0.p); svg += `<ellipse cx="${f1(q[0])}" cy="${f1(q[1])}" rx="${f1(0.011 * h * kk)}" ry="${f1(0.0055 * h * kk)}" fill="#f07c7c" fill-opacity="${f1(E.bl * 0.38 * 100) / 100}"/>`; } }
+    if (look.wrinkles) { const a = surf(-0.018 * h, 0.044 * h), b = surf(0.018 * h, 0.044 * h); if (vis(a) > 0.3 && vis(b) > 0.3) svg += `<path d="${smoothD([cam.p(a.p), cam.p(surf(0, 0.046 * h).p), cam.p(b.p)], false)}" fill="none" stroke="${shade(look.skin, -0.35)}" stroke-width="${f1(lw * 0.55)}"/>`; }
+    if (look.beard) { const pts = [surf(-0.034 * h, -0.03 * h), surf(-0.02 * h, -0.06 * h), surf(0, -0.068 * h), surf(0.02 * h, -0.06 * h), surf(0.034 * h, -0.03 * h)]; if (vis(pts[2]) > 0) svg += `<path d="${smoothD(pts.map((q) => cam.p(q.p)), false)}" fill="none" stroke="${shade(look.hairColor, 0.25)}" stroke-width="${f1(lw * 0.9)}" stroke-dasharray="${f1(lw)} ${f1(lw * 2.4)}"/>`; }
+    // chin
+    if (kc * h > 800) { const a = surf(-0.012 * h, -0.067 * h), b = surf(0.012 * h, -0.067 * h); if (vis(a) > 0.2) svg += `<path d="${smoothD([cam.p(a.p), cam.p(surf(0, -0.069 * h).p), cam.p(b.p)], false)}" fill="none" stroke="${shade(look.skin, -0.25)}" stroke-width="${f1(lw * 0.5)}"/>`; }
+    cv.svg(0, svg, 0);
+    // comic marks, sweat (screen space near the head)
+    const top = cam.p(HP([0, hr.y * 1.15, 0])), kk = cam.k(HP([0, 0, 0])) * h;
+    const age = t - E.mkT;
+    if (E.sw > 0.4) {
+      const sd = surf(-0.05 * h, 0.02 * h); const q = cam.p(sd.p); const yy = q[1] + ((t * 0.25) % 1) * 0.03 * kk, r = 0.008 * kk;
+      cv.svg(0, `<path d="M${f1(q[0])} ${f1(yy - r * 2.2)}Q${f1(q[0] + r * 1.1)} ${f1(yy)} ${f1(q[0])} ${f1(yy + r)}Q${f1(q[0] - r * 1.1)} ${f1(yy)} ${f1(q[0])} ${f1(yy - r * 2.2)}Z" fill="#9fd3f2" stroke="${INK}" stroke-width="${f1(lw * 0.7)}"/>`, 0);
+    }
+    if (E.mk && age < 2.2 && age > -0.01) {
+      const pop = clamp(age * 5), sc = (0.6 + 0.4 * pop) * kk;
+      const x = top[0] + 0.08 * sc, y = top[1] - 0.02 * sc;
+      let m = '';
+      if (E.mk === '!') { m = `<text x="${f1(x)}" y="${f1(y)}" font-size="${f1(0.11 * sc)}" font-family="WQHand" fill="#c2410c" font-weight="bold">!</text>`; for (let i = 0; i < 3; i++) { const a = -2.2 + i * 0.55; m += `<path d="M${f1(top[0] + cos(a) * 0.07 * sc)} ${f1(top[1] + sin(a) * 0.07 * sc)}L${f1(top[0] + cos(a) * 0.11 * sc)} ${f1(top[1] + sin(a) * 0.11 * sc)}" stroke="${INK}" stroke-width="${f1(lw)}" stroke-linecap="round"/>`; } }
+      if (E.mk === '?') m = `<text x="${f1(x)}" y="${f1(y)}" font-size="${f1(0.1 * sc)}" font-family="WQHand" fill="#1f6f9f">?</text>`;
+      if (E.mk === 'idea') { const r = 0.028 * sc, bx = top[0] + 0.07 * sc, byy = top[1] - 0.05 * sc; m = `<circle cx="${f1(bx)}" cy="${f1(byy)}" r="${f1(r)}" fill="#ffe27a" stroke="${INK}" stroke-width="${f1(lw)}"/><rect x="${f1(bx - r * 0.5)}" y="${f1(byy + r * 0.85)}" width="${f1(r)}" height="${f1(r * 0.6)}" fill="#9aa3ad" stroke="${INK}" stroke-width="${f1(lw * 0.8)}"/>`; for (let i = 0; i < 6; i++) { const a = -PI + i * PI / 5; m += `<path d="M${f1(bx + cos(a) * r * 1.4)} ${f1(byy + sin(a) * r * 1.4)}L${f1(bx + cos(a) * r * 1.9)} ${f1(byy + sin(a) * r * 1.9)}" stroke="#e0a400" stroke-width="${f1(lw)}" stroke-linecap="round"/>`; } }
+      cv.svg(0, `<g opacity="${f1(clamp((2.2 - age) * 2) * 100) / 100}">${m}</g>`, 0);
+    }
   }
 
   // ───────────── props & scenes ─────────────
@@ -548,14 +706,16 @@
   PROPS.window = (cv, o) => {   // on back wall (z) or side wall (x)
     const { x, y, z, w, h } = o; const side = o.side;
     const P = side ? [[x, y, z], [x, y, z + w], [x, y + h, z + w], [x, y + h, z]] : [[x, y, z], [x + w, y, z], [x + w, y + h, z], [x, y + h, z]];
-    quad(cv, P, { fill: '#cfe6f2', stroke: INK, w: 2.2, rough: 0.6, layer: -1, seed: hash('win' + x + z) });
+    const night = (o.state || {}).night || (o.mood && o.mood.night);
+    quad(cv, P, { fill: night ? '#1d2b4a' : '#cfe6f2', stroke: INK, w: 2.2, rough: 0.6, layer: -1, seed: hash('win' + x + z) });
+    if (night) { for (let i = 0; i < 14; i++) { const q = vlerp(vlerp(P[0], P[1], ((i * 37) % 13) / 13 + 0.03), vlerp(P[3], P[2], ((i * 37) % 13) / 13 + 0.03), 0.08 + ((i * 53) % 7) / 18); cv.blob(cv.cam.depth(q) - 0.01, sphere2(cv, add(q, side ? [0.01, 0, 0] : [0, 0, 0.01]), 0.018, 6), { fill: '#ffd76a', layer: -1, off: false }); } const mq = vlerp(P[0], P[2], 0.8); cv.blob(cv.cam.depth(mq) - 0.01, sphere2(cv, add(mq, side ? [0.01, 0, 0] : [0, 0, 0.01]), 0.08, 14), { fill: '#f4f1d0', stroke: INK, w: 1.2, layer: -1, off: false }); }
     const mid = (a, b) => mul(add(a, b), 0.5);
     line3(cv, mid(P[0], P[1]), mid(P[3], P[2]), { stroke: INK, w: 2, layer: -1, seed: 4 });
     line3(cv, mid(P[0], P[3]), mid(P[1], P[2]), { stroke: INK, w: 2, layer: -1, seed: 5 });
     // sky strokes
     const a = vlerp(P[0], P[2], 0.25), b = vlerp(P[0], P[2], 0.32);
     line3(cv, a, add(b, [0, 0, 0]), { stroke: '#ffffff', w: 3, layer: -1, rough: 0.2 });
-    if (o.city) { for (let i = 0; i < 5; i++) { const k = (i + 0.5) / 5; const bh = 0.18 + 0.25 * ((i * 37) % 5) / 5; const b0 = vlerp(P[0], P[1], k - 0.07), b1 = vlerp(P[0], P[1], k + 0.07); quad(cv, [b0, b1, add(b1, [0, h * bh, 0]), add(b0, [0, h * bh, 0])].map((p) => add(p, side ? [0.01, 0.01, 0] : [0, 0.01, 0.01])), { fill: '#9fb6c6', stroke: '#6d8394', w: 1.2, rough: 0.6, layer: -1, seed: 40 + i, off: false }); } }
+    if (o.city && !night) { for (let i = 0; i < 5; i++) { const k = (i + 0.5) / 5; const bh = 0.18 + 0.25 * ((i * 37) % 5) / 5; const b0 = vlerp(P[0], P[1], k - 0.07), b1 = vlerp(P[0], P[1], k + 0.07); quad(cv, [b0, b1, add(b1, [0, h * bh, 0]), add(b0, [0, h * bh, 0])].map((p) => add(p, side ? [0.01, 0.01, 0] : [0, 0.01, 0.01])), { fill: '#9fb6c6', stroke: '#6d8394', w: 1.2, rough: 0.6, layer: -1, seed: 40 + i, off: false }); } }
   };
   PROPS.table = (cv, o) => {
     const { x, z, w, d } = o, ht = o.h || 0.75, c = o.c || '#c9a27a';
@@ -584,13 +744,12 @@
     const st = o.state || {};
     const lines = st.lines || [];
     const k = st.k == null ? 1 : st.k;
-    let out = '';
+    let inner = '';
     lines.forEach((ln, i) => {
-      const p = cv.cam.p([x + 0.15, y + h - 0.22 - i * 0.24, z + 0.01]), sc = cv.cam.k([x + 0.15, y + h - 0.22 - i * 0.24, z]);
       const n = Math.floor(ln.length * clamp(k * lines.length - i));
-      if (n > 0) out += `<text x="${f1(p[0])}" y="${f1(p[1])}" font-size="${f1(0.15 * sc)}" font-family="WQHand" fill="${i === 0 ? '#1f6f9f' : '#2a2f36'}">${esc(ln.slice(0, n))}</text>`;
+      if (n > 0) inner += `<text x="40" y="${90 + i * 95}" font-size="${i === 0 ? 76 : 64}" font-family="WQHand" fill="${i === 0 ? '#1f6f9f' : '#2a2f36'}">${esc(ln.slice(0, n))}</text>`;
     });
-    if (out) cv.svg(cv.cam.depth([x + w / 2, y + h / 2, z]) - 0.05, out, -1);
+    if (inner) planeSvg(cv, cv.cam.depth([x + w / 2, y + h / 2, z]) - 0.05, [x, y + h, z + 0.01], [x + w, y + h, z + 0.01], [x, y, z + 0.01], 1000, 1000 * h / w, inner, -1);
   };
   PROPS.screen = (cv, o) => {   // wall-mounted TV/projection on back wall
     const { x, y, z, w, h } = o;
@@ -612,14 +771,26 @@
     const S = (u, v) => Wp([-w / 2 + 0.03 + u * (w - 0.06), 0.15 + v * (h - 0.06), -0.035]);
     quad(cv, [S(0, 0), S(1, 0), S(1, 1), S(0, 1)], { fill: '#f4f8fb', stroke: null, z: zc - 0.001, off: false });
     const st = o.state || {}, mode = st.mode || 'code', T = o.t || 0;
-    if (mode === 'code') { for (let i = 0; i < 6; i++) { const L = 0.3 + 0.5 * ((i * 53) % 7) / 7; cv.line(zc - 0.002, [cv.cam.p(S(0.08, 0.85 - i * 0.13)), cv.cam.p(S(0.08 + L * 0.8, 0.85 - i * 0.13))], { stroke: i % 3 ? '#5b7fa3' : '#2e7d4f', w: 2, rough: 0.2 }); } }
-    else if (mode === 'bad' || mode === 'ok' || mode === 'find') {
-      const pts = []; for (let i = 0; i <= 40; i++) { const u = i / 40; let v = 0.5 + 0.22 * sin(u * 6.3 + T * 2); if (mode === 'bad' || mode === 'find') v += 0.12 * sin(u * 70 + T * 9) * clamp((u - 0.35) * 4); pts.push(cv.cam.p(S(0.06 + u * 0.88, v))); }
-      cv.line(zc - 0.002, pts, { stroke: mode === 'ok' ? '#2e7d4f' : '#c2410c', w: 2.4, rough: 0 });
-      cv.line(zc - 0.002, [cv.cam.p(S(0.06, 0.1)), cv.cam.p(S(0.94, 0.1))], { stroke: '#8a96a3', w: 1.2, rough: 0 });
-      if (mode === 'find') { const q = cv.cam.p(S(0.62, 0.55)), kk = cv.cam.k(S(0.62, 0.5)) * 0.07; cv.blob(zc - 0.003, ring([0, 0, 0], [1, 0, 0], [0, 1, 0], kk * 1.4, kk, 14).map((p) => [q[0] + p[0], q[1] + p[1]]), { fill: null, stroke: '#c2410c', w: 3, rough: 1, seed: 77 }); }
-      if (mode === 'ok') { const q = cv.cam.p(S(0.85, 0.82)), kk = cv.cam.k(S(0.85, 0.8)) * 0.04; cv.line(zc - 0.003, [[q[0] - kk, q[1]], [q[0] - kk * 0.3, q[1] + kk * 0.7], [q[0] + kk, q[1] - kk * 0.8]], { stroke: '#2e7d4f', w: 4, rough: 0.3 }); }
-    }
+    const code = o.code || ['# 关节 3 · 电机参数', 'kp = 2.40   # 旧芯片', 'ki = 0.15', 'kd = 0.02', 'run_test(joint=3)'];
+    const fixed = o.fixed || 'kp = 1.65   # 新芯片';
+    let inner = `<rect width="400" height="240" fill="#f4f8fb"/><rect width="400" height="22" fill="#dfe6ec"/><circle cx="12" cy="11" r="5" fill="#e06c5a"/><circle cx="27" cy="11" r="5" fill="#e0b04a"/><circle cx="42" cy="11" r="5" fill="#6aa56f"/>`;
+    inner += `<rect x="0" y="22" width="200" height="218" fill="#22272e"/>`;
+    const shown = mode === 'code' ? Math.floor(((T * 1.2) % 8) * 1.0) + 2 : code.length;
+    code.forEach((l, i) => {
+      if (i >= shown) return;
+      let txt = l, col = l.startsWith('#') ? '#8b9aa8' : '#e6edf3';
+      if (i === 1 && (mode === 'find')) { col = '#ff8a7a'; inner += `<rect x="4" y="${30 + i * 30}" width="192" height="26" fill="#5a2a2a"/>`; }
+      if (i === 1 && mode === 'ok') { txt = fixed; col = '#8fe0a5'; inner += `<rect x="4" y="${30 + i * 30}" width="192" height="26" fill="#1f4a32"/>`; }
+      inner += `<text x="10" y="${49 + i * 30}" font-size="15" font-family="WQHand" fill="${col}">${esc(txt)}</text>`;
+    });
+    if (mode === 'code' && Math.floor(T * 2) % 2 === 0) inner += `<rect x="10" y="${34 + Math.min(shown, code.length) * 30}" width="8" height="18" fill="#e6edf3"/>`;
+    // right: joint-3 response
+    let d = '';
+    for (let i = 0; i <= 60; i++) { const u = i / 60; let v = 0.5 + 0.3 * sin(u * 6.3 + T * 1.5); if (mode !== 'ok' && mode !== 'code') v += 0.13 * sin(u * 80 + T * 9) * clamp((u - 0.3) * 4); d += (i ? 'L' : 'M') + f1(210 + u * 180) + ' ' + f1(215 - v * 170); }
+    inner += `<text x="210" y="44" font-size="14" font-family="WQHand" fill="#5f6b76">关节 3 角度</text><path d="M210 215H392" stroke="#9aa6b2" stroke-width="1.5"/><path d="${d}" fill="none" stroke="${mode === 'ok' || mode === 'code' ? '#2e7d4f' : '#c2410c'}" stroke-width="3"/>`;
+    if (mode === 'find') inner += `<ellipse cx="320" cy="120" rx="58" ry="46" fill="none" stroke="#c2410c" stroke-width="4"/>`;
+    if (mode === 'ok') inner += `<path d="M352 50l10 12 20-24" fill="none" stroke="#2e7d4f" stroke-width="6" stroke-linecap="round"/>`;
+    planeSvg(cv, zc - 0.002, S(0, 1), S(1, 1), S(0, 0), 400, 240, inner);
   };
   PROPS.laptop = (cv, o) => { const { x, y, z } = o; box(cv, { x: x - 0.17, y, z: z - 0.12, w: 0.34, h: 0.02, d: 0.24, c: '#9aa3ad', id: 'lp' + x }); quad(cv, [[x - 0.17, y + 0.02, z - 0.12], [x + 0.17, y + 0.02, z - 0.12], [x + 0.17, y + 0.24, z - 0.17], [x - 0.17, y + 0.24, z - 0.17]], { fill: '#3a4049', stroke: INK, w: 2, seed: 61 }); };
   PROPS.plant = (cv, o) => {
@@ -703,6 +874,86 @@
   PROPS.bench = (cv, o) => { const { x, z } = o; const zc = box(cv, { x: x - (o.w || 1.4) / 2, y: 0, z: z - 0.35, w: o.w || 1.4, h: 0.8, d: 0.7, c: o.c || '#8a98a6', id: 'bn' + x }); for (let i = 0; i < 6; i++) line3(cv, [x - 0.7 + i * 0.28, 0.802, z + 0.351], [x - 0.6 + i * 0.28, 0.802, z + 0.351], { stroke: '#e0b33a', w: 6, z: zc - 0.02, rough: 0 }); return zc; };
   PROPS.stripe = (cv, o) => { const { x, z, w, d } = o; quad(cv, [[x, 0.003, z], [x + w, 0.003, z], [x + w, 0.003, z + d], [x, 0.003, z + d]], { fill: null, stroke: '#e0b33a', w: 5, layer: -2, dash: '18 10', rough: 0 }); };
   PROPS.rug = (cv, o) => { const { x, z, w, d } = o; quad(cv, [[x, 0.004, z], [x + w, 0.004, z], [x + w, 0.004, z + d], [x, 0.004, z + d]], { fill: o.c || '#c8d6c3', stroke: INK, w: 1.5, layer: -2, seed: 91 }); };
+  // SVG drawn in a plane: TL, TR, BL corners (3D), local units w×h → affine transform
+  function planeSvg(cv, z, TL, TR, BL, w, h, inner, layer) {
+    if (cv.cam.depth(TL) < 0.15 || cv.cam.depth(TR) < 0.15 || cv.cam.depth(BL) < 0.15) return;
+    const a = cv.cam.p(TL), b = cv.cam.p(TR), c = cv.cam.p(BL);
+    const m = [(b[0] - a[0]) / w, (b[1] - a[1]) / w, (c[0] - a[0]) / h, (c[1] - a[1]) / h, a[0], a[1]].map((x) => Math.round(x * 10000) / 10000);
+    cv.svg(z, `<g transform="matrix(${m.join(' ')})">${inner}</g>`, layer || 0);
+  }
+  PROPS.keyboard = (cv, o) => {   // on a desk top at y, facing the typist at angle face (deg; 0 = typist at +z)
+    const { x, y, z } = o, R = M.y((o.face || 0) * D), Wp = (l) => add([x, y, z], M.v(R, l));
+    const w = 0.44, d = 0.15;
+    const zc = cv.cam.depth(Wp([0, 0, 0])) + (o.bias || 0);
+    const top = [Wp([-w / 2, 0.022, -d / 2]), Wp([w / 2, 0.022, -d / 2]), Wp([w / 2, 0.016, d / 2]), Wp([-w / 2, 0.016, d / 2])];
+    const bot = top.map((p) => [p[0], y + 0.001, p[2]]);
+    cv.blob(zc, hull(proj(cv, top.concat(bot))), { poly: true, fill: '#3b4048', stroke: INK, w: 1.8, rough: 0.3, seed: hash('kb' + x) });
+    if (cv.cam.k(Wp([0, 0, 0])) * w < 90) return;
+    let inner = `<rect x="2" y="2" width="436" height="146" rx="6" fill="#4b525c"/>`;
+    const T = o.t || 0, typing = (o.state || {}).typing !== false;
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 14; c++) {
+      if (r === 4 && c > 3 && c < 10) { if (c === 4) inner += `<rect x="${6 + 4 * 30.5}" y="${6 + r * 28}" width="${6 * 30.5 - 4}" height="24" rx="3" fill="#e8e8e2"/>`; continue; }
+      const hit = typing && (((Math.floor(T * 9) * 7 + r * 5 + c * 3) % 23) === 0);
+      inner += `<rect x="${6 + c * 30.5}" y="${6 + r * 28}" width="26.5" height="24" rx="3" fill="${hit ? '#f0b14a' : '#e8e8e2'}"/>`;
+    }
+    planeSvg(cv, zc - 0.002, top[0], top[1], top[3], 440, 150, inner);
+  };
+  PROPS.mouse = (cv, o) => { const c = [o.x, o.y + 0.018, o.z]; cv.blob(cv.cam.depth(c) + (o.bias || 0), hull(proj(cv, ellipsoidPts(c, M.y(0), 0.032, 0.018, 0.05, 5, 10))), { fill: '#d6d9dd', stroke: INK, w: 1.6, rough: 0.3, seed: 52 }); };
+  PROPS.mug = (cv, o) => {
+    const { x, y, z } = o; const zc = cyl(cv, { x, z, y, h: 0.1, r: 0.042, c: o.c || '#f2f2ee', id: 'mug' + x + z, lw: 1.6, bias: o.bias });
+    const hs = [[x + 0.04, y + 0.08, z], [x + 0.075, y + 0.065, z], [x + 0.075, y + 0.035, z], [x + 0.04, y + 0.022, z]];
+    cv.line(zc - 0.001, proj(cv, hs), { stroke: INK, w: 2.4, smooth: true, rough: 0.2 });
+    if (o.steam !== false) { const T = o.t || 0; for (let i = 0; i < 2; i++) { const k = (T * 0.4 + i * 0.5) % 1; const b = [x - 0.012 + i * 0.024, y + 0.12 + k * 0.12, z]; cv.line(zc - 0.002, proj(cv, [b, add(b, [0.012 * sin(T * 3 + i), 0.04, 0]), add(b, [-0.01, 0.08, 0])]), { stroke: '#a7b2bd', w: 1.8, smooth: true, rough: 0, salpha: f1(1 - k) }); } }
+  };
+  PROPS.papers = (cv, o) => {
+    const { x, y, z } = o; const a = (o.rot || 0) * D, R = M.y(a);
+    for (let i = 0; i < (o.n || 2); i++) {
+      const r = M.y(a + i * 0.25), c = add([x, y + 0.002 + i * 0.002, z], M.v(R, [i * 0.03, 0, i * 0.02]));
+      const Q = [[-0.105, 0, -0.148], [0.105, 0, -0.148], [0.105, 0, 0.148], [-0.105, 0, 0.148]].map((l) => add(c, M.v(r, l)));
+      quad(cv, Q, { fill: '#fffef8', stroke: INK, w: 1.3, rough: 0.3, seed: hash('pp' + x + i), z: cv.cam.depth(c) - 0.01 * i + (o.bias || 0) });
+      if (cv.cam.k(c) * 0.2 > 40) for (let j = 0; j < 6; j++) line3(cv, add(c, M.v(r, [-0.08, 0.001, -0.11 + j * 0.035])), add(c, M.v(r, [0.04 + 0.03 * ((j * 7) % 3), 0.001, -0.11 + j * 0.035])), { stroke: '#9aa6b2', w: 1.2, rough: 0.2, z: cv.cam.depth(c) - 0.01 * i - 0.001 + (o.bias || 0) });
+    }
+  };
+  PROPS.sticky = (cv, o) => { const { x, y, z } = o; const s = 0.07; const n = o.side ? [[x, y, z], [x, y, z + s], [x, y - s, z + s], [x, y - s, z]] : [[x, y, z], [x + s, y, z], [x + s, y - s, z], [x, y - s, z]]; quad(cv, n, { fill: o.c || '#ffe680', stroke: INK, w: 1.2, rough: 0.3, seed: hash('st' + x + y), z: cv.cam.depth([x, y, z]) - 0.06 }); };
+  PROPS.clock = (cv, o) => {   // wall clock on the back wall (or side: true on the x wall)
+    const { x, y, z } = o, r = o.r || 0.22; const st = o.state || {};
+    const u = o.side ? [0, 0, 1] : [1, 0, 0], v = [0, 1, 0], c = [x, y, z];
+    const zc = cv.cam.depth(c) - 0.02;
+    cv.blob(zc, proj(cv, ring(c, u, v, r, r, 28)), { fill: '#ffffff', stroke: INK, w: 3, rough: 0.5, seed: 61, layer: -1 });
+    const [hh, mm] = String(st.time || o.time || '09:00').split(':').map(Number);
+    const T = o.t || 0, sec = (T * 6) % 60;
+    const hand = (ang, len, w, col) => { const e = add(c, add(mul(u, sin(ang) * len), mul(v, cos(ang) * len))); line3(cv, c, e, { stroke: col || INK, w, rough: 0.1, layer: -1, z: zc - 0.001 }); };
+    for (let i = 0; i < 12; i++) { const a = i / 12 * 2 * PI; line3(cv, add(c, add(mul(u, sin(a) * r * 0.82), mul(v, cos(a) * r * 0.82))), add(c, add(mul(u, sin(a) * r * 0.93), mul(v, cos(a) * r * 0.93))), { stroke: INK, w: i % 3 ? 1.4 : 2.6, rough: 0, layer: -1, z: zc - 0.0005 }); }
+    hand(((hh % 12) + mm / 60) / 12 * 2 * PI, r * 0.5, 4.5); hand(mm / 60 * 2 * PI, r * 0.75, 3); hand(sec / 60 * 2 * PI, r * 0.82, 1.4, '#c2410c');
+  };
+  PROPS.calendar = (cv, o) => {
+    const { x, y, z } = o, w = 0.42, h = 0.52;
+    const TL = [x, y + h, z], TR = [x + w, y + h, z], BL = [x, y, z];
+    quad(cv, [BL, [x + w, y, z], TR, TL], { fill: '#ffffff', stroke: INK, w: 2, rough: 0.4, seed: 62, layer: -1 });
+    let inner = `<rect x="0" y="0" width="420" height="110" fill="#c2410c"/><text x="210" y="80" font-size="64" font-family="WQHand" fill="#fff" text-anchor="middle">${esc(o.month || '十一月')}</text>`;
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 7; c++) { const n = r * 7 + c + 1; if (n > 30) continue; inner += `<text x="${30 + c * 58}" y="${165 + r * 72}" font-size="34" font-family="WQHand" fill="#5f6b76" text-anchor="middle">${n}</text>`; }
+    const mark = o.mark || 19, mr = Math.floor((mark - 1) / 7), mc = (mark - 1) % 7;
+    inner += `<ellipse cx="${30 + mc * 58}" cy="${153 + mr * 72}" rx="30" ry="26" fill="none" stroke="#c2410c" stroke-width="6"/><text x="${30 + mc * 58}" y="${195 + mr * 72}" font-size="26" font-family="WQHand" fill="#c2410c" text-anchor="middle">${esc(o.label || '发布')}</text>`;
+    planeSvg(cv, cv.cam.depth([x + w / 2, y + h / 2, z]) - 0.05, add(TL, [0, 0, 0.005]), add(TR, [0, 0, 0.005]), add(BL, [0, 0, 0.005]), 420, 520, inner, -1);
+  };
+  PROPS.lamp = (cv, o) => {
+    const { x, y, z } = o; const on = (o.state || {}).on;
+    const zc = cyl(cv, { x, z, y, h: 0.025, r: 0.08, c: '#3d4450', id: 'lb' + x, bias: o.bias });
+    const j = [x + 0.05, y + 0.32, z], hd = [x + 0.2, y + 0.42, z];
+    line3(cv, [x, y + 0.02, z], j, { stroke: '#3d4450', w: 5, z: zc - 0.01 }); line3(cv, j, hd, { stroke: '#3d4450', w: 5, z: zc - 0.01 });
+    const sh = ring(add(hd, [0.04, -0.06, 0]), [1, 0, 0], [0, 0, 1], 0.1, 0.1, 16).concat(ring(add(hd, [0, 0.03, 0]), [1, 0, 0], [0, 0, 1], 0.045, 0.045, 12));
+    cv.blob(zc - 0.02, hull(proj(cv, sh)), { poly: true, fill: on ? '#f6c453' : '#4a5260', stroke: INK, w: 2, rough: 0.4, seed: 63 });
+    if (on) { const q = cv.cam.p(add(hd, [0.06, -0.38, 0])), k = cv.cam.k(add(hd, [0.06, -0.38, 0])); cv.svg(zc + 0.4, `<ellipse cx="${f1(q[0])}" cy="${f1(q[1])}" rx="${f1(0.45 * k)}" ry="${f1(0.16 * k)}" fill="#ffe9a8" fill-opacity="0.45"/>`, 0); }
+  };
+  PROPS.cable = (cv, o) => { const pts = o.pts.map((p) => cv.cam.p(p)); cv.line(cv.cam.depth(o.pts[0]) + (o.bias || 0), pts, { stroke: o.c || '#2d3540', w: 3.4, smooth: true, rough: 0.3, seed: 64 }); };
+  PROPS.pans = (cv, o) => {   // pans and a ladle hanging on the back wall
+    const { x, y, z } = o; line3(cv, [x, y, z + 0.02], [x + 1.0, y, z + 0.02], { stroke: '#6b7280', w: 4, layer: -1 });
+    [[0.15, 0.13, '#5b6470'], [0.5, 0.17, '#a5562f'], [0.85, 0.11, '#5b6470']].forEach(([dx, r, c], i) => { const cc = [x + dx, y - 0.12 - r, z + 0.03]; line3(cv, [x + dx, y, z + 0.03], add(cc, [0, r, 0]), { stroke: INK, w: 3, layer: -1 }); cv.blob(cv.cam.depth(cc), proj(cv, ring(cc, [1, 0, 0], [0, 1, 0], r, r, 18)), { fill: c, stroke: INK, w: 2, rough: 0.6, seed: 70 + i, layer: -1 }); });
+  };
+  PROPS.jars = (cv, o) => { const { x, y, z } = o; ['#c94f3d', '#e2b04a', '#6aa56f', '#8b6b4a'].forEach((c, i) => { cyl(cv, { x: x + i * 0.11, z, y, h: 0.14 + (i % 2) * 0.03, r: 0.035, c, id: 'jar' + i, lw: 1.5 }); }); };
+  PROPS.hood = (cv, o) => { const { x, z } = o; box(cv, { x, y: 1.75, z, w: 0.8, h: 0.12, d: 0.55, c: '#b9c0c8', id: 'hood' }); box(cv, { x: x + 0.25, y: 1.87, z, w: 0.3, h: 0.93, d: 0.3, c: '#c7cdd3', id: 'hood2' }); };
+  PROPS.cup = (cv, o) => cyl(cv, { x: o.x, z: o.z, y: o.y, h: 0.11, r: 0.035, r2: 0.042, c: o.c || '#dbe9f3', id: 'cup' + o.x + o.z, lw: 1.5 });
+  PROPS.notebook = (cv, o) => { box(cv, { x: o.x - 0.1, y: o.y, z: o.z - 0.14, w: 0.2, h: 0.015, d: 0.28, c: o.c || '#2f5d8a', id: 'nb' + o.x }); };
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 
   // ───────────── shots ─────────────
@@ -748,6 +999,47 @@
     return out;
   }
 
+  // approximate head centre of a character (for camera framing)
+  function headOf(story, shot, name, t) {
+    const keys = (shot.chars || {})[name]; if (!keys) return null;
+    const st = charState(keys, t), look = Object.assign({}, LOOK0, story.cast[name] || {}), h = look.height;
+    const P = mixPose(poseVec(st.prevPose), poseVec(st.pose), curPoseK(st, t));
+    const hipY = P.sit ? 0.47 + (h - 1.7) * 0.05 : 0.535 * h;
+    const r = 0.39 * h, fa = curFace(st, t) * D, ln = P.lean * D;
+    return { c: [st.pos[0] + sin(fa) * sin(ln) * r, hipY + cos(ln) * r, st.pos[1] + cos(fa) * sin(ln) * r], face: curFace(st, t), h };
+  }
+  function shake(t, a) { return [a * (sin(t * 1.31) * 0.6 + sin(t * 2.93 + 1) * 0.4), a * (sin(t * 1.07 + 2) * 0.6 + sin(t * 2.41) * 0.4), a * sin(t * 0.9 + 4) * 0.5]; }
+  function cutCam(story, shot, cut, t, t1) {
+    const sp = cut.spec, k = clamp((t - cut.t) / max(0.5, t1 - cut.t));
+    if (sp.pos) {   // fixed / insert shot, gentle move from pos to pos2
+      return { pos: vlerp(sp.pos, sp.pos2 || sp.pos, ease(k)), look: vlerp(sp.look, sp.look2 || sp.look, ease(k)), fov: sp.fov || 36, focus: sp.focus, dof: sp.dof !== false && !!sp.insert };
+    }
+    if (sp.close || sp.medium) {
+      const who = sp.close || sp.medium, hd = headOf(story, shot, who, t); if (!hd) return null;
+      const close = !!sp.close;
+      const dist = (sp.dist || (close ? 0.95 : 2.0)) * (1.07 - 0.1 * k);
+      const a = (hd.face + (sp.ang == null ? 28 : sp.ang)) * D;
+      const tgt = add(hd.c, [0, close ? -0.06 : -0.32, 0]);
+      const pos = add(tgt, [sin(a) * dist, (sp.up == null ? (close ? 0.04 : 0.1) : sp.up), cos(a) * dist]);
+      return { pos, look: tgt, fov: sp.fov || (close ? 30 : 36), focus: dist, dof: true };
+    }
+    if (sp.ots) {
+      const A = headOf(story, shot, sp.ots[0], t), B = headOf(story, shot, sp.ots[1], t); if (!A || !B) return null;
+      const d = norm([B.c[0] - A.c[0], 0, B.c[2] - A.c[2]]), side = [-d[2], 0, d[0]], sg = sp.side || 1;
+      const pos = add(A.c, add(mul(d, -0.62 * (1.04 - 0.06 * k)), add(mul(side, 0.36 * sg), [0, 0.07, 0])));
+      const look = add(B.c, [0, -0.1, 0]);
+      return { pos, look, fov: sp.fov || 34, focus: sqrt(dot(sub(look, pos), sub(look, pos))), dof: true };
+    }
+    if (sp.two) {
+      const A = headOf(story, shot, sp.two[0], t), B = headOf(story, shot, sp.two[1], t); if (!A || !B) return null;
+      const m = add(mul(add(A.c, B.c), 0.5), [0, -0.25, 0]), d = norm([B.c[0] - A.c[0], 0, B.c[2] - A.c[2]]);
+      let n = [-d[2], 0, d[0]]; if (sp.flip) n = mul(n, -1);
+      const dist = (sp.dist || 2.4) * (1.04 - 0.06 * k);
+      return { pos: add(m, add(mul(n, dist), [0, 0.15, 0])), look: m, fov: sp.fov || 36, focus: dist, dof: true };
+    }
+    return null;
+  }
+
   function render(story, t, opts) {
     opts = opts || {};
     const [W, H] = story.size;
@@ -756,19 +1048,26 @@
     const gen = global.rough.generator();
     let svg = `<rect width="${W}" height="${H}" fill="#fbf8f2"/>`;
     if (shot.title) return svg + titleCard(shot, tl, W, H, gen);
-    let ck = camAt(shot.cam, t);
-    let cpos = ck.pos;
+    let ck = camAt(shot.cam, t), focus = null, closeUp = false;
+    const cuts = shot.cuts || [];
+    let ci = -1; for (let i = 0; i < cuts.length; i++) if (cuts[i].t <= t) ci = i;
+    if (ci >= 0 && !cuts[ci].spec.wide) { const c = cutCam(story, shot, cuts[ci], t, ci + 1 < cuts.length ? cuts[ci + 1].t : shot.t1); if (c) { ck = c; focus = c.dof ? c.focus : null; closeUp = true; } }
+    const hand = shake(t, closeUp ? 0.006 : 0.012);
+    let cpos = add(ck.pos, hand), clook = add(ck.look, mul(hand, 0.5));
     if (opts.orbit) {   // viewer drags while paused
-      const d = sub(cpos, ck.look), r = sqrt(d[0] * d[0] + d[2] * d[2]), a = atan2(d[0], d[2]) + opts.orbit[0];
-      cpos = [ck.look[0] + r * sin(a), clamp(cpos[1] + opts.orbit[1], 0.4, 6), ck.look[2] + r * cos(a)];
+      const d = sub(cpos, clook), r = sqrt(d[0] * d[0] + d[2] * d[2]), a = atan2(d[0], d[2]) + opts.orbit[0];
+      cpos = [clook[0] + r * sin(a), clamp(cpos[1] + opts.orbit[1], 0.4, 6), clook[2] + r * cos(a)];
+      focus = null;
     }
-    const cam = Camera(cpos, ck.look, ck.fov, W, H);
+    const cam = Camera(cpos, clook, ck.fov, W, H);
     const cv = Canvas(cam, gen); cv.gen = gen;
     // scene props
+    const pstate = {};
     for (const p of story.scenes[shot.scene]) {
       const fn = PROPS[p.type]; if (!fn) continue;
-      const o = Object.assign({}, p, { t, state: propState((shot.props || {})[p.id], t) });
+      const o = Object.assign({}, p, { t, state: propState((shot.props || {})[p.id], t), mood: shot.mood });
       if (o.state.hide) continue;
+      pstate[p.id] = o.state;
       fn(cv, o);
     }
     // people
@@ -786,14 +1085,25 @@
       for (let i = start; i < cv.items.length; i++) cv.items[i].z = person.z - (i - start) * 0.00001;
     }
     const reveal = shot.reveal === false ? 1 : clamp(tl / 1.3);
-    svg += cv.render(reveal);
-    // bubbles
+    svg += cv.render(reveal, focus);
+    // mood: night = dark room with a pool of lamp light
+    if (shot.mood && shot.mood.night) {
+      const L = shot.mood.light ? cam.p(shot.mood.light) : [W / 2, H / 2];
+      svg += `<defs><radialGradient id="wq-night" gradientUnits="userSpaceOnUse" cx="${f1(L[0])}" cy="${f1(L[1])}" r="${f1(W * 0.75)}"><stop offset="0" stop-color="#0d1a3a" stop-opacity="0"/><stop offset="0.3" stop-color="#0d1a3a" stop-opacity="0.22"/><stop offset="1" stop-color="#0d1a3a" stop-opacity="0.62"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#wq-night)"/>`;
+    }
+    svg += `<defs><radialGradient id="wq-vig" cx="50%" cy="50%" r="75%"><stop offset="0.6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.22"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#wq-vig)"/>`;
+    // speech: bubble in wide shots; lower-third caption with the speaker's name in close-ups or when the speaker is off screen
     for (const b of shot.bubbles || []) {
       if (t < b.t0 || t >= b.t1) continue;
-      let anchor;
-      if (b.style === 'phone') { const hd = ctx.heads[b.at]; anchor = hd ? cam.p(add(hd.c, [0.15, 0.05, 0])) : [W * 0.7, H * 0.3]; }
-      else { const hd = ctx.heads[b.who]; anchor = hd ? cam.p(hd.top) : [W * 0.5, H * 0.3]; }
-      svg += bubble(cv, W, H, anchor, b.text, t - b.t0, b.style, b.label);
+      let anchor, big = false, off = false;
+      if (b.style === 'phone') { const hd = ctx.heads[b.at]; anchor = hd ? cam.p(add(hd.c, [0.15, 0.05, 0])) : [W * 0.7, H * 0.3]; big = closeUp; }
+      else {
+        const hd = ctx.heads[b.who];
+        if (hd) { anchor = cam.p(hd.top); const c = cam.p(hd.c); big = (c[1] - anchor[1]) > 70; off = c[2] < 0.2 || c[0] < 0 || c[0] > W || c[1] < 0 || c[1] > H; }
+        else off = true;
+      }
+      if (big || off || closeUp) svg += caption(W, H, b, t - b.t0);
+      else svg += bubble(cv, W, H, anchor, b.text, t - b.t0, b.style, b.label);
     }
     // subtitles (narration)
     for (const s of shot.subs || []) {
@@ -806,6 +1116,17 @@
     }
     if (story.watermark) svg += `<text x="18" y="30" font-size="18" font-family="WQHand" fill="#8a96a3">${esc(story.watermark)}</text>`;
     return svg;
+  }
+  function caption(W, H, b, age) {
+    const lines = wrap(b.text, 26), fs = 32, lh = 42;
+    const name = b.label || b.who;
+    const bh = lines.length * lh + 18, y0 = H - bh - 24;
+    const bw = Math.max(...lines.map(textW)) * fs + 52;
+    const a = clamp(age * 6);
+    let o = `<g opacity="${f1(a * 100) / 100}"><rect x="${f1(W / 2 - bw / 2)}" y="${f1(y0)}" width="${f1(bw)}" height="${bh}" rx="10" fill="#fffdf6" stroke="${INK}" stroke-width="2.4"${b.style === 'phone' ? ' stroke-dasharray="8 6"' : ''}/>`;
+    o += `<rect x="${f1(W / 2 - bw / 2 + 14)}" y="${f1(y0 - 18)}" width="${f1(textW(name) * 22 + 22)}" height="30" rx="8" fill="#f0b14a" stroke="${INK}" stroke-width="2"/><text x="${f1(W / 2 - bw / 2 + 25)}" y="${f1(y0 + 4)}" font-size="22" font-family="WQHand" fill="${INK}">${esc(name)}</text>`;
+    lines.forEach((l, i) => (o += `<text x="${W / 2}" y="${f1(y0 + 12 + (i + 0.8) * lh)}" font-size="${fs}" font-family="WQHand" fill="${INK}" text-anchor="middle">${esc(l)}</text>`));
+    return o + '</g>';
   }
   function titleCard(shot, tl, W, H, gen) {
     let out = '';
