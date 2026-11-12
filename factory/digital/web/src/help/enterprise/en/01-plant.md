@@ -10,7 +10,9 @@ At the top of [Design & process](/work/engineer) is “Plant manifest (Excel)”
 2. **Edit it in Excel**: add a product, change BOM quantities, routing minutes, prices…;
 3. **Upload the edited manifest**: the platform checks it on the spot and names the sheet and row of any error; if it passes it lists what changed against the manifest in use (items, BOMs, operations and products added / removed / changed) and saves it as a “pending manifest”.
 
-A pending manifest is not in effect yet: for now the implementation team downloads its yaml and takes it live with step 3 below; one-click go-live from the web (creating new items in ERPNext too, keeping the old manifest for rollback) comes in the next phase.
+A pending manifest is not in effect yet: for now the implementation team downloads its yaml and takes it live with step 3 below; one-click go-live from the web (creating new items in ERPNext too, keeping the old manifest for rollback) will later be offered for an enterprise's own plant only.
+
+**WenQuest's seven teaching plants (gearbox, robot, sewing machine, motor, sensor, PCB, chip packaging & test) can only be downloaded and previewed, never taken live**: the labs' material calculations, routings and bottlenecks all read this manifest, so a web edit would make lab answers disagree with the lab guides. Students' lab data is therefore not affected by uploads here.
 
 ## Three steps
 
