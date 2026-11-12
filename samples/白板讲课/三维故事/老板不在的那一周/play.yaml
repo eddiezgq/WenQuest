@@ -1,0 +1,152 @@
+# 第 163 轮第 1 步：互动扮演版（单人）。演员、场景和大部分镜头取自 story.yaml（use: 镜头 id），分支镜头写在这里。
+# 节点：use（引用 story.yaml 的镜头）或 shot（本文件新写的镜头）；next 下一个节点；choice 决定点；ending 结局卡。
+base: story.yaml
+title: 老板不在的那一周 · 互动版
+roles: [老马, 周敏, 小陈]
+start: title
+lessons:
+  - 关键的人不在时，要有人敢拍板：把决定权写清楚、交出去，事情才不会停。
+  - 坏消息要早说：把问题和解决办法一起讲清楚，客户反而更放心。
+  - 把本事写下来、把经验教出去：谁暂时不在，事情都能接着做。
+
+nodes:
+  - {id: title, use: title, next: s1}
+  - {id: s1, use: s1, next: s2}
+  - {id: s2, use: s2, next: s3}
+  - {id: s3, use: s3, next: s4a}
+
+  - id: s4a
+    shot:
+      scene: meeting
+      chars:
+        周敏: {pos: [2.7, -2.75], face: 180, pose: write}
+        小陈: {pos: [0.4, -0.2], face: '@周敏', lookAt: 周敏, expr: worried}
+        老马: {pos: [-1.0, 0.3], face: '@周敏', lookAt: 周敏, expr: worried, pose: cross}
+      props:
+        wb: {lines: ['谁来定？', '① 查数据：小陈', '② 说实话：老马'], k: 0}
+        clock: {time: '10:15'}
+      cam:
+        - {at: 0, pos: [-1.8, 1.9, 4.2], look: [1.4, 1.3, -2.0], fov: 42}
+        - {at: 1, pos: [0.2, 1.8, 3.3], look: [1.6, 1.4, -2.0], fov: 40}
+      beats:
+        - {say: 小陈, text: 以前这种事，都等林总拍板。, do: [{prop: wb, set: {k: 0.34}}], cams: [{at: 0.3, close: 小陈, ang: 25}]}
+        - {say: 旁白, text: 大家都看着周敏。, do: [{who: 周敏, face: '@小陈', pose: stand, expr: thinking, lookAt: 小陈}], cams: [{at: 0.15, close: 周敏, ang: 15}]}
+    choice:
+      who: 周敏
+      prompt: 老板不在，这件事谁来拍板？
+      options:
+        - {text: 我们自己定：分好工，马上干, next: s4b, note: 有人拍板，事情当天就动了起来。}
+        - {text: 等林总回来再说, next: s4c, note: 没人拍板，一周就这么过去了。}
+
+  - id: s4b
+    shot:
+      scene: meeting
+      chars:
+        周敏: {pos: [2.7, -2.75], face: '@小陈', pose: stand, lookAt: 小陈, expr: determined}
+        小陈: {pos: [0.4, -0.2], face: '@周敏', lookAt: 周敏, expr: worried}
+        老马: {pos: [-1.0, 0.3], face: '@周敏', lookAt: 周敏, expr: worried, pose: cross}
+      props:
+        wb: {lines: ['谁来定？', '① 查数据：小陈', '② 说实话：老马'], k: 0.34}
+        clock: {time: '10:15'}
+      cam:
+        - {at: 0, pos: [-1.8, 1.9, 4.2], look: [1.4, 1.3, -2.0], fov: 42}
+      beats:
+        - {say: 周敏, text: 他不在，我们自己定。小陈查数据，老马先跟客户说实话。,
+           do: [{who: 周敏, pose: talk}, {prop: wb, set: {k: 1}, delay: 2.0}, {who: 周敏, pose: point, lookAt: 老马, face: '@老马', delay: 2.6}],
+           cams: [{at: 0, close: 周敏, ang: 15}, {at: 0.42, insert: true, pos: [1.9, 1.7, -1.6], pos2: [1.95, 1.7, -1.85], look: [2.3, 1.75, -3.48], fov: 38}, {at: 0.72, ots: [老马, 周敏]}]}
+        - {say: 老马, text: 说实话？万一客户跑了呢？, do: [{who: 老马, pose: shrug, expr: worried}], cam: {ots: [周敏, 老马]}}
+        - {say: 周敏, text: 瞒着，客户才会跑。, do: [{who: 周敏, pose: stand, expr: serious, face: '@老马'}, {who: 老马, pose: stand, expr: thinking, delay: 1.0}],
+           cams: [{at: 0, close: 周敏, ang: -15, dist: 0.8}, {at: 0.62, close: 老马, ang: 20}]}
+    choice:
+      who: 老马
+      prompt: 老马要给客户回电话。机械臂抖动的问题，说不说？
+      options:
+        - {text: 说实话：有问题，正在修, next: s5, note: 客户知道了问题和解决办法，反而更放心。}
+        - {text: 先瞒着：一切正常, next: s5b, note: 问题修好了，可客户事后知道了，信任没了。}
+
+  - id: s4c
+    shot:
+      scene: meeting
+      chars:
+        周敏: {pos: [2.7, -2.75], face: '@小陈', pose: stand, lookAt: 小陈, expr: sad}
+        小陈: {pos: [0.4, -0.2], face: '@周敏', lookAt: 周敏, expr: worried}
+        老马: {pos: [-1.0, 0.3], face: '@周敏', lookAt: 周敏, expr: worried, pose: cross}
+      props:
+        wb: {lines: ['谁来定？'], k: 1}
+        clock: {time: '10:15'}
+      cam:
+        - {at: 0, pos: [-1.8, 1.9, 4.2], look: [1.4, 1.3, -2.0], fov: 42}
+        - {at: 1, pos: [-0.6, 2.2, 5.2], look: [1.0, 1.3, -2.0], fov: 44}
+      beats:
+        - {say: 周敏, text: 那就等林总回来再说吧。, cams: [{at: 0, close: 周敏, ang: 15}]}
+        - {say: 旁白, text: 一周过去了，没有人拍板，机械臂还在抖。, do: [{who: 小陈, expr: sad}, {who: 老马, expr: sad}],
+           cams: [{at: 0, insert: true, pos: [-3.1, 1.35, -2.25], pos2: [-3.2, 1.33, -2.45], look: [-3.49, 1.31, -3.47], fov: 34}, {at: 0.5, wide: true}]}
+    next: a2call
+
+  - id: a2call
+    shot:
+      scene: office
+      chars:
+        老马: {pos: [-0.4, -1.2], face: 20, pose: phone, expr: worried}
+      cam:
+        - {at: 0, pos: [1.2, 1.7, 3.0], look: [-0.5, 1.3, -1.2], fov: 40}
+      beats:
+        - {say: 客户, style: phone, at: 老马, label: 客户（电话里）, text: 马总，明天就发布了，芯片能交吗？, cams: [{at: 0.3, close: 老马, ang: 25, dist: 0.85}]}
+    choice:
+      who: 老马
+      prompt: 问题还没解决。老马怎么回答？
+      options:
+        - {text: 说实话：还没解决, next: e3, note: 保住了信任；可因为没人拍板，订单还是丢了。}
+        - {text: 先瞒着：没问题, next: e4, note: 带着问题发货，问题和信任一起爆发。}
+
+  - id: e3
+    shot:
+      scene: office
+      chars:
+        老马: {pos: [-0.4, -1.2], face: 20, pose: phone, expr: sad}
+      cam:
+        - {at: 0, pos: [1.2, 1.7, 3.0], look: [-0.5, 1.3, -1.2], fov: 40}
+        - {at: 1, pos: [2.0, 2.2, 4.2], look: [-0.5, 1.2, -1.2], fov: 44}
+      beats:
+        - {say: 老马, text: 老实说，老板不在，问题还没定下来。, cam: {close: 老马, ang: 25, dist: 0.85}}
+        - {say: 客户, style: phone, at: 老马, label: 客户（电话里）, text: 谢谢你说实话。这次我们先找别家，下次再合作。, do: [{who: 老马, expr: worried}], cam: {close: 老马, ang: 45, dist: 0.9}}
+        - {say: 旁白, text: 说了实话，保住了信任；可因为没人拍板，订单还是丢了。, do: [{who: 老马, pose: stand, expr: sad}], cam: {wide: true}}
+    next: end_lost
+
+  - id: e4
+    shot:
+      scene: office
+      chars:
+        老马: {pos: [-0.4, -1.2], face: 20, pose: phone, expr: nervous}
+      cam:
+        - {at: 0, pos: [1.2, 1.7, 3.0], look: [-0.5, 1.3, -1.2], fov: 40}
+      beats:
+        - {say: 老马, text: 没问题，明天准时交！, cam: {close: 老马, ang: 25, dist: 0.85}}
+        - {say: 旁白, text: 发布那天，带着抖动的芯片发了出去。三天后，电话又响了。, do: [{who: 老马, pose: stand, expr: neutral}, {who: 老马, pose: phone, expr: worried, delay: 3.0}], cam: {wide: true}}
+        - {say: 客户, style: phone, at: 老马, label: 客户（电话里）, text: 机械臂在我们产线上停了三次！你们早就知道吧？, do: [{who: 老马, expr: shocked}], cam: {close: 老马, ang: 30, dist: 0.85}}
+    next: end_worst
+
+  - {id: s5, use: s5, next: s6}
+  - {id: s6, use: s6, next: s7}
+  - {id: s7, use: s7, next: s8}
+  - {id: s8, use: s8, next: end_good}
+
+  - {id: s5b, use: s5, next: s6bad}
+  - id: s6bad
+    shot:
+      scene: office
+      chars:
+        老马: {pos: [-0.85, -0.2], face: 90, pose: stand, expr: smile, lookAt: 客户}
+        客户: {pos: [0.45, -0.2], face: -90, pose: stand, expr: serious, lookAt: 老马}
+      cam:
+        - {at: 0, pos: [0.3, 1.6, 3.4], look: [0, 1.3, -0.3], fov: 40}
+      beats:
+        - {say: 旁白, text: 芯片按时交了。可客户在测试记录里，发现了那次故障。, cams: [{at: 0.5, ots: [老马, 客户], side: -1}]}
+        - {say: 客户, text: 出了问题不告诉我们，下次我们怎么放心？, do: [{who: 客户, pose: cross, expr: serious}, {who: 老马, expr: worried, delay: 1.2}], cam: {ots: [老马, 客户], side: -1}}
+        - {say: 老马, text: 这……, do: [{who: 老马, expr: worried}], cam: {close: 老马, ang: 25}}
+    next: end_trust
+
+  - {id: end_good, ending: {title: 结局一：准时交货，客户更放心, text: 有人拍板，坏消息早说。}}
+  - {id: end_trust, ending: {title: 结局二：问题修好了，信任丢了, text: 瞒下来的问题，迟早会被发现。}}
+  - {id: end_lost, ending: {title: 结局三：保住了信任，丢了订单, text: 说了实话，可没人拍板，事情一直没动。}}
+  - {id: end_worst, ending: {title: 结局四：问题没修，信任也丢了, text: 没人拍板，又瞒着客户。}}

@@ -78,7 +78,7 @@ def face_to(src, dst):
     return math.degrees(math.atan2(dst[0] - src[0], dst[1] - src[1]))
 
 
-def compile_story(S, tts):
+def compile_story(S, tts, end_card=True, clip_info=None):
     cast = S["cast"]
     shots, clips, t = [], [], 0.0
     for sh in S["shots"]:
@@ -110,6 +110,8 @@ def compile_story(S, tts):
             a = tts.say(b["text"], sid)
             dur = len(a) / RATE
             clips.append((start, a))
+            if clip_info is not None:
+                clip_info.append({"t": start, "dur": dur, "who": who, "text": b["text"], "a": a})
             if who == NARRATOR:
                 subs.append({"t0": start, "t1": start + dur + 0.2, "text": b["text"]})
             else:
@@ -159,9 +161,10 @@ def compile_story(S, tts):
         shots.append({"t0": t0, "t1": t1, "scene": sh["scene"], "chars": chars, "props": props, "cam": cam, "bubbles": bubbles, "subs": subs,
                       "cuts": cuts, "mood": sh.get("mood")})
         t = t1
-    end = 3.2
-    shots.append({"t0": t, "t1": t + end, "title": {"zh": "（完）", "sub": S["title"], "note": S.get("note", "")}})
-    t += end
+    if end_card:
+        end = 3.2
+        shots.append({"t0": t, "t1": t + end, "title": {"zh": "（完）", "sub": S["title"], "note": S.get("note", "")}})
+        t += end
     audio = np.zeros(int(t * RATE) + RATE, np.float32)
     for st, a in clips:
         i = int(st * RATE)
