@@ -29,7 +29,7 @@ CAP-FILM-1U-450V,1u/450V,C_Rect_L18.0mm_W8.0mm_P15.00mm_FKS3_FKP3,1,C104,,,,整�
 CAP-X2-470N,470n X2,C_Rect_L26.5mm_W10.5mm_P22.50mm_MKS4,1,C101,BFC233920474,Vishay,C511073,BFC233920474（封装待核对）
 CAP-Y-2N2,2n2 Y1,C_Disc_D8.0mm_W5.0mm_P7.50mm,2,C102 C103,DE1E3RA222MA4BP01F,Murata,C907949,Y 电容（封装待核对）
 CMC-8118RC,7.3mH 9.3A,L_CommonMode_Toroid_Vertical_L41.9mm_W20.3mm_Px15.24mm_Py22.86mm_Bourns_8100,1,L101,8118-RC,Bourns,,8118-RC（Bourns 8100 系列，KiCad 官方库同系列封装；159d2 由 FC-HLF2018 换来：那颗规格书读不出、库里没有封装）
-CONN-AC,AC IN L/N/PE,"TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal",1,J101,,,,交流输入：1 相线、2 零线、3 保护地
+CONN-AC,AC IN L/N,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",1,J101,,,,交流输入：1 相线、2 零线。保护地线不上板：直接接电控箱的接地螺柱；板上的 Y 电容经安装孔 H1 接箱体（159d2b）
 CONN-MOT,MOTOR U/V/W,"TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal",1,J401,,,,电机三相
 CONN-VH8,SOLENOIDS,JST_VH_B8P-VH_1x08_P3.96mm_Vertical,1,J501,,,,电磁铁 4 路（每路 +24 V 与漏极）：剪线、拨线、倒缝、抬压脚
 CONN-XH3,PEDAL,JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical,1,J702,,,,脚踏板（霍尔，0.5–4.5 V）

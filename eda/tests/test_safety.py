@@ -41,3 +41,20 @@ def test_no_nets_is_unknown():
     b = board(5, 5)
     b.has_nets = False
     assert safety.run(b, RULES)[0]["status"] == UNKNOWN
+
+
+def test_bridge_component_courtyard_is_exempt():
+    """隔离电源 2、3 脚之间（器件自己的外框里）不算；外框以外照算"""
+    b = Board("kicad", (0, 0, 100, 100), 2, has_nets=True)
+    b.features = [
+        Feature("F", box(0, 0, 1, 1), "pth", "GND", "U2", "2"),
+        Feature("F", box(2, 0, 3, 1), "pth", "GND_ISO", "U2", "3"),
+        Feature("F", box(2.2, 0.2, 6, 0.6), "track", "GND_ISO"),  # 从 3 脚引出的线，离 2 脚 1.2 mm，但在外框里
+        Feature("F", box(0, 10, 1, 11), "track", "GND"),
+        Feature("F", box(3, 10, 4, 11), "track", "GND_ISO"),       # 外框外 2 mm：不够 4 mm
+    ]
+    b.courtyards = {"U2": ("F", box(-0.5, -1, 3.5, 2))}
+    r = {x["key"]: x for x in safety.run(b, RULES)}
+    assert r["S-iso"]["status"] == FAIL and r["S-iso"]["value"] == 2.0
+    b.features = b.features[:3]
+    assert {x["key"]: x for x in safety.run(b, RULES)}["S-iso"]["status"] == PASS

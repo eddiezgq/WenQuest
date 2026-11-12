@@ -68,25 +68,25 @@
  "date": "2026-11-12",
  "disclaimer": "示例设计，未经硬件验证，不能直接投产",
  "drc": {
-  "errors": 134,
-  "unconnected": 74,
-  "warnings": 53
+  "errors": 256,
+  "unconnected": 98,
+  "warnings": 73
  },
  "files": {
-  "bom.csv": "9ccf2d3bd4b0d552",
-  "drc.json": "67a7bdcb055dc93b",
-  "gerber.zip": "1b885633d45fb3f1",
-  "kicad-project.zip": "48cadf87e4ef885e",
+  "bom.csv": "9f20a8bc3946c9f2",
+  "drc.json": "7803c7907f4096a6",
+  "gerber.zip": "63e97d753409b2bb",
+  "kicad-project.zip": "e1531cd6df840391",
   "netcheck.json": "9eddaa8fe06de745",
-  "pcb/B_Cu.svg": "6b7ede79027a0fed",
-  "pcb/B_Silk.svg": "beef35b14751043c",
-  "pcb/F_Cu.svg": "65d698f27b3ec669",
-  "pcb/F_Silk.svg": "2d5a7db006d30473",
-  "pcb/In1_Cu.svg": "ac4a011235a4d113",
-  "pcb/In2_Cu.svg": "280370fcae692308",
-  "pos.csv": "03236c2224598db9",
-  "safety.json": "5b9875cb0c27ef4c",
-  "schematic/ctrl-ls-1 交流输入、浪涌与整流.svg": "6e838f858b991632",
+  "pcb/B_Cu.svg": "73ffa754bfe33f5c",
+  "pcb/B_Silk.svg": "d6a9b1055dc02ec2",
+  "pcb/F_Cu.svg": "5b1bf56c33e5697f",
+  "pcb/F_Silk.svg": "f5d618f710df0faa",
+  "pcb/In1_Cu.svg": "2f890600aeeceec8",
+  "pcb/In2_Cu.svg": "bd1dd5ae19214f31",
+  "pos.csv": "4d57d391eb3f0365",
+  "safety.json": "927d9de15cd4d4e1",
+  "schematic/ctrl-ls-1 交流输入、浪涌与整流.svg": "e0142d35c4b2b912",
   "schematic/ctrl-ls-2 功率因数校正与母线.svg": "d0b0075d62408796",
   "schematic/ctrl-ls-3 辅助电源.svg": "4fc48a7082c416a7",
   "schematic/ctrl-ls-4 主轴伺服逆变与电流采样.svg": "e989a8807fc40f73",
@@ -109,13 +109,13 @@
  "nets": 150,
  "parts": [
   {
-   "fp": "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal",
+   "fp": "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
    "item": "CONN-AC",
-   "lib": "Connector:Screw_Terminal_01x03",
-   "note": "交流输入：1 相线、2 零线、3 保护地",
+   "lib": "Connector:Screw_Terminal_01x02",
+   "note": "交流输入：1 相线、2 零线。保护地线不上板：直接接电控箱的接地螺柱；板上的 Y 电容经安装孔 H1 接箱体（159d2b）",
    "ref": "J101",
    "sheet": "mains",
-   "value": "AC IN L/N/PE"
+   "value": "AC IN L/N"
   },
   {
    "fp": "Fuse:Fuseholder_Clip-5x20mm_Bel_FC-203-22_Lateral_P17.80x5.00mm_D1.17mm_Horizontal",
@@ -2148,7 +2148,7 @@
    "limit": 4.0,
    "name": "安全距离：隔离面板口 ↔ 其余电路",
    "status": "fail",
-   "value": 1.12
+   "value": 3.605
   },
   {
    "example": true,
@@ -2164,7 +2164,7 @@
    "limit": 2.5,
    "name": "安全距离：相线 ↔ 零线（保险丝之后）",
    "status": "pass",
-   "value": 2.62
+   "value": 2.65
   },
   {
    "example": true,
@@ -2172,7 +2172,7 @@
    "limit": 2.0,
    "name": "安全距离：390 V 母线与电机相线 ↔ 弱电",
    "status": "fail",
-   "value": 1.0
+   "value": 1.002
   }
  ],
  "sheets": [

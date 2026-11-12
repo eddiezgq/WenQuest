@@ -217,8 +217,8 @@ def planes(board, nets):
     main = [(0.5, 0.5), (w - 0.5, 0.5), (w - 0.5, y), (x, y), (x, h - 0.5), (0.5, h - 0.5)]
     iso = [(x, y), (w - 0.5, y), (w - 0.5, h - 0.5), (x, h - 0.5)]
     for net, pts in (("GND", main), ("GND_ISO", iso)):
-        # 主地平面离别的网络 2.2 mm（= 高压类布线间距；地平面挨着母线、电机相线的过孔和通孔焊盘）
-        z = gb.add_pour(board, nets[net], "In1.Cu", pts, clearance=2.2 if net == "GND" else 0.3)
+        # 铺铜间距 0.3 mm；高压网络的过孔、焊盘按它们的网络分类间距（2.2 mm）让开（检查那一步按工程设置重新填）
+        z = gb.add_pour(board, nets[net], "In1.Cu", pts, clearance=0.3)
         z.SetAssignedPriority(0)
         z.SetPadConnection(pcbnew().ZONE_CONNECTION_FULL)
     rule_area(board, _band(), "隔离带")

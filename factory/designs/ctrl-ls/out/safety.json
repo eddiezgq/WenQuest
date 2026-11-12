@@ -2,12 +2,13 @@
  {
   "at": [
    [
-    308.14,
-    232.0,
-    "In1"
+    307.3,
+    233.77,
+    "In1",
+    "pth GND_ISO U602 ↔ zone GND zone:286b0bd4-ebb8-4637-9b97-8d9902a01446"
    ]
   ],
-  "detail": "最近 1.12 mm（In1 层）",
+  "detail": "最近 3.61 mm（In1 层，pth GND_ISO U602 ↔ zone GND zone:286b0bd4-ebb8-4637-9b97-8d9902a01446）",
   "example": true,
   "groups": [
    [
@@ -172,17 +173,18 @@
   "source": "示例值；数字隔离器 ADuM1201 本身的爬电与电气间隙各 4.0 mm（规格书 Rev. L p.21），板上不应比它小",
   "status": "fail",
   "unit": "mm",
-  "value": 1.12
+  "value": 3.605
  },
  {
   "at": [
    [
     111.65,
     145.68,
-    "F"
+    "F",
+    "pth PE C102 ↔ pth N_C C103"
    ]
   ],
-  "detail": "最近 1.76 mm（F 层）",
+  "detail": "最近 1.76 mm（F 层，pth PE C102 ↔ pth N_C C103）",
   "example": true,
   "groups": [
    [
@@ -349,12 +351,13 @@
  {
   "at": [
    [
-    131.72,
-    157.86,
-    "B"
+    136.44,
+    136.17,
+    "F",
+    "track L_C ↔ pth N_IN C101"
    ]
   ],
-  "detail": "最近 2.62 mm（B 层）",
+  "detail": "最近 2.65 mm（F 层，track L_C ↔ pth N_IN C101）",
   "example": true,
   "groups": [
    [
@@ -376,17 +379,18 @@
   "source": "示例值",
   "status": "pass",
   "unit": "mm",
-  "value": 2.62
+  "value": 2.65
  },
  {
   "at": [
    [
-    251.31,
-    103.62,
-    "In1"
+    258.97,
+    172.14,
+    "In2",
+    "via OUT_W via@258.400,-171.573 ↔ track N_U"
    ]
   ],
-  "detail": "最近 1.00 mm（In1 层）",
+  "detail": "最近 1.00 mm（In2 层，via OUT_W via@258.400,-171.573 ↔ track N_U）",
   "example": true,
   "groups": [
    [
@@ -538,6 +542,6 @@
   "source": "示例值",
   "status": "fail",
   "unit": "mm",
-  "value": 1.0
+  "value": 1.002
  }
 ]

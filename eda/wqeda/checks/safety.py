@@ -9,7 +9,9 @@
 - 电气间隙：就是这个直线距离（铜面上方没有遮挡时的空气距离）。
 - 爬电距离：沿板面的路径不会比直线短，直线够了爬电一定够（偏保守）；开槽能加长爬电，本版不算开槽。
 - 内层之间隔着板材（固体绝缘），实际要求通常更低；本版内层也按同一规则查（偏保守）。
-- 同一个器件自己的焊盘之间不算（引脚间距是器件自己的事，按它规格书的额定；例如功率模块的自举脚和输入脚）。"""
+- 同一个器件自己的焊盘之间不算（引脚间距是器件自己的事，按它规格书的额定；例如功率模块的自举脚和输入脚）。
+- 跨在两组之间的器件（两组网络都有它的焊盘，例如隔离电源、数字隔离器、功率模块），最近点落在它的器件外框里面时也不算：
+  那一段是器件引脚自己的间距，由器件的隔离额定管（隔离额定另在计算书里核对）。"""
 
 from __future__ import annotations
 
@@ -35,7 +37,25 @@ def _feats(board, nets):
     return [f for f in board.features if f.kind in COPPER and f.net in nets]
 
 
-def _nearest(fa, fb, window):
+def _bridges(board):
+    """{位号: 它焊盘上的网络集合}"""
+    out = {}
+    for f in board.features:
+        if f.kind in ("pad", "pth") and f.ref and f.net:
+            out.setdefault(f.ref, set()).add(f.net)
+    return out
+
+
+def _inside_bridge(board, bridges, pt, na, nb):
+    from shapely.geometry import Point
+
+    for ref, nets in bridges.items():
+        if na in nets and nb in nets and ref in board.courtyards and board.courtyards[ref][1].contains(Point(pt)):
+            return True
+    return False
+
+
+def _nearest(fa, fb, window, board=None, bridges=None):
     """两组铜之间的最短距离（同层；同一器件自己的焊盘之间不算）：(距离, 位置)"""
     from shapely import STRtree
     from shapely.ops import nearest_points
@@ -56,7 +76,11 @@ def _nearest(fa, fb, window):
             d = f.geom.distance(g.geom)
             if best is None or d < best:
                 p, q = nearest_points(f.geom, g.geom)
-                best, where = d, [round((p.x + q.x) / 2, 2), round(-(p.y + q.y) / 2, 2), f.layer]
+                if bridges and _inside_bridge(board, bridges, ((p.x + q.x) / 2, (p.y + q.y) / 2), f.net, g.net):
+                    continue
+                best, where = d, [round((p.x + q.x) / 2, 2), round(-(p.y + q.y) / 2, 2), f.layer,
+                                  "{} {}{} ↔ {} {}{}".format(f.kind, f.net, " " + f.ref if f.ref else "", g.kind, g.net,
+                                                           " " + g.ref if g.ref else "")]
     return best, where
 
 
@@ -70,13 +94,13 @@ def run(board, rules):
         a = set().union(*(g[x] for x in r["a"]))
         b = set().union(*(g[x] for x in r["b"]))
         need = max(r["clearance_mm"], r["creepage_mm"])
-        best, where = _nearest(_feats(board, a), _feats(board, b), need + 1.0)
+        best, where = _nearest(_feats(board, a), _feats(board, b), need + 1.0, board, _bridges(board))
         if best is None:
             st, best_txt = PASS, None
             detail = "两组铜在同一层上都隔着 {:g} mm 以上".format(need + 1.0)
         else:
             st = PASS if best >= need - EPS else FAIL
-            detail = "最近 {:.2f} mm（{} 层）".format(best, where[2])
+            detail = "最近 {:.2f} mm（{} 层，{}）".format(best, where[2], where[3])
             best_txt = round(best, 3)
         out.append({
             "key": "S-" + r["key"], "name": "安全距离：" + r["name"], "status": st, "value": best_txt,
