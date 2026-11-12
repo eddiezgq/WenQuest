@@ -4,14 +4,48 @@
   {
    "at": [
     [
-     151.94,
-     93.45,
-     "Reference 'Q507'"
+     144.03,
+     20.87,
+     "Reference 'Q202'"
     ],
     [
      -101.16,
      -101.51,
      "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     77.28,
+     7.03,
+     "Reference 'C104'"
+    ],
+    [
+     79.37,
+     6.18,
+     "Reference 'BR101'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ],
+    [
+     59.47,
+     144.83,
+     "Reference 'U302'"
     ]
    ],
    "code": "silk_overlap",
@@ -55,14 +89,14 @@
   {
    "at": [
     [
-     79.37,
-     6.18,
-     "Reference 'BR101'"
+     212.0,
+     126.0,
+     "Reference 'U602'"
     ],
     [
-     77.28,
-     7.03,
-     "Reference 'C104'"
+     212.0,
+     126.56,
+     "Line on F.Silkscreen"
     ]
    ],
    "code": "silk_overlap",
@@ -72,9 +106,26 @@
   {
    "at": [
     [
-     59.47,
-     144.83,
-     "Reference 'U302'"
+     212.0,
+     126.0,
+     "Reference 'U602'"
+    ],
+    [
+     212.0,
+     126.56,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     164.56,
+     85.5,
+     "Reference 'Q505'"
     ],
     [
      -101.16,
@@ -88,32 +139,15 @@
   },
   {
    "at": [
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ],
-    [
-     144.03,
-     20.87,
-     "Reference 'Q202'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ],
     [
      193.56,
      93.45,
      "Reference 'Q508'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
     ]
    ],
    "code": "silk_overlap",
@@ -123,13 +157,13 @@
   {
    "at": [
     [
-     212.0,
-     126.0,
-     "Reference 'U602'"
+     174.12,
+     93.23,
+     "Reference 'D507'"
     ],
     [
-     212.0,
-     126.56,
+     171.98,
+     92.63,
      "Line on F.Silkscreen"
     ]
    ],
@@ -140,14 +174,48 @@
   {
    "at": [
     [
-     212.0,
-     126.0,
-     "Reference 'U602'"
+     151.94,
+     93.45,
+     "Reference 'Q507'"
     ],
     [
-     212.0,
-     126.56,
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     196.11,
+     30.65,
+     "Reference 'U401'"
+    ],
+    [
+     194.94,
+     30.15,
+     "Reference 'C401'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     194.23,
+     31.09,
      "Line on F.Silkscreen"
+    ],
+    [
+     196.11,
+     30.65,
+     "Reference 'U401'"
     ]
    ],
    "code": "silk_overlap",
@@ -182,74 +250,6 @@
      -101.16,
      -101.51,
      "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     171.98,
-     92.63,
-     "Line on F.Silkscreen"
-    ],
-    [
-     174.12,
-     93.23,
-     "Reference 'D507'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     164.56,
-     85.5,
-     "Reference 'Q505'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     194.94,
-     30.15,
-     "Reference 'C401'"
-    ],
-    [
-     196.11,
-     30.65,
-     "Reference 'U401'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     196.11,
-     30.65,
-     "Reference 'U401'"
-    ],
-    [
-     194.23,
-     31.09,
-     "Line on F.Silkscreen"
     ]
    ],
    "code": "silk_overlap",
@@ -305,9 +305,9 @@
      "Line on Edge.Cuts"
     ],
     [
-     102.23,
-     0.17,
-     "Reference 'Q201'"
+     119.27,
+     0.15,
+     "Reference 'D201'"
     ]
    ],
    "code": "silk_edge_clearance",
@@ -339,9 +339,9 @@
      "Line on Edge.Cuts"
     ],
     [
-     119.27,
-     0.15,
-     "Reference 'D201'"
+     102.23,
+     0.17,
+     "Reference 'Q201'"
     ]
    ],
    "code": "silk_edge_clearance",
@@ -459,18 +459,6 @@
   {
    "at": [
     [
-     165.86,
-     26.6,
-     "Track [VB_W] on F.Cu, length 0.0003 mm"
-    ]
-   ],
-   "code": "track_dangling",
-   "severity": "warning",
-   "text": "Track has unconnected end"
-  },
-  {
-   "at": [
-    [
      165.26,
      28.05,
      "Track [VB_W] on F.Cu, length 3.6500 mm"
@@ -483,38 +471,40 @@
   {
    "at": [
     [
-     210.73,
-     132.0,
-     "PTH pad 2 [+5V] of U602"
-    ],
-    [
-     203.0,
-     129.47,
-     "Track [+5V] on F.Cu, length 57.0710 mm"
+     165.86,
+     26.6,
+     "Track [VB_W] on F.Cu, length 0.0003 mm"
     ]
    ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
+   "code": "track_dangling",
+   "severity": "warning",
+   "text": "Track has unconnected end"
   },
   {
    "at": [
     [
-     159.58,
-     78.64,
-     "Pad 2 [VBUS_SNS_2] of R421 on F.Cu"
-    ],
-    [
-     162.47,
-     78.64,
-     "Pad 1 [VBUS_SNS_2] of R422 on F.Cu"
+     210.73,
+     129.47,
+     "Track [+5V] on F.Cu, length 2.5250 mm"
     ]
    ],
-   "code": "unconnected_items",
+   "code": "items_not_allowed",
    "severity": "error",
-   "text": "Missing connection between items"
+   "text": "Items not allowed (keepout area '隔离带')"
+  },
+  {
+   "at": [
+    [
+     203.0,
+     129.47,
+     "Track [+5V] on F.Cu, length 7.7300 mm"
+    ]
+   ],
+   "code": "items_not_allowed",
+   "severity": "error",
+   "text": "Items not allowed (keepout area '隔离带')"
   }
  ],
- "unconnected": 2,
+ "unconnected": 0,
  "warnings": 32
 }

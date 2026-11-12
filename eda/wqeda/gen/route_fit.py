@@ -250,10 +250,11 @@ def widen(board, targets, clearance):
     return full, part, none
 
 
-def finish(board, class_of, clearance, width_of, layers_of, skip=("GND", "GND_ISO")):
+def finish(board, class_of, clearance, width_of, layers_of, skip=("GND", "GND_ISO"), keepouts=()):
     """布线器两遍都没接上的几根：同一网络还分成几块时，在两块最近的两点之间试一段直线或一个拐角（两段），
     哪一层、哪条路上离别的网络的铜都够远就加上。器件自己引脚之间的间距照旧不算（与 stubs 同一口径）。
-    skip = 平面网络（由内层平面连通，不在这里补）。返回 [(网络, 层, 段数)]"""
+    skip = 平面网络（由内层平面连通，不在这里补）；keepouts = 禁布区（shapely 多边形），补的线不进去。
+    返回 [(网络, 层, 段数)]"""
     from shapely.geometry import LineString, Point
     from shapely.ops import unary_union
 
@@ -316,8 +317,8 @@ def finish(board, class_of, clearance, width_of, layers_of, skip=("GND", "GND_IS
                 for path in ([pa, pb], [pa, (pb[0], pa[1]), pb], [pa, (pa[0], pb[1]), pb]):
                     legs = zip(path, path[1:], strict=False)
                     shape = unary_union([LineString([u, v]).buffer(w / 2) for u, v in legs])
-                    ok = True
-                    for onet, olay, og, oref, _c in its:
+                    ok = not any(shape.intersects(k) for k in keepouts)
+                    for onet, olay, og, oref, _c in its if ok else ():
                         if onet == net or lid[ln] not in olay:
                             continue
                         need = 0.15 if (oref in refs) else clearance(net, onet)

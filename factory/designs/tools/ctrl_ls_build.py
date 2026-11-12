@@ -279,9 +279,10 @@ def board_build(route, jar):
         lays = {n: c.get("layers") or ["F.Cu", "In2.Cu", "B.Cu"] for c in D.X["net_classes"] for n in c["nets"]}
         w_, h_ = D.X["board_mm"]
         ox, oy = gb.ORIGIN
+        kos = [RF._poly(z.Outline()) for z in board.Zones() if z.GetIsRuleArea() and z.GetDoNotAllowTracks()]
         n_stub = RF.stubs(board, class_of, clearance, lambda n: width.get(n, 0.25),
                           lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"]), box(ox, oy, ox + w_, oy + h_),
-                          [RF._poly(z.Outline()) for z in board.Zones() if z.GetIsRuleArea() and z.GetDoNotAllowTracks()])
+                          kos)
         print("引出线（器件自己引脚比布线间距近的焊盘）：", n_stub)
         stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep, pairs=gb.pairs_of(D.X),
                              timeout=3000)
@@ -295,7 +296,7 @@ def board_build(route, jar):
             print("第二遍（第一遍剩 {} 处）：".format(left), stats, "；去重：", RF.dedupe(board))
         print("用不上的引出线：", RF.drop_dangling(board))
         print("补线（两遍都没接上的，直线或一个拐角）：", RF.finish(board, class_of, clearance, lambda n: width.get(n, 0.25),
-                                                       lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"])))
+                                                       lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"]), keepouts=kos))
         targets = {n: c["track_mm"] for c in D.X["net_classes"] if c.get("route_mm") for n in c["nets"]}
         print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance))
     # 功率铺铜（设计描述 board.pours）布完线再加：给布线器当平面时，别的网络从底层穿过去把它切成几块、块和块之间没连上
