@@ -41,9 +41,10 @@ STITCH = (1.0, 2.0, 3.0, 4.0, 5.0)
 GEO = dict(
     O1=(0.0, S.ZU),                 # 上轴
     O2=(S.YL, S.ZL),                # 下轴
-    G=(0.0, -22.0),                 # 调节器滑槽中心（滑块 P 的平均位置）：上轴正下方（送布连杆竖直），机座里、立柱脚下
-    Fr=(78.0, -32.0), rc=12.0,      # 送布摆轴（机座后部）中心、曲柄（朝上）
-    ra=24.0,                        # 送布摆轴前端摆杆（朝上）→ 牙架后铰点 T
+    G=(0.0, -50.0),                 # 调节器滑槽中心（滑块 P 的平均位置）：上轴正下方（送布连杆竖直），机座里、立柱脚下、下轴下面
+    Fr=(76.0, -40.0), rc=10.0,      # 送布摆轴（机座后部）中心、曲柄（朝下，曲柄销与 G 同高 → L2 水平，正倒缝对称）；
+                                    #   y 76 让开立柱脚的螺钉凸台；L2 在下轴、下带轮轮毂下面 2.6 mm 过去
+    ra=32.0,                        # 送布摆轴前端摆杆（朝上）→ 牙架后铰点 T (76, −8)
     Lr=(-45.0, -28.0), rd=12.0,     # 抬牙摆轴（机座前部）中心、曲柄
     yk=-30.0,                       # 叉子在牙架前端滑块处的 y
     d=78.0,                         # 送布牙中心离 T 的距离（牙在针的位置 y = 0）
@@ -59,9 +60,9 @@ def target(s, rev=False):
 
 
 def mean_C():
-    """送布摆轴曲柄销的平均位置：曲柄朝上"""
+    """送布摆轴曲柄销的平均位置：曲柄朝下"""
     Fr, rc = GEO["Fr"], GEO["rc"]
-    return (Fr[0], Fr[1] + rc)
+    return (Fr[0], Fr[1] - rc)
 
 
 def mean_D():
@@ -116,9 +117,12 @@ def kin(p, alpha, full=False):
         if full:
             for k_, v_ in (("P", P), ("C", C), ("T", T), ("D", D), ("K", K), ("E", E), ("EL", EL)):
                 out[k_].append(v_)
+            out.setdefault("dog", []).append((dog_y, dog_z))
+            out.setdefault("beta", []).append(beta)
+            out.setdefault("gam", []).append(gam)
         nearP, nearC, nearD = P, C, D
     out["y"], out["z"] = np.array(out["y"]), np.array(out["z"])
-    out.update(L1=L1, L2=L2, L3=L3, rfa=rfa)
+    out.update(L1=L1, L2=L2, L3=L3, rfa=rfa, T0=T0, K0=K0, C0=C0, D0=D0, u=u)
     return out
 
 
@@ -312,10 +316,14 @@ def main():
             res["settings"].append(dict(s=s, reverse=rev, alpha_deg=round(math.degrees(a), 3), dev_y=round(float(ey), 3), dev_z=round(float(ez), 3),
                                         y_mean=round(float(np.mean(k["y"])), 3), check=feed_check(k, s, rev)))
     # 倒缝扳手：把调节器从 +α 扳到 −α（对称），倒缝针距与正缝之比
+    # 调节器的零位：正、倒缝调节器角的中点（不送布的那个角），做进零件里；倒缝扳手绕零位对称地扳过去
     mirror = []
     fw = {x["s"]: x["alpha_deg"] for x in res["settings"] if not x["reverse"]}
+    bw = {x["s"]: x["alpha_deg"] for x in res["settings"] if x["reverse"]}
+    a0 = float(np.mean([(fw[s_] + bw[s_]) / 2 for s_ in fw]))
+    res["alpha_zero_deg"] = round(a0, 3)
     for s_, a_ in fw.items():
-        c = feed_check(kin(p, -math.radians(a_)), s_, True)
+        c = feed_check(kin(p, math.radians(2 * a0 - a_)), s_, True)
         mirror.append(dict(s=float(s_), reverse_stitch=round(-c["net"], 3), ratio=round(-c["net"] / s_, 4)))
     res["reverse_by_mirror"] = mirror
     # 针距旋钮：α 与针距的线性拟合，按直线刻度时的针距误差
@@ -327,10 +335,21 @@ def main():
         c = feed_check(kin(p, math.radians(k_ * s_ + b_)), s_)
         lin.append(round(c["net"] - s_, 3))
     res["dial"] = dict(alpha_per_mm_deg=round(float(k_), 3), alpha0_deg=round(float(b_), 3), stitch_err_linear_mm=[float(v) for v in lin])
+    # 给三维和干涉检查用的位置（每 2°）：3 mm 正缝（动画）、5 mm 正缝和倒缝（干涉检查的两个极端）
+    poses = {}
+    for key, s_, rev in (("s3", 3.0, False), ("s5", 5.0, False), ("r5", 5.0, True)):
+        a = next(math.radians(x["alpha_deg"]) for x in res["settings"] if x["s"] == s_ and x["reverse"] == rev)
+        k = kin(p, a, full=True)
+        rnd = lambda v: [round(float(c), 4) for c in v]                   # noqa: E731
+        poses[key] = dict(alpha=round(a, 6), u=rnd(k["u"]), T0=rnd(k["T0"]), K0=rnd(k["K0"]), C0=rnd(k["C0"]), D0=rnd(k["D0"]),
+                          L1=round(k["L1"], 4), L2=round(k["L2"], 4), L3=round(k["L3"], 4),
+                          **{n: [rnd(v) for v in k[n]] for n in ("E", "P", "C", "T", "D", "K", "EL", "dog")},
+                          beta=[round(float(v), 6) for v in k["beta"]], gam=[round(float(v), 6) for v in k["gam"]])
+    res["poses"] = poses
     res["dev_worst_mm"] = round(float(worst), 3)
     res["all_ok"] = bool(all(x["check"]["ok"] for x in res["settings"]) and all(abs(m["ratio"] - 1) <= 0.05 for m in mirror)
                      and max(abs(v) for v in lin) <= 0.2)
-    (out / "送布机构.json").write_text(json.dumps(res, ensure_ascii=False, indent=1))
+    (out / "送布机构.json").write_text(json.dumps(res, ensure_ascii=False))
     for x in res["settings"]:
         print(x["s"], "倒" if x["reverse"] else "正", x["alpha_deg"], x["dev_y"], x["dev_z"], x["check"])
     print("倒缝（对称）", mirror)
