@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>WQ-LS 机壳工艺</title>
-<!-- 第 138 轮 G5.1：机壳的铸造与机加工工艺三维。数据 d/proc.json（tools/wqls/g5_web.py）：
-     铸件毛坯、浇注系统与冒口、冷铁（凝固仿真的体素等值面），各时刻还没凝固的区域；上件在卧加夹具上、刀具中心轨迹。
+<!-- 第 138 轮 G5.1、G5.2：机壳的铸造与机加工工艺三维。数据 d/proc.json（tools/wqls/g5_web.py）：
+     铸件毛坯、浇注系统与冒口、冷铁（凝固仿真的体素等值面），各时刻还没凝固的区域；合件在卧加夹具 FX-HSG-P-70 上（G5.2）、上件在粗加工夹具上，刀具中心轨迹。
      坐标同整机（mm），three 里 (x, z, −y)/1000。?film=1 时提供 window.go({...}) 给出图脚本。 -->
 <style>
 :root{--bg:#e6e9ec;--ink:#1c2228;--mut:#5a6570;--card:rgba(255,255,255,.9);--line:#cbd2d8;--acc:#0b4fae;--hot:#c2410c;--chill:#2b5c8a}
@@ -29,7 +29,7 @@ body.shot .panel,body.shot #busy{display:none}
 <div id="busy">正在载入（约 10 MB）…</div>
 <div class="panel" id="ui">
   <h1>WQ-LS 机壳工艺</h1>
-  <p class="sub">HT250 砂型铸造（上件、下件各一套工艺）；上件在卧式加工中心上一次装夹完成孔系。数值来自凝固仿真和工艺规程。</p>
+  <p class="sub">HT250 砂型铸造（上件、下件各一套工艺）。两件各自粗加工、精铣接合面后合箱，在卧式加工中心上一次装夹完成两件上的全部孔系。数值来自凝固仿真和工艺规程。</p>
   <div class="lbl">看什么</div>
   <div class="row"><button data-m="cast" class="on">铸造工艺</button><button data-m="solid">凝固过程</button><button data-m="mach">夹具与刀路</button></div>
   <div id="partbox">
@@ -48,8 +48,8 @@ body.shot .panel,body.shot #busy{display:none}
   </div>
   <div id="machbox" hidden>
     <div class="lbl">刀路</div>
-    <div class="row"><button data-n="path_1205" class="on">工序 50、60 精加工</button><button data-n="path_1202">工序 20 粗加工</button></div>
-    <p class="sub" style="margin:4px 0 0">接合面 C 贴支承钉，两工艺孔套液压涨销；4 根液压拉杆拧进立柱脚 M10 螺孔拉紧；机头悬伸，底面、后侧、顶面 4 个液压辅助支承锁紧后只撑不定位（精镗两轴承孔时缩回）。红线是刀具中心的切削轨迹。</p>
+    <div class="row"><button data-n="path_1401" class="on">合件精加工（工序 70、80）</button><button data-n="path_1202">上件粗加工（工序 20）</button></div>
+    <p class="sub" style="margin:4px 0 0">合件：下件底面 A 放在框架的 4 个支承钉上，两工艺孔套液压涨销，4 个回转压板压住；先从底下钻铰锥销孔，再测针杆轴线，以它为基准精镗旋梭轴孔和上轴孔。同轴镗杆、阶梯镗杆伸进机壳里的刀路没画。红线是刀具中心的切削轨迹。</p>
   </div>
   <div class="lbl">数据</div>
   <table id="tbl"></table>
@@ -102,6 +102,7 @@ const M = {
   fix: new THREE.MeshPhysicalMaterial({ color: 0x4a5560, metalness: 0.7, roughness: 0.45 }),
 };
 const G = {};
+const BUD = info._budget || { nh: '30%', cu: '73%', cl: '68%', cd: '60%', h: '33%' };
 function mesh(k, m) { const x = new THREE.Mesh(geo(k), m); root.add(x); return x; }
 for (const p of ['upper', 'lower']) {
   G['cast_' + p] = mesh('cast_' + p, M.cast);
@@ -109,10 +110,10 @@ for (const p of ['upper', 'lower']) {
   G['chill_' + p] = mesh('chill_' + p, M.chill);
   for (const t of info[p].times) G[`liq_${p}_${t.t}`] = mesh(`liq_${p}_${t.t}`, M.liq);
 }
-G.part = mesh('part_upper', M.part); G.fix = mesh('fixture', M.fix);
-for (const n of ['path_1202', 'path_1205']) { const l = new THREE.LineSegments(geo(n, true), new THREE.LineBasicMaterial({ color: 0xd8341a })); root.add(l); G[n] = l; }
+G.part = mesh('part_upper', M.part); G.partL = mesh('part_lower', M.part); G.fix = mesh('fixture', M.fix); G.fix70 = mesh('fixture_p70', M.fix);
+for (const n of ['path_1202', 'path_1401']) { const l = new THREE.LineSegments(geo(n, true), new THREE.LineBasicMaterial({ color: 0xd8341a })); root.add(l); G[n] = l; }
 
-let mode = 'cast', part = 'upper', ti = 0, path = 'path_1205';
+let mode = 'cast', part = 'upper', ti = 0, path = 'path_1401';
 const VIEW = { upper: [[-0.30, 0.42, 0.62], [0.17, 0.12, 0.0]], lower: [[-0.25, 0.42, 0.55], [0.15, -0.03, -0.03]], mach: [[-0.55, 0.40, 0.75], [0.2, 0.0, -0.03]] };
 function show() {
   for (const o of Object.values(G)) o.visible = false;
@@ -124,15 +125,19 @@ function show() {
     G[`liq_${part}_${T[ti].t}`].visible = true;
     document.getElementById('tlbl').textContent = `浇注后 ${T[ti].t} s：铸件还有 ${(T[ti].frac * 100).toFixed(1)}% 没凝固完`;
   }
-  if (mode === 'mach') { G.part.visible = G.fix.visible = true; G[path].visible = true; }
+  if (mode === 'mach') { G.part.visible = true; G[path].visible = true; if (path === 'path_1401') G.partL.visible = G.fix70.visible = true; else G.fix.visible = true; }
   document.getElementById('partbox').hidden = mode === 'mach';
   document.getElementById('castkey').hidden = mode !== 'cast';
   document.getElementById('solidbox').hidden = mode !== 'solid';
   document.getElementById('machbox').hidden = mode !== 'mach';
   const I = info[part], g = I.gating;
   document.getElementById('tbl').innerHTML = mode === 'mach'
-    ? `<tr><td>夹具</td><td>FX-HSG-U-20，一面两销</td></tr><tr><td>夹紧</td><td>4 × 液压拉缸，合计 9.4 kN</td></tr><tr><td>辅助支承</td><td>4 个，机头让刀 79 → 11 μm</td></tr>
-       <tr><td>两轴承孔同轴度</td><td>Ø0.02（预算 73%）</td></tr><tr><td>针杆孔位置度</td><td>Ø0.05（预算 60%）</td></tr><tr><td>上轴中心高</td><td>200 ± 0.03（预算 36%）</td></tr>`
+    ? (path === 'path_1401'
+      ? `<tr><td>夹具</td><td>FX-HSG-P-70：下件底面 A ＋ 两工艺孔</td></tr><tr><td>夹紧</td><td>4 × 液压回转压板，压在支承正上方</td></tr>
+         <tr><td>针杆孔对旋梭轴孔</td><td>Ø0.05（预算 ${BUD.nh}）</td></tr><tr><td>上轴、下轴两孔同轴度</td><td>Ø0.02（预算 ${BUD.cu} / ${BUD.cl}）</td></tr>
+         <tr><td>齿轮中心距</td><td>31.058 ± 0.015（预算 ${BUD.cd}）</td></tr><tr><td>上轴中心高（对 A）</td><td>262 ± 0.05（预算 ${BUD.h}）</td></tr>`
+      : `<tr><td>夹具</td><td>FX-HSG-U-20，一面两销（G5.2 起只做粗加工）</td></tr><tr><td>夹紧</td><td>4 × 液压拉缸，合计 9.4 kN</td></tr><tr><td>辅助支承</td><td>4 个，机头让刀 79 → 11 μm</td></tr>
+         <tr><td>各面、各孔</td><td>单边留 0.5，合箱后精加工</td></tr>`)
     : `<tr><td>铸件 / 浇注重量</td><td>${I.mass_casting} / ${I.mass_poured} kg</td></tr><tr><td>工艺出品率</td><td>${I.yield_pct} %</td></tr>
        <tr><td>浇注温度、时间</td><td>1380 ℃，${g.tau_s} s</td></tr><tr><td>内浇道总截面</td><td>${g.A_ingate_cm2} cm²（${g.n_ingates} 个）</td></tr>
        <tr><td>全部凝固（含冒口）</td><td>${I.t_total} s</td></tr>`;

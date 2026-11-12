@@ -286,11 +286,11 @@ YL, ZL, ZH = 27.791774943072237, -35.36485983577417, -21.5
 def pair_sheet(step_u: Path, step_l: Path) -> Sheet:
     c = chars("HSG-LS-P")
     u, lo = load(step_u), load(step_l)
-    sh = Sheet(size="A2", title="机壳合件（上件＋下件，配对）", code="WQLS-HSG-P", material="HT250", scale_text="1:3", mass="24.2 kg", qty="1",
+    sh = Sheet(size="A2", title="机壳合件", code="WQLS-HSG-P", material="HT250", scale_text="1:2.5", mass="24.2 kg", qty="1",
                designer="AI（问渠）", checker="", date=DATE)
     ref = (153.0, 0.0, 100.0)
-    fv = sh.view([(u, 1), (lo, 2)], "front", scale=1 / 3, ref3=ref, at=(200, 190), hidden=False, section=((0, 0, 0), (0, -1, 0)), name="A–A")
-    lv = sh.view([(u, 1), (lo, 2)], "left", scale=1 / 3, ref3=(0, 27, 100), at=(420, 190), hidden=False, name="")
+    fv = sh.view([(u, 1), (lo, 2)], "front", scale=0.4, ref3=ref, at=(205, 185), hidden=False, section=((0, 0, 0), (0, -1, 0)), name="A–A")
+    lv = sh.view([(u, 1), (lo, 2)], "left", scale=0.4, ref3=(0, 27, 100), at=(455, 185), hidden=False, name="")
     for v_ in (fv,):
         sh.centerline(v_, (-75, 0, ZU), (420, 0, ZU))
         sh.centerline(v_, (-115, 0, ZH), (75, 0, ZH))
@@ -312,23 +312,24 @@ def pair_sheet(step_u: Path, step_l: Path) -> Sheet:
     ph = fv.at((45, 0, ZH + 7))
     sh.leader_note(ph, (ph[0] - 10, ph[1] - 40), spec(c, "P9"))
     sh.gdt(fv.at((60, 0, ZH + 7)), (ph[0] + 20, ph[1] - 52), "∥", "0.012/100", "D")
+    sh.datum(fv.at((30, 0, ZH - 7)), "E", direction=(0, -1))
     pn = fv.at((0, 0, 120))
     sh.leader_note(pn, (pn[0] - 50, pn[1] - 20), "针杆孔 2 × Ø12 H7（上件已加工）")
-    sh.gdt(fv.at((6, 0, 110)), (pn[0] - 50, pn[1] - 8), "⌖", "Ø0.05", "旋梭轴孔")
+    sh.gdt(fv.at((6, 0, 110)), (pn[0] - 50, pn[1] - 8), "⌖", "Ø0.05", "E")
     sh.gdt(fv.at((6, 0, 140)), (pn[0] - 50, pn[1] + 4), "⌖", "Ø0.05", "B")
     pm = fv.at((408, 0, ZU + 26))
     sh.leader_note(pm, (pm[0] + 10, pm[1] - 26), spec(c, "P14"))
     sh.gdt(fv.at((402, 0, ZU + 26)), (pm[0] + 10, pm[1] - 38), "◎", "Ø0.03", "B")
     sh.gdt(fv.at((408, 0, ZU - 20)), (pm[0] + 10, pm[1] + 30), "⊥", "0.02", "B")
     pd = lv.at((0, YL, ZL - 16))
-    sh.leader_note(pd, (pd[0] + 30, pd[1] + 22), "下轴两孔 2 × Ø32 H7，公共轴线 D，◎ Ø0.02 D；D ∥ B 0.03/300")
+    sh.leader_note(pd, (pd[0] - 95, pd[1] + 26), "下轴两孔 2 × Ø32 H7，公共轴线 D，◎ Ø0.02 D；D ∥ B 0.03/300")
     sh.roughness(fv.at((40, 0, ZU + 17.5)), "Ra 1.6")
     sh.roughness(fv.at((45, 0, ZH + 7)), "Ra 1.6")
     sh.roughness_rest((505, 42), "Ra 12.5")
     sh.requirements([
         "本图为上件 WQLS-HSG-U 与下件 WQLS-HSG-L 合箱后的配对件：两件立柱脚打同一配对编号，不得与别的件互换；更换须整对更换。",
         "合箱：接合面 0.02 塞尺塞不进；4 × M10（10.9 级）45 N·m 对角两次拧紧；2 × 锥销 10 × 40（GB/T 117，1:50）合箱后配铰，红丹接触 ≥ 75%。",
-        "基准 A：下件底面；两工艺孔 Ø10 H7（下件底边法兰）与 A 组成加工、检测的统一基准体系。B：上轴两孔公共轴线；D：下轴两孔公共轴线。",
+        "基准 A：下件底面；两工艺孔 Ø10 H7（下件底边法兰）与 A 组成加工、检测的统一基准体系。B：上轴两孔公共轴线；D：下轴两孔公共轴线；E：旋梭轴孔轴线。",
         "本图标注的孔系在合件上一次装夹加工（工艺规程 HSG-LS-P 工序 70）。旋梭轴孔、上轴两孔的 y 向位置以合箱后实测的针杆轴线为准"
         "（针杆孔在上件工序 50 精铰），使针杆轴线与旋梭轴线、B 垂直相交，位置度 Ø0.05。",
         "螺孔：电机座 4 × M5-6H ↧9（PCD 40），面板口 4 × M4-6H ↧7，前窗口 6 × M4-6H ↧7，顶盖 4 × M4-6H ↧3。",
@@ -355,12 +356,12 @@ def fixture_p70_model():
     parts.append(("1", "FX-P70-01", "托盘过渡板", 1, "HT300", at(B(640, 360, 40, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MAX)), 153, 27, -222)))
     frame = at(B(560, 40, 140, align=up), 153, -57, -222) + at(B(560, 40, 140, align=up), 153, 111, -222)
     frame = frame + at(B(40, 128, 140, align=up), -90, 27, -222) + at(B(40, 128, 140, align=up), 402, 27, -222)
-    parts.append(("2", "FX-P70-02", "框架（四根梁焊接后去应力、精加工；中间空着，放直角铣头）", 1, "Q235", frame))
+    parts.append(("2", "FX-P70-02", "框架（中间空，放直角铣头）", 1, "Q235", frame))
     pads = None
     for x, y in PADS:
         pd = at(C(12, 20, align=up), x, y, -82)
         pads = pd if pads is None else pads + pd
-    parts.append(("3", "JB/T 8029.2", "支承钉 Ø24（淬硬，顶面等高 0.005）", 4, "T8", pads))
+    parts.append(("3", "JB/T 8029.2", "支承钉 Ø24", 4, "T8", pads))
     parts.append(("4", "外购", "液压圆柱涨销 Ø10", 1, "—", at(C(5, 24, align=up), *LOWER_PINS[0], -82)))
     parts.append(("5", "外购", "液压削边涨销 Ø10", 1, "—", at(B(10, 4, 24, align=up), *LOWER_PINS[1], -82)))
     cl = None
@@ -368,13 +369,13 @@ def fixture_p70_model():
         yo = y - 38 if y < 0 else y + 38                   # 缸体在机座外面
         k = at(C(20, 222 + 18, align=up), x, yo, -222) + at(B(24, abs(yo - y) + 14, 12, align=up), x, (y + yo) / 2, 2)
         cl = k if cl is None else cl + k
-    parts.append(("6", "外购", "液压回转压板（缸径 25，4 MPa 时 1.4 kN；压在机座顶面四角）", 4, "—", cl))
+    parts.append(("6", "外购", "液压回转压板 缸径 25", 4, "—", cl))
     lb = at(B(40, 70, 222 - 36 + 20, align=up), -150, YL, -222) + at(C(35, 40, rotation=(0, 90, 0), align=(bd.Align.CENTER,) * 3), -135, YL, ZL)
     lb = lb - at(C(8.5, 50, rotation=(0, 90, 0), align=(bd.Align.CENTER,) * 3), -135, YL, ZL)
-    parts.append(("7", "FX-P70-07", "左支架（液压翻转）＋ 旋转导向套（内孔 Ø17，下轴镗杆）", 1, "组件", lb))
+    parts.append(("7", "FX-P70-07", "左支架＋旋转导向套（下轴）", 1, "组件", lb))
     rb = at(B(40, 90, 380 + 62 - 160 + 160, align=up), 465, 0, -222) + at(C(35, 40, rotation=(0, 90, 0), align=(bd.Align.CENTER,) * 3), 440, 0, ZU)
     rb = rb - at(C(8.5, 50, rotation=(0, 90, 0), align=(bd.Align.CENTER,) * 3), 440, 0, ZU)
-    parts.append(("8", "FX-P70-08", "右支架（液压翻转）＋ 旋转导向套（内孔 Ø17，上轴镗杆）", 1, "组件", rb))
+    parts.append(("8", "FX-P70-08", "右支架＋旋转导向套（上轴）", 1, "组件", rb))
     return parts
 
 
@@ -410,7 +411,7 @@ def fixture_p60_model():
 
     def at(shape, x, y, z):
         return shape.moved(bd.Location((x, y, z)))
-    parts = [("1", "FX-P60-01", "底板（带 T 形槽）", 1, "HT300", at(B(620, 300, 40, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MAX)), 153, 27, -82))]
+    parts = [("1", "FX-P60-01", "底板", 1, "HT300", at(B(620, 300, 40, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MAX)), 153, 27, -82))]
     pads = None
     for x, y in PADS:
         pd = at(C(12, 20, align=up), x, y, -82)
@@ -422,9 +423,9 @@ def fixture_p60_model():
     for x, y, dy in ((330, -75, 1), (366, -75, 1), (330, 129, -1), (366, 129, -1)):
         j = at(B(30, 20, 120, align=up), x, y, -82) + at(C(5, 30, rotation=(90, 0, 0), align=up), x, y + dy * 10, 20)
         js = j if js is None else js + j
-    parts.append(("5", "FX-P60-05", "顶丝座 ＋ M10 细牙顶丝（微调上件，前后各 2）", 4, "45", js))
+    parts.append(("5", "FX-P60-05", "顶丝座＋M10 细牙顶丝", 4, "45", js))
     gauge = at(B(64, 44, 2.5, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MAX)), 0, 0, 0) - at(C(6, 5, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MAX)), 0, 0, 0.5)
-    parts.append(("6", "FX-P60-06", "针板孔基准检具（按针板外形和 4 个 M3 孔定位，中间 Ø12 H6 衬套）", 1, "GCr15", gauge))
+    parts.append(("6", "FX-P60-06", "针板孔基准检具", 1, "GCr15", gauge))
     parts.append(("7", "FX-P60-07", "找正检棒 Ø12 h5 × 260", 1, "GCr15", at(C(6, 260, align=up), 0, 0, -2.5)))
     return parts
 

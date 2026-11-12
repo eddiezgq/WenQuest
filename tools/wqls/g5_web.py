@@ -5,7 +5,8 @@
 内容（坐标同整机 mm）：
   cast_<part>：铸件毛坯（STL 网格）；gate_<part>：浇注系统和冒口；chill_<part>：冷铁（由凝固仿真的体素做等值面）；
   liq_<part>_<t>：t 秒时还没凝固完（固相分数 < 0.99）的区域；
-  fixture：上件卧加夹具 FX-HSG-U-20；part_upper：上件成品；path_<程序>：刀具中心轨迹（切削段），已从各面的工件坐标系换回整机坐标。
+  fixture：上件卧加粗加工夹具 FX-HSG-U-20；fixture_p70：合件卧加夹具 FX-HSG-P-70（G5.2）；part_upper、part_lower：成品；
+  path_<程序>：刀具中心轨迹（切削段），已从各面的工件坐标系换回整机坐标（O1202 上件粗加工，O1401 合件精加工）。
 网格打包成 base64 Float32（每个三角形 9 个数），与 render/stl2json.py 同一格式。
 """
 from __future__ import annotations
@@ -74,16 +75,22 @@ def main():
         fx = s if fx is None else fx + s
     bd.export_stl(fx, str(out / "_fx.stl"), tolerance=0.2)
     P["fixture"] = pack(C.read_stl(out / "_fx.stl"))
+    fx = None
+    for n, code, name, q, m, s_ in DW.fixture_p70_model():
+        fx = s_ if fx is None else fx + s_
+    bd.export_stl(fx, str(out / "_fx.stl"), tolerance=0.2)
+    P["fixture_p70"] = pack(C.read_stl(out / "_fx.stl"))
     (out / "_fx.stl").unlink()
     P["part_upper"] = pack(C.read_stl(g6 / "part_upper.stl"))
+    P["part_lower"] = pack(C.read_stl(g6 / "part_lower.stl"))
     import g5_cam as GC
     from cae import cam_sim
     paths = {}
-    for num in (1202, 1205):
+    for num in (1202, 1401):
         title, part, seq, machine, fn = GC.PROGRAMS[num]
         segs = []
         for opx in fn():
-            if opx.get("kind") == "linebar":
+            if opx.get("kind") in ("linebar", "probe"):
                 continue
             n, ex, ey, p0 = (np.asarray(v, float) for v in GC.FRAMES[opx["frame"]])
             prog = dict(machine=machine, title="x", number=1, ops=[{k: v for k, v in opx.items() if k not in ("frame", "kind", "b")}])
@@ -96,6 +103,10 @@ def main():
                     segs.append(p0 + ex * q[0] + ey * q[1] + n * q[2])
         paths[f"path_{num}"] = pack(np.asarray(segs).reshape(-1, 2, 3))   # 线段：每段 6 个数
     P.update(paths)
+    b = json.loads((ROOT / "docs" / "设计" / "WQ-LS" / "G5" / "精度分析.json").read_text())["budgets"]
+    pc = lambda k: f"{b[k]['share']:.0%}"                                   # noqa: E731
+    info["_budget"] = dict(nh=pc("针杆孔对旋梭轴孔 位置度 Ø0.05"), cu=pc("上轴两孔同轴度 Ø0.02"), cl=pc("下轴两孔同轴度 Ø0.02"),
+                           cd=pc("齿轮中心距 31.058 ± 0.015"), h=pc("上轴中心高 262 ± 0.05（对 A）"))
     P["_info"] = info
     # 网页托管单个文件 ≤ 16 MB：凝固过程的网格按件分开放
     for part in ("upper", "lower"):
