@@ -148,3 +148,18 @@ def test_zip_slip_is_flattened(client):
 def test_demo_package_button(client):
     j = client.post("/api/factory/check", data={"factory": "example-smt", "demo": "1"}).json()
     assert next(x for x in j["results"] if x["key"] == "D1")["refs"] == ["C47"]
+
+
+def test_demo_package_returns_merged_bom_rows(client):
+    """第 158 轮：检查结果回物料清单（合并行），给页面做“到外部库查”；不参与判定"""
+    import csv
+    j = client.post("/api/factory/check", data={"factory": "example-smt", "demo": "1"}).json()
+    rows = j["bom"]
+    src = list(csv.DictReader((DEMO / "bom.csv").open(encoding="utf-8")))
+    want = {}
+    for r in src:
+        k = (r["物料编号"], r["数值"], r["封装"])
+        want[k] = want.get(k, 0) + int(r["数量"])
+    assert {(r["item"], r["value"], r["package"]): r["qty"] for r in rows} == want
+    gdr = next(r for r in rows if r["value"] == "IR2101S")
+    assert gdr["item"] == "IC-GDRV" and gdr["qty"] == 3

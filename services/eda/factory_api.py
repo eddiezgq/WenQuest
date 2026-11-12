@@ -100,6 +100,17 @@ def _json_field(form, key):
     return d
 
 
+def bom_rows(board):
+    """第 158 轮：物料清单按“物料编号、数值、封装”合并成行，回给上传的人做“到外部库查”的链接。
+    只回显，不存；不参与任何判定。"""
+    rows = {}
+    for r in getattr(board, "bom", None) or []:
+        k = (r.item or "", r.value or "", r.package or "")
+        q = r.qty if r.qty is not None else len(r.refs)
+        rows[k] = rows.get(k, 0) + (q or 0)
+    return [{"item": i, "value": v, "package": p, "qty": q} for (i, v, p), q in sorted(rows.items())]
+
+
 def register(app, *, factory_dir, gateway, headers_of, gw_errors, client, demo=None):
     """demo = {gerber, bom, cpl}：演示资料包（第 112 轮，故意带错，标明）的路径；页面上“用演示资料包”用"""
     caps = factories(factory_dir)
@@ -189,6 +200,7 @@ def register(app, *, factory_dir, gateway, headers_of, gw_errors, client, demo=N
                               "factory": key, "counts": counts, "ms": int((time.time() - t0) * 1000)}), flush=True)
             return {"factory": caps[key].get("factory"), "fictional": bool(caps[key].get("fictional")),
                     "results": out["results"], "quantity": out["quantity"], "notes": out["notes"],
+                    "bom": bom_rows(out.get("board")),
                     "layers": out["layers"], "headers": heads, "guessed": guessed,
                     "maps": {k: maps[k] or guessed.get(k) for k in side}, "svg": svg, "counts": counts}
         finally:
