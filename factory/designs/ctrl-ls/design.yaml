@@ -207,8 +207,8 @@ board:
   - {name: HVSig, track_mm: 0.5, clearance_mm: 2.2, nets: [XDIS, BRO_A, BRO_B, TOP_V1, TOP_V, FLY_D, CLAMP, CLAMP_M, VSENSE_1, VSENSE_2,
                                                        OVP_1, OVP_2, VBUS_SNS_1, VBUS_SNS_2],
      layers: [F.Cu, B.Cu]}
-  # 自举电容的两根线（上桥浮地）只在功率模块脚旁边一小段（电容紧贴模块控制脚一排）
-  - {name: Boot, track_mm: 0.5, clearance_mm: 2.0, nets: [OUT_U, OUT_V, OUT_W, VB_U, VB_V, VB_W], layers: [F.Cu, B.Cu]}
+  # 自举电容的两根线（上桥浮地）只在功率模块脚旁边一小段（电容紧贴模块控制脚一排）。模块脚距 2.35 mm：间距取 2.0 时布线器卡住（第二次就是这样），取 1.0
+  - {name: Boot, track_mm: 0.5, clearance_mm: 1.0, nets: [OUT_U, OUT_V, OUT_W, VB_U, VB_V, VB_W], layers: [F.Cu, B.Cu]}
   - {name: Power, track_mm: 1.0, clearance_mm: 0.3, nets: [+24V, +15V, N_U, N_V, N_W, SOL1_D, SOL2_D, SOL3_D, SOL4_D, SOL1_K, SOL2_K,
                                                        SOL3_K, SOL4_K, STP_OA1, STP_OA2, STP_OB1, STP_OB2, FLY_24, FLY_15, FLY_5, +5V],
      layers: [F.Cu, In2.Cu, B.Cu]}
