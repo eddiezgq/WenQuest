@@ -1,4 +1,9 @@
-"""第 138 轮 G5.1 第 4、5、6 步：尺寸链、夹具、精度预算（用数字工厂 hub/tolerance.py、hub/fixture.py、hub/accuracy.py）。
+"""第 138 轮 G5.1 第 4、5、6 步、G5.2：尺寸链、夹具、精度预算（用数字工厂 hub/tolerance.py、hub/fixture.py、hub/accuracy.py）。
+
+G5.2（2026-11-11）改为“先做精基准、合箱，再整体精镗”：两件各自粗加工、时效、精铣接合面后合箱，打锥销，
+合件以下件底面 A 和两个工艺孔 Ø10 H7 定位，在卧加上一次装夹精加工两件上的全部孔系（工序 70，夹具 FX-HSG-P-70）。
+现在用的是 pair_budgets()（合件精加工的精度预算）和 fixture_pair()（FX-HSG-P-70 的夹紧）；
+下面的方案 I、方案 III 和上件单独精加工的 budgets_upper_g51() 留作 G5.1 的记录。
 
     python3 tools/wqls/g5_precision.py [<输出目录>]  → 精度分析.json，并打印结论
 
@@ -25,6 +30,8 @@ sys.path[:0] = [str(ROOT / "factory" / "digital"), str(ROOT / "factory")]
 from hub import accuracy as AC  # noqa: E402
 from hub import fixture as FX  # noqa: E402
 from hub import tolerance as TL  # noqa: E402
+
+KC11, MC = 1160.0, 0.26
 
 ARCSEC = math.pi / 180 / 3600
 # 几何（mm，整机坐标）：针杆轴线 x = 0、y = 0；定位销（G4.4 的 joint()）；上轴两孔
@@ -131,7 +138,8 @@ def fixture_upper():
 
 
 # ---------------------------------------------------------------- 三、精度预算（hub/accuracy.budget：系统误差相加，随机误差平方和开方）
-def budgets():
+def budgets_upper_g51():
+    """G5.1 记录：上件单独在卧加上精加工时的预算（G5.2 起不用）"""
     L_half = 172.0                                      # 两轴承孔离转台中心各约 172 mm（零件在托盘上居中）
     coax = [   # 同轴度 Ø0.02：精镗用“镗模式”同轴镗——一根镗杆从机头一端伸进去，前端 Ø35、后端 Ø32 两把精镗刀相距 344 mm，
                # 镗杆尾部 Ø17 导向柱穿过电机座的 Ø20 轴过孔，插进夹具支架上的旋转导向套，两孔一刀完成，不靠转台掉头。
@@ -166,17 +174,123 @@ def budgets():
     return out
 
 
+# ---------------------------------------------------------------- G5.2：合件精加工（工序 70）
+LOWER_PINS = ((-94.4, -30.0), (401.4, 80.0))      # 下件底边法兰上的两个工艺孔 Ø10 H7（housing.py BED_PROC_HOLES）
+X_TABLE = 153.0                                   # 合件在转台上居中：转台中心 x 153、y 27
+X_LOW = (96.0, 371.0)                             # 下轴两孔中点 x（88…104、364…378）
+
+
+def pair_budgets():
+    """合件一次装夹（下件 A ＋ 两工艺孔）精加工的精度预算。公差带是直径或全宽，误差项按全宽（偏移 × 2）计。"""
+    s3 = 3 * ARCSEC
+    # 针杆孔对旋梭轴孔轴线的位置度 Ø0.05（只看 y 向：x 向的梭尖间隙靠旋梭在轴上的轴向位置调）。
+    # 针杆孔在上件工序 50 已精铰（合箱后进不去刀，见细则 G5.2 偏差 1）。工序 70 开头在针杆上、下两孔里各插一个液压涨紧塞规 Ø12，
+    # 测头在 B 0° 测两个塞规伸出来的测量段：下塞规在机座和机头之间的空当里（z 30），上塞规经面板口（z 190），各 3 点定圆心。
+    # 两个圆心连成针杆轴线，外推到旋梭轴高度 z −21.5、上轴高度 z 200，作为旋梭轴孔和上轴两孔的 y 坐标。
+    # 测量和镗孔都在 B 0°，零件 y 向都由机床 X 轴定，不经过转台分度。
+    zl, zu = 30.0, 190.0
+
+    def amp(z):                                          # 两个圆心的误差外推到 z 的放大系数
+        k = (z - zl) / (zu - zl)
+        return math.hypot(1 - k, k)
+    a_h, a_b = amp(-21.5), amp(200.0)
+    needle_hook = [
+        dict(name="两个涨紧塞规在针杆孔里的定心（液压涨紧，零间隙）各 ±0.002，外推到 z −21.5（放大 {:.2f}）".format(a_h), range=2 * 0.002 * a_h, kind="rand"),
+        dict(name="测头：每个塞规 3 点定圆心 ±0.0015（单点重复性 1 μm，含测针偏置标定），外推后", range=2 * 0.0015 * a_h, kind="rand"),
+        dict(name="镗旋梭轴孔时 X 轴定位重复性 ±0.002", range=2 * 0.002, kind="rand"),
+        dict(name="阶梯镗杆（Ø18 杆、Ø12 颈，伸出 175）：切削力随刀转动，主要让孔变小（按实测孔径补偿），轴线偏移按 ±0.002", range=2 * 0.002, kind="rand"),
+        dict(name="热漂移（测量到镗完约 10 min）", range=2 * 0.002, kind="sys"),
+        dict(name="夹紧变形：压板压在支承正上方，只有局部压缩", range=2 * 0.001, kind="sys"),
+    ]
+    needle_b = [   # 针杆孔对上轴两孔公共轴线 B 的位置度 Ø0.05（y 向）：上轴两孔的 y 也取测出的针杆轴线（外推到 z 200）
+        dict(name="两个塞规定心各 ±0.002，外推到 z 200（放大 {:.2f}）".format(a_b), range=2 * 0.002 * a_b, kind="rand"),
+        dict(name="测头定圆心 ±0.0015，外推后", range=2 * 0.0015 * a_b, kind="rand"),
+        dict(name="同轴镗杆定位：X 轴重复性 ±0.002、导向套对主轴 0.002", range=2 * math.hypot(0.002, 0.002), kind="rand"),
+        dict(name="热漂移", range=2 * 0.002, kind="sys"),
+    ]
+    coax_up = [   # 上轴两孔同轴度 Ø0.02：同 G5.1（镗杆从机头端伸进去，尾部导向柱 Ø17 穿过电机端 Ø20 过孔进旋转导向套）
+        dict(name="旋转导向套（预紧轴承，零间隙）轴线对主轴轴线：夹具装上后在机用检棒调到 0.002", range=2 * 0.002, kind="sys"),
+        dict(name="旋转导向套径向跳动 0.002", range=2 * 0.002, kind="rand"),
+        dict(name="主轴径向跳动（精镗区 0.002）", range=2 * 0.002, kind="rand"),
+        dict(name="镗杆弯曲（两端支承；尾部导向柱 Ø17，按 0.0015 计）", range=2 * 0.0015, kind="sys"),
+        dict(name="精镗前夹紧力降到 40%，夹紧变形残余（估 0.001）", range=2 * 0.001, kind="sys"),
+    ]
+    coax_low = [   # 下轴两孔同轴度 Ø0.02：镗杆 Ø26 从右端壁 Ø34 孔进，经横筋 Ø34 孔，尾部导向柱 Ø17 穿过左端壁 Ø20 孔进旋转导向套（左支架）
+        dict(name="旋转导向套轴线对主轴轴线：在机用检棒调到 0.002", range=2 * 0.002, kind="sys"),
+        dict(name="旋转导向套径向跳动 0.002", range=2 * 0.002, kind="rand"),
+        dict(name="主轴径向跳动 0.002", range=2 * 0.002, kind="rand"),
+        dict(name="镗杆弯曲（杆身 Ø26，两刀相距 276，按 0.001 计）", range=2 * 0.001, kind="sys"),
+        dict(name="夹紧变形残余（估 0.001）", range=2 * 0.001, kind="sys"),
+    ]
+    centre = [   # 齿轮中心距 31.058 ± 0.015（T 0.03）：旋梭轴孔在 B 0° 镗，下轴两孔在 B 180° 镗
+        dict(name="转台分度 180° ±3″：下轴孔离转台中心最远 218（x 371）", range=2 * s3 * (X_LOW[1] - X_TABLE), kind="rand"),
+        dict(name="X、Y 轴定位精度 ±0.004（两个孔各一次，投影到中心连线上）", range=2 * math.sqrt(2) * 0.004, kind="rand"),
+        dict(name="两次对刀（镗杆偏心标定）±0.002", range=2 * math.sqrt(2) * 0.002, kind="rand"),
+        dict(name="热漂移", range=0.004, kind="sys"),
+    ]
+    height = [   # 上轴中心到底面 A：262 ± 0.05（T 0.1）
+        dict(name="夹具支承钉顶面对托盘的高度，标定后 0.005", range=0.005, kind="sys"),
+        dict(name="Y 轴定位精度 ±0.004", range=0.008, kind="rand"),
+        dict(name="底面 A 平面度 0.05 与支承钉贴合（4 点，取 0.02）", range=0.02, kind="rand"),
+        dict(name="热漂移 Y 向", range=0.006, kind="sys"),
+    ]
+    par = [   # 上轴对下轴的平行度 0.03（在 300 长度上，同步带两轮对齐、齿轮不受影响）
+        dict(name="上轴两孔在 B 0° 镗、下轴两孔在 B 180° 镗：分度 ±3″ 在 300 长度上", range=2 * s3 * 300, kind="rand"),
+        dict(name="两根镗杆各自的导向套对主轴 0.002", range=2 * math.sqrt(2) * 0.002, kind="rand"),
+        dict(name="两根镗杆弯曲之差", range=0.002, kind="sys"),
+    ]
+    out = {}
+    for name, items, T in (("针杆孔对旋梭轴孔 位置度 Ø0.05", needle_hook, 0.05), ("针杆孔对上轴孔 B 位置度 Ø0.05", needle_b, 0.05),
+                           ("上轴两孔同轴度 Ø0.02", coax_up, 0.02),
+                           ("下轴两孔同轴度 Ø0.02", coax_low, 0.02), ("齿轮中心距 31.058 ± 0.015", centre, 0.03),
+                           ("上轴中心高 262 ± 0.05（对 A）", height, 0.10), ("上轴对下轴平行度 0.03/300", par, 0.03)):
+        r = AC.budget(items, T)
+        out[name] = dict(items=[dict(name=i["name"], kind=i["kind"], range=round(i["range"], 4)) for i in items],
+                         sys=round(r["sys"], 4), rand=round(r["rand"], 4), total=round(r["total"], 4), T=T,
+                         share=round(r["total"] / T, 2), ok=r["ok"], tight=r["tight"])
+    return out
+
+
+budgets = pair_budgets
+
+
+def fixture_pair():
+    """合件卧加夹具 FX-HSG-P-70：底面 A 放在 4 个支承钉上，两个工艺孔 Ø10 H7 套液压圆柱涨销、削边涨销（零间隙）；
+    4 个液压回转压板压在机座顶面的四角，正对下面的支承钉。夹具是框架，支承钉在两条纵梁上，中间空着：
+    锥销孔要从机座底下往上钻（机座底面敞开），直角铣头就放在框里。工序 L30 下件单独粗镗也用这个夹具。"""
+    kc = lambda h: KC11 * h ** -MC                      # noqa: E731
+    h = 0.15 / 2 * math.sin(math.radians(59))
+    Ff_drill = 0.5 * kc(h) * (8.5 / 2) * 0.15 * math.sin(math.radians(59))     # 钻锥销底孔 Ø8.5、f 0.15，往上的轴向力
+    hm = 0.08 * math.sqrt(47.25 / 63)
+    Fc_face = KC11 * hm ** (-MC) * 0.5 * hm * 5 * 47.25 / (math.pi * 63)      # 精铣面板口端面 ap 0.5（最大的横向力）
+    G = 24.3 * 9.81
+    K = FX.safety_factor(K1="粗加工", K2="钻削", K3="连续", K4="机动")["K"]
+    W_lift = max(0.0, K * Ff_drill - G)                  # 钻孔把合件往上顶，靠压板压住
+    Kf = FX.safety_factor(K1="精加工", K2="铣削", K3="断续", K4="机动")["K"]
+    W_slide = max(0.0, FX.friction_clamp_required(Fc_face, Kf, mu1=0.16, mu2=0.16) - G)
+    W = max(W_lift, W_slide)
+    cyl = FX.cylinder_bore(W / 4, p=4.0, eta=0.85, pull=True)
+    expand = dict(X1=0.003, X2=0.004, note="液压涨销定位，间隙按 0.003–0.004 计")
+    L = math.dist(*LOWER_PINS)
+    return dict(drill_thrust_up_N=round(Ff_drill), Fc_face_N=round(Fc_face), weight_N=round(G), K_drill=round(K, 2), K_face=round(Kf, 2),
+                W_lift_N=round(W_lift), W_slide_N=round(W_slide), W_required_N=round(W),
+                clamps=dict(n=4, p_mpa=4.0, D_min=round(cyl["D_min"], 1), D=cyl["D"], Q_each=round(cyl["Q"]) if cyl["Q"] else None),
+                pins_L_mm=round(L, 1), locating=dict(expand, rot_rad=(expand["X1"] + expand["X2"]) / L),
+                head_support="不加：精加工最大的横向力是精铣面板口端面约 {:.0f} N，机头让刀约 {:.0f} μm，只影响这个端面（平面度 0.1）".format(Fc_face, Fc_face / 10.0),
+                note="所有孔都在这一次装夹里加工，相互位置与定位误差无关；定位误差只影响孔系对 A 和工艺孔的位置（中心高 262 ± 0.05）")
+
+
 def main():
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "docs" / "设计" / "WQ-LS" / "G5"
-    res = dict(scheme_I=scheme_I(), scheme_III=scheme_III(), fixture_upper=fixture_upper(), budgets=budgets())
+    res = dict(budgets=pair_budgets(), fixture_pair=fixture_pair(), fixture_upper_rough=fixture_upper(),
+               g51_record=dict(scheme_I=scheme_I(), scheme_III=scheme_III(), budgets_upper=budgets_upper_g51()))
     (out / "精度分析.json").write_text(json.dumps(res, ensure_ascii=False, indent=1))
-    I, II = res["scheme_I"], res["scheme_III"]
+    I, II = res["g51_record"]["scheme_I"], res["g51_record"]["scheme_III"]
     print(f"方案 I（分开加工、互换）：针杆—旋梭 极值 ±{I['extreme_half']}，概率 ±{I['statistical_half']}，要求 ±0.05")
     for l in I["links"]:
         print("    ", l)
     print(f"方案 III（找正后配铰锥销）：极值 ±{II['extreme_half']}，概率 ±{II['statistical_half']}")
-    print("夹具", {k: v for k, v in res["fixture_upper"].items() if k != "aux_supports"})
-    print("辅助支承", res["fixture_upper"]["aux_supports"])
+    print("合件夹具 P-70", res["fixture_pair"])
     for k, v in res["budgets"].items():
         print(k, "合计", v["total"], "/", v["T"], f"{v['share']:.0%}", "OK" if v["ok"] else "超差", "裕量不足" if v["tight"] else "")
 

@@ -317,7 +317,8 @@ def lower_seats(hollow, solid, info):
     ② 下轴左轴承座：轴线 (y 27.8, z −35.4)，x 88…104，Ø42 凸台，6 mm 厚的筋连到顶板；孔 Ø32 H7 装 6201；
     ③ 下轴右轴承座：x 364…378，同上（在同步带轮右边，筋在过带孔右边）；
     ④ 两个端壁上的工艺孔：右端壁在下轴轴线上 Ø34（镗下轴两孔时镗杆从这里进），左端壁在旋梭轴轴线上 Ø20（镗旋梭轴孔），装配后橡胶堵堵上；
-    ⑤ 立柱下左横筋上 Ø34 铸孔，让下轴穿过（干涉检查查出）。"""
+    ⑤ 立柱下左横筋上 Ø34 铸孔，让下轴穿过（干涉检查查出）；
+    ⑥ G5.2：左端壁在下轴轴线上再开 Ø20，同轴镗下轴两孔时镗杆尾部导向柱从这里伸出去插进导向套；装配后橡胶堵堵上。"""
     sp = _spec()
     zh, zl, yl = sp.ZH, sp.ZL, sp.YL
     top = Part.makeBox(600, 400, 3.0, V(-200, -200, -BEDWALL - 1.0))       # 筋伸进顶板 1 mm，保证连上
@@ -333,14 +334,16 @@ def lower_seats(hollow, solid, info):
                                                                      V(f_.BoundBox.XMin, f_.BoundBox.YMin, -BEDWALL - 1.0)))).common(solid))
     # ⑤ 立柱下的左横筋（x 300…307）挡在下轴上：开 Ø34 铸孔（下轴穿过；G5.2 镗下轴两孔时镗杆也从这里过）
     hollow = hollow.cut(Part.makeCylinder(17.0, 20, V(PIL["x0"] - 6, yl, zl), V(1, 0, 0)))
+    hollow = hollow.cut(Part.makeCylinder(17.0, 20, V(PIL["x1"] - RIB_T - 6, yl, zl), V(1, 0, 0)))   # G5.2：右横筋（x 389…396）同样开 Ø34（下轴镗杆通过）
     if not FEA_SIMPLE:
         hollow = hollow.cut(Part.makeCylinder(7.0, 46, V(22, 0, zh), V(1, 0, 0)))            # 旋梭轴孔 Ø14 H7
         for x0, L in ((88.0, 16.0), (364.0, 14.0)):
             hollow = hollow.cut(Part.makeCylinder(16.0, L + 2, V(x0 - 1, yl, zl), V(1, 0, 0)))   # 6201 座孔 Ø32 H7
         hollow = hollow.cut(Part.makeCylinder(17.0, 20, V(BED["x1"] - 12, yl, zl), V(1, 0, 0)))  # 右端壁工艺孔 Ø34
         hollow = hollow.cut(Part.makeCylinder(10.0, 20, V(BED["x0"] - 8, 0, zh), V(1, 0, 0)))    # 左端壁工艺孔 Ø20
+        hollow = hollow.cut(Part.makeCylinder(10.0, 20, V(BED["x0"] - 8, yl, zl), V(1, 0, 0)))  # G5.2：左端壁下轴轴线上 Ø20（同轴镗下轴两孔时镗杆导向柱穿过）
     info["lower_seats"] = dict(hook_bore=dict(axis=(0.0, zh), x=(24, 66), d=14), lower_bores=dict(axis=(yl, zl), x=[(88, 104), (364, 378)], d=32),
-                               end_holes=dict(right=34, left=20), rib_hole=dict(x=PIL["x0"], d=34))
+                               end_holes=dict(right=34, left=20, left_lower=20), rib_hole=dict(x=[PIL["x0"], PIL["x1"] - RIB_T], d=34))
     return hollow
 
 
@@ -355,7 +358,7 @@ def joint(hollow, solid, info):
     ix0, ix1, iy0, iy1 = PIL["x0"] + w, PIL["x1"] - w, PIL["y0"] + w, PIL["y1"] - w
     r = 14.0
     bolts = [(ix0 + r, iy0 + r), (ix1 - r, iy0 + r), (ix0 + r, iy1 - r), (ix1 - r, iy1 - r)]
-    pins = [(ix0 + 10, (iy0 + iy1) / 2 - 20), (ix1 - 10, (iy0 + iy1) / 2 + 20)]
+    pins = [(ix0 + 10, (iy0 + iy1) / 2 - 20), (ix1 - 10, (iy0 + iy1) / 2 + 39)]   # G5.2：第二个销由 y 47 移到 66——锥销孔要从机座底下往上钻，原位置被下轴右轴承座挡住
     feats_u, feats_l = None, None
     for x_, y_ in bolts:
         u = Part.makeCylinder(r, 32, V(x_, y_, 0), V(0, 0, 1))
