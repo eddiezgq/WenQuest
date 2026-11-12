@@ -185,11 +185,11 @@ def strength(FD, FP, KIN, dog, vd, above, w, dphi, P_foot, mu, F_rod):
                            M_thin_Nmm=round(Mmax_thin * 1000, 1), sigma_thin_MPa=round(Mmax_thin * 1000 / W_thin, 1),
                            h_block_mm=round(h_blk, 2), sigma_block_MPa=round(Mmax_blk * 1000 / W_blk, 1),
                            SF_fatigue=round(270 / (2 * max(Mmax_thin * 1000 / W_thin, Mmax_blk * 1000 / W_blk)), 1))
-    # 送布牙（单独零件，20CrMnTi 渗碳淬火：取 σb 1080、σ−1 480；Kf 2）：牙上的力经两根侧梁（宽 3、高 2.5）悬臂传到牙架上的块（x 23.6），
+    # 送布牙（单独零件，20CrMnTi 渗碳淬火：取 σb 1080、σ−1 480；Kf 2）：牙上的力经两根侧梁（宽 2.8、高 2.5）悬臂传到牙架上的块（x 23.6），
     # 力臂取三排牙的中心 x 3.5 到 x 23.6；力从 0 到最大（脉动），按 Goodman：S = 1 / (Kf σa / σ−1 + σm / σb)
     Fz_dog = float(np.max(np.abs(Fc[:, 1] - KIN["feed_bar"]["m"] * 0.25 * b["a"][:, 1])))     # 牙这一段约占牙架质量的 1/4
     M_beam = Fz_dog * (23.6 - 3.5) / 2                                                     # 每根侧梁 N·mm
-    sig = M_beam / (3.0 * 2.5 ** 2 / 6)
+    sig = M_beam / (2.8 * 2.5 ** 2 / 6)
     out["feed_dog"] = dict(F_max_N=round(Fz_dog, 1), M_per_beam_Nmm=round(M_beam, 0), sigma_max_MPa=round(sig, 1),
                            material="20CrMnTi 渗碳淬火 58–62 HRC", SF_static=round(1080 / sig, 1),
                            SF_fatigue=round(1 / (2 * (sig / 2) / 480 + (sig / 2) / 1080), 2))

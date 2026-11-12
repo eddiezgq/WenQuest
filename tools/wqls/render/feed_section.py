@@ -16,7 +16,8 @@ V = App.Vector
 D = os.environ["WQ_MECH"]
 PHI = int(os.environ.get("WQ_PHI", "34"))
 CUTS = (25.5, 316.0, 331.0)
-FR = json.load(open(os.path.join(D, "frames.json")))["frames"]
+with open(os.path.join(D, "frames.json")) as fh:
+    FR = json.load(fh)["frames"]
 f = min(FR, key=lambda x: abs(x["phi"] - PHI))
 
 low = Part.read(os.environ["WQ_HOUSING_LOWER"])
@@ -54,5 +55,6 @@ for x in CUTS:
             sec[k] = rings
     out[str(x)] = sec
     print(x, sorted(sec))
-json.dump(dict(phi=f["phi"], cuts=out), open(os.path.join(D, "feed_section.json"), "w"))
+with open(os.path.join(D, "feed_section.json"), "w") as fh:
+    json.dump({"phi": f["phi"], "cuts": out}, fh)
 print('{"ok": true}')

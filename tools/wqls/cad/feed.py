@@ -100,17 +100,18 @@ def build():
     for x0, x1 in ((-6.5, -3.5), (3.5, 6.5), (9.0, 12.0)):
         r_ = Part.makeBox(x1 - x0, 24.0, 2.5, V(x0, yd - 12.0, zt - 2.5))
         rows = r_ if rows is None else rows.fuse(r_)
-    # 侧梁：在旋梭和针板之间，y ±(11.3…14.3)（送布行程 ±2.7 后最里到 8.6、最外到 17，针板下开口 ±18），
+    # 侧梁：在旋梭和针板之间，y ±(11.3…14.1)（送布行程 ±2.7 后最里到 8.6、最外到 16.8，针板下开口 ±18）；
+    # 宽 2.8（原 3.0：5 mm 正缝往后送到最远时外侧离开口侧壁 0.97，一转干涉检查查出），
     # 高 2.5：平均位置顶 −4.6、底 −7.1（最高时离针板底 1.1，最低时离旋梭 1.1）；牙顶平均 −0.3 → 侧梁顶 = 牙顶 − 4.3
     zb1, zb0 = zt - 4.3, zt - 6.8
     for s_ in (-1, 1):
-        y0 = yd + (11.3 if s_ > 0 else -14.3)
-        rows = rows.fuse(Part.makeBox(X["bar"][1] + 6.5, 3.0, zb1 - zb0, V(-6.5, y0, zb0)))
+        y0 = yd + (11.3 if s_ > 0 else -14.1)
+        rows = rows.fuse(Part.makeBox(X["bar"][1] + 6.5, 2.8, zb1 - zb0, V(-6.5, y0, zb0)))
         yl_ = yd + (11.3 if s_ > 0 else -12.0)                     # 牙排两端往下接侧梁的“腿”（y 11.3…12）
         rows = rows.fuse(Part.makeBox(X["bar"][1] + 6.5, 0.7, (zt - 2.5) - zb1 + 0.1, V(-6.5, yl_, zb1)).common(
             Part.makeBox(19.0, 1.0, 10.0, V(-6.5, yl_ - 0.1, zb1 - 1))))
-    # 侧梁接到牙架：牙架在 y −14.3…14.3 处往上加高到侧梁顶
-    rows = rows.fuse(Part.makeBox(X["bar"][1] - X["bar"][0], 28.6, zb1 - (T[1] - 2.5), V(X["bar"][0], yd - 14.3, T[1] - 2.5)))
+    # 侧梁接到牙架：牙架在 y −14.1…14.1 处往上加高到侧梁顶
+    rows = rows.fuse(Part.makeBox(X["bar"][1] - X["bar"][0], 28.2, zb1 - (T[1] - 2.5), V(X["bar"][0], yd - 14.1, T[1] - 2.5)))
     P["feed_bar"] = (bar.fuse(rows).cut(notch), "chrome", "steel", "plane")
     # ---- 抬牙偏心（下轴上，孔 Ø12）
     lec = xcyl(10.0, *X["lecc"], *EL).cut(xcyl(6.0, X["lecc"][0] - 1, X["lecc"][1] + 1, *O2))

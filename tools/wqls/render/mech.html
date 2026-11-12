@@ -36,7 +36,7 @@ body.shot .panel,body.shot .legend{display:none}
   <div class="row"><button data-v="iso" class="on">斜视</button><button data-v="face">端面</button><button data-v="front">正面</button><button data-v="hook">旋梭</button><button data-v="train">传动</button><button data-v="feed">送布</button><button data-v="dog">送布牙</button></div>
   <div class="row"><button id="shell" class="on">机壳半透明</button><button id="thr" class="on">面线</button></div>
 </div>
-<div class="legend"><span style="background:#c8ccd1"></span>钢件<span style="background:#eef0f2"></span>镀铬件<span style="background:#d24a3a"></span>面线<span style="background:#b7bbc0;opacity:.6"></span>机壳</div>
+<div class="legend"><span style="background:#c8ccd1"></span>钢件<span style="background:#eef0f2"></span>镀铬件<span style="background:#d24a3a"></span>面线<span style="background:#6f9fd4"></span>送布组<span style="background:#b7bbc0;opacity:.6"></span>机壳</div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
@@ -68,6 +68,7 @@ const MAT = {
   chrome: new THREE.MeshPhysicalMaterial({ color: 0xeef0f2, metalness: 1, roughness: 0.1 }),
   black: new THREE.MeshPhysicalMaterial({ color: 0x2a2d31, metalness: 0.2, roughness: 0.6 }),
   brass: new THREE.MeshPhysicalMaterial({ color: 0xc9a25a, metalness: 1, roughness: 0.3 }),
+  feed: new THREE.MeshPhysicalMaterial({ color: 0x6f9fd4, metalness: 0.7, roughness: 0.35 }),      // G4.6：送布组的运动件上蓝色，和机座里别的零件分开
   shell: new THREE.MeshPhysicalMaterial({ color: 0xb7bbc0, metalness: 0.4, roughness: 0.4, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide }),
   shellSolid: new THREE.MeshPhysicalMaterial({ color: 0xb7bbc0, metalness: 0.45, roughness: 0.38, clearcoat: 1, clearcoatRoughness: 0.06 }),
 };
@@ -88,10 +89,11 @@ async function geom(k) {
   }
   return loader.loadAsync(`${BASE}/${k}.stl`);
 }
+const FEED = new Set(['feed_ecc', 'feed_rod', 'regulator', 'reg_slider', 'feed_link', 'feed_rock', 'feed_bar', 'lift_ecc', 'lift_link', 'lift_rock', 'oil_ecc', 'oil_plunger']);
 const mesh = {};
 await Promise.all(Object.entries(info.parts).map(async ([k, p]) => {
   const g = prep(await geom(k));
-  const m = new THREE.Mesh(g, MAT[p.material] || MAT.metal);
+  const m = new THREE.Mesh(g, FEED.has(k) ? MAT.feed : (MAT[p.material] || MAT.metal));
   m.castShadow = m.receiveShadow = true; m.matrixAutoUpdate = false;
   root.add(m); mesh[k] = m;
 }));
@@ -120,7 +122,7 @@ const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true;
 // 视角：three 坐标 = (x, z, −y)/1000；目标对着机头（x ≈ 0、z ≈ 0.15）
 const VIEWS = { iso: [[-0.32, 0.27, 0.40], [0.01, 0.15, 0.0]], face: [[-0.55, 0.15, 0.0], [0.0, 0.15, 0.0]], front: [[0.0, 0.15, 0.55], [0.0, 0.15, 0.0]],
                 hook: [[-0.16, -0.02, 0.17], [0.04, -0.03, -0.01]], train: [[0.15, 0.12, 0.62], [0.2, 0.08, 0.0]],
-                feed: [[0.02, 0.16, 0.48], [0.17, -0.03, 0.0]], dog: [[-0.11, 0.012, 0.0], [0.012, -0.006, 0.0]] };   // G4.6：送布组全貌（机壳透明看机座里）；送布牙（从左往右看 y–z 平面）
+                feed: [[0.06, 0.12, 0.38], [0.17, -0.03, 0.0]], dog: [[-0.085, -0.02, 0.08], [0.014, -0.006, 0.0]] };   // G4.6：送布组全貌（机壳透明看机座里）；送布牙（从左往右看 y–z 平面）
 function view(v) { const [p, t] = VIEWS[v]; cam.position.set(...p); ctl.target.set(...t); ctl.update(); }
 view(q.get('view') || 'iso');
 

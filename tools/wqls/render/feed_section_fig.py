@@ -41,13 +41,26 @@ STYLE = {   # 名字: (填充色, 剖面线, 图上的名称)
     "lift_link": (MOVE, None, "抬牙连杆"),
     "lift_ecc": (BRASS, None, "抬牙偏心"),
 }
-PANELS = [("25.5", "x 25.5：牙架、送布牙从旋梭右边过去", (-60, 90), (-50, 8)),
-          ("316.0", "x 316：调节器、送布摆轴曲柄", (-60, 90), (-75, 20)),
-          ("331.0", "x 331：送布偏心、送布连杆（立柱里）", (-60, 90), (-75, 215))]
+PANELS = [("25.5", "x 25.5：牙架、送布牙从旋梭右边过去", (-60, 90), (-50, 14)),
+          ("316.0", "x 316：调节器、送布摆轴曲柄", (-60, 90), (-78, 14)),
+          ("331.0", "x 331：送布偏心、送布连杆（立柱里）", (-60, 90), (-75, 228))]
+# 标注：剖面 → [(名字, 引线起点 (y, z), 文字位置 (y, z), 文字)]
+LABELS = {
+    "25.5": [("feed_bar", (40, -12.5), (48, -27), "牙架（送布牙在针 y 0 处，见三维）"), ("lift_rock", (-45, -28), (-28, -44), "抬牙摆轴（机座凸台里）"),
+             ("hook_shaft", (0, -21.5), (12, -40), "旋梭轴"), ("feed_rock", (76, -40), (52, -47), "送布摆轴"),
+             ("casting", (55, -3), (58, 9), "机座顶板（剖面打斜线）")],
+    "316.0": [("regulator", (-6, -62), (-45, -74), "调节器"), ("reg_slider", (0, -47), (25, -64), "滑块"),
+              ("lower_shaft", (28, -35), (44, -18), "下轴"), ("feed_rock", (76, -46), (50, -72), "送布摆轴曲柄")],
+    "331.0": [("feed_ecc", (12, 208), (35, 222), "送布偏心 Ø26"), ("shaft", (0, 200), (-40, 172), "上轴"),
+              ("feed_rod", (2, 110), (30, 128), "送布连杆（ADC12）"), ("reg_slider", (0, -50), (-40, -66), "滑块销 P"),
+              ("lower_shaft", (28, -35), (50, -18), "下轴")],
+}
 
 d = Path(sys.argv[1])
 sec = json.loads((d / "feed_section.json").read_text())
-fig, axs = plt.subplots(1, 3, figsize=(15, 8.2), dpi=150, gridspec_kw=dict(width_ratios=[1, 1, 1]))
+fig = plt.figure(figsize=(14, 9.6), dpi=150)
+gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 0.62])
+axs = [fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[1, 0]), fig.add_subplot(gs[:, 1])]
 for ax, (key, title, xl, yl) in zip(axs, PANELS):
     R = sec["cuts"].get(key, {})
     for k in ["casting"] + [k for k in STYLE if k != "casting"]:
@@ -61,13 +74,11 @@ for ax, (key, title, xl, yl) in zip(axs, PANELS):
         fc, hatch, name = STYLE[k]
         ax.add_patch(PathPatch(MPath(verts, codes), facecolor=fc, edgecolor="#374151", lw=0.5, hatch=hatch,
                                zorder=1 if k == "casting" else 3, alpha=1.0))
-        if name:
-            ys = [p[0] for r in rings for p in r]
-            zs = [p[1] for r in rings for p in r]
-            cy, cz = (min(ys) + max(ys)) / 2, (min(zs) + max(zs)) / 2
-            if xl[0] < cy < xl[1] and yl[0] < cz < yl[1]:
-                ax.annotate(name, (cy, cz), (cy + 14, cz + 9), fontsize=8, color=INK, zorder=6,
-                            arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6))
+    for k, xy, txt_xy, txt in LABELS[key]:
+        if R.get(k):
+            ax.annotate(txt, xy, txt_xy, fontsize=8.5, color=INK, zorder=6, ha="center",
+                        bbox=dict(boxstyle="square,pad=0.15", fc="white", ec="none", alpha=0.85),
+                        arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6))
     ax.axhline(0, color="#9b1c1c", lw=0.6, ls=(0, (12, 3, 2, 3)), zorder=4)
     ax.set_aspect("equal")
     ax.set_xlim(*xl)
