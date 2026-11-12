@@ -17,10 +17,10 @@ parts:
   - {role: 整流桥 10 A 600 V, mpn: GBU1006, maker: LGE, lcsc: C5183365}
   # —— 功率因数校正 ——
   - {role: 连续导通功率因数校正控制器, mpn: ICE3PCS01G, maker: Infineon, lcsc: C192050, kicad: 'Regulator_Controller:ICE3PCS01'}
-  - {role: 升压开关管 600 V 180 mΩ, mpn: IPA60R180P7S, maker: Infineon, lcsc: C2916134}
+  - {role: 升压开关管 600 V 60 mΩ（TO-247）, mpn: IPW60R060P7, maker: Infineon, lcsc: C454258, note: 159b 由 IPA60R180P7S 换来（FullPAK 散不掉 18.7 W）}
   - {role: 升压二极管（碳化硅 6 A 600 V）, mpn: C3D06060A, maker: Wolfspeed (Cree), lcsc: C5693025}
   - {role: 升压电感, custom: true, spec_from: 159b 计算书}
-  - {role: 母线电容 330 µF 500 V, mpn: 500MXH330MEFCSN30X50, maker: Rubycon, lcsc: C472902}
+  - {role: 母线电容 330 µF 500 V（3 只）, mpn: 500MXH330MEFCSN30X50, maker: Rubycon, lcsc: C472902, note: 159b 由 2 只改 3 只（纹波电流 3.75 A > 2 × 1.81 A）}
   # —— 逆变 ——
   - {role: 智能功率模块（三相，14 A 600 V，带热敏电阻）, mpn: STGIPS14K60T, maker: STMicroelectronics, lcsc: C5268145, kicad: 'Transistor_Power_Module:STGIPS14K60T'}
   - {role: 三相下桥采样电阻 25 mΩ 2512, mpn: WSLT2512R0250FEA, maker: Vishay, lcsc: C4210426}
@@ -32,8 +32,9 @@ parts:
   # —— 主控与接口 ——
   - {role: 主控, mpn: STM32G431CBT6, maker: STMicroelectronics, lcsc: C529355, note: 沿用关节驱动板（片内三路运放采电流、比较器过流）, kicad: 'MCU_ST_STM32G4:STM32G431CBTx'}
   - {role: 编码器与针位信号施密特整形, mpn: SN74LVC14APWR, maker: Texas Instruments, lcsc: C7663}
-  - {role: 电磁铁驱动管 40 V, mpn: AOD4184A, maker: Alpha & Omega, lcsc: C99124}
-  - {role: 电磁铁关断钳位, mpn: SMBJ33A, maker: Littelfuse, lcsc: C224019}
+  - {role: 电磁铁驱动管 80 V, mpn: BSC040N08NS5, maker: Infineon, lcsc: C534333, note: 159b 由 AOD4184A（40 V）换来：钳位后漏极 57 V}
+  - {role: 电磁铁关断钳位稳压管, mpn: SMBJ24A, maker: Littelfuse, lcsc: C224017, note: 159b 由 SMBJ33A 换来（与二极管串联跨在线圈上）}
+  - {role: 电磁铁续流二极管、24 V 整流管, mpn: ES3D, maker: onsemi, lcsc: C241735}
   - {role: 针距步进驱动, mpn: TMC2226-SA, maker: ADI / Trinamic, lcsc: C6718351, kicad: 'Driver_Motor:TMC2226-SA'}
   - {role: 面板口数字隔离, mpn: ADUM1201ARZ-RL7, maker: Analog Devices, lcsc: C9669, kicad: 'Isolator:ADuM1201AR'}
   - {role: 面板口隔离电源 5 V→5 V 1 W, mpn: B0505S-1WR2, maker: YLPTEC, lcsc: C2992393}
