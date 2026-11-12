@@ -381,10 +381,10 @@ def fill_zones(board):
 
 
 def classes_of(x):
-    """L4 网络分类 → 布线器要的 {类名: (线宽, 间距, [网络], [层]?)}"""
+    """L4 网络分类 → 布线器要的 {类名: (线宽, 间距, [网络], [层]?)}；分类写了 route_mm 时布线按它（布完再加宽，见 route_fit）"""
     out = {}
     for c in x.get("net_classes") or []:
-        spec = (c["track_mm"], c["clearance_mm"], list(c["nets"]))
+        spec = (c.get("route_mm") or c["track_mm"], c["clearance_mm"], list(c["nets"]))
         out[c["name"]] = spec + (list(c["layers"]),) if c.get("layers") else spec
     return out
 

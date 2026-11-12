@@ -262,8 +262,24 @@ def board_build(route, jar):
     os.makedirs(TMP, exist_ok=True)
     stats = None
     if route:
-        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep,
-                               pairs=gb.pairs_of(D.X), timeout=3000)
+        from wqeda.gen import route_fit as RF
+        cls = {n: c["name"] for c in D.X["net_classes"] for n in c["nets"]}
+        own = {c["name"]: c["clearance_mm"] for c in D.X["net_classes"]}
+        want = {frozenset((a, b)): c for a, b, c in gb.pairs_of(D.X)}
+
+        def class_of(net):
+            return cls.get(net, "Default")
+
+        def clearance(na, nb):
+            a, b = class_of(na), class_of(nb)
+            return want.get(frozenset((a, b)), max(own.get(a, 0.2), own.get(b, 0.2)))
+
+        pairs, notes = RF.clamp_pairs(gb.pairs_of(D.X), RF.pad_gaps(board, class_of))
+        for a, b, c, r, ref in notes:
+            print("布线间距 {}↔{}：要求 {:g} mm，{} 自己引脚只隔 {:.2f}，布线用 {:g}（安全距离另查）".format(a, b, c, ref, r + 0.05, r))
+        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep, pairs=pairs, timeout=3000)
+        targets = {n: c["track_mm"] for c in D.X["net_classes"] if c.get("route_mm") for n in c["nets"]}
+        print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance))
     board.BuildConnectivity()
     gb.fill_zones(board)
     pcbnew().SaveBoard(path, board)

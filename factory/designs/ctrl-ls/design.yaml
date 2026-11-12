@@ -204,27 +204,33 @@ board:
   # 组和组之间要多大写在 class_pairs 里——只给一个分类整体设大间距时，它自己的电阻两脚（1206 脚间 1.6 mm）都“违规”，布线器接不上
   # （第八次 59 处没连上大多是这个）。真正的安全要求由安全距离检查（safety.yaml）按铜间距量，这里的数比它略大一点留余量
   net_classes:
-  - {name: AC_L, track_mm: 2.5, clearance_mm: 0.5, nets: [L_IN, L_F, L_C, L_R], layers: [F.Cu, B.Cu]}
-  - {name: AC_N, track_mm: 2.5, clearance_mm: 0.5, nets: [N_IN, N_C], layers: [F.Cu, B.Cu]}
+  - {name: AC_L, track_mm: 2.5, route_mm: 1.2, clearance_mm: 0.5, nets: [L_IN, L_F, L_C, L_R], layers: [F.Cu, B.Cu]}
+  - {name: AC_N, track_mm: 2.5, route_mm: 1.2, clearance_mm: 0.5, nets: [N_IN, N_C], layers: [F.Cu, B.Cu]}
   - {name: PE, track_mm: 1.5, clearance_mm: 0.5, nets: [PE], layers: [F.Cu, B.Cu]}
-  - {name: HV, track_mm: 2.0, clearance_mm: 0.5, nets: [VBUS, VRECT, SW_PFC, MOT_U, MOT_V, MOT_W], layers: [F.Cu, B.Cu]}
-  - {name: HVSig, track_mm: 0.5, clearance_mm: 0.5, nets: [XDIS, BRO_A, BRO_B, TOP_V1, TOP_V, FLY_D, CLAMP, CLAMP_M, VSENSE_1, VSENSE_2,
+  - {name: HV, track_mm: 2.0, route_mm: 1.2, clearance_mm: 0.5, nets: [VBUS, VRECT, SW_PFC, MOT_U, MOT_V, MOT_W], layers: [F.Cu, B.Cu]}
+  - {name: HVSig, track_mm: 0.5, clearance_mm: 0.5, nets: [XDIS, BRO_A, BRO_B, TOP_V1, FLY_D, CLAMP, CLAMP_M, VSENSE_1, VSENSE_2,
                                                        OVP_1, OVP_2, VBUS_SNS_1, VBUS_SNS_2],
      layers: [F.Cu, B.Cu]}
   # 自举电容的两根线（上桥浮地，跟着电机相线跳到 390 V）：模块脚距 2.35 mm，同组之间 0.5
   - {name: Boot, track_mm: 0.5, clearance_mm: 0.5, nets: [OUT_U, OUT_V, OUT_W, VB_U, VB_V, VB_W], layers: [F.Cu, B.Cu]}
   # 整流桥负端到采样电阻：电流大但电位贴着地（弱电一侧）
-  - {name: Return, track_mm: 2.0, clearance_mm: 0.3, nets: [RECT_N], layers: [F.Cu, B.Cu]}
-  - {name: Power, track_mm: 1.0, clearance_mm: 0.3, nets: [+24V, +15V, N_U, N_V, N_W, SOL1_D, SOL2_D, SOL3_D, SOL4_D, SOL1_K, SOL2_K,
-                                                       SOL3_K, SOL4_K, STP_OA1, STP_OA2, STP_OB1, STP_OB2, FLY_24, FLY_15, FLY_5, +5V],
+  - {name: Return, track_mm: 2.0, route_mm: 1.2, clearance_mm: 0.3, nets: [RECT_N], layers: [F.Cu, B.Cu]}
+  # 功率模块下桥采样端（电流大、电位贴着地）；单列是因为它们和电机相线在模块上相邻（脚间 1.7 mm）
+  - {name: Shunt, track_mm: 1.0, clearance_mm: 0.3, nets: [N_U, N_V, N_W], layers: [F.Cu, In2.Cu, B.Cu]}
+  # 功率模块的输入脚、15 V：和自举脚在模块上相邻，单列（只在模块旁边按引脚间距放宽，见 route_fit）
+  - {name: IpmIn, track_mm: 0.3, clearance_mm: 0.2, nets: [IN_UH, IN_UL, IN_VH, IN_VL, IN_WH, IN_WL]}
+  - {name: Vcc15, track_mm: 0.6, route_mm: 0.4, clearance_mm: 0.2, nets: [+15V, FLY_15], layers: [F.Cu, In2.Cu, B.Cu]}
+  # 步进驱动 HTSSOP 脚距 0.65 mm（焊盘 0.4）：布线先用 0.3 mm 进脚，布完加宽
+  - {name: Power, track_mm: 1.0, route_mm: 0.3, clearance_mm: 0.2, nets: [+24V, SOL1_D, SOL2_D, SOL3_D, SOL4_D, SOL1_K, SOL2_K,
+                                                       SOL3_K, SOL4_K, STP_OA1, STP_OA2, STP_OB1, STP_OB2, FLY_24, FLY_5, +5V],
      layers: [F.Cu, In2.Cu, B.Cu]}
-  - {name: Ground, track_mm: 0.4, clearance_mm: 0.2, nets: [GND, GND_ISO]}
+  - {name: Ground, track_mm: 0.4, route_mm: 0.25, clearance_mm: 0.2, nets: [GND, GND_ISO]}
   # 组和组之间的布线间距（Default = 其余网络）；安全距离规则（safety.yaml 示例值）：相线↔零线 2.5、高压↔弱电 2.0、保护地 4.0
   class_pairs:
   - {a: [AC_L], b: [AC_N], clearance_mm: 2.6}
   - {a: [AC_L, AC_N], b: [HV, HVSig, Boot], clearance_mm: 1.5}
-  - {a: [AC_L, AC_N, HV, HVSig, Boot], b: [Return, Power, Ground, Default], clearance_mm: 2.2}
-  - {a: [PE], b: [AC_L, AC_N, HV, HVSig, Boot, Return, Power, Ground, Default], clearance_mm: 4.2}
+  - {a: [AC_L, AC_N, HV, HVSig, Boot], b: [Return, Shunt, IpmIn, Vcc15, Power, Ground, Default], clearance_mm: 2.2}
+  - {a: [PE], b: [AC_L, AC_N, HV, HVSig, Boot, Return, Shunt, IpmIn, Vcc15, Power, Ground, Default], clearance_mm: 4.2}
   placement:
     BR101: [71.67, 2.88, 0, F]
     C40: [66.94, 126.48, 0, F]
