@@ -455,11 +455,33 @@ cadmd = f"""# 三维装配与装配示意图
 
 部件 SA-000（箱体合镗）、SA-100 / 200 / 300（三根轴部件）各有自己的物料清单，见“设计与工艺”页的“本厂物料”。
 """
+LIBP = [L.lib_part("A-BRG-DG", b_) for b_ in ("6205", "6206", "6207")] + [
+    L.lib_part("A-KEY-FLAT", "6x6x25"), L.lib_part("A-KEY-FLAT", "10x8x28"), L.lib_part("A-KEY-FLAT", "12x8x45"), L.lib_part("A-KEY-FLAT", "8x7x63"),
+    L.lib_part("A-SEL-LIP", "20x40x7"), L.lib_part("A-SEL-LIP", "35x52x8"), L.lib_part("A-BLT-HEX", "M12x110"), L.lib_part("A-NUT-HEX", "M12"),
+    L.lib_part("A-WSH-PLN", "M12"), L.lib_part("A-PIN-TAPER", "8x35"), L.lib_part("A-PLG-HEX", "M16x1.5"), L.lib_part("A-SCR-SHC", "M8x25")]
+lib_bad = [b_ for b_ in ("6205", "6206", "6207") if any(float(L.lib_part("A-BRG-DG", b_)["row"][k + "_mm"]) != mdstd.bearing(b_)[k] for k in ("d", "D", "B"))]
+cadmd += f"""
+## 用到的零件库零件
+
+物料清单里的标准件逐个在问渠零件库里对上编号：
+
+{L.lib_md(LIBP, {"A-BRG-DG/6205": "输入轴 ×2", "A-BRG-DG/6206": "中间轴 ×2", "A-BRG-DG/6207": "输出轴 ×2", "A-KEY-FLAT/6x6x25": "输入轴伸",
+                 "A-KEY-FLAT/10x8x28": "中间轴两只齿轮", "A-KEY-FLAT/12x8x45": "输出轴齿轮", "A-KEY-FLAT/8x7x63": "输出轴伸（案例 A，C 型同截面）",
+                 "A-SEL-LIP/20x40x7": "输入端油封", "A-SEL-LIP/35x52x8": "输出端油封", "A-BLT-HEX/M12x110": "箱座箱盖联接 ×6",
+                 "A-NUT-HEX/M12": "×6", "A-WSH-PLN/M12": "×6", "A-PIN-TAPER/8x35": "定位销 ×2", "A-PLG-HEX/M16x1.5": "放油螺塞",
+                 "A-SCR-SHC/M8x25": "轴承端盖 ×24"})}
+
+- 六只轴承的尺寸与计算用表 {'一致' if not lib_bad else '不一致：' + '、'.join(lib_bad)}；额定动载荷零件库没录，取《机械设计手册》表（教材 `std/gbt276_6200.yaml`）。
+- **零件库里没有的**：物料清单写端盖螺栓“BOLT-M8x25（六角头）”，零件库的六角头螺栓（GB/T 5782，部分螺纹）最短 M8×40，没有 M8×25；
+  本案例改用零件库里的内六角圆柱头螺钉 M8×25，物料清单要跟着改（或者零件库补 GB/T 5783 全螺纹六角头螺栓）。
+- 透气塞、油标（VENT-M16、GAUGE-M12）零件库还没有，按外购件处理。
+"""
+case.check("cad", "轴承尺寸与零件库一致", "Bearing dimensions match the parts library", len(lib_bad), "==", 0, "", "零件库 A-BRG-DG")
 case.step("cad", f"三根轴、四只齿轮、六只轴承按新布置装成三维；装配示意图标出跨距 {SPAN:g} mm；物料清单 {len(bom_rows)} 行。",
           f"Three shafts, four gears and six bearings assembled in 3D to the new layout; layout sketch with the {SPAN:g} mm span; {len(bom_rows)}-line BOM.",
           md=case.text("5_三维与装配.md", cadmd),
           figs=[("5_三维装配.png", "WQR-105 内部三维（不含箱体）", "WQR-105 internals in 3D (housing hidden)"), ("5_装配示意图.png", "装配示意图（俯视展开）", "Layout sketch (developed plan view)")],
-          files=[("WQR-105-内部.step", "内部三维 STEP", "Internals (STEP)")], tools=tools("library", "design", "3d"),
+          files=[("WQR-105-内部.step", "内部三维 STEP", "Internals (STEP)")], tools=tools("design", "3d") + L.lib_tools(LIBP[:3]),
           facts=[("跨距", "Span", SPAN, "mm"), ("物料清单", "BOM lines", len(bom_rows), "")])
 
 # ================================================================ 6 装配工艺

@@ -327,15 +327,28 @@ cadmd = f"""# 三维模型与零件图
   体积 {solid.volume / 1e3:.1f} cm³，40Cr 质量 **{mass:.2f} kg**，总长 {S.LEN_B:g} mm，最大直径 Ø48（毛坯 Ø50 够用）。
 - **零件图**：轴承位 Ø35 k6、齿轮位 Ø40 r6（与齿轮孔 H7 过盈）、密封段 Ø35 f9、外伸段 Ø30 k6；轴承位、齿轮位 Ra 0.8 磨削；
   以两个轴承位为公共基准 A–B，轴承位、齿轮位径向圆跳动和齿轮定位端面（轴环左端面）圆跳动；两个键槽断面 C–C、D–D。
-- 标准件全部来自零件库：轴承 6207（A-BRG-DG）、平键（A-KEY-FLAT）、唇形油封（A-SEL-LIP）。
 - 下载：STEP 模型可直接在 FreeCAD、SolidWorks 打开，也可以在“仿真与分析”里上传复算。
 
 {L.md_table(["轴段", "直径", "长度", "公差带", "作用"], [[i + 1, f"Ø{d:g}", f"{Lseg:g}", tol or "—", name] for i, (d, Lseg, name, tol) in enumerate(S.SEG_B)])}
 """
+LIBP = [L.lib_part("A-BRG-DG", "6207"), L.lib_part("A-KEY-FLAT", f"{kA['b']}x{kA['h']}x{S.L_KEY_GEAR}"),
+        L.lib_part("A-KEY-FLAT", f"{mdstd.key_for(30)['b']}x{mdstd.key_for(30)['h']}x{S.L_KEY_CPL}"), L.lib_part("A-SEL-LIP", "35x52x8")]
+lb = LIBP[0]["row"]
+lib_same = all(float(lb[k + "_mm"]) == brg[k] for k in ("d", "D", "B"))
+cadmd += f"""
+## 用到的零件库零件
+
+标准件都从问渠零件库里选，三维、图纸、物料清单里用同一个编号：
+
+{L.lib_md(LIBP, {"A-BRG-DG/6207": "两端轴承（BRG-6207）", LIBP[1]['ref']: "齿轮处", LIBP[2]['ref']: "外伸段（零件库是 A 型，这里用 C 型同截面）", "A-SEL-LIP/35x52x8": "密封段 Ø35 f9"})}
+
+轴承尺寸与计算用表（GB/T 276）{'一致' if lib_same else '不一致，要查'}；零件库的 6207 没有录额定动载荷，第 3 步的 C = {brg['C_kN']} kN 取自《机械设计手册》深沟球轴承表（教材 `std/gbt276_6200.yaml`）。
+"""
+case.check("cad", "轴承尺寸与零件库一致", "Bearing dimensions match the parts library", 1 if lib_same else 0, "==", 1, "", "零件库 A-BRG-DG")
 case.step("cad", f"七段、{len(S.FILLET_B)} 处圆角、两个键槽；质量 {mass:.2f} kg；零件图带公差、跳动、粗糙度和两个键槽断面。",
           f"Seven steps, {len(S.FILLET_B)} fillets, two keyways; {mass:.2f} kg; drawing with fits, run-out, roughness and keyway sections.",
           md=case.text("5_三维与图纸.md", cadmd), figs=[("5_三维.png", "SH-301 B 版三维模型", "SH-301 rev B 3D model"), ("5_零件图.svg", "零件图（生成）", "Part drawing (generated)")],
-          files=[("SH-301-B.step", "三维模型 STEP", "3D model (STEP)"), ("5_零件图.svg", "零件图 SVG", "Part drawing (SVG)")], tools=tools("engineer", "library", "design"),
+          files=[("SH-301-B.step", "三维模型 STEP", "3D model (STEP)"), ("5_零件图.svg", "零件图 SVG", "Part drawing (SVG)")], tools=tools("engineer", "design") + L.lib_tools(LIBP),
           facts=[("质量", "Mass", mass, "kg"), ("总长", "Length", S.LEN_B, "mm")])
 case.check("cad", "最大直径不超过毛坯（Ø50 圆钢）", "Largest diameter within the Ø50 bar stock", 48.0, "<=", 48.0, "mm", "任务书")
 

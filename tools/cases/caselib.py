@@ -267,7 +267,7 @@ def shaft_drawing(segs, keyways, fillets, *, item, title, material, rev, tech, c
 
 
 # ---------------------------------------------------------------- 三维效果图
-def render_solid(solid, path, elev=30, azim=-72, color=(0.80, 0.84, 0.88), size=(9, 3.4)):
+def render_solid(solid, path, elev=30, azim=-72, color=(0.80, 0.84, 0.88), size=(9, 3.4), swap=True):
     """build123d 实体 → 简单明暗的三维效果图（matplotlib）。"""
     import numpy as np
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -282,7 +282,8 @@ def render_solid(solid, path, elev=30, azim=-72, color=(0.80, 0.84, 0.88), size=
     sh = 0.55 + 0.45 * np.abs(n @ light)
     cols = np.clip(np.outer(sh, color), 0, 1)
     # 轴线沿 z：画图时换成水平
-    tri = tri[:, :, [2, 0, 1]]
+    if swap:                                    # 轴类零件（轴线沿 z）横着画；机器人等按原坐标（z 向上）
+        tri = tri[:, :, [2, 0, 1]]
     fig = plt.figure(figsize=size)
     ax = fig.add_subplot(111, projection="3d")
     ax.add_collection3d(Poly3DCollection(tri, facecolors=cols, edgecolors="none", linewidths=0))
@@ -341,11 +342,13 @@ def cpk(values, lo, hi, one_sided=False):
 def shop_table(meas):
     """测量值 → (表格行, 最低 Cpk, 不合格数, 各特性)。属性特性（上下限都是 0，如“磨削烧伤 0 无 1 有”）只数不合格，不算 Cpk。"""
     by = {}
+    multi = len({m["item"] for m in meas}) > 1
     for m in meas:
-        by.setdefault((m["characteristic"], m["name"], m["lower_tol_mm"], m["upper_tol_mm"]), []).append(m["value_mm"])
+        by.setdefault((m["item"], m["characteristic"], m["name"], m["lower_tol_mm"], m["upper_tol_mm"]), []).append(m["value_mm"])
     rows, low, stats = [], math.inf, {}
     fails = sum(1 for m in meas if m["result"] != "pass")
-    for (cid, name, lo, hi), vals in by.items():
+    for (item, cid, name, lo, hi), vals in by.items():
+        name = f"{item} {name}" if multi else name
         if lo == hi:
             bad = sum(1 for v in vals if v != lo)
             rows.append([name, f"{lo:g}", len(vals), f"不合格 {bad} 件", "—", "—（属性特性）"])
@@ -353,8 +356,60 @@ def shop_table(meas):
         one = lo == 0
         mu, sd, c = cpk(vals, lo, hi, one)
         low = min(low, c)
-        stats[cid] = dict(name=name, mean=mu, sd=sd, cpk=c, lo=lo, hi=hi)
-        unit = "μm" if "Ra" in name else "mm"
-        sd_s = f"{sd:.3f} μm" if unit == "μm" else f"{sd * 1000:.1f} μm"
+        stats[cid if not multi else (item, cid)] = dict(name=name, mean=mu, sd=sd, cpk=c, lo=lo, hi=hi)
+        # 公差带窄（尺寸、形位，mm）时标准差写成 μm；其余（力矩、角秒、粗糙度……）按这个特性自己的单位
+        sd_s = f"{sd * 1000:.1f} μm" if (hi - lo) <= 0.1 and "Ra" not in name else f"{sd:.3g}"
         rows.append([name, f"{lo:g}–{hi:g}" if not one else f"≤ {hi:g}", len(vals), f"{mu:.4f}", sd_s, f"{c:.2f}{'（单边）' if one else ''}"])
     return rows, low, fails, stats
+
+
+# ---------------------------------------------------------------- 问渠零件库（library/catalog）：案例里的标准件、外购件都从这里选
+LIBCAT = ROOT / "library" / "catalog"
+
+
+def _lib_entry(eid):
+    import csv
+    import functools  # noqa: F401
+    import yaml
+    d = LIBCAT / eid[0] / eid
+    e = yaml.safe_load((d / "entry.yaml").read_text(encoding="utf-8"))
+    rows = {}
+    with (d / "specs.csv").open(encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            rows[r["size"]] = r
+    return e, rows
+
+
+_LIB = {}
+
+
+def lib_part(eid, size):
+    """零件库里的一个规格：{id, size, ref, name, name_en, row（specs.csv 一行）}；零件库没有就报错（不编）"""
+    if eid not in _LIB:
+        _LIB[eid] = _lib_entry(eid)
+    e, rows = _LIB[eid]
+    if size not in rows:
+        raise KeyError(f"零件库 {eid} 没有规格 {size}")
+    nm = e.get("name") or {}
+    return {"id": eid, "size": size, "ref": f"{eid}/{size}", "name": nm.get("zh", eid), "name_en": nm.get("en", eid), "row": rows[size]}
+
+
+def lib_tools(parts):
+    """零件库页面按钮：/library?ref=<编号>/<规格>（零件库页直接打开这个规格）"""
+    seen, out = set(), []
+    for p in parts:
+        if p["ref"] in seen:
+            continue
+        seen.add(p["ref"])
+        out.append((f"零件库：{p['size']}", f"Library: {p['size']}", f"/library?ref={p['ref']}"))
+    return out
+
+
+def lib_md(parts, use=None):
+    """“用到的零件库零件”表：编号、名称、规格、主要尺寸（零件库原样）、用在哪"""
+    use = use or {}
+    rows = []
+    for p in parts:
+        dims = "，".join(f"{k.replace('_mm', '')} {v}" for k, v in p["row"].items() if k.endswith("_mm") and v)[:70]
+        rows.append([f"`{p['ref']}`", p["name"], p["size"], dims, use.get(p["ref"], "")])
+    return md_table(["零件库编号", "名称", "规格", "主要尺寸（mm，零件库）", "用在"], rows)

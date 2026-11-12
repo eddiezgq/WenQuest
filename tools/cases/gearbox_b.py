@@ -336,13 +336,23 @@ cadmd = f"""# 三维模型与零件图
 - **零件图**：轴向全剖视、啮合参数表（模数、齿数、精度等级、跨齿数和公法线长度及偏差——车间用公法线千分尺检验）、技术要求。
 - 三维效果图把两只齿轮按中心距 {A_FIX:g} 放在啮合位置。
 """
+LIBP = [L.lib_part("A-KEY-FLAT", "10x8x40"), L.lib_part("A-KEY-FLAT", "12x8x45")]
+cadmd += f"""
+## 用到的零件库零件
+
+{L.lib_md(LIBP, {"A-KEY-FLAT/10x8x40": "GR-203 与中间轴（轮毂宽 50）", "A-KEY-FLAT/12x8x45": "GR-302 与输出轴（轮毂宽 55，案例 A）"})}
+
+键槽宽、毂槽深 t₂ 取零件库（GB/T 1095）：GR-203 孔径 + t₂ = 35 + {LIBP[0]['row']['t2_mm']}，GR-302 = 40 + {LIBP[1]['row']['t2_mm']}，和两张零件图一致。
+"""
+key_ok = abs(35 + float(LIBP[0]["row"]["t2_mm"]) - 38.3) < 1e-6 and abs(40 + float(LIBP[1]["row"]["t2_mm"]) - 43.3) < 1e-6
+case.check("cad", "毂槽深与零件库（GB/T 1095）一致", "Hub keyway depth matches the parts library", 1 if key_ok else 0, "==", 1, "", "零件库 A-KEY-FLAT")
 case.step("cad", f"展成齿形直接拉伸成三维；GR-203 约 {m1:.2f} kg，GR-302 约 {m2:.1f} kg；两张零件图带啮合参数表和公法线检验尺寸。",
           f"The generated tooth outline is extruded into 3D; GR-203 about {m1:.2f} kg, GR-302 about {m2:.1f} kg; two drawings with gear data tables and span measurements.",
           md=case.text("5_三维与图纸.md", cadmd),
           figs=[("5_三维.png", "齿轮副三维（中心距 135 啮合位置）", "3D gear pair at 135 mm centre distance"),
                 ("5_GR-203零件图.svg", "GR-203 零件图（生成）", "GR-203 drawing (generated)"), ("5_GR-302零件图.svg", "GR-302 零件图（生成）", "GR-302 drawing (generated)")],
           files=[("GR-203.step", "GR-203 三维 STEP", "GR-203 3D model (STEP)"), ("GR-302.step", "GR-302 三维 STEP", "GR-302 3D model (STEP)")],
-          tools=tools("library", "design"), facts=[("GR-203 质量", "GR-203 mass", m1, "kg"), ("GR-302 质量", "GR-302 mass", m2, "kg")])
+          tools=tools("design") + L.lib_tools(LIBP), facts=[("GR-203 质量", "GR-203 mass", m1, "kg"), ("GR-302 质量", "GR-302 mass", m2, "kg")])
 
 # ================================================================ 6 工艺
 from hub import process as PR  # noqa: E402
