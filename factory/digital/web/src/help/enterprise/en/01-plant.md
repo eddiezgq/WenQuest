@@ -2,6 +2,16 @@
 
 > Hand in one Excel file: company, workstations, where each machine stands, operations, shifts, targets. The digital factory, ERPNext and the 3D shop are all built from it.
 
+## Editing on the web (process engineers, plant managers)
+
+At the top of [Design & process](/work/engineer) is “Plant manifest (Excel)”:
+
+1. **Download the manifest in use**: get the Excel of the manifest the plant runs on now (the same format as the template generated on the command line below);
+2. **Edit it in Excel**: add a product, change BOM quantities, routing minutes, prices…;
+3. **Upload the edited manifest**: the platform checks it on the spot and names the sheet and row of any error; if it passes it lists what changed against the manifest in use (items, BOMs, operations and products added / removed / changed) and saves it as a “pending manifest”.
+
+A pending manifest is not in effect yet: for now the implementation team downloads its yaml and takes it live with step 3 below; one-click go-live from the web (creating new items in ERPNext too, keeping the old manifest for rollback) comes in the next phase.
+
 ## Three steps
 
 ```anim
