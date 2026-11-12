@@ -239,8 +239,25 @@ def pair_budgets():
         dict(name="两根镗杆各自的导向套对主轴 0.002", range=2 * math.sqrt(2) * 0.002, kind="rand"),
         dict(name="两根镗杆弯曲之差", range=0.002, kind="sys"),
     ]
+    # G4.6 送布摆轴两孔同轴度 Ø0.04（摆动轴、含油轴套，摆角 ±6°）：前孔 x 33…47 在 B 0° 从左端壁 Ø16 工艺孔伸进去镗，
+    # 后孔 x 296…311 在 B 180° 从右端壁、右横筋的 Ø16 工艺孔伸进去镗；两孔各自定位，中间经转台分度
+    coax_feed = [
+        dict(name="转台分度 180° ±3″：后孔离转台中心 {:.0f}".format(abs(303.5 - X_TABLE)), range=2 * s3 * abs(303.5 - X_TABLE), kind="rand"),
+        dict(name="X、Y 轴定位精度 ±0.004（两孔各一次）", range=2 * math.sqrt(2) * 0.004, kind="rand"),
+        dict(name="两次对刀（镗杆偏心标定）±0.002", range=2 * math.sqrt(2) * 0.002, kind="rand"),
+        dict(name="镗杆让刀（Ø12 硬质合金减振杆，前孔伸出 152、后孔 116；半精镗后精镗余量 0.15，按 0.003 计）", range=2 * 0.003, kind="sys"),
+        dict(name="热漂移（两次镗孔间隔约 8 min）", range=0.004, kind="sys"),
+    ]
+    # G4.6 抬牙摆轴两孔同轴度 Ø0.03：都在 B 0° 从左端壁 Ø18 工艺孔进去，先镗后孔 Ø14（刀从前孔铸出的 Ø15 里穿过），再镗前孔 Ø16
+    coax_lift = [
+        dict(name="X、Y 轴定位重复性 ±0.002（两把刀各一次）", range=2 * math.sqrt(2) * 0.002, kind="rand"),
+        dict(name="两次对刀 ±0.002", range=2 * math.sqrt(2) * 0.002, kind="rand"),
+        dict(name="后孔镗杆让刀（Ø12 杆伸出 212，按 0.004 计）", range=2 * 0.004, kind="sys"),
+        dict(name="热漂移", range=0.002, kind="sys"),
+    ]
     out = {}
     for name, items, T in (("针杆孔对旋梭轴孔 位置度 Ø0.05", needle_hook, 0.05), ("针杆孔对上轴孔 B 位置度 Ø0.05", needle_b, 0.05),
+                           ("送布摆轴两孔同轴度 Ø0.04", coax_feed, 0.04), ("抬牙摆轴两孔同轴度 Ø0.03", coax_lift, 0.03),
                            ("上轴两孔同轴度 Ø0.02", coax_up, 0.02),
                            ("下轴两孔同轴度 Ø0.02", coax_low, 0.02), ("齿轮中心距 31.058 ± 0.015", centre, 0.03),
                            ("上轴中心高 262 ± 0.05（对 A）", height, 0.10), ("上轴对下轴平行度 0.03/300", par, 0.03)):

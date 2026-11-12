@@ -104,7 +104,9 @@ def frames(step=2):
                  feed_rock=rot_x(math.degrees(FP["beta"][i] - FP["beta"][0]), *g["Fr"]),
                  feed_bar=rigid(f0["T"], f0["dog"], fi["T"], fi["dog"]),
                  lift_link=rigid(f0["EL"], f0["D"], fi["EL"], fi["D"]),
-                 lift_rock=rot_x(math.degrees(FP["gam"][i] - FP["gam"][0]), *g["Lr"]))
+                 lift_rock=rot_x(math.degrees(FP["gam"][i] - FP["gam"][0]), *g["Lr"]),
+                 oil_ecc=low,                                                           # 油泵偏心（偏心 0.4，φ = 0 朝下）
+                 oil_plunger=trans(0.0, 0.4 * (1 - math.cos(phi * DEG))))              # 柱塞跟着偏心最下点上下
         # 面线：A → 线眼 → B → 针杆线钩 → 针眼（x 取各自所在平面）
         tip = Bv + ZU - X["nb_below"] - X["tip_below"]
         Ey, Ez = w(lp["E"])

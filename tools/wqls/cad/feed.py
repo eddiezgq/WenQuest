@@ -2,8 +2,8 @@
 
 位置来自 g4_feed.py 的综合结果（docs/设计/WQ-LS/G4/送布机构.json 的 poses.s3，φ = 0 时的位置；3 mm 正缝）。
 所有运动都在垂直于 x 的平面里，x 是层：
-  送布偏心、送布连杆 x 327…335；调节器板 x 318…326；滑块和销 x 318…342；水平连杆 L2、送布摆轴曲柄 x 336…342；
-  送布摆轴 Ø10（x 22…342），前端摆杆 x 28…32；牙架 x 23.5…27.5，送布牙在针两边；
+  送布偏心、送布连杆 x 327…335；调节器板 x 311…319；滑块和销 x 311…335；水平连杆 L2 x 320…326；送布摆轴曲柄 x 313…319；
+  送布摆轴 Ø10（x 22…320），前端摆杆 x 28…32；牙架 x 23.6…27.5，送布牙在针两边；
   抬牙偏心、抬牙连杆 x 108…116，抬牙曲柄 x 116…122；抬牙摆轴 Ø10（x 15…122），叉子 x 19…23。
 转动类别：'upper' 随上轴、'lower' 随下轴、'plane' 平面运动（变换由 g4_mech.py 按两点给出）、None 不动。
 """
@@ -21,8 +21,10 @@ FEED = json.load(open(os.path.join(ROOT, "docs", "设计", "WQ-LS", "G4", "送�
 SET = os.environ.get("WQ_FEED", "s3")
 P0 = FEED["poses"][SET]
 GEO, PAR = FEED["geo"], FEED["params"]
-X = dict(ecc=(327.0, 335.0), reg=(318.0, 326.0), link=(335.6, 341.6), farm=(28.0, 32.0), bar=(23.5, 27.5),
-         lecc=(108.0, 116.0), lcrank=(116.0, 122.0), fork=(19.0, 23.0), rock=(22.0, 342.0), lrock=(15.0, 122.0))
+# 一转干涉检查后（G4.6）：L2 原在 x 335.6…341.6，过下轴同步带轮（x 337.9 起）的下沿 → 移到调节器板和送布连杆之间；
+# 牙架原从 x 23.5 起，离旋梭 0.97 → 23.6
+X = dict(ecc=(327.0, 335.0), reg=(311.0, 319.0), link=(320.0, 326.0), farm=(28.0, 32.0), bar=(23.6, 27.5),
+         lecc=(108.0, 116.0), lcrank=(116.0, 122.0), fork=(19.0, 23.0), rock=(22.0, 320.0), lrock=(15.0, 122.0))
 
 
 def at0(key):
@@ -64,13 +66,13 @@ def build():
     plate = plate.cut(slot)
     plate.rotate(V(0, 0, 0), V(1, 0, 0), ang)
     plate.translate(V(0, *G))
-    plate = plate.fuse(xcyl(4.0, 298.0, X["reg"][0], *G))            # 调节器轴 Ø8（装在立柱下左横筋的座里，x 297…310）
+    plate = plate.fuse(xcyl(4.0, 297.5, X["reg"][0], *G))            # 调节器轴 Ø8（装在立柱下左横筋的座里，x 297…310）
     P["regulator"] = (plate, "metal", "steel", None)
     # ---- 滑块（在调节器槽里）＋ 销（穿过送布连杆小头、L2 一端）
     blk = Part.makeBox(X["reg"][1] - X["reg"][0], 9.0, 6.6, V(X["reg"][0], -4.5, -3.3))
     blk.rotate(V(0, 0, 0), V(1, 0, 0), ang)
     blk.translate(V(0, *Pp))
-    blk = blk.fuse(xcyl(2.95, X["reg"][0], X["link"][1], *Pp))
+    blk = blk.fuse(xcyl(2.95, X["reg"][0], max(X["link"][1], X["ecc"][1]), *Pp))      # 销穿过调节器滑块、L2、送布连杆小头
     P["reg_slider"] = (blk, "metal", "steel", "plane")
     # ---- 水平连杆 L2（P → C）
     l2 = bar2d(Pp, C, 8.0, X["link"]).cut(xcyl(3.0, X["link"][0] - 1, X["link"][1] + 1, *Pp)).cut(
@@ -84,6 +86,11 @@ def build():
     # ---- 牙架：从 T 到叉子处的滑块 K，宽 5（z），在 x 23.5…27.5；前端滑块销伸到叉子层
     bar = bar2d(T, (K[0], T[1] + (K[1] - T[1])), 5.0, X["bar"])
     bar = bar.cut(xcyl(2.5, X["bar"][0] - 1, X["bar"][1] + 1, *T))
+    # 牙架下面在旋梭轴（Ø10，顶 z −16.5）上方让开：轴 ±5、送布行程 ±2.7、余量 → 让开 y ±9.5（按一转里牙架的平均位置），底面抬高 1.5
+    ty_mean = sum(t[0] for t in P0["T"]) / len(P0["T"])
+    yn = 0.0 - (ty_mean - T[0])                                               # 旋梭轴线 y 0 在这一位置的牙架上对应的 y
+    zc0 = T[1] + (K[1] - T[1]) * (yn - T[0]) / (K[0] - T[0])                  # 牙架中线在那里的高度
+    notch = Part.makeBox(X["bar"][1] - X["bar"][0] + 2, 19.0, 4.0, V(X["bar"][0] - 1, yn - 9.5, zc0 - 2.5 - 2.5))
     bar = bar.fuse(xcyl(2.45, X["fork"][0], X["bar"][0], K[0], T[1] + (K[1] - T[1])))
     # ---- 送布牙（框式）：三排牙在针两边（x −6.5…−3.5、3.5…6.5、9…12），y −12…12，高 2.5；两端往下接侧梁
     zt, yd = dog[1], dog[0]
@@ -102,7 +109,7 @@ def build():
             Part.makeBox(19.0, 1.0, 10.0, V(-6.5, yl_ - 0.1, zb1 - 1))))
     # 侧梁接到牙架：牙架在 y −14.3…14.3 处往上加高到侧梁顶
     rows = rows.fuse(Part.makeBox(X["bar"][1] - X["bar"][0], 28.6, zb1 - (T[1] - 2.5), V(X["bar"][0], yd - 14.3, T[1] - 2.5)))
-    P["feed_bar"] = (bar.fuse(rows), "chrome", "steel", "plane")
+    P["feed_bar"] = (bar.fuse(rows).cut(notch), "chrome", "steel", "plane")
     # ---- 抬牙偏心（下轴上，孔 Ø12）
     lec = xcyl(10.0, *X["lecc"], *EL).cut(xcyl(6.0, X["lecc"][0] - 1, X["lecc"][1] + 1, *O2))
     P["lift_ecc"] = (lec, "metal", "steel", "lower")
@@ -118,7 +125,23 @@ def build():
     fork = bar2d(Lr, (Kp[0] - 4.0, Kp[1]), 8.0, X["fork"]).fuse(Part.makeBox(X["fork"][1] - X["fork"][0], 14.0, 10.0, V(X["fork"][0], Kp[0] - 7.0, Kp[1] - 5.0)))
     fork = fork.cut(Part.makeBox(X["fork"][1] - X["fork"][0] + 2, 16.0, 5.0, V(X["fork"][0] - 1, Kp[0] - 8.0, Kp[1] - 2.5)))
     P["lift_rock"] = (lr.fuse(fork), "metal", "steel", "plane")
+    # ---- 油泵（G4.6 第三节）：下轴上的泵偏心（偏心 0.4、外 r7，x 290…296），往下顶柱塞 Ø3（行程 0.8，弹簧压着跟随）；
+    #      泵体 x 289…300、y 21…35、z −62…−46，用两个 M4 螺钉固定在立柱脚下左横筋（x 300…307）的左面；进油管往下伸进油盘
+    yl, zl = O2
+    oe = OIL["e"]
+    P["oil_ecc"] = (xcyl(7.0, 290.0, 296.0, yl, zl - oe).cut(xcyl(6.0, 289.0, 297.0, yl, zl)), "metal", "steel", "lower")
+    ztop = zl - oe - 7.0                                                      # 柱塞顶（φ = 0 时偏心在最下面，柱塞压到最低）
+    pl = Part.makeCylinder(4.0, 1.5, V(293.0, yl, ztop - 1.5)).fuse(Part.makeCylinder(1.5, 10.5, V(293.0, yl, ztop - 12.0)))
+    P["oil_plunger"] = (pl, "metal", "steel", "plane")
+    body = Part.makeBox(11.0, 14.0, 16.0, V(289.0, yl - 7.0, -62.0))
+    body = body.cut(Part.makeCylinder(1.55, 12.0, V(293.0, yl, -58.0))).cut(Part.makeCylinder(4.5, 4.0, V(293.0, yl, -50.0)))
+    body = body.fuse(Part.makeCylinder(2.5, 12.0, V(293.0, yl, -74.0)))               # 进油管（单向阀在泵体里）伸进油盘
+    body = body.fuse(Part.makeCylinder(2.0, 6.0, V(293.0, yl + 7.0, -56.0), V(0, 1, 0)))   # 出油接头（往后接油管上立柱）
+    P["oil_pump"] = (body, "metal", "steel", None)
     return P
+
+
+OIL = dict(e=0.4)
 
 
 RHO = dict(steel=7.85e-6, alu=2.75e-6)

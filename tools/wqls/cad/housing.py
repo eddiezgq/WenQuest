@@ -355,9 +355,13 @@ def feed_seats(hollow, solid, info):
     """G4.6 机座里的送布组支承（cad/feed.py 的零件装在这里；位置来自 G4/送布机构.json 的 geo）：
     ① 送布摆轴（y 76、z −40）：前座 x 34…46（Ø20 凸台，一道 6 mm 的筋接机座顶板），后座在立柱下的左横筋（x 300…307）上，
        筋上加 Ø20 凸台 x 297…310；孔 Ø14 H7 装含油轴套 Ø10 × Ø14；
-    ② 抬牙摆轴（y −45、z −28）：两个座 x 25…37、x 96…106（Ø20 凸台，一道 6 mm 的筋接前壁）；孔 Ø14 H7；
+    ② 抬牙摆轴（y −45、z −28）：两个座 x 25…37（Ø24 凸台，孔 Ø16 H7）、x 96…106（Ø20 凸台，孔 Ø14 H7），各一道 6 mm 的筋接前壁；
+       前孔比后孔大一档，后孔的镗刀才能从前孔（铸出 Ø15）里穿过去；
     ③ 调节器轴（y 0、z −50）：左横筋上 Ø18 凸台 x 297…310，孔 Ø10 H7 装含油轴套 Ø8 × Ø10；
-    ④ 机座顶板在立柱脚里开送布连杆过孔 x 326…339、y −10…12。"""
+    ④ 机座顶板在立柱脚里开送布连杆过孔 x 326…339、y −10…12；
+    ⑤ 机座顶板底面在抬牙叉子上方 x 18…24、y −39…−22 铸出 1.3 深的让位槽；
+    ⑥ 工艺孔（合件工序 70 的镗杆、铰刀从这里伸进去，加工完压碗形堵盖、涂密封胶）：
+       左端壁 Ø16（送布摆轴前孔）、Ø18（抬牙摆轴两孔）；右横筋和右端壁 Ø16（送布摆轴后孔）、Ø14（调节器孔）。"""
     g = json.load(open(os.path.join(os.path.dirname(_tkj), "送布机构.json"), encoding="utf-8"))["geo"]
     (fy, fz), (ly, lz), (gy, gz) = g["Fr"], g["Lr"], g["G"]
     top = Part.makeBox(600, 400, 3.0, V(-200, -200, -BEDWALL - 1.0))
@@ -365,22 +369,31 @@ def feed_seats(hollow, solid, info):
     feats.append(Part.makeCylinder(10, 12, V(34, fy, fz), V(1, 0, 0)).fuse(Part.makeBox(12, 6, -fz, V(34, fy - 3, fz))))
     feats.append(Part.makeCylinder(10, 13, V(297, fy, fz), V(1, 0, 0)))
     feats.append(Part.makeCylinder(9, 13, V(297, gy, gz), V(1, 0, 0)))
-    for x0, L in ((25.0, 12.0), (96.0, 10.0)):
-        feats.append(Part.makeCylinder(10, L, V(x0, ly, lz), V(1, 0, 0)).fuse(Part.makeBox(L, ly - (BED["y0"] - 1.0), 6, V(x0, BED["y0"] - 1.0, lz - 3))))
+    for x0, L, r_ in ((25.0, 12.0, 12.0), (96.0, 10.0, 10.0)):
+        feats.append(Part.makeCylinder(r_, L, V(x0, ly, lz), V(1, 0, 0)).fuse(Part.makeBox(L, ly - (BED["y0"] - 1.0), 6, V(x0, BED["y0"] - 1.0, lz - 3))))
     for f_ in feats:
         hollow = fuse_fillet(hollow, f_.fuse(top.common(Part.makeBox(f_.BoundBox.XLength, f_.BoundBox.YLength, 3.0,
                                                                      V(f_.BoundBox.XMin, f_.BoundBox.YMin, -BEDWALL - 1.0)))).common(solid))
     if not FEA_SIMPLE:
         for x0, L in ((33.0, 14.0), (296.0, 15.0)):
             hollow = hollow.cut(Part.makeCylinder(7.0, L, V(x0, fy, fz), V(1, 0, 0)))          # 送布摆轴孔 Ø14 H7
-        for x0, L in ((24.0, 14.0), (95.0, 12.0)):
-            hollow = hollow.cut(Part.makeCylinder(7.0, L, V(x0, ly, lz), V(1, 0, 0)))          # 抬牙摆轴孔 Ø14 H7
+        for x0, L, r_ in ((24.0, 14.0, 8.0), (95.0, 12.0, 7.0)):
+            hollow = hollow.cut(Part.makeCylinder(r_, L, V(x0, ly, lz), V(1, 0, 0)))           # 抬牙摆轴孔 前 Ø16 H7、后 Ø14 H7
         hollow = hollow.cut(Part.makeCylinder(5.0, 15, V(296, gy, gz), V(1, 0, 0)))             # 调节器轴孔 Ø10 H7
+        # 工艺孔（见 ⑥）
+        for y_, z_, r_ in ((fy, fz, 8.0), (ly, lz, 9.0)):
+            hollow = hollow.cut(Part.makeCylinder(r_, 10, V(-107, y_, z_), V(1, 0, 0)))
+        hollow = hollow.cut(Part.makeCylinder(8.0, 27, V(387, fy, fz), V(1, 0, 0)))
+        hollow = hollow.cut(Part.makeCylinder(7.0, 27, V(387, gy, gz), V(1, 0, 0)))
     rod = Part.makeBox(13, 22, 20, V(326, -10, -15))
     rod = rod.makeFillet(4, [e for e in rod.Edges if e.BoundBox.ZLength > 19])
     hollow = hollow.cut(rod)                                                                    # 送布连杆过孔
-    info["feed_seats"] = dict(feed_rock=dict(axis=(fy, fz), x=[(34, 46), (297, 310)], d=14), lift_rock=dict(axis=(ly, lz), x=[(25, 37), (96, 106)], d=14),
-                              regulator=dict(axis=(gy, gz), x=(297, 310), d=10), rod_hole=dict(x=(326, 339), y=(-10, 12)))
+    # 一转干涉检查：抬牙叉子头最高到 z −5.5，机座顶板底面 −5.6 → 顶板底面在叉子上方铸出 1.3 深的让位槽（顶板这里剩 4.3）
+    hollow = hollow.cut(Part.makeBox(6.0, 17.0, 1.3, V(18.0, -39.0, -BEDWALL - 0.01)))
+    info["feed_seats"] = dict(feed_rock=dict(axis=(fy, fz), x=[(34, 46), (297, 310)], d=14), lift_rock=dict(axis=(ly, lz), x=[(25, 37), (96, 106)], d=[16, 14]),
+                              regulator=dict(axis=(gy, gz), x=(297, 310), d=10), rod_hole=dict(x=(326, 339), y=(-10, 12)),
+                              fork_relief=dict(x=(18, 24), y=(-39, -22), depth=1.3),
+                              process_holes=dict(left_wall=dict(d16=(fy, fz), d18=(ly, lz)), right=dict(d16=(fy, fz), d14=(gy, gz))))
     return hollow
 
 

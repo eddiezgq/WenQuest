@@ -47,6 +47,7 @@ WCS = {"B0": "G54", "B180": "G55", "B270": "G56", "UP": "G57", "DOWN_HEAD": "G58
 BVAL = {"B0": 0, "B180": 180, "B270": 270, "UP": 0, "DOWN_HEAD": 0, "TOPARM": 0, "UNDER": 0, "LB0": 0}
 PINS = ((315.8, 7.0), (380.2, 66.0))          # 工艺孔 / 锥销孔（G5.2 第二个由 y 47 移到 66）
 YL, ZL, ZH = 27.791774943072237, -35.36485983577417, -21.5
+FEED = json.loads((Path(__file__).resolve().parents[2] / "docs" / "设计" / "WQ-LS" / "G4" / "送布机构.json").read_text(encoding="utf-8"))["geo"]   # G4.6
 
 
 def to_frame(frame, p):
@@ -147,11 +148,24 @@ def pair_hmc():
     ops.append(op("B0 精铣面板口端面", "B0", 2, "面铣刀 Ø63", 63, 200, face_rows(-72, 50, -82, 60, 63, 0.0, 0.08 * 5 * r)))
     hx, hy, _ = to_frame("LB0", (-105.0, 0.0, ZH))
     r = rpm(120, 13.7)
-    ops.append(op("B0 阶梯镗杆半精镗旋梭轴孔 Ø13.7（从左端壁 Ø20 孔伸进去，孔在 x 24…66）", "LB0", 23, "阶梯镗杆 Ø13.7", 13.7, 120,
-                  cam.bore([(hx, hy)], 66 + 105, 0.10 * r, r_plane=-(24 + 105 - 2)), kind="linebar"))
+    ops.append(op("B0 阶梯镗杆半精镗旋梭轴孔 Ø13.7（从左端壁 Ø20 孔伸进去，孔在 x 30…66；G4.6 轴座左端由 24 缩到 30）", "LB0", 23, "阶梯镗杆 Ø13.7", 13.7, 120,
+                  cam.bore([(hx, hy)], 66 + 105, 0.10 * r, r_plane=-(30 + 105 - 2)), kind="linebar"))
     r = rpm(140, 14)
-    ops.append(op("B0 精镗旋梭轴孔 Ø14 H7", "LB0", 24, "阶梯精镗杆 Ø14", 14, 140, cam.bore([(hx, hy)], 66 + 105, 0.05 * r, r_plane=-(24 + 105 - 2)),
+    ops.append(op("B0 精镗旋梭轴孔 Ø14 H7", "LB0", 24, "阶梯精镗杆 Ø14", 14, 140, cam.bore([(hx, hy)], 66 + 105, 0.05 * r, r_plane=-(30 + 105 - 2)),
                   kind="linebar"))
+    # G4.6 送布组的孔（B 0°：从左端壁的工艺孔伸进去）
+    fx, fy_, _ = to_frame("LB0", (-105.0, *FEED["Fr"]))
+    gx, gy_, _ = to_frame("LB0", (-105.0, *FEED["Lr"]))
+    for d_, vc_, fz_, tno in ((13.7, 120, 0.10, 33), (14.0, 140, 0.05, 34)):
+        r = rpm(vc_, d_)
+        ops.append(op(f"B0 摆轴镗杆 Ø{d_:g} 镗送布摆轴前孔（x 33…47，左端壁 Ø16 工艺孔进）", "LB0", tno, f"摆轴镗杆 Ø{d_:g}", d_, vc_,
+                      cam.bore([(fx, fy_)], 47 + 105 + 1, fz_ * r, r_plane=-(33 + 105 - 2)), kind="linebar"))
+        ops.append(op(f"B0 摆轴镗杆 Ø{d_:g} 镗抬牙摆轴后孔（x 95…107，穿过前孔铸出的 Ø15）", "LB0", tno, f"摆轴镗杆 Ø{d_:g}", d_, vc_,
+                      cam.bore([(gx, gy_)], 107 + 105 + 1, fz_ * r, r_plane=-(95 + 105 - 2)), kind="linebar"))
+    for d_, vc_, fz_, tno in ((15.7, 120, 0.10, 35), (16.0, 140, 0.05, 36)):
+        r = rpm(vc_, d_)
+        ops.append(op(f"B0 摆轴镗杆 Ø{d_:g} 镗抬牙摆轴前孔（x 24…38，左端壁 Ø18 工艺孔进）", "LB0", tno, f"摆轴镗杆 Ø{d_:g}", d_, vc_,
+                      cam.bore([(gx, gy_)], 38 + 105 + 1, fz_ * r, r_plane=-(24 + 105 - 2)), kind="linebar"))
     r = rpm(140, 34.7)
     ops.append(op("B0 同轴半精镗上轴两孔 Ø34.7 / Ø31.7（程序按前刀编）", "B0", 25, "同轴半精镗杆", 31.7, 140,
                   [{"t": "comment", "text": "右导向套支架翻上；压板油压降到 40%（M 代码由夹具 PLC 处理）"}]
@@ -173,6 +187,19 @@ def pair_hmc():
     r = rpm(150, 32)
     ops.append(op("B180 下轴同轴精镗两孔 Ø32 H7", "B180", 27, "下轴精镗杆", 32, 150,
                   cam.bore([(lx, ly)], 408 - 88 + 1, 0.06 * r, r_plane=-(408 - 106), safe=10), kind="linebar"))
+    # G4.6 B 180°：送布摆轴后孔、调节器孔（从右端壁、右横筋的工艺孔伸进去）
+    bx, by, _ = to_frame("B180", (412.0, *FEED["Fr"]))
+    for d_, vc_, fz_, tno in ((13.7, 120, 0.10, 33), (14.0, 140, 0.05, 34)):
+        r = rpm(vc_, d_)
+        ops.append(op(f"B180 摆轴镗杆 Ø{d_:g} 镗送布摆轴后孔（x 296…311，右端壁、右横筋 Ø16 工艺孔进）", "B180", tno, f"摆轴镗杆 Ø{d_:g}", d_, vc_,
+                      cam.bore([(bx, by)], 408 - 296 + 1, fz_ * r, r_plane=-(408 - 313), safe=10), kind="linebar"))
+    cx, cy, _ = to_frame("B180", (412.0, *FEED["G"]))
+    r = rpm(70, 9.7)
+    ops.append(op("B180 加长钻 Ø9.7 调节器轴孔（x 296…311，Ø14 工艺孔进）", "B180", 37, "加长钻头 Ø9.7", 9.7, 70,
+                  cam.drill([(cx, cy)], 408 - 296 + 1, 0, 0.12 * r, r_plane=-(408 - 313), safe=10), kind="linebar"))
+    r = rpm(12, 10)
+    ops.append(op("B180 加长铰刀 Ø10 H7 铰调节器轴孔", "B180", 38, "加长铰刀 Ø10 H7", 10, 12,
+                  cam.bore([(cx, cy)], 408 - 296 + 1, 0.2 * r, r_plane=-(408 - 313), safe=10), kind="linebar"))
     # 工序 80：螺纹孔
     r = rpm(60, 4.2)
     mh = [to_frame("B180", p)[:2] for p in [(408.0, 14.142, 214.142), (408.0, -14.142, 214.142), (408.0, -14.142, 185.858), (408.0, 14.142, 185.858)]]

@@ -323,6 +323,15 @@ def pair_sheet(step_u: Path, step_l: Path) -> Sheet:
     sh.gdt(fv.at((408, 0, ZU - 20)), (pm[0] + 10, pm[1] + 30), "⊥", "0.02", "B")
     pd = lv.at((0, YL, ZL - 16))
     sh.leader_note(pd, (pd[0] - 95, pd[1] + 26), "下轴两孔 2 × Ø32 H7，公共轴线 D，◎ Ø0.02 D；D ∥ B 0.03/300")
+    # G4.6 送布组的孔：送布摆轴 F、抬牙摆轴 L、调节器轴（在左视图上标轴线位置）
+    import json as _json
+    _g = _json.loads((Path(__file__).resolve().parents[2] / "docs" / "设计" / "WQ-LS" / "G4" / "送布机构.json").read_text(encoding="utf-8"))["geo"]
+    for key, txt, dx, dy in (("Fr", f"{spec(c, 'P22')}；公共轴线 F，◎ Ø0.04 F", 20, 30), ("Lr", f"{spec(c, 'P24')}；公共轴线 L，◎ Ø0.03 L", -110, 34),
+                             ("G", spec(c, "P26"), -100, 50)):
+        y_, z_ = _g[key]
+        sh.center_mark(lv, (0, y_, z_), 6)
+        pf = lv.at((0, y_, z_))
+        sh.leader_note(pf, (pf[0] + dx, pf[1] + dy), txt)
     sh.roughness(fv.at((40, 0, ZU + 17.5)), "Ra 1.6")
     sh.roughness(fv.at((45, 0, ZH + 7)), "Ra 1.6")
     sh.roughness_rest((505, 42), "Ra 12.5")
@@ -334,6 +343,8 @@ def pair_sheet(step_u: Path, step_l: Path) -> Sheet:
         "（针杆孔在上件工序 50 精铰），使针杆轴线与旋梭轴线、B 垂直相交，位置度 Ø0.05。",
         "螺孔：电机座 4 × M5-6H ↧9（PCD 40），面板口 4 × M4-6H ↧7，前窗口 6 × M4-6H ↧7，顶盖 4 × M4-6H ↧3。",
         "左端壁 2 × Ø20、右端壁与两道横筋 Ø34 为镗杆过孔，装配后用橡胶堵堵上。",
+        "送布组（G4.6）：F、L、调节器轴孔对旋梭轴孔 E 的位置 ± 0.1，F、L ∥ D 0.05/100；左端壁 Ø16、Ø18，右端壁 Ø16、Ø14 为镗杆工艺孔，"
+        "加工后压碗形堵盖（DIN 443，涂厌氧密封胶）。",
     ], (390, 285))
     return sh
 

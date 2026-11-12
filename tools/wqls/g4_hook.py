@@ -34,7 +34,11 @@ ALPHA_STOP = T_MOTOR_PEAK / _row["J_total"]                              # ① �
 ALPHA_RIPPLE = (_row["ripple_pct"] / 100 / 2) * W * (2 * 2 * math.pi * N / 60)   # ② 转速波动（幅值 = 峰峰值的一半，频率 2 倍转频）
 ALPHA_PEAK = ALPHA_STOP + ALPHA_RIPPLE
 T_FRIC_HOOK = 0.02                   # N·m（旋梭轴上）
-T_PUMP_LIFT = 0.05                   # N·m（下轴上：油泵、抬牙偏心，G4.6 再核）
+# G4.6 核过：抬牙链 5 mm 针距时下轴力矩最大 0.053 N·m（G4/送布动力.json T_low_max），油泵冷机 73 kPa × 柱塞面积 × 偏心 0.4 ≈ 0.0002 N·m
+_FD = ROOT / "docs" / "设计" / "WQ-LS" / "G4" / "送布动力.json"
+_FDJ = __import__("json").loads(_FD.read_text()) if _FD.exists() else None
+T_PUMP_LIFT = max(0.05, (_FDJ["s5"]["summary"]["T_low_max"] + 0.001) if _FDJ else 0.05)   # N·m（下轴上：油泵、抬牙偏心）
+F_LIFT_LINK = _FDJ["s5"]["strength"]["lift_link"]["F_max_N"] if _FDJ and "strength" in _FDJ["s5"] else 0.0   # 抬牙连杆力，加在抬牙偏心 x 112
 BRG_6201 = S.BRG_6201
 BELT_ALLOW_N = 300.0                 # HTD 3M 宽 15 的许用拉力（MiSUMi 经济型目录：6 mm 136 N、15 mm 309 N），取 300
 BELT_T0 = 20.0                       # 安装张力（每边）N
@@ -122,6 +126,10 @@ def main():
     xp, xg = S.X_BELT, 76.0
     R2 = (F_belt * (xp - xb1) - F_gear * (xb1 - xg)) / (xb2 - xb1)
     R1 = F_belt + F_gear - R2
+    # G4.6：抬牙偏心（x 112）上的抬牙连杆力，方向不定，两个支反力按同号叠加（偏保守）
+    x_le = 112.0
+    R1 = abs(R1) + F_LIFT_LINK * (xb2 - x_le) / (xb2 - xb1)
+    R2 = abs(R2) + F_LIFT_LINK * (x_le - xb1) / (xb2 - xb1)
     life = {}
     for name, R in (("左 6201", abs(R1)), ("右 6201", abs(R2))):
         P = max(R, 10.0)
@@ -132,8 +140,8 @@ def main():
     tau = 16 * T_low_peak * 1000 / (math.pi * 12 ** 3)
     S_fat = 280.0 / math.sqrt((sig_b * 1.8) ** 2 + 3 * (tau * 1.5) ** 2)   # 45 钢调质 σ-1 ≈ 280 MPa，Kσ 1.8、Kτ 1.5（卡簧槽）
     n_crit = shaft_critical((70.0, 384.0), 12.0, (xb1, xb2), [(76.0, ms["m"]["gear_lower"]), (S.X_BELT, ms["m"]["pulley_lower"])])
-    # 旋梭轴：两个铜套（x 26–40、50–64，内径 10），齿轮在 76（悬伸），旋梭在 x 12 附近（悬伸）
-    xa, xb = 33.0, 57.0
+    # 旋梭轴：两个铜套（x 32–46、50–64，内径 10；G4.6 左套由 26 右移到 32，cad/hook.py X_BUSH），齿轮在 76（悬伸），旋梭在 x 12 附近（悬伸）
+    xa, xb = 39.0, 57.0
     Fg = math.hypot(Ft_peak, Fr_peak)
     F_hook = ms["m"]["hook"] * 9.81 + 5.0                  # 旋梭自重 + 线环拉力（几牛）
     Rb = (Fg * (76.0 - xa) + F_hook * (xa - 12.0)) / (xb - xa)

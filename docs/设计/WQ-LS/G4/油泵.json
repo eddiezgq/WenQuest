@@ -1,0 +1,116 @@
+{
+ "pump": {
+  "e_mm": 0.4,
+  "stroke_mm": 0.8,
+  "d_plunger_mm": 3.0,
+  "eta_v": 0.7,
+  "V_rev_mm3": 5.65,
+  "Q_mL_min": 19.8,
+  "a_max_ms2": 109.7,
+  "spring_preload_N": 0.62
+ },
+ "run_40C_VG10": {
+  "lines": [
+   {
+    "line": "泵 → 立柱（Ø4 × 1 铜管（内径 2），机座里 + 立柱里）",
+    "d_mm": 2.0,
+    "L_m": 0.75,
+    "Q_mL_min": 19.79,
+    "v_ms": 0.105,
+    "Re": 21.0,
+    "dp_kPa": 5.42
+   },
+   {
+    "line": "分油块 → 上轴前轴承（Ø2 尼龙管）",
+    "d_mm": 1.2,
+    "L_m": 0.4,
+    "Q_mL_min": 4.95,
+    "v_ms": 0.073,
+    "Re": 8.8,
+    "dp_kPa": 5.57
+   },
+   {
+    "line": "分油块 → 上轴后轴承",
+    "d_mm": 1.2,
+    "L_m": 0.1,
+    "Q_mL_min": 2.97,
+    "v_ms": 0.044,
+    "Re": 5.2,
+    "dp_kPa": 0.84
+   },
+   {
+    "line": "分油块 → 针杆、挑线油毡",
+    "d_mm": 1.2,
+    "L_m": 0.45,
+    "Q_mL_min": 4.95,
+    "v_ms": 0.073,
+    "Re": 8.8,
+    "dp_kPa": 6.27
+   }
+  ],
+  "lift_kPa": 2.53,
+  "p_pump_kPa": 14.22,
+  "F_plunger_N": 0.101,
+  "P_hydraulic_mW": 4.69
+ },
+ "cold_20C_VG22": {
+  "lines": [
+   {
+    "line": "泵 → 立柱（Ø4 × 1 铜管（内径 2），机座里 + 立柱里）",
+    "d_mm": 2.0,
+    "L_m": 0.75,
+    "Q_mL_min": 19.79,
+    "v_ms": 0.105,
+    "Re": 3.5,
+    "dp_kPa": 32.51
+   },
+   {
+    "line": "分油块 → 上轴前轴承（Ø2 尼龙管）",
+    "d_mm": 1.2,
+    "L_m": 0.4,
+    "Q_mL_min": 4.95,
+    "v_ms": 0.073,
+    "Re": 1.5,
+    "dp_kPa": 33.44
+   },
+   {
+    "line": "分油块 → 上轴后轴承",
+    "d_mm": 1.2,
+    "L_m": 0.1,
+    "Q_mL_min": 2.97,
+    "v_ms": 0.044,
+    "Re": 0.9,
+    "dp_kPa": 5.02
+   },
+   {
+    "line": "分油块 → 针杆、挑线油毡",
+    "d_mm": 1.2,
+    "L_m": 0.45,
+    "Q_mL_min": 4.95,
+    "v_ms": 0.073,
+    "Re": 1.5,
+    "dp_kPa": 37.63
+   }
+  ],
+  "lift_kPa": 2.53,
+  "p_pump_kPa": 72.67,
+  "F_plunger_N": 0.514,
+  "P_hydraulic_mW": 23.97
+ },
+ "hook": {
+  "needle_valve_mm3_min": [
+   0.0,
+   30.0
+  ],
+  "share_of_pump_max": 0.0015,
+  "dp_kPa_cold": 0.315,
+  "note": "旋梭供油：泵出口分一路，经针阀（调节螺钉在机座底下）到旋梭轴中心 Ø2.5 孔；针阀全关不供油，全开约 1.8 mL/h"
+ },
+ "checks": {
+  "flow_ok": true,
+  "cold_pressure_ok": true,
+  "laminar_ok": true,
+  "spring_ok": true
+ },
+ "all_ok": true
+}

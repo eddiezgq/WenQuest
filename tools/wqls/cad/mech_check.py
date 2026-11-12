@@ -48,7 +48,13 @@ JOINT = {frozenset(p) for p in [
     ("hook_shaft", "bushes_hook"), ("casting", "bushes_hook"), ("gear_hook", "hook_shaft"), ("hook", "hook_shaft"),
     ("gear_hook", "gear_lower"),          # 啮合（齿侧间隙另算）
     ("hook", "bobbin_case"),              # 梭芯套装在旋梭里（梭床导轨配合）
-    ("needle", "hook")]}                  # 梭尖与机针的间隙是设计的 0.08，单独核对（G4.5 计算书），不按 1 mm 要求
+    ("needle", "hook"),                   # 梭尖与机针的间隙是设计的 0.08，单独核对（G4.5 计算书），不按 1 mm 要求
+    # G4.6 送布组：偏心与轴、连杆大头与偏心；同一根销上的几件（P：送布连杆小头、调节器滑块、L2；C：L2、摆轴曲柄；T：摆轴摆杆、牙架）；
+    # 滑块在调节器槽里；牙架前端滑块销在抬牙叉槽里；抬牙偏心与下轴、抬牙连杆，抬牙连杆与抬牙曲柄
+    ("feed_ecc", "shaft"), ("feed_ecc", "feed_rod"), ("feed_rod", "reg_slider"), ("feed_rod", "feed_link"), ("reg_slider", "feed_link"),
+    ("regulator", "reg_slider"), ("feed_link", "feed_rock"), ("feed_rock", "feed_bar"), ("feed_bar", "lift_rock"),
+    ("lift_ecc", "lower_shaft"), ("lift_ecc", "lift_link"), ("lift_link", "lift_rock"),
+    ("oil_ecc", "lower_shaft"), ("oil_ecc", "oil_plunger"), ("oil_plunger", "oil_pump"), ("casting", "oil_pump")]}
 
 
 def mat(m):
