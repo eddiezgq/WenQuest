@@ -52,16 +52,16 @@ def build():
     E, Pp, C, T, D, K, EL, dog = (at0(k) for k in ("E", "P", "C", "T", "D", "K", "EL", "dog"))
     Fr, Lr, G = GEO["Fr"], GEO["Lr"], GEO["G"]
     # ---- 送布偏心（上轴上，孔 Ø16）
-    ecc = xcyl(11.0, *X["ecc"], *E).cut(xcyl(8.0, X["ecc"][0] - 1, X["ecc"][1] + 1, *O1))
+    ecc = xcyl(13.0, *X["ecc"], *E).cut(xcyl(8.0, X["ecc"][0] - 1, X["ecc"][1] + 1, *O1))   # Ø26：孔 Ø16 偏 3，最薄处壁厚 2（Ø22 时为 0）
     P["feed_ecc"] = (ecc, "metal", "steel", "upper")
-    # ---- 送布连杆：大头套在偏心上（外 r15、内 r11.05），杆身 8 宽，小头 r6 带 Ø6 销孔
-    rod = bar2d(E, Pp, 8.0, X["ecc"]).fuse(xcyl(15.0, *X["ecc"], *E)).fuse(xcyl(6.0, *X["ecc"], *Pp))
-    rod = rod.cut(xcyl(11.05, X["ecc"][0] - 1, X["ecc"][1] + 1, *E)).cut(xcyl(3.0, X["ecc"][0] - 1, X["ecc"][1] + 1, *Pp))
+    # ---- 送布连杆：大头套在偏心上（外 r17、内 r13.05），杆身 8 宽，小头 r6 带 Ø6 销孔
+    rod = bar2d(E, Pp, 8.0, X["ecc"]).fuse(xcyl(17.0, *X["ecc"], *E)).fuse(xcyl(6.0, *X["ecc"], *Pp))
+    rod = rod.cut(xcyl(13.05, X["ecc"][0] - 1, X["ecc"][1] + 1, *E)).cut(xcyl(3.0, X["ecc"][0] - 1, X["ecc"][1] + 1, *Pp))
     P["feed_rod"] = (rod, "metal", "alu", "plane")          # 铝合金压铸（ADC12），杆长 250，钢的 141 g 惯性力太大
     # ---- 调节器板：绕 G 转到调节器角（这一档），中间滑槽沿 u；板 20 × 16，槽 7 宽
     u = P0["u"]
     ang = math.degrees(math.atan2(u[1], u[0]))
-    plate = Part.makeBox(X["reg"][1] - X["reg"][0], 22.0, 16.0, V(X["reg"][0], -11.0, -8.0))
+    plate = Part.makeBox(X["reg"][1] - X["reg"][0] - 0.2, 22.0, 16.0, V(X["reg"][0], -11.0, -8.0))     # 厚 7.8：离 L2 1.2
     slot = Part.makeBox(X["reg"][1] - X["reg"][0] + 2, 15.0, 7.0, V(X["reg"][0] - 1, -7.5, -3.5))
     plate = plate.cut(slot)
     plate.rotate(V(0, 0, 0), V(1, 0, 0), ang)
@@ -93,7 +93,9 @@ def build():
     notch = Part.makeBox(X["bar"][1] - X["bar"][0] + 2, 19.0, 4.0, V(X["bar"][0] - 1, yn - 9.5, zc0 - 2.5 - 2.5))
     bar = bar.fuse(xcyl(2.45, X["fork"][0], X["bar"][0], K[0], T[1] + (K[1] - T[1])))
     # ---- 送布牙（框式）：三排牙在针两边（x −6.5…−3.5、3.5…6.5、9…12），y −12…12，高 2.5；两端往下接侧梁
-    zt, yd = dog[1], dog[0]
+    # 牙排、侧梁以一转里牙的平均位置对准针（y 0）：机构综合出的牙点平均在 y −1.8（一转干涉检查发现侧梁偏前，离针板下开口只剩 0.48）
+    zt = dog[1]
+    yd = dog[0] - sum(q[0] for q in P0["dog"]) / len(P0["dog"])
     rows = None
     for x0, x1 in ((-6.5, -3.5), (3.5, 6.5), (9.0, 12.0)):
         r_ = Part.makeBox(x1 - x0, 24.0, 2.5, V(x0, yd - 12.0, zt - 2.5))
@@ -126,15 +128,15 @@ def build():
     fork = fork.cut(Part.makeBox(X["fork"][1] - X["fork"][0] + 2, 16.0, 5.0, V(X["fork"][0] - 1, Kp[0] - 8.0, Kp[1] - 2.5)))
     P["lift_rock"] = (lr.fuse(fork), "metal", "steel", "plane")
     # ---- 油泵（G4.6 第三节）：下轴上的泵偏心（偏心 0.4、外 r7，x 290…296），往下顶柱塞 Ø3（行程 0.8，弹簧压着跟随）；
-    #      泵体 x 289…300、y 21…35、z −62…−46，用两个 M4 螺钉固定在立柱脚下左横筋（x 300…307）的左面；进油管往下伸进油盘
+    #      泵体 x 289…300、y 21…35、z −62…−47，用两个 M4 螺钉固定在立柱脚下左横筋（x 300…307）的左面；进油管往下伸进油盘
     yl, zl = O2
     oe = OIL["e"]
-    P["oil_ecc"] = (xcyl(7.0, 290.0, 296.0, yl, zl - oe).cut(xcyl(6.0, 289.0, 297.0, yl, zl)), "metal", "steel", "lower")
-    ztop = zl - oe - 7.0                                                      # 柱塞顶（φ = 0 时偏心在最下面，柱塞压到最低）
+    P["oil_ecc"] = (xcyl(8.0, 290.0, 296.0, yl, zl - oe).cut(xcyl(6.0, 289.0, 297.0, yl, zl)), "metal", "steel", "lower")   # 最薄处壁厚 1.6
+    ztop = zl - oe - 8.0                                                      # 柱塞顶（φ = 0 时偏心在最下面，柱塞压到最低）
     pl = Part.makeCylinder(4.0, 1.5, V(293.0, yl, ztop - 1.5)).fuse(Part.makeCylinder(1.5, 10.5, V(293.0, yl, ztop - 12.0)))
     P["oil_plunger"] = (pl, "metal", "steel", "plane")
-    body = Part.makeBox(11.0, 14.0, 16.0, V(289.0, yl - 7.0, -62.0))
-    body = body.cut(Part.makeCylinder(1.55, 12.0, V(293.0, yl, -58.0))).cut(Part.makeCylinder(4.5, 4.0, V(293.0, yl, -50.0)))
+    body = Part.makeBox(11.0, 14.0, 15.0, V(289.0, yl - 7.0, -62.0))
+    body = body.cut(Part.makeCylinder(1.55, 12.0, V(293.0, yl, -58.0))).cut(Part.makeCylinder(4.5, 4.0, V(293.0, yl, -51.0)))
     body = body.fuse(Part.makeCylinder(2.5, 12.0, V(293.0, yl, -74.0)))               # 进油管（单向阀在泵体里）伸进油盘
     body = body.fuse(Part.makeCylinder(2.0, 6.0, V(293.0, yl + 7.0, -56.0), V(0, 1, 0)))   # 出油接头（往后接油管上立柱）
     P["oil_pump"] = (body, "metal", "steel", None)

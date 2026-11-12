@@ -143,7 +143,7 @@ def strength(FD, FP, KIN, dog, vd, above, w, dphi, P_foot, mu, F_rod):
                            P_euler_N=round(math.pi ** 2 * 71000 * I_r / L_r ** 2, 0),
                            SF_buckling=round(math.pi ** 2 * 71000 * I_r / L_r ** 2 / Fr_max, 1),
                            SF_fatigue=round(60 / (2 * amp(np.nan_to_num(F_rod)) / A_r), 1),
-                           big_end_pv=round(Fr_max / (22 * 8) * w * 0.011, 2))
+                           big_end_pv=round(Fr_max / (26 * 8) * w * 0.013, 2))           # 大头孔 Ø26 × 8 套在送布偏心上
     L2 = float(np.mean(np.linalg.norm(C - Pp, axis=1))) * 1000
     out["feed_link"] = dict(F_max_N=round(mx(F_L2), 1), sigma_MPa=round(mx(F_L2) / 48, 2),
                             SF_buckling=round(math.pi ** 2 * 206000 * (8 * 6 ** 3 / 12) / L2 ** 2 / mx(F_L2), 0))
@@ -185,6 +185,14 @@ def strength(FD, FP, KIN, dog, vd, above, w, dphi, P_foot, mu, F_rod):
                            M_thin_Nmm=round(Mmax_thin * 1000, 1), sigma_thin_MPa=round(Mmax_thin * 1000 / W_thin, 1),
                            h_block_mm=round(h_blk, 2), sigma_block_MPa=round(Mmax_blk * 1000 / W_blk, 1),
                            SF_fatigue=round(270 / (2 * max(Mmax_thin * 1000 / W_thin, Mmax_blk * 1000 / W_blk)), 1))
+    # 送布牙（单独零件，20CrMnTi 渗碳淬火：取 σb 1080、σ−1 480；Kf 2）：牙上的力经两根侧梁（宽 3、高 2.5）悬臂传到牙架上的块（x 23.6），
+    # 力臂取三排牙的中心 x 3.5 到 x 23.6；力从 0 到最大（脉动），按 Goodman：S = 1 / (Kf σa / σ−1 + σm / σb)
+    Fz_dog = float(np.max(np.abs(Fc[:, 1] - KIN["feed_bar"]["m"] * 0.25 * b["a"][:, 1])))     # 牙这一段约占牙架质量的 1/4
+    M_beam = Fz_dog * (23.6 - 3.5) / 2                                                     # 每根侧梁 N·mm
+    sig = M_beam / (3.0 * 2.5 ** 2 / 6)
+    out["feed_dog"] = dict(F_max_N=round(Fz_dog, 1), M_per_beam_Nmm=round(M_beam, 0), sigma_max_MPa=round(sig, 1),
+                           material="20CrMnTi 渗碳淬火 58–62 HRC", SF_static=round(1080 / sig, 1),
+                           SF_fatigue=round(1 / (2 * (sig / 2) / 480 + (sig / 2) / 1080), 2))
     pins = dict(P=(5.9, Fr_max), C=(5.9, mx(F_L2)), T=(4.9, float(np.max(np.linalg.norm(F_A, axis=1)))), K=(4.9, mx(F_Kz)))
     out["pins_tau_MPa"] = {k: round(F / (math.pi * dd ** 2 / 4), 2) for k, (dd, F) in pins.items()}
     return out

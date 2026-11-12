@@ -54,6 +54,7 @@ JOINT = {frozenset(p) for p in [
     ("feed_ecc", "shaft"), ("feed_ecc", "feed_rod"), ("feed_rod", "reg_slider"), ("feed_rod", "feed_link"), ("reg_slider", "feed_link"),
     ("regulator", "reg_slider"), ("feed_link", "feed_rock"), ("feed_rock", "feed_bar"), ("feed_bar", "lift_rock"),
     ("lift_ecc", "lower_shaft"), ("lift_ecc", "lift_link"), ("lift_link", "lift_rock"),
+    ("motor_housing", "stator_winding"),   # 定子绕组端部贴着电机壳（G4.3 的电机实体，绝缘纸隔开），不是运动副
     ("oil_ecc", "lower_shaft"), ("oil_ecc", "oil_plunger"), ("oil_plunger", "oil_pump"), ("casting", "oil_pump")]}
 
 
