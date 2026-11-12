@@ -120,12 +120,13 @@ def gen_ac_input(block, spec, d):
         c.part(
             "L101",
             "Device:Filter_EMI_CommonMode",
-            "15mH 10A",
-            "Inductor_THT:L_CommonMode_Toroid_Vertical_L34.3mm_W20.3mm_Px15.24mm_Py22.86mm_Bourns_8100",
+            "7.3mH 9.3A",
+            "Inductor_THT:L_CommonMode_Toroid_Vertical_L41.9mm_W20.3mm_Px15.24mm_Py22.86mm_Bourns_8100",
             k,
             {"1": "L_F", "2": "L_C", "3": "N_IN", "4": "N_C"},
-            "CMC-15MH",
-            p["cmc"] + "（规格书是图片读不出、KiCad 库没有它的封装：159d2 换一个库里有封装的型号，这里先占位）",
+            "CMC-8118RC",
+            p["cmc"]
+            + "（Bourns 8100 系列，KiCad 官方库同系列封装；159d2 由 FC-HLF2018 换来：那颗规格书读不出、库里没有封装）",
         ),
         c.part(
             "C102",
@@ -179,13 +180,13 @@ def gen_bridge(block, spec, d):
     return [
         c.part(
             "BR101",
-            "Device:D_Bridge_+AA-",
+            "Diode_Bridge:GBU4A",
             p["bridge"],
             "Diode_THT:Diode_Bridge_Vishay_GBU",
             k,
             {"1": "VRECT", "2": "L_R", "3": "N_C", "4": "RECT_N"},
             "BRG-GBU1006",
-            "整流桥（引脚 + ~ ~ −，与 KiCad 的 GBU 封装对照规格书待核对；装在散热器上）",
+            "整流桥（符号和封装用 KiCad 官方库的 GBU 系列：1 +、2 ~、3 ~、4 −；装在散热器上）",
         ),
         c.part(
             "C104",
@@ -260,13 +261,13 @@ def gen_pfc_boost(block, spec, d):
         _r("R202", "10k", "GATE_PFC", "GND", k, "栅源下拉（设计取值）"),
         c.part(
             "D201",
-            "Device:D",
+            "Diode:C3D06060A",
             p["diode"],
             "Package_TO_SOT_THT:TO-220-2_Vertical",
             k,
             {"1": "VBUS", "2": "SW_PFC"},
             "DIO-C3D06060A",
-            "升压二极管（碳化硅，TO-220-2：1 阴极、2 阳极，待核对规格书；装在散热器上）",
+            "升压二极管（碳化硅；符号和封装用 KiCad 官方库的 C3D06060A：1 阴极、2 阳极；装在散热器上）",
         ),
         _d(
             "D202",
@@ -805,7 +806,7 @@ def gen_stepper(block, spec, d):
         c.part(
             "R509",
             "Device:R",
-            "0.12",
+            c.fmt(p["r_sense"]),
             "Resistor_SMD:R_2010_5025Metric",
             k,
             {"1": "STP_BRA", "2": "GND"},
@@ -815,7 +816,7 @@ def gen_stepper(block, spec, d):
         c.part(
             "R510",
             "Device:R",
-            "0.12",
+            c.fmt(p["r_sense"]),
             "Resistor_SMD:R_2010_5025Metric",
             k,
             {"1": "STP_BRB", "2": "GND"},
@@ -836,8 +837,8 @@ def gen_stepper(block, spec, d):
             "VS 去耦",
         ),
         _c("C506", "100n", "+3V3", "GND", k),
-        _r("R511", "10k", "STP_5V", "STP_VREF", k, "VREF 分压（电流设定，见计算书；关系式待核对）"),
-        _r("R512", "22k", "STP_VREF", "GND", k),
+        _r("R511", c.fmt(p["r_vref_top"]), "STP_5V", "STP_VREF", k, "VREF 分压：线圈电流见计算书"),
+        _r("R512", c.fmt(p["r_vref_bot"]), "STP_VREF", "GND", k),
         _r("R513", "10k", "+3V3", "STP_EN", k, "EN 高 = 关断：主控没输出时步进不动"),
     ]
 
@@ -880,7 +881,8 @@ def gen_panel_iso(block, spec, d):
             k,
             {"1": "GND", "2": "+5V", "3": "GND_ISO", "4": "+5V_ISO"},
             "DCDC-B0505S",
-            "隔离电源 5 V → 5 V 1 W（引脚 1 GND、2 Vin、3 0V、4 +Vo；引脚与封装待核对规格书）",
+            "隔离电源 5 V → 5 V 1 W，隔离 1500 V 直流 1 分钟（Mornsun 原版规格书）。规格书写“行业标准引脚”、图读不出："
+            "按 1 W 单列直插行业通用排法 1 −Vin、2 +Vin、3 −Vo、4 +Vo、间距 2.54 mm 做封装，待核对",
         ),
         c.part("C603", "Device:C", "4.7u/25V", FP_C1206, k, {"1": "+5V", "2": "GND"}, "CAP-1206"),
         c.part("C604", "Device:C", "10u/25V", FP_C1206, k, {"1": "+5V_ISO", "2": "GND_ISO"}, "CAP-1206"),

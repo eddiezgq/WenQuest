@@ -133,15 +133,15 @@ def calc_ac_input(block, spec, d, parts):
             "A",
             "触点额定 ≥ {:g} × I_输入".format(m["fuse"]),
         ),
-        c.judge(
-            "cmc_i",
-            "共模电感额定电流",
-            pb["i_in"],
-            None,
-            "A",
-            "额定 ≥ I_输入",
-            status=c.UNKNOWN,
-            note="{} 的规格书是图片，读不出数；施工时换一份能读的规格书或换型号".format(p["cmc"]),
+        dev.judge(p["cmc"], "i_rated", "共模电感额定电流", pb["i_in"], "A", "额定（温升约 35 ℃）≥ I_输入"),
+        # 159d2：继电器线圈 12 V 用在 15 V 辅助电源上
+        dev.judge(
+            p["relay"],
+            "coil_v_max_pct",
+            "继电器线圈电压（12 V 线圈接 15 V）",
+            100 * spec["vcc_aux_v"] / p["relay_coil_v"],
+            "%",
+            "最高允许电压（额定的 %）≥ 15 V / 12 V",
         ),
     ]
     return items, checks

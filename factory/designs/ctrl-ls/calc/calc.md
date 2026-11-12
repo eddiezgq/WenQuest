@@ -19,7 +19,7 @@
 
 ## 结论
 
-通过 9 项，不通过 0 项，待核对 49 项，未知 5 项。
+通过 9 项，不通过 0 项，待核对 56 项，未知 1 项。
 
 ## 交流输入、电磁兼容与浪涌（AC input, EMI and inrush）
 
@@ -42,7 +42,8 @@
 | 热敏电阻最大电流 | 7.916 A | 11 A | I_max ≥ I_输入（继电器旁路前） | **待核对** | 待核对；NTC thermistors for inrush current limiting, Series/Type S364/**/M**, B57364S0***M0** Date: 2021-04-22, Version a，p.4 Table 1 |
 | 热敏电阻允许的负载电容（230 V） | 990 µF | 1 mF | C_T ≥ 母线电容 | **待核对** | 待核对；NTC thermistors for inrush current limiting, Series/Type S364/**/M**, B57364S0***M0** Date: 2021-04-22, Version a，p.4 Table 1 |
 | 旁路继电器触点电流 | 9.894 A | 16 A | 触点额定 ≥ 1.25 × I_输入 | **待核对** | 待核对；Power Relay G5LE-G / G5LE-E (no revision printed)，p.1 |
-| 共模电感额定电流 | 7.916 A | — | 额定 ≥ I_输入 | **未知** | FC-HLF2018-15mH-10A-LF 的规格书是图片，读不出数；施工时换一份能读的规格书或换型号 |
+| 共模电感额定电流 | 7.916 A | 9.3 A | 额定（温升约 35 ℃）≥ I_输入 | **待核对** | 待核对；8100 Series Common Mode Inductors (with optional header) REV. 07/15，p.1 table, footnote * |
+| 继电器线圈电压（12 V 线圈接 15 V） | 125 % | 170 % | 最高允许电压（额定的 %）≥ 15 V / 12 V | **待核对** | 待核对；Power Relay G5LE-G / G5LE-E (no revision printed)，Omron G5LE 标准型资料 Cat. No. K100-E1-06（Farnell 转存）p.1 coil ratings |
 
 ## 整流桥（Bridge rectifier）
 
@@ -171,7 +172,7 @@
 | 量程覆盖峰值电流（留余量） | 6.348 A | 8.8 A | I_满 ≥ 1.05 × 峰值 | **待核对** | WSLT2512 Power Metal Strip Resistors, High Temperature (275 °C), Low Value, Surface-Mount Document Number: 30121, Revision: 04-Apr-2022，p.1 Global Part Number Information |
 | 过流门限高于峰值、在量程内 | 6.046 A | 7.5 A | 峰值 ≤ I_跳 ≤ I_满 | **待核对** |  |
 | 采样电阻额定功率 | 456.9 mW | 1 W | P_额定(70 ℃) ≥ 峰值时功耗 | **待核对** | 待核对；WSLT2512 Power Metal Strip Resistors, High Temperature (275 °C), Low Value, Surface-Mount Document Number: 30121, Revision: 04-Apr-2022，p.1 Standard Electrical Specifications |
-| MCU 片内运放能设成这个增益 | 8 | — | 片内 PGA 可选增益含 G | **未知** | STM32G431 的运放增益档位没录进 eda/parts（参考手册），待补 |
+| MCU 片内运放能设成这个增益 | 8 | 有 | 片内 PGA 可选增益含 G | **待核对** | 可选：2、4、8、16、32、64；STM32G431x6/x8/xB (DS12589) Rev 6, 2021-10，AN5306 Rev 2, section 4.4.1 p.24 |
 | 过流门限不超过模块电流 | 7.5 A | 14 A | I_C ≥ I_跳 | **待核对** | 待核对；STGIPS14K60T SLLIMM small low-loss intelligent molded module IPM, 3-phase inverter, 14 A, 600 V, Datasheet - production data DocID018534 Rev 5, April 2015，p.5 Table 3 |
 
 ## 电磁铁驱动（Solenoid drivers）
@@ -207,11 +208,14 @@
 | 量 | 结果 | 公式 | 说明 |
 |---|---|---|---|
 | 步进电机线圈电流（有效值） | 1 A |  | 示例值（针距步进电机按实物改） |
+| VREF 电压 | 1.562 V | V_5VOUT · R_下/(R_上 + R_下) |  |
+| 设定的线圈电流（有效值） | 1.026 A | I = 0.325 V / (R_采样 + 0.02 Ω) / √2 × V_REF / 2.5 V | TMC22xx 的电流式子（采样 0.11 Ω、V_REF 2.5 V 时 1.77 A，与 FYSETC TMC2226 资料一致）；待核对 TMC2226 规格书 |
 
 | 判定 | 要求 | 实有 | 规则 | 结论 | 说明 |
 |---|---|---|---|---|---|
 | 24 V（含波动）在驱动器工作范围 | 26.4 V | 5.5–29 V | 范围包含 26.4 V | **待核对** | 待核对；TMC2226 Datasheet, Power driver for stepper motors Rev. 1.06 / 2020-MAY-18，p.72 Operational Range |
 | 驱动器连续电流 | 1 A | 1.6 A | I_RMS,连续 ≥ 线圈电流 | **待核对** | 待核对；TMC2226 Datasheet, Power driver for stepper motors Rev. 1.06 / 2020-MAY-18，p.72 Operational Range |
+| 设定电流与线圈电流相差 ≤ 10 % | 1 A | 1.026 A | \|I_设 − I_线圈\| ≤ 10 % | **待核对** | 式子待核对规格书，所以只判到“待核对” |
 
 ## MCU 最小系统与烧录口（MCU core and programming port）
 
@@ -249,11 +253,13 @@
 | 量 | 结果 | 公式 | 说明 |
 |---|---|---|---|
 | 面板串口速率 | 1.152e+05 bit/s |  | 设计给定 |
+| 数字隔离器耐压（峰值） | 3.536 kV | √2 × V_iso,rms | ADuM1200/ADuM1201 Dual-Channel Digital Isolators Rev. L, 3/2025，p.21 Table 9, Table 10 |
 
 | 判定 | 要求 | 实有 | 规则 | 结论 | 说明 |
 |---|---|---|---|---|---|
-| 数字隔离器隔离耐压 | 1.5 kV | — | 耐压 ≥ 要求 | **未知** | ADUM1201ARZ-RL7 规格书未录（隔离耐压要求 1500 V 是示例值，企业按安规表填） |
-| 隔离电源隔离耐压 | 1.5 kV | — | 耐压 ≥ 要求 | **未知** | B0505S-1WR2 规格书未录 |
+| 数字隔离器隔离耐压 | 1.5 kV | 3.536 kV | √2 × V_iso,rms ≥ 要求（直流 1 分钟，示例值） | **待核对** | ADuM1200/ADuM1201 Dual-Channel Digital Isolators Rev. L, 3/2025，p.21 Table 9, Table 10 |
+| 隔离电源隔离耐压 | 1.5 kV | 1.5 kV | V_iso（直流 1 分钟）≥ 要求 | **待核对** | 待核对；Mornsun B_S-1WR2 & B_D-1WR2 Series, 1W isolated DC-DC converter 2013.06.18-A/2，p.1 general characteristics |
+| 数字隔离器两侧供电 3.3 V 在范围内 | 3.3 V | 2.7–5.5 V | 范围包含 3.3 V | **待核对** | 待核对；ADuM1200/ADuM1201 Dual-Channel Digital Isolators Rev. L, 3/2025，p.23 Table 12 |
 
 ## 散热器（Heatsink）
 
@@ -279,6 +285,9 @@
 |---|---|---|---|
 | 0215010.MXP | Littelfuse | Axial Lead & Cartridge Fuses 5×20 mm > Time-Lag > 215 Series Revised: 01/12/17 | https://www.lcsc.com/datasheet/C142733.pdf |
 | 500MXH330MEFCSN30X50 | Rubycon | Rubycon MXH series SNAP-IN aluminum electrolytic capacitors catalog page 115-116 (no revision printed) | https://www.lcsc.com/datasheet/C472902.pdf |
+| 8118-RC | Bourns | 8100 Series Common Mode Inductors (with optional header) REV. 07/15 | https://static.chipdip.ru/lib/855/DOC011855172.pdf |
+| ADUM1201ARZ-RL7 | Analog Devices | ADuM1200/ADuM1201 Dual-Channel Digital Isolators Rev. L, 3/2025 | https://www.analog.com/media/en/technical-documentation/data-sheets/ADUM1200_1201.pdf |
+| B0505S-1WR2 | YLPTEC（系列原版 Mornsun） | Mornsun B_S-1WR2 & B_D-1WR2 Series, 1W isolated DC-DC converter 2013.06.18-A/2 | https://mantech.co.za/datasheets/products/b_s-1wr2.pdf |
 | B57364S0259M000 | TDK | NTC thermistors for inrush current limiting, Series/Type S364/**/M**, B57364S0***M0** Date: 2021-04-22, Version a | https://www.lcsc.com/datasheet/C17362791.pdf |
 | B72214S0271K101 | TDK (EPCOS) | SIOV metal oxide varistors, Leaded varistors, StandarD series, Series/Type: B722* Date: March 2018 | https://www.lcsc.com/datasheet/C7502584.pdf |
 | BFC233920474 | Vishay BCcomponents | MKP339 X2 Interference Suppression Film Capacitors Document Number: 28138, Revision: 24-Jul-2019 | https://www.lcsc.com/datasheet/C511073.pdf |

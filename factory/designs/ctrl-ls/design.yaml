@@ -49,7 +49,7 @@ blocks:
   units:
   - type: ac_input
     params: {fuse: 0215010.MXP, ntc: B57364S0259M000, mov: B72214S0271K101, x_cap: BFC233920474, relay: G5LE-1-E DC12,
-             cmc: FC-HLF2018-15mH-10A-LF}
+             cmc: 8118-RC, relay_coil_v: 12}
   - type: bridge
     params: {bridge: GBU1006, ntc: B57364S0259M000}
 - key: pfc
@@ -85,7 +85,8 @@ blocks:
   - type: ipm_inverter
     params: {ipm: STGIPS14K60T, f_pwm: 16000, m_index: 0.9, cos_phi: 0.9, t_dead: 1.0e-6}
   - type: low_side_sense
-    params: {shunt: WSLT2512R0250FEA, ipm: STGIPS14K60T, gain: 8, v_ref: 3.3, i_trip: 7.5, r_in: 1000, r_bias: 15000}
+    params: {shunt: WSLT2512R0250FEA, ipm: STGIPS14K60T, gain: 8, v_ref: 3.3, i_trip: 7.5, r_in: 1000, r_bias: 15000,
+             mcu: STM32G431CBT6}
 - key: act
   name: 电磁铁与步进
   name_en: Solenoids and stepper
@@ -94,7 +95,7 @@ blocks:
     params: {fet: BSC040N08NS5, tvs: SMBJ24A, diode: ES3D, v24_tol: 0.1, coil_r: 8, coil_l: 0.02, t_off_max: 0.003,
              channels: [[剪线, SOL_TRIM], [拨线, SOL_WIPE], [倒缝, SOL_REV], [抬压脚, SOL_FOOT]]}
   - type: stepper
-    params: {driver: TMC2226-SA, v24_tol: 0.1, i_coil_rms: 1.0}
+    params: {driver: TMC2226-SA, v24_tol: 0.1, i_coil_rms: 1.0, r_sense: 0.12, r_vref_top: 22000, r_vref_bot: 10000, v_5vout: 5.0}
 - key: io
   name: 主控与传感器输入
   name_en: MCU and sensor inputs
