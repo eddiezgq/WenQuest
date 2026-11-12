@@ -9,9 +9,9 @@
 
     <!-- 列表 -->
     <template v-if="!id && list">
-      <div class="grid">
+      <div class="grid" data-help="cases-grid">
         <component :is="c.ready ? 'router-link' : 'div'" v-for="c in cards" :key="c.id" :to="c.ready ? '/cases/' + c.id : undefined"
-                   class="card cs" :class="{ off: !c.ready, ok: c.all_ok }">
+                   class="card cs" :class="{ off: !c.ready, ok: c.all_ok }" data-help="cases-card">
           <div class="lh"><b class="no">{{ c.id }}</b><span class="dom small">{{ levelName(c.id) }}</span>
             <span v-if="c.ready" class="small r" :class="c.all_ok ? 'good' : 'warn'">{{ $t('校核 {a}/{b}', { a: c.n_ok, b: c.n_checks }) }}</span></div>
           <h2>{{ c.ready ? (en ? c.title_en : c.title) : $t('制作中') }}</h2>
@@ -31,7 +31,7 @@
         <p class="muted">{{ en ? c.summary_en : c.summary }}</p>
         <p class="small honest">{{ en ? c.honest_en : c.honest }}</p>
       </div>
-      <div class="steps" role="tablist">
+      <div class="steps" role="tablist" data-help="cases-steps">
         <button v-for="(s, i) in c.steps" :key="s.key" class="st" :class="{ on: cur === i }" role="tab" @click="go(i)">
           <span class="n">{{ i + 1 }}</span>{{ en ? s.title_en : s.title }}
           <span v-if="badStep(s.key)" class="bad">✗</span></button>
