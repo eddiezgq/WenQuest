@@ -23,7 +23,8 @@
    "lower": 3.488e-05,
    "hook": 8.93e-06
   },
-  "J_hook_train_reflected_kgm2": 8.1173e-05
+  "J_hook_train_reflected_kgm2": 8.1173e-05,
+  "feed_setting": "s3"
  },
  "parts": {
   "needle_bar": {
@@ -164,6 +165,46 @@
   },
   "bobbin_case": {
    "mass_g": 31.2,
+   "material": "metal"
+  },
+  "feed_ecc": {
+   "mass_g": 11.2,
+   "material": "metal"
+  },
+  "feed_rod": {
+   "mass_g": 141.0,
+   "material": "metal"
+  },
+  "regulator": {
+   "mass_g": 17.9,
+   "material": "metal"
+  },
+  "reg_slider": {
+   "mass_g": 7.2,
+   "material": "metal"
+  },
+  "feed_link": {
+   "mass_g": 28.3,
+   "material": "metal"
+  },
+  "feed_rock": {
+   "mass_g": 211.1,
+   "material": "metal"
+  },
+  "feed_bar": {
+   "mass_g": 28.5,
+   "material": "chrome"
+  },
+  "lift_ecc": {
+   "mass_g": 12.6,
+   "material": "metal"
+  },
+  "lift_link": {
+   "mass_g": 45.2,
+   "material": "metal"
+  },
+  "lift_rock": {
+   "mass_g": 77.8,
    "material": "metal"
   }
  },
