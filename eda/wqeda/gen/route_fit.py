@@ -59,10 +59,12 @@ def conflicts(board, class_of, clearance):
     return out
 
 
-def stubs(board, class_of, clearance, width_of, layers_of, outline):
+def stubs(board, class_of, clearance, width_of, layers_of, outline, keepouts=()):
     """给“比布线间距还近”的焊盘各引一小段固定线（锁定）：从焊盘中心朝最空的方向引出，长到离开相邻焊盘的间距范围，
     布线器从线头接（它接不上这种焊盘本身，见上面第 1 条）。返回加的段数。
-    width_of(网络) → 布线线宽；layers_of(网络) → 允许的铜层名；outline = 板框（shapely 多边形，mm，KiCad 坐标）"""
+    width_of(网络) → 布线线宽；layers_of(网络) → 允许的铜层名；outline = 板框（shapely 多边形，mm，KiCad 坐标）；
+    keepouts = 禁布区（shapely 多边形）：焊盘压着禁布区边的（隔离带收窄处的隔离电源脚），布线器同样接不上，
+    也引一段出来，引出线本身不进禁布区"""
     import math
 
     from shapely.geometry import LineString
@@ -74,6 +76,10 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline):
             k = (a.GetParent().GetReference(), a.GetNumber())
             need[k] = (a, max(c, need.get(k, (a, 0))[1]))
     pads = [(p, _poly(p.GetEffectivePolygon())) for fp in board.GetFootprints() for p in fp.Pads() if p.GetNetname()]
+    for p, g in pads:
+        if any(g.intersects(k) for k in keepouts):
+            k = (p.GetParent().GetReference(), p.GetNumber())
+            need.setdefault(k, (p, 0.6))
     lid = {"F.Cu": pcbnew.F_Cu, "B.Cu": pcbnew.B_Cu, "In2.Cu": pcbnew.In2_Cu}
     made = []  # 已经引出的线也算障碍：(网络, 层, 形状)
     for (_ref, _num), (p, c) in sorted(need.items(), key=lambda kv: (kv[0][0], kv[0][1])):
@@ -90,6 +96,8 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline):
                 end = (x0 + length * math.cos(a), y0 + length * math.sin(a))
                 seg = LineString([(x0, y0), end])
                 if not outline.buffer(-(w / 2 + 0.5)).contains(LineString([seg.interpolate(0.5), end])):
+                    continue
+                if any(seg.buffer(w / 2).intersects(kp) for kp in keepouts):
                     continue
                 tip = LineString([seg.interpolate(max(sx, sy) / 2 + c), end]).buffer(w / 2)
                 score = 99.0
@@ -138,8 +146,13 @@ def drop_dangling(board):
             continue
         mm = pcbnew.ToMM
         a, b = (mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))
-        outer = LineString([(a[0] + 0.6 * (b[0] - a[0]), a[1] + 0.6 * (b[1] - a[1])), b])
+        # 整段都算（第十四次：布线器的过孔打在引出线中段，只看外面一截时误删了）；
+        # 宁可留下一段用不上的（只是提示），不能删掉接着的
+        outer = LineString([a, b])
+        pad = [_poly(p.GetEffectivePolygon()) for p in board.GetPads() if p.GetNetname() == t.GetNetname()
+               and p.GetPosition() == t.GetStart()]
         used = any(o is not t and o.GetNetname() == t.GetNetname() and not o.IsLocked() and
+                   not (pad and pad[0].buffer(0.05).contains(geom(o))) and
                    (o.GetClass() == "PCB_VIA" or o.GetLayer() == t.GetLayer()) and geom(o).distance(outer) < 0.01
                    for o in tracks)
         if not used:

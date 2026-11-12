@@ -228,6 +228,8 @@ def planes(board, nets):
     inner = [(x - r, y - r), (w_, y - r), (w_, y + r), (x + r, y + r), (x + r, h_), (x - r, h_)]
     rule_area(board, inner, "隔离带（内层）")
     for k, (hx, hy) in enumerate(D.X["holes"]):
+        if k == 0:  # H1 接 PE：它周围不设禁布区（保护地线要接进来；别的网络离它多远由 PE 的布线间距 4.2 mm 管）
+            continue
         rule_area(board, _circle(hx, hy, HOLE_KEEP), "安装孔{}".format(k + 1))
 
 
@@ -278,7 +280,8 @@ def board_build(route, jar):
         w_, h_ = D.X["board_mm"]
         ox, oy = gb.ORIGIN
         n_stub = RF.stubs(board, class_of, clearance, lambda n: width.get(n, 0.25),
-                          lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"]), box(ox, oy, ox + w_, oy + h_))
+                          lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"]), box(ox, oy, ox + w_, oy + h_),
+                          [RF._poly(z.Outline()) for z in board.Zones() if z.GetIsRuleArea() and z.GetDoNotAllowTracks()])
         print("引出线（器件自己引脚比布线间距近的焊盘）：", n_stub)
         stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep, pairs=gb.pairs_of(D.X),
                              timeout=3000)
