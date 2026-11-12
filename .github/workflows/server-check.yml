@@ -92,9 +92,11 @@ jobs:
           if [ "${{ inputs.server }}" = cn ]; then
             pages="https://wenquestech.online/ https://factory.wenquestech.online/"
             hosts="https://factory.wenquestech.online"
+            ask='{"q":"怎么生成数控G代码？","page":"/","lang":"zh"}'
           else
             pages="https://wenquestrobotics.com/ https://wenquestrobotics.com/cases/cam.html https://wenquestrobotics.com/pilot/ https://wenquestrobotics.com/kits.html https://wenquestrobotics.com/terms.html https://wenquestrobotics.com/factory/ https://factory.wenquestrobotics.com/ https://demo.wenquestrobotics.com/ https://sewing.factory.wenquestrobotics.com/"
             hosts="https://factory.wenquestrobotics.com https://demo.wenquestrobotics.com https://sewing.factory.wenquestrobotics.com"
+            ask='{"q":"How do I generate G-code?","page":"/","lang":"en"}'
           fi
           for p in $pages; do
             body=$(curl -sL -m 25 "$p"); n=$(printf '%s' "$body" | grep -c 'assist.js' || true); h=$(printf '%s' "$body" | grep -o 'index-[A-Za-z0-9_-]*\.js' | head -1)
@@ -102,7 +104,7 @@ jobs:
           done
           for h in $hosts; do
             js=$(curl -s -o /dev/null -m 25 -w "%{http_code} %{content_type}" "$h/assist.js")
-            ans=$(curl -s -m 90 -H 'Content-Type: application/json' -d '{"q":"How do I generate G-code?","page":"/","lang":"en"}' "$h/api/v1/public/assist" -w ' HTTP=%{http_code}' | tr '\n' ' ' | cut -c1-260)
+            ans=$(curl -s -m 90 -H 'Content-Type: application/json' -d "$ask" "$h/api/v1/public/assist" -w ' HTTP=%{http_code}' | tr '\n' ' ' | cut -c1-260)
             echo "::notice::assist host $h js=$js ask=$ans"
           done
       - name: 网关发信（11-11：试点邀请的验证码没收到，Brevo 日志里没有记录）
