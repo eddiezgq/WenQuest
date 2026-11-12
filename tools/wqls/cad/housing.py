@@ -313,7 +313,7 @@ def _spec():
 
 def lower_seats(hollow, solid, info):
     """G4.5 机座里的旋梭组支承（cad/hook.py 的零件装在这里）：
-    ① 旋梭轴座：轴线 y 0、z −21.5，x 24…66 的圆柱凸台 Ø24（孔 Ø14，壁厚 5；凝固仿真定的，Ø28 时是热节），上面一道 5 mm 厚的筋连到机座顶板；孔铸出 Ø9（砂芯）；孔 Ø14 H7 装两个铜套；
+    ① 旋梭轴座：轴线 y 0、z −21.5，x 30…66（G4.6 由 24 缩到 30）的圆柱凸台 Ø24（孔 Ø14，壁厚 5；凝固仿真定的，Ø28 时是热节），上面一道 5 mm 厚的筋连到机座顶板；孔铸出 Ø9（砂芯）；孔 Ø14 H7 装两个铜套；
     ② 下轴左轴承座：轴线 (y 27.8, z −35.4)，x 88…104，Ø42 凸台，6 mm 厚的筋连到顶板；孔 Ø32 H7 装 6201；
     ③ 下轴右轴承座：x 364…378，同上（在同步带轮右边，筋在过带孔右边）；
     ④ 两个端壁上的工艺孔：右端壁在下轴轴线上 Ø34（镗下轴两孔时镗杆从这里进），左端壁在旋梭轴轴线上 Ø20（镗旋梭轴孔），装配后橡胶堵堵上；
@@ -325,7 +325,8 @@ def lower_seats(hollow, solid, info):
     feats = []
     # 筋厚 5（凝固仿真：12、8 厚时筋、座、顶板交接处是热节）；G5.2：筋从 x 34 开始——原来从 x 24 起，伸进了针板座下面的开口
     # （x −32…32），顶到 z 0，针板放不平，数控仿真铣针板座时查出
-    hb = Part.makeCylinder(12, 42, V(24, 0, zh), V(1, 0, 0)).fuse(Part.makeBox(32, 5, -zh, V(34, -2.5, zh)))
+    # G4.6：座的左端由 x 24 缩到 30（牙架在 x 23.5…27.5 从旋梭右边过去）
+    hb = Part.makeCylinder(12, 36, V(30, 0, zh), V(1, 0, 0)).fuse(Part.makeBox(32, 5, -zh, V(34, -2.5, zh)))
     feats.append(hb)
     for x0, L in ((88.0, 16.0), (364.0, 14.0)):
         # 筋厚 6（凝固仿真：14 厚时筋和顶板交接处是热节）
@@ -338,13 +339,13 @@ def lower_seats(hollow, solid, info):
     hollow = hollow.cut(Part.makeCylinder(17.0, 20, V(PIL["x0"] - 6, yl, zl), V(1, 0, 0)))
     hollow = hollow.cut(Part.makeCylinder(17.0, 20, V(PIL["x1"] - RIB_T - 6, yl, zl), V(1, 0, 0)))   # G5.2：右横筋（x 389…396）同样开 Ø34（下轴镗杆通过）
     if not FEA_SIMPLE:
-        hollow = hollow.cut(Part.makeCylinder(7.0, 46, V(22, 0, zh), V(1, 0, 0)))            # 旋梭轴孔 Ø14 H7
+        hollow = hollow.cut(Part.makeCylinder(7.0, 40, V(28, 0, zh), V(1, 0, 0)))            # 旋梭轴孔 Ø14 H7（x 30…66）
         for x0, L in ((88.0, 16.0), (364.0, 14.0)):
             hollow = hollow.cut(Part.makeCylinder(16.0, L + 2, V(x0 - 1, yl, zl), V(1, 0, 0)))   # 6201 座孔 Ø32 H7
         hollow = hollow.cut(Part.makeCylinder(17.0, 20, V(BED["x1"] - 12, yl, zl), V(1, 0, 0)))  # 右端壁工艺孔 Ø34
         hollow = hollow.cut(Part.makeCylinder(10.0, 20, V(BED["x0"] - 8, 0, zh), V(1, 0, 0)))    # 左端壁工艺孔 Ø20
         hollow = hollow.cut(Part.makeCylinder(10.0, 20, V(BED["x0"] - 8, yl, zl), V(1, 0, 0)))  # G5.2：左端壁下轴轴线上 Ø20（同轴镗下轴两孔时镗杆导向柱穿过）
-    info["lower_seats"] = dict(hook_bore=dict(axis=(0.0, zh), x=(24, 66), d=14), lower_bores=dict(axis=(yl, zl), x=[(88, 104), (364, 378)], d=32),
+    info["lower_seats"] = dict(hook_bore=dict(axis=(0.0, zh), x=(30, 66), d=14), lower_bores=dict(axis=(yl, zl), x=[(88, 104), (364, 378)], d=32),
                                end_holes=dict(right=34, left=20, left_lower=20), rib_hole=dict(x=[PIL["x0"], PIL["x1"] - RIB_T], d=34))
     return hollow
 

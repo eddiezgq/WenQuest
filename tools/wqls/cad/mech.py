@@ -273,6 +273,14 @@ for k, (s, mat_, rk, spin) in hookm.build().items():
 bal["J_hook_train_kgm2"] = {k: round(v, 9) for k, v in J_train.items()}
 bal["J_hook_train_reflected_kgm2"] = round(J_train["upper"] + J_train["lower"] + 4 * J_train["hook"], 9)   # 折算到上轴（旋梭 2 倍速）
 
+# G4.6 送布组（cad/feed.py）：送布偏心、连杆、调节器、送布摆轴、牙架和送布牙、抬牙偏心、抬牙摆轴
+spec_f = importlib.util.spec_from_file_location("wq_feed", os.path.join(HERE, "feed.py"))
+feedm = importlib.util.module_from_spec(spec_f)
+spec_f.loader.exec_module(feedm)
+for k, (s, mat_, rk, spin) in feedm.build().items():
+    parts[k], mats[k], dens[k] = s, mat_, feedm.RHO[rk]
+bal["feed_setting"] = feedm.SET
+
 out = dict(lk=TK, x=X, balance=bal, parts={})
 for k, s in parts.items():
     s.exportStep(os.path.join(OUT, f"{k}.step"))

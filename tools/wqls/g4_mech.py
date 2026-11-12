@@ -23,6 +23,9 @@ import spec as S  # noqa: E402
 DEG = math.pi / 180
 R, L, ZU = S.SEW["r"], S.SEW["l"], S.ZU
 TK = json.loads((T.OUT / "挑线机构.json").read_text())["lk"]
+import os  # noqa: E402
+FD = json.loads((T.OUT / "送布机构.json").read_text())
+FP = FD["poses"][os.environ.get("WQ_FEED", "s3")]          # G4.6 送布组：哪一档（s3 动画，s5 / r5 干涉检查）
 MK = T.Mech2(r=R, l=L, mr=S.SEW["mr"], lk=TK)
 X = S.MECH_X
 
@@ -89,6 +92,19 @@ def frames(step=2):
         low = rot_x(phi, S.YL, S.ZL)
         hk = rot_x(-2 * phi, 0.0, S.ZH)
         M.update(pulley_lower=low, lower_shaft=low, gear_lower=low, gear_hook=hk, hook_shaft=hk, hook=hk)
+        # G4.6 送布组（g4_feed.py 算的每 2° 位置）
+        i = (phi // 2) % len(FP["E"])
+        g = FD["geo"]
+        f0 = {k: FP[k][0] for k in ("E", "P", "C", "T", "D", "EL", "dog")}
+        fi = {k: FP[k][i] for k in ("E", "P", "C", "T", "D", "EL", "dog")}
+        M.update(feed_ecc=rot, lift_ecc=low,
+                 feed_rod=rigid(f0["E"], f0["P"], fi["E"], fi["P"]),
+                 reg_slider=trans(fi["P"][0] - f0["P"][0], fi["P"][1] - f0["P"][1]),
+                 feed_link=rigid(f0["P"], f0["C"], fi["P"], fi["C"]),
+                 feed_rock=rot_x(math.degrees(FP["beta"][i] - FP["beta"][0]), *g["Fr"]),
+                 feed_bar=rigid(f0["T"], f0["dog"], fi["T"], fi["dog"]),
+                 lift_link=rigid(f0["EL"], f0["D"], fi["EL"], fi["D"]),
+                 lift_rock=rot_x(math.degrees(FP["gam"][i] - FP["gam"][0]), *g["Lr"]))
         # 面线：A → 线眼 → B → 针杆线钩 → 针眼（x 取各自所在平面）
         tip = Bv + ZU - X["nb_below"] - X["tip_below"]
         Ey, Ez = w(lp["E"])
