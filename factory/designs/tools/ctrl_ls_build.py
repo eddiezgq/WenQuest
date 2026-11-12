@@ -256,10 +256,14 @@ def board_build(route, jar):
     board, nets = gb.build(D.X, path, title, hole_net="PE")
     hole_nets(board, nets)
     planes(board, nets)
+    keep = gb.tie_keepouts(board)
+    for net, layer, pts in D.X["pours"]:            # 功率铺铜（设计描述 board.pours），布线器把它当禁布区
+        gb.add_pour(board, nets[net], layer, pts)
+        keep.append((layer, pts))
     os.makedirs(TMP, exist_ok=True)
     stats = None
     if route:
-        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=20, keepouts=gb.tie_keepouts(board))
+        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep)
     board.BuildConnectivity()
     gb.fill_zones(board)
     pcbnew().SaveBoard(path, board)

@@ -1,17 +1,17 @@
 {
- "errors": 256,
+ "errors": 84,
  "items": [
   {
    "at": [
     [
-     14.48,
-     29.17,
+     194.46,
+     1.06,
      "Line on F.Silkscreen"
     ],
     [
-     27.72,
-     29.67,
-     "Reference 'C101'"
+     195.0,
+     29.82,
+     "Reference 'C408'"
     ]
    ],
    "code": "silk_overlap",
@@ -21,9 +21,315 @@
   {
    "at": [
     [
-     48.69,
-     42.4,
-     "Reference 'Q101'"
+     176.63,
+     29.83,
+     "Reference 'C406'"
+    ],
+    [
+     194.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     186.57,
+     29.82,
+     "Reference 'C407'"
+    ],
+    [
+     194.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     182.36,
+     29.82,
+     "Reference 'R401'"
+    ],
+    [
+     194.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     190.78,
+     29.82,
+     "Reference 'R402'"
+    ],
+    [
+     194.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     194.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ],
+    [
+     154.17,
+     29.83,
+     "Reference 'C402'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     194.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ],
+    [
+     195.0,
+     29.82,
+     "Reference 'C408'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     194.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ],
+    [
+     160.02,
+     29.83,
+     "Reference 'C403'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     194.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ],
+    [
+     170.9,
+     29.82,
+     "Reference 'C405'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     194.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ],
+    [
+     165.87,
+     29.83,
+     "Reference 'C404'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     194.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ],
+    [
+     148.32,
+     29.83,
+     "Reference 'C401'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     195.0,
+     29.82,
+     "Reference 'C408'"
+    ],
+    [
+     192.11,
+     30.65,
+     "Reference 'U401'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     195.24,
+     37.52,
+     "Reference 'C222'"
+    ],
+    [
+     193.58,
+     36.93,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     192.11,
+     30.65,
+     "Reference 'U401'"
+    ],
+    [
+     190.78,
+     29.82,
+     "Reference 'R402'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     192.11,
+     30.65,
+     "Reference 'U401'"
+    ],
+    [
+     190.54,
+     30.73,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     163.24,
+     37.52,
+     "Reference 'C221'"
+    ],
+    [
+     164.11,
+     36.93,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     208.0,
+     126.56,
+     "Line on F.Silkscreen"
+    ],
+    [
+     208.0,
+     126.0,
+     "Reference 'U602'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     208.0,
+     126.0,
+     "Reference 'U602'"
+    ],
+    [
+     208.0,
+     126.56,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     167.98,
+     92.63,
+     "Line on F.Silkscreen"
+    ],
+    [
+     170.12,
+     93.23,
+     "Reference 'D507'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     160.56,
+     85.5,
+     "Reference 'Q505'"
     ],
     [
      -101.16,
@@ -38,14 +344,14 @@
   {
    "at": [
     [
-     14.35,
-     41.54,
-     "Line on F.Silkscreen"
+     202.18,
+     85.5,
+     "Reference 'Q506'"
     ],
     [
-     17.28,
-     41.93,
-     "Reference 'C103'"
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
     ]
    ],
    "code": "silk_overlap",
@@ -55,14 +361,31 @@
   {
    "at": [
     [
-     94.67,
-     19.06,
-     "Reference 'Q202'"
+     189.56,
+     93.45,
+     "Reference 'Q508'"
     ],
     [
      -101.16,
      -101.51,
      "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     209.59,
+     92.63,
+     "Line on F.Silkscreen"
+    ],
+    [
+     211.73,
+     93.23,
+     "Reference 'D508'"
     ]
    ],
    "code": "silk_overlap",
@@ -89,9 +412,9 @@
   {
    "at": [
     [
-     2.95,
-     115.7,
-     "Reference 'U302'"
+     94.67,
+     19.06,
+     "Reference 'Q202'"
     ],
     [
      -101.16,
@@ -123,142 +446,6 @@
   {
    "at": [
     [
-     147.94,
-     93.45,
-     "Reference 'Q507'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     208.0,
-     126.0,
-     "Reference 'U602'"
-    ],
-    [
-     208.0,
-     126.56,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     208.0,
-     126.0,
-     "Reference 'U602'"
-    ],
-    [
-     208.0,
-     126.56,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     202.18,
-     85.5,
-     "Reference 'Q506'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     211.73,
-     93.23,
-     "Reference 'D508'"
-    ],
-    [
-     209.59,
-     92.63,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     189.56,
-     93.45,
-     "Reference 'Q508'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     160.56,
-     85.5,
-     "Reference 'Q505'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     170.12,
-     93.23,
-     "Reference 'D507'"
-    ],
-    [
-     167.98,
-     92.63,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
      56.56,
      136.52,
      "Reference 'C307'"
@@ -276,14 +463,14 @@
   {
    "at": [
     [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
      56.72,
      127.94,
      "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
     ]
    ],
    "code": "silk_overlap",
@@ -292,15 +479,15 @@
   },
   {
    "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
     [
      56.76,
      127.94,
      "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
     ]
    ],
    "code": "silk_overlap",
@@ -309,15 +496,15 @@
   },
   {
    "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
     [
      56.8,
      127.95,
      "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
     ]
    ],
    "code": "silk_overlap",
@@ -326,15 +513,15 @@
   },
   {
    "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
     [
      56.84,
      127.95,
      "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
     ]
    ],
    "code": "silk_overlap",
@@ -343,15 +530,15 @@
   },
   {
    "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
     [
      56.88,
      127.95,
      "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
     ]
    ],
    "code": "silk_overlap",
@@ -360,15 +547,15 @@
   },
   {
    "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
     [
      56.92,
      127.96,
      "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
     ]
    ],
    "code": "silk_overlap",
@@ -377,32 +564,15 @@
   },
   {
    "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.24,
-     128.0,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
     [
      56.96,
      127.96,
      "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
     ]
    ],
    "code": "silk_overlap",
@@ -519,43 +689,9 @@
      "Reference 'C307'"
     ],
     [
-     57.28,
-     133.06,
+     57.24,
+     128.0,
      "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.32,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     57.36,
-     133.06,
-     "Line on F.Silkscreen"
-    ],
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
     ]
    ],
    "code": "silk_overlap",
@@ -582,24 +718,7 @@
   {
    "at": [
     [
-     57.6,
-     133.06,
-     "Line on F.Silkscreen"
-    ],
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     57.64,
+     57.8,
      133.06,
      "Line on F.Silkscreen"
     ],
@@ -706,7 +825,7 @@
      "Reference 'C307'"
     ],
     [
-     57.68,
+     57.28,
      133.06,
      "Line on F.Silkscreen"
     ]
@@ -722,10 +841,112 @@
      136.52,
      "Reference 'C307'"
     ],
+    [
+     57.32,
+     133.06,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     57.64,
+     133.06,
+     "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     56.56,
+     141.77,
+     "Circle on F.Silkscreen"
+    ],
+    [
+     55.14,
+     146.57,
+     "Reference 'R307'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     57.6,
+     133.06,
+     "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     57.68,
+     133.06,
+     "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     57.72,
+     133.06,
+     "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
     [
      57.76,
      133.06,
      "Line on F.Silkscreen"
+    ],
+    [
+     56.56,
+     136.52,
+     "Reference 'C307'"
     ]
    ],
    "code": "silk_overlap",
@@ -735,13 +956,30 @@
   {
    "at": [
     [
+     57.36,
+     133.06,
+     "Line on F.Silkscreen"
+    ],
+    [
      56.56,
      136.52,
      "Reference 'C307'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     36.27,
+     29.67,
+     "Reference 'C101'"
     ],
     [
-     57.8,
-     133.06,
+     23.02,
+     29.17,
      "Line on F.Silkscreen"
     ]
    ],
@@ -752,13 +990,64 @@
   {
    "at": [
     [
-     56.56,
-     136.52,
-     "Reference 'C307'"
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
     ],
     [
-     57.72,
-     133.06,
+     47.94,
+     42.4,
+     "Reference 'Q101'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     22.9,
+     41.54,
+     "Line on F.Silkscreen"
+    ],
+    [
+     42.42,
+     42.08,
+     "Reference 'D101'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     147.94,
+     93.45,
+     "Reference 'Q507'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     45.97,
+     127.02,
+     "Reference 'D303'"
+    ],
+    [
+     46.54,
+     116.19,
      "Line on F.Silkscreen"
     ]
    ],
@@ -786,14 +1075,14 @@
   {
    "at": [
     [
-     45.97,
-     127.02,
-     "Reference 'D303'"
+     2.95,
+     115.7,
+     "Reference 'U302'"
     ],
     [
-     46.54,
-     116.19,
-     "Line on F.Silkscreen"
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
     ]
    ],
    "code": "silk_overlap",
@@ -803,19 +1092,14 @@
   {
    "at": [
     [
-     56.56,
-     141.77,
-     "Circle on F.Silkscreen"
-    ],
-    [
-     55.14,
-     146.57,
-     "Reference 'R307'"
+     192.11,
+     30.65,
+     "Reference 'U401'"
     ]
    ],
-   "code": "silk_overlap",
+   "code": "silk_over_copper",
    "severity": "warning",
-   "text": "Silkscreen overlap"
+   "text": "Silkscreen clipped by solder mask"
   },
   {
    "at": [
@@ -828,23 +1112,6 @@
    "code": "silk_over_copper",
    "severity": "warning",
    "text": "Silkscreen clipped by solder mask"
-  },
-  {
-   "at": [
-    [
-     2.0,
-     0.0,
-     "Line on Edge.Cuts"
-    ],
-    [
-     98.23,
-     0.17,
-     "Reference 'Q201'"
-    ]
-   ],
-   "code": "silk_edge_clearance",
-   "severity": "warning",
-   "text": "Silkscreen clipped by board edge"
   },
   {
    "at": [
@@ -888,9 +1155,9 @@
      "Line on Edge.Cuts"
     ],
     [
-     150.41,
-     -0.38,
-     "Reference 'U401'"
+     98.23,
+     0.17,
+     "Reference 'Q201'"
     ]
    ],
    "code": "silk_edge_clearance",
@@ -900,2940 +1167,31 @@
   {
    "at": [
     [
+     170.12,
+     31.25,
+     "Pad 1 [+15V] of C405 on F.Cu"
+    ],
+    [
+     124.89,
+     33.61,
+     "Track [+15V] on B.Cu, length 46.4037 mm"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     170.12,
+     31.25,
+     "Pad 1 [+15V] of C405 on F.Cu"
+    ],
+    [
      164.39,
-     70.69,
-     "Track [+15V] on F.Cu, length 1.5207 mm"
-    ],
-    [
-     161.5,
-     69.17,
-     "Pad 2 [OUT_W] of C403 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8250 mm)"
-  },
-  {
-   "at": [
-    [
-     164.63,
-     70.92,
-     "Track [+15V] on F.Cu, length 0.3309 mm"
-    ],
-    [
-     161.5,
-     69.17,
-     "Pad 2 [OUT_W] of C403 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.9682 mm)"
-  },
-  {
-   "at": [
-    [
-     151.37,
-     68.25,
-     "Track [+15V] on In2.Cu, length 6.8494 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8626 mm)"
-  },
-  {
-   "at": [
-    [
-     151.37,
-     68.25,
-     "Track [+15V] on In2.Cu, length 6.8494 mm"
-    ],
-    [
-     152.59,
-     66.87,
-     "Via [VB_V] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0436 mm)"
-  },
-  {
-   "at": [
-    [
-     156.22,
-     73.09,
-     "Track [+15V] on In2.Cu, length 2.0836 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8626 mm)"
-  },
-  {
-   "at": [
-    [
-     151.37,
-     68.25,
-     "Track [+15V] on In2.Cu, length 0.0001 mm"
-    ],
-    [
-     152.59,
-     66.87,
-     "Via [VB_V] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0436 mm)"
-  },
-  {
-   "at": [
-    [
-     146.41,
-     63.29,
-     "Track [+15V] on In2.Cu, length 7.0151 mm"
-    ],
-    [
-     152.59,
-     66.87,
-     "Via [VB_V] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0398 mm)"
-  },
-  {
-   "at": [
-    [
-     156.22,
-     73.09,
-     "Track [+15V] on In2.Cu, length 2.3687 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8210 mm)"
-  },
-  {
-   "at": [
-    [
-     144.59,
-     7.94,
-     "Via [GND] on F.Cu - B.Cu"
-    ],
-    [
-     150.41,
-     4.37,
-     "Track [OUT_U] on B.Cu, length 16.0109 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0392 mm)"
-  },
-  {
-   "at": [
-    [
-     163.17,
-     6.68,
-     "Track [IN_UH] on F.Cu, length 16.1774 mm"
-    ],
-    [
-     179.8,
-     4.45,
-     "Track [VB_W] on F.Cu, length 0.4341 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8554 mm)"
-  },
-  {
-   "at": [
-    [
-     163.17,
-     6.68,
-     "Track [IN_UH] on F.Cu, length 16.1774 mm"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8054 mm)"
-  },
-  {
-   "at": [
-    [
-     163.17,
-     6.68,
-     "Track [IN_UH] on F.Cu, length 16.1774 mm"
-    ],
-    [
-     181.26,
-     2.99,
-     "Track [VB_W] on F.Cu, length 2.0697 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8997 mm)"
-  },
-  {
-   "at": [
-    [
-     179.35,
-     6.68,
-     "Via [IN_UH] on F.Cu - B.Cu"
-    ],
-    [
-     179.8,
-     4.45,
-     "Track [VB_W] on F.Cu, length 0.4341 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6804 mm)"
-  },
-  {
-   "at": [
-    [
-     179.35,
-     6.68,
-     "Via [IN_UH] on F.Cu - B.Cu"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6304 mm)"
-  },
-  {
-   "at": [
-    [
-     179.35,
-     6.68,
-     "Via [IN_UH] on F.Cu - B.Cu"
-    ],
-    [
-     181.26,
-     2.99,
-     "Track [VB_W] on F.Cu, length 2.0697 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.7247 mm)"
-  },
-  {
-   "at": [
-    [
-     179.35,
-     6.68,
-     "Via [IN_UH] on F.Cu - B.Cu"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6304 mm)"
-  },
-  {
-   "at": [
-    [
-     179.35,
-     6.68,
-     "Via [IN_UH] on F.Cu - B.Cu"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6304 mm)"
-  },
-  {
-   "at": [
-    [
-     179.35,
-     6.68,
-     "Via [IN_UH] on F.Cu - B.Cu"
-    ],
-    [
-     160.66,
-     23.16,
-     "Track [VB_W] on B.Cu, length 26.4560 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0184 mm)"
-  },
-  {
-   "at": [
-    [
-     179.35,
-     6.68,
-     "Via [IN_UH] on F.Cu - B.Cu"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6304 mm)"
-  },
-  {
-   "at": [
-    [
-     179.35,
-     6.68,
-     "Track [IN_UH] on In2.Cu, length 1.6464 mm"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8054 mm)"
-  },
-  {
-   "at": [
-    [
-     170.46,
-     7.26,
-     "Via [IN_UL] on F.Cu - B.Cu"
-    ],
-    [
-     159.47,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 27.4888 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8578 mm)"
-  },
-  {
-   "at": [
-    [
-     178.94,
-     6.1,
-     "Track [IN_VH] on In2.Cu, length 0.6968 mm"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.2258 mm)"
-  },
-  {
-   "at": [
-    [
-     175.31,
-     2.47,
-     "Track [IN_VH] on In2.Cu, length 5.1349 mm"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0403 mm)"
-  },
-  {
-   "at": [
-    [
-     175.31,
-     2.47,
-     "Track [IN_VH] on In2.Cu, length 5.1349 mm"
-    ],
-    [
-     178.91,
-     2.22,
-     "PTH pad 11 [OUT_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6988 mm)"
-  },
-  {
-   "at": [
-    [
-     179.64,
-     6.1,
-     "Track [IN_VH] on In2.Cu, length 0.7432 mm"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.2486 mm)"
-  },
-  {
-   "at": [
-    [
-     180.16,
-     6.63,
-     "Track [IN_VH] on In2.Cu, length 1.7760 mm"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8940 mm)"
-  },
-  {
-   "at": [
-    [
-     178.49,
-     8.59,
-     "Track [IN_WL] on F.Cu, length 9.0111 mm"
-    ],
-    [
-     179.8,
-     4.45,
-     "Track [VB_W] on F.Cu, length 0.4341 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6270 mm)"
-  },
-  {
-   "at": [
-    [
-     178.49,
-     8.59,
-     "Track [IN_WL] on F.Cu, length 9.0111 mm"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8840 mm)"
-  },
-  {
-   "at": [
-    [
-     178.49,
-     8.59,
-     "Track [IN_WL] on F.Cu, length 9.0111 mm"
-    ],
-    [
-     181.26,
-     2.22,
-     "Track [VB_W] on F.Cu, length 0.7687 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6270 mm)"
-  },
-  {
-   "at": [
-    [
-     178.49,
-     8.59,
-     "Track [IN_WL] on F.Cu, length 9.0111 mm"
-    ],
-    [
-     181.26,
-     2.99,
-     "Track [VB_W] on F.Cu, length 2.0697 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6270 mm)"
-  },
-  {
-   "at": [
-    [
-     178.49,
-     8.59,
-     "Track [IN_WL] on F.Cu, length 9.0111 mm"
-    ],
-    [
-     181.26,
-     2.22,
-     "PTH pad 12 [VB_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.5206 mm)"
-  },
-  {
-   "at": [
-    [
-     178.11,
-     8.59,
-     "Via [IN_WL] on F.Cu - B.Cu"
-    ],
-    [
-     160.66,
-     23.16,
-     "Track [VB_W] on B.Cu, length 26.4560 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.4933 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Track [N_U] on F.Cu, length 0.6202 mm"
-    ],
-    [
-     159.25,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 3.1722 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1345 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Track [N_U] on F.Cu, length 0.6202 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 0.8517 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1345 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Track [N_U] on F.Cu, length 0.6202 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1102 mm)"
-  },
-  {
-   "at": [
-    [
-     159.79,
-     73.91,
-     "Track [N_U] on F.Cu, length 1.7305 mm"
-    ],
-    [
-     159.25,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 3.1722 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6470 mm)"
-  },
-  {
-   "at": [
-    [
-     159.79,
-     73.91,
-     "Track [N_U] on F.Cu, length 1.7305 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 0.8517 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6470 mm)"
-  },
-  {
-   "at": [
-    [
-     159.79,
-     73.91,
-     "Track [N_U] on F.Cu, length 1.7305 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.9165 mm)"
-  },
-  {
-   "at": [
-    [
-     159.33,
-     73.46,
-     "Track [N_U] on F.Cu, length 0.6399 mm"
-    ],
-    [
-     159.25,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 3.1722 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1362 mm)"
-  },
-  {
-   "at": [
-    [
-     159.33,
-     73.46,
-     "Track [N_U] on F.Cu, length 0.6399 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 0.8517 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1362 mm)"
-  },
-  {
-   "at": [
-    [
-     159.33,
-     73.46,
-     "Track [N_U] on F.Cu, length 0.6399 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3025 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Via [N_U] on F.Cu - B.Cu"
-    ],
-    [
-     159.25,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 3.1722 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.4102 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Via [N_U] on F.Cu - B.Cu"
-    ],
-    [
-     158.4,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 0.8517 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3345 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Via [N_U] on F.Cu - B.Cu"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3102 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Via [N_U] on F.Cu - B.Cu"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3102 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Via [N_U] on F.Cu - B.Cu"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3102 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Via [N_U] on F.Cu - B.Cu"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3102 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Via [N_U] on F.Cu - B.Cu"
-    ],
-    [
-     158.4,
-     71.57,
-     "Track [OUT_W] on B.Cu, length 1.9649 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3602 mm)"
-  },
-  {
-   "at": [
-    [
-     158.71,
-     73.46,
-     "Track [N_U] on In2.Cu, length 0.3514 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1102 mm)"
-  },
-  {
-   "at": [
-    [
-     159.06,
-     73.46,
-     "Track [N_U] on In2.Cu, length 5.5451 mm"
-    ],
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0017 mm)"
-  },
-  {
-   "at": [
-    [
-     141.13,
-     60.27,
-     "Track [OUT_U] on F.Cu, length 12.2547 mm"
-    ],
-    [
-     143.77,
-     66.16,
-     "Track [VB_U] on F.Cu, length 0.0740 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.7487 mm)"
-  },
-  {
-   "at": [
-    [
-     141.13,
-     60.27,
-     "Track [OUT_U] on F.Cu, length 12.2547 mm"
-    ],
-    [
-     146.84,
-     69.17,
-     "Pad 1 [VB_U] of C401 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0593 mm)"
-  },
-  {
-   "at": [
-    [
-     141.13,
-     60.27,
-     "Track [OUT_U] on F.Cu, length 12.2547 mm"
-    ],
-    [
-     143.84,
-     66.16,
-     "Track [VB_U] on F.Cu, length 4.2503 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.7487 mm)"
-  },
-  {
-   "at": [
-    [
-     141.13,
-     60.27,
-     "Track [OUT_U] on F.Cu, length 12.2547 mm"
-    ],
-    [
-     143.77,
-     66.16,
-     "Via [VB_U] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.7511 mm)"
-  },
-  {
-   "at": [
-    [
-     139.83,
-     60.27,
-     "Via [OUT_U] on F.Cu - B.Cu"
-    ],
-    [
-     143.77,
-     62.02,
-     "Track [VB_U] on B.Cu, length 4.4903 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     139.83,
-     60.27,
-     "Via [OUT_U] on F.Cu - B.Cu"
-    ],
-    [
-     140.59,
-     58.84,
-     "Track [VB_U] on B.Cu, length 42.4372 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0725 mm)"
-  },
-  {
-   "at": [
-    [
-     139.09,
-     59.54,
-     "Track [OUT_U] on B.Cu, length 1.0451 mm"
-    ],
-    [
-     143.77,
-     62.02,
-     "Track [VB_U] on B.Cu, length 4.4903 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0520 mm)"
-  },
-  {
-   "at": [
-    [
-     139.09,
-     59.54,
-     "Track [OUT_U] on B.Cu, length 1.0451 mm"
-    ],
-    [
-     140.59,
-     58.84,
-     "Track [VB_U] on B.Cu, length 42.4372 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0520 mm)"
-  },
-  {
-   "at": [
-    [
-     150.41,
-     2.22,
-     "Track [OUT_U] on B.Cu, length 2.1519 mm"
-    ],
-    [
-     140.59,
-     16.41,
-     "Track [VB_U] on B.Cu, length 17.2103 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0655 mm)"
-  },
-  {
-   "at": [
-    [
-     150.41,
-     2.22,
-     "Track [OUT_U] on B.Cu, length 2.1519 mm"
-    ],
-    [
-     152.76,
-     2.22,
-     "PTH pad 2 [VB_U] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.2000 mm)"
-  },
-  {
-   "at": [
-    [
-     150.41,
-     2.22,
-     "Track [OUT_U] on B.Cu, length 2.1519 mm"
-    ],
-    [
-     152.76,
-     4.24,
-     "Track [VB_U] on B.Cu, length 2.0158 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8500 mm)"
-  },
-  {
-   "at": [
-    [
-     139.09,
-     15.69,
-     "Track [OUT_U] on B.Cu, length 43.8421 mm"
-    ],
-    [
-     143.77,
-     62.02,
-     "Track [VB_U] on B.Cu, length 4.4903 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0019 mm)"
-  },
-  {
-   "at": [
-    [
-     139.09,
-     15.69,
-     "Track [OUT_U] on B.Cu, length 43.8421 mm"
-    ],
-    [
-     140.59,
-     58.84,
-     "Track [VB_U] on B.Cu, length 42.4372 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0019 mm)"
-  },
-  {
-   "at": [
-    [
-     139.09,
-     15.69,
-     "Track [OUT_U] on B.Cu, length 43.8421 mm"
-    ],
-    [
-     140.59,
-     16.41,
-     "Track [VB_U] on B.Cu, length 17.2103 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0019 mm)"
-  },
-  {
-   "at": [
-    [
-     150.41,
-     4.37,
-     "Track [OUT_U] on B.Cu, length 16.0109 mm"
-    ],
-    [
-     140.59,
-     58.84,
-     "Track [VB_U] on B.Cu, length 42.4372 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0655 mm)"
-  },
-  {
-   "at": [
-    [
-     150.41,
-     4.37,
-     "Track [OUT_U] on B.Cu, length 16.0109 mm"
-    ],
-    [
-     140.59,
-     16.41,
-     "Track [VB_U] on B.Cu, length 17.2103 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0655 mm)"
-  },
-  {
-   "at": [
-    [
-     150.41,
-     4.37,
-     "Track [OUT_U] on B.Cu, length 16.0109 mm"
-    ],
-    [
-     152.76,
-     4.24,
-     "Track [VB_U] on B.Cu, length 2.0158 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8539 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Track [OUT_V] on F.Cu, length 18.0957 mm"
-    ],
-    [
-     152.69,
-     66.97,
-     "Track [VB_V] on F.Cu, length 2.1975 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.4394 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Track [OUT_V] on F.Cu, length 18.0957 mm"
-    ],
-    [
-     152.59,
-     66.87,
-     "Via [VB_V] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3894 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Track [OUT_V] on F.Cu, length 18.0957 mm"
-    ],
-    [
-     152.59,
-     66.87,
-     "Track [VB_V] on F.Cu, length 0.1486 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.4394 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Via [OUT_V] on F.Cu - B.Cu"
-    ],
-    [
-     144.4,
-     53.74,
-     "Track [VB_V] on B.Cu, length 1.0351 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Via [OUT_V] on F.Cu - B.Cu"
-    ],
-    [
-     140.59,
-     58.84,
-     "Track [VB_U] on B.Cu, length 42.4372 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.7089 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Via [OUT_V] on F.Cu - B.Cu"
-    ],
-    [
-     143.67,
-     53.01,
-     "Track [VB_V] on B.Cu, length 28.5433 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0508 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Via [OUT_V] on F.Cu - B.Cu"
-    ],
-    [
-     144.4,
-     58.68,
-     "Track [VB_V] on B.Cu, length 4.9375 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0019 mm)"
-  },
-  {
-   "at": [
-    [
-     153.44,
-     18.54,
-     "Track [OUT_V] on B.Cu, length 15.8676 mm"
-    ],
-    [
-     153.95,
-     20.16,
-     "Track [VB_V] on B.Cu, length 18.4664 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     153.44,
-     18.54,
-     "Track [OUT_V] on B.Cu, length 15.8676 mm"
-    ],
-    [
-     147.98,
-     20.16,
-     "Track [VB_V] on B.Cu, length 5.9723 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1117 mm)"
-  },
-  {
-   "at": [
-    [
-     153.44,
-     18.54,
-     "Track [OUT_V] on B.Cu, length 15.8676 mm"
-    ],
-    [
-     167.01,
-     7.1,
-     "Track [VB_V] on B.Cu, length 4.8778 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8608 mm)"
-  },
-  {
-   "at": [
-    [
-     142.17,
-     53.7,
-     "Track [OUT_V] on B.Cu, length 29.9277 mm"
-    ],
-    [
-     143.67,
-     24.47,
-     "Track [VB_V] on B.Cu, length 6.0961 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0034 mm)"
-  },
-  {
-   "at": [
-    [
-     142.17,
-     53.7,
-     "Track [OUT_V] on B.Cu, length 29.9277 mm"
-    ],
-    [
-     144.4,
-     53.74,
-     "Track [VB_V] on B.Cu, length 1.0351 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0034 mm)"
-  },
-  {
-   "at": [
-    [
-     142.17,
-     53.7,
-     "Track [OUT_V] on B.Cu, length 29.9277 mm"
-    ],
-    [
-     140.59,
-     58.84,
-     "Track [VB_U] on B.Cu, length 42.4372 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0755 mm)"
-  },
-  {
-   "at": [
-    [
-     142.17,
-     53.7,
-     "Track [OUT_V] on B.Cu, length 29.9277 mm"
-    ],
-    [
-     143.67,
-     53.01,
-     "Track [VB_V] on B.Cu, length 28.5433 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0034 mm)"
-  },
-  {
-   "at": [
-    [
-     142.17,
-     53.7,
-     "Track [OUT_V] on B.Cu, length 29.9277 mm"
-    ],
-    [
-     144.4,
-     58.68,
-     "Track [VB_V] on B.Cu, length 4.9375 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.7357 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Track [OUT_V] on B.Cu, length 0.9665 mm"
-    ],
-    [
-     144.4,
-     53.74,
-     "Track [VB_V] on B.Cu, length 1.0351 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0520 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Track [OUT_V] on B.Cu, length 0.9665 mm"
-    ],
-    [
-     140.59,
-     58.84,
-     "Track [VB_U] on B.Cu, length 42.4372 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0755 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Track [OUT_V] on B.Cu, length 0.9665 mm"
-    ],
-    [
-     143.67,
-     53.01,
-     "Track [VB_V] on B.Cu, length 28.5433 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0520 mm)"
-  },
-  {
-   "at": [
-    [
-     142.85,
-     54.38,
-     "Track [OUT_V] on B.Cu, length 0.9665 mm"
-    ],
-    [
-     144.4,
-     58.68,
-     "Track [VB_V] on B.Cu, length 4.9375 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0519 mm)"
-  },
-  {
-   "at": [
-    [
-     147.4,
-     18.54,
-     "Track [OUT_V] on B.Cu, length 6.0446 mm"
-    ],
-    [
-     143.67,
-     24.47,
-     "Track [VB_V] on B.Cu, length 6.0961 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1117 mm)"
-  },
-  {
-   "at": [
-    [
-     147.4,
-     18.54,
-     "Track [OUT_V] on B.Cu, length 6.0446 mm"
-    ],
-    [
-     153.95,
-     20.16,
-     "Track [VB_V] on B.Cu, length 18.4664 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     147.4,
-     18.54,
-     "Track [OUT_V] on B.Cu, length 6.0446 mm"
-    ],
-    [
-     147.98,
-     20.16,
-     "Track [VB_V] on B.Cu, length 5.9723 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1117 mm)"
-  },
-  {
-   "at": [
-    [
-     164.66,
-     7.32,
-     "Track [OUT_V] on B.Cu, length 5.1037 mm"
-    ],
-    [
-     153.95,
-     20.16,
-     "Track [VB_V] on B.Cu, length 18.4664 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     164.66,
-     7.32,
-     "Track [OUT_V] on B.Cu, length 5.1037 mm"
-    ],
-    [
-     167.01,
-     7.1,
-     "Track [VB_V] on B.Cu, length 4.8778 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8500 mm)"
-  },
-  {
-   "at": [
-    [
-     164.66,
-     7.32,
-     "Track [OUT_V] on B.Cu, length 5.1037 mm"
-    ],
-    [
-     167.01,
-     2.22,
-     "PTH pad 7 [VB_V] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.2000 mm)"
-  },
-  {
-   "at": [
-    [
-     142.17,
-     23.77,
-     "Track [OUT_V] on B.Cu, length 7.3953 mm"
-    ],
-    [
-     143.67,
-     24.47,
-     "Track [VB_V] on B.Cu, length 6.0961 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0531 mm)"
-  },
-  {
-   "at": [
-    [
-     142.17,
-     23.77,
-     "Track [OUT_V] on B.Cu, length 7.3953 mm"
-    ],
-    [
-     140.59,
-     58.84,
-     "Track [VB_U] on B.Cu, length 42.4372 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0755 mm)"
-  },
-  {
-   "at": [
-    [
-     142.17,
-     23.77,
-     "Track [OUT_V] on B.Cu, length 7.3953 mm"
-    ],
-    [
-     143.67,
-     53.01,
-     "Track [VB_V] on B.Cu, length 28.5433 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0531 mm)"
-  },
-  {
-   "at": [
-    [
-     142.17,
-     23.77,
-     "Track [OUT_V] on B.Cu, length 7.3953 mm"
-    ],
-    [
-     147.98,
-     20.16,
-     "Track [VB_V] on B.Cu, length 5.9723 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0531 mm)"
-  },
-  {
-   "at": [
-    [
-     159.25,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 3.1722 mm"
-    ],
-    [
-     158.55,
-     66.96,
-     "Track [VB_W] on F.Cu, length 2.2150 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6990 mm)"
-  },
-  {
-   "at": [
-    [
-     159.25,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 3.1722 mm"
-    ],
-    [
-     158.55,
-     69.17,
-     "Pad 1 [VB_W] of C403 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0096 mm)"
-  },
-  {
-   "at": [
-    [
-     159.25,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 3.1722 mm"
-    ],
-    [
-     159.79,
-     73.91,
-     "Pad 1 [N_U] of R414 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6387 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 0.8517 mm"
-    ],
-    [
-     158.55,
-     66.96,
-     "Track [VB_W] on F.Cu, length 2.2150 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.9030 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 0.8517 mm"
-    ],
-    [
-     158.55,
-     69.17,
-     "Pad 1 [VB_W] of C403 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.2530 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 0.8517 mm"
-    ],
-    [
-     157.02,
-     75.09,
-     "Pad 2 [GND] of R411 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8253 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     71.57,
-     "Track [OUT_W] on F.Cu, length 0.8517 mm"
-    ],
-    [
-     159.79,
-     73.91,
-     "Pad 1 [N_U] of R414 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6387 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ],
-    [
-     158.55,
-     66.96,
-     "Track [VB_W] on F.Cu, length 2.2150 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8574 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ],
-    [
-     158.55,
-     69.17,
-     "Pad 1 [VB_W] of C403 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.2030 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ],
-    [
-     157.02,
-     75.09,
-     "Pad 2 [GND] of R411 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.7753 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     71.57,
-     "Via [OUT_W] on F.Cu - B.Cu"
-    ],
-    [
-     159.79,
-     73.91,
-     "Pad 1 [N_U] of R414 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.8781 mm)"
-  },
-  {
-   "at": [
-    [
-     159.47,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 27.4888 mm"
-    ],
-    [
-     149.3,
-     23.16,
-     "Track [VB_W] on B.Cu, length 11.3578 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0019 mm)"
-  },
-  {
-   "at": [
-    [
-     159.47,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 27.4888 mm"
-    ],
-    [
-     160.66,
-     23.16,
-     "Track [VB_W] on B.Cu, length 26.4560 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3983 mm)"
-  },
-  {
-   "at": [
-    [
-     159.47,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 27.4888 mm"
-    ],
-    [
-     175.31,
-     2.22,
-     "PTH pad 10 [IN_VH] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3956 mm)"
-  },
-  {
-   "at": [
-    [
-     159.47,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 27.4888 mm"
-    ],
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3483 mm)"
-  },
-  {
-   "at": [
-    [
-     159.47,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 27.4888 mm"
-    ],
-    [
-     181.26,
-     2.22,
-     "PTH pad 12 [VB_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.2000 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     53.12,
-     "Track [OUT_W] on B.Cu, length 1.0336 mm"
-    ],
-    [
-     144.4,
-     53.74,
-     "Track [VB_V] on B.Cu, length 1.0351 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     53.12,
-     "Track [OUT_W] on B.Cu, length 1.0336 mm"
-    ],
-    [
-     158.55,
-     63.64,
-     "Track [VB_W] on B.Cu, length 16.7634 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     53.12,
-     "Track [OUT_W] on B.Cu, length 1.0336 mm"
-    ],
-    [
-     143.67,
-     53.01,
-     "Track [VB_V] on B.Cu, length 28.5433 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0029 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     53.12,
-     "Track [OUT_W] on B.Cu, length 1.0336 mm"
-    ],
-    [
-     144.4,
-     58.68,
-     "Track [VB_V] on B.Cu, length 4.9375 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     53.12,
-     "Track [OUT_W] on B.Cu, length 1.0336 mm"
-    ],
-    [
-     146.69,
-     51.78,
-     "Track [VB_W] on B.Cu, length 26.0180 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     148.67,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 10.7987 mm"
-    ],
-    [
-     143.67,
-     24.47,
-     "Track [VB_V] on B.Cu, length 6.0961 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0527 mm)"
-  },
-  {
-   "at": [
-    [
-     148.67,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 10.7987 mm"
-    ],
-    [
-     146.69,
-     25.77,
-     "Track [VB_W] on B.Cu, length 3.6853 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0019 mm)"
-  },
-  {
-   "at": [
-    [
-     148.67,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 10.7987 mm"
-    ],
-    [
-     153.95,
-     20.16,
-     "Track [VB_V] on B.Cu, length 18.4664 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     148.67,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 10.7987 mm"
-    ],
-    [
-     147.98,
-     20.16,
-     "Track [VB_V] on B.Cu, length 5.9723 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     148.67,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 10.7987 mm"
-    ],
-    [
-     149.3,
-     23.16,
-     "Track [VB_W] on B.Cu, length 11.3578 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0019 mm)"
-  },
-  {
-   "at": [
-    [
-     148.67,
-     21.66,
-     "Track [OUT_W] on B.Cu, length 10.7987 mm"
-    ],
-    [
-     160.66,
-     23.16,
-     "Track [VB_W] on B.Cu, length 26.4560 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.3983 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     25.16,
-     "Track [OUT_W] on B.Cu, length 4.9519 mm"
-    ],
-    [
-     143.67,
-     24.47,
-     "Track [VB_V] on B.Cu, length 6.0961 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0527 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     25.16,
-     "Track [OUT_W] on B.Cu, length 4.9519 mm"
-    ],
-    [
-     146.69,
-     25.77,
-     "Track [VB_W] on B.Cu, length 3.6853 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0030 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     25.16,
-     "Track [OUT_W] on B.Cu, length 4.9519 mm"
-    ],
-    [
-     143.67,
-     53.01,
-     "Track [VB_V] on B.Cu, length 28.5433 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0029 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     25.16,
-     "Track [OUT_W] on B.Cu, length 4.9519 mm"
-    ],
-    [
-     146.69,
-     51.78,
-     "Track [VB_W] on B.Cu, length 26.0180 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0030 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     25.16,
-     "Track [OUT_W] on B.Cu, length 4.9519 mm"
-    ],
-    [
-     147.98,
-     20.16,
-     "Track [VB_V] on B.Cu, length 5.9723 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     25.16,
-     "Track [OUT_W] on B.Cu, length 4.9519 mm"
-    ],
-    [
-     149.3,
-     23.16,
-     "Track [VB_W] on B.Cu, length 11.3578 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0030 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     69.61,
-     "Track [OUT_W] on B.Cu, length 17.6734 mm"
-    ],
-    [
-     152.59,
-     66.87,
-     "Via [VB_V] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6205 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     69.61,
-     "Track [OUT_W] on B.Cu, length 17.6734 mm"
-    ],
-    [
-     152.59,
-     66.87,
-     "Track [VB_V] on B.Cu, length 11.5804 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6705 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     69.61,
-     "Track [OUT_W] on B.Cu, length 17.6734 mm"
-    ],
-    [
-     158.55,
-     66.96,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.4284 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     69.61,
-     "Track [OUT_W] on B.Cu, length 17.6734 mm"
-    ],
-    [
-     158.55,
-     66.96,
-     "Track [VB_W] on B.Cu, length 3.3182 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.4784 mm)"
-  },
-  {
-   "at": [
-    [
-     158.4,
-     69.61,
-     "Track [OUT_W] on B.Cu, length 17.6734 mm"
-    ],
-    [
-     144.4,
-     58.68,
-     "Track [VB_V] on B.Cu, length 4.9375 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0019 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     57.11,
-     "Track [OUT_W] on B.Cu, length 3.9920 mm"
-    ],
-    [
-     152.59,
-     66.87,
-     "Track [VB_V] on B.Cu, length 11.5804 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.6710 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     57.11,
-     "Track [OUT_W] on B.Cu, length 3.9920 mm"
-    ],
-    [
-     144.4,
-     53.74,
-     "Track [VB_V] on B.Cu, length 1.0351 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0019 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     57.11,
-     "Track [OUT_W] on B.Cu, length 3.9920 mm"
-    ],
-    [
-     158.55,
-     63.64,
-     "Track [VB_W] on B.Cu, length 16.7634 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     57.11,
-     "Track [OUT_W] on B.Cu, length 3.9920 mm"
-    ],
-    [
-     143.67,
-     53.01,
-     "Track [VB_V] on B.Cu, length 28.5433 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.7365 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     57.11,
-     "Track [OUT_W] on B.Cu, length 3.9920 mm"
-    ],
-    [
-     144.4,
-     58.68,
-     "Track [VB_V] on B.Cu, length 4.9375 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0019 mm)"
-  },
-  {
-   "at": [
-    [
-     145.9,
-     57.11,
-     "Track [OUT_W] on B.Cu, length 3.9920 mm"
-    ],
-    [
-     146.69,
-     51.78,
-     "Track [VB_W] on B.Cu, length 26.0180 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0511 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     52.39,
-     "Track [OUT_W] on B.Cu, length 27.2292 mm"
-    ],
-    [
-     143.67,
-     24.47,
-     "Track [VB_V] on B.Cu, length 6.0961 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0527 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     52.39,
-     "Track [OUT_W] on B.Cu, length 27.2292 mm"
-    ],
-    [
-     146.69,
-     25.77,
-     "Track [VB_W] on B.Cu, length 3.6853 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0192 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     52.39,
-     "Track [OUT_W] on B.Cu, length 27.2292 mm"
-    ],
-    [
-     144.4,
-     53.74,
-     "Track [VB_V] on B.Cu, length 1.0351 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0020 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     52.39,
-     "Track [OUT_W] on B.Cu, length 27.2292 mm"
-    ],
-    [
-     158.55,
-     63.64,
-     "Track [VB_W] on B.Cu, length 16.7634 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0192 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     52.39,
-     "Track [OUT_W] on B.Cu, length 27.2292 mm"
-    ],
-    [
-     143.67,
-     53.01,
-     "Track [VB_V] on B.Cu, length 28.5433 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0029 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     52.39,
-     "Track [OUT_W] on B.Cu, length 27.2292 mm"
-    ],
-    [
-     144.4,
-     58.68,
-     "Track [VB_V] on B.Cu, length 4.9375 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0573 mm)"
-  },
-  {
-   "at": [
-    [
-     145.17,
-     52.39,
-     "Track [OUT_W] on B.Cu, length 27.2292 mm"
-    ],
-    [
-     146.69,
-     51.78,
-     "Track [VB_W] on B.Cu, length 26.0180 mm"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0192 mm)"
-  },
-  {
-   "at": [
-    [
-     140.59,
-     16.41,
-     "Track [VB_U] on B.Cu, length 17.2103 mm"
-    ],
-    [
-     150.41,
-     2.22,
-     "PTH pad 1 [OUT_U] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.5643 mm)"
-  },
-  {
-   "at": [
-    [
-     152.76,
-     4.24,
-     "Track [VB_U] on B.Cu, length 2.0158 mm"
-    ],
-    [
-     150.41,
-     2.22,
-     "PTH pad 1 [OUT_U] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.2000 mm)"
-  },
-  {
-   "at": [
-    [
-     167.01,
-     7.1,
-     "Track [VB_V] on B.Cu, length 4.8778 mm"
-    ],
-    [
-     164.66,
-     2.22,
-     "PTH pad 6 [OUT_V] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.2000 mm)"
-  },
-  {
-   "at": [
-    [
-     179.8,
-     4.45,
-     "Track [VB_W] on F.Cu, length 0.4341 mm"
-    ],
-    [
-     178.91,
-     2.22,
-     "PTH pad 11 [OUT_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1276 mm)"
-  },
-  {
-   "at": [
-    [
-     181.26,
-     2.22,
-     "Track [VB_W] on F.Cu, length 0.7687 mm"
-    ],
-    [
-     178.91,
-     2.22,
-     "PTH pad 11 [OUT_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.2000 mm)"
-  },
-  {
-   "at": [
-    [
-     181.26,
-     2.99,
-     "Track [VB_W] on F.Cu, length 2.0697 mm"
-    ],
-    [
-     178.91,
-     2.22,
-     "PTH pad 11 [OUT_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0553 mm)"
-  },
-  {
-   "at": [
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ],
-    [
-     178.91,
-     2.22,
-     "PTH pad 11 [OUT_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0776 mm)"
-  },
-  {
-   "at": [
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ],
-    [
-     178.91,
-     2.22,
-     "PTH pad 11 [OUT_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0776 mm)"
-  },
-  {
-   "at": [
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ],
-    [
-     178.91,
-     2.22,
-     "PTH pad 11 [OUT_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0776 mm)"
-  },
-  {
-   "at": [
-    [
-     179.36,
-     4.45,
-     "Via [VB_W] on F.Cu - B.Cu"
-    ],
-    [
-     178.91,
-     2.22,
-     "PTH pad 11 [OUT_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.0776 mm)"
-  },
-  {
-   "at": [
-    [
-     160.66,
-     23.16,
-     "Track [VB_W] on B.Cu, length 26.4560 mm"
-    ],
-    [
-     178.91,
-     2.22,
-     "PTH pad 11 [OUT_W] of U401"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Boot' clearance 2.0000 mm; actual 1.1276 mm)"
-  },
-  {
-   "at": [
-    [
-     82.15,
-     135.85,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     213.57,
-     68.37,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     82.19,
-     133.15,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     216.34,
-     100.71,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     224.88,
-     98.15,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     199.95,
-     88.7,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     140.3,
-     126.84,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     127.79,
-     130.8,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     58.76,
-     44.68,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     232.34,
-     94.73,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     205.16,
-     69.11,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     131.49,
-     132.77,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     73.42,
-     135.4,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     196.74,
-     69.11,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     224.68,
-     101.79,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     27.56,
-     117.39,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     187.34,
-     96.51,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     86.55,
-     12.49,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     170.78,
-     73.89,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     107.37,
-     133.96,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "via_dangling",
-   "severity": "warning",
-   "text": "Via is not connected or connected on only one layer"
-  },
-  {
-   "at": [
-    [
-     51.92,
-     13.42,
-     "Track [+15V] on In2.Cu, length 23.2481 mm"
-    ],
-    [
-     92.46,
-     12.49,
-     "Track [+15V] on F.Cu, length 2.5156 mm"
+     31.68,
+     "Pad 1 [+15V] of C404 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -3845,7 +1203,7 @@
     [
      213.88,
      96.23,
-     "Track [+24V] on F.Cu, length 2.4771 mm"
+     "Track [+24V] on F.Cu, length 5.4967 mm"
     ],
     [
      217.65,
@@ -3877,14 +1235,31 @@
   {
    "at": [
     [
+     181.54,
+     35.24,
+     "Track [+3V3] on F.Cu, length 1.6546 mm"
+    ],
+    [
+     167.74,
+     36.41,
+     "Pad 1 [+3V3] of R417 on F.Cu"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
      206.73,
      132.0,
      "PTH pad 2 [+5V] of U602"
     ],
     [
-     199.0,
-     129.47,
-     "Track [+5V] on F.Cu, length 1.0881 mm"
+     198.98,
+     129.49,
+     "Track [+5V] on F.Cu, length 0.0269 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -3962,26 +1337,26 @@
   {
    "at": [
     [
-     46.57,
-     99.58,
-     "Pad 2 [FLY_D] of D301 on F.Cu"
+     41.88,
+     104.84,
+     "Pad 1 [CLAMP_M] of R310 on F.Cu"
     ],
+    [
+     56.1,
+     99.75,
+     "Pad 2 [CLAMP_M] of R303 on F.Cu"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
     [
      42.38,
      87.07,
      "Pad 6 [FLY_D] of U301 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     15.61,
-     108.39,
-     "PTH pad 3 [FLY_D] of T301"
     ],
     [
      46.57,
@@ -3996,65 +1371,14 @@
   {
    "at": [
     [
-     217.65,
-     102.0,
-     "Pad 12 [GND] of U501 on F.Cu"
+     223.4,
+     98.75,
+     "Pad 22 [GND] of U501 on F.Cu"
     ],
-    [
-     217.65,
-     100.71,
-     "Track [GND] on F.Cu, length 1.3166 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
     [
      223.4,
      97.46,
      "Pad 24 [GND] of U501 on F.Cu"
-    ],
-    [
-     223.4,
-     98.75,
-     "Pad 22 [GND] of U501 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     221.61,
-     101.88,
-     "PTH pad 29 [GND] of U501"
-    ],
-    [
-     223.4,
-     101.79,
-     "Track [GND] on F.Cu, length 0.4395 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     221.61,
-     98.15,
-     "PTH pad 29 [GND] of U501"
-    ],
-    [
-     223.4,
-     98.75,
-     "Pad 22 [GND] of U501 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -4081,48 +1405,14 @@
   {
    "at": [
     [
-     81.16,
-     133.53,
-     "Pad 2 [GND] of C703 on F.Cu"
+     171.91,
+     28.05,
+     "PTH pad 8 [GND] of U401"
     ],
-    [
-     81.21,
-     136.24,
-     "Track [GND] on F.Cu, length 0.5500 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     129.07,
-     130.75,
-     "Track [GND] on F.Cu, length 1.2233 mm"
-    ],
-    [
-     132.25,
-     133.53,
-     "Track [GND] on F.Cu, length 1.0710 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
     [
      171.68,
-     68.75,
+     31.25,
      "Pad 2 [GND] of C405 on F.Cu"
-    ],
-    [
-     168.45,
-     69.11,
-     "Via [GND] on F.Cu - B.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -4132,48 +1422,14 @@
   {
    "at": [
     [
-     126.7,
-     127.65,
-     "Via [GND] on F.Cu - B.Cu"
+     77.21,
+     25.14,
+     "Pad 2 [GND] of R217 on F.Cu"
     ],
     [
-     129.07,
-     130.75,
-     "Track [GND] on F.Cu, length 1.2233 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     73.42,
-     135.4,
-     "Track [GND] on F.Cu, length 0.9677 mm"
-    ],
-    [
-     69.5,
-     133.9,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     89.94,
-     9.95,
-     "Track [GND] on F.Cu, length 1.1725 mm"
-    ],
-    [
-     86.55,
-     12.49,
-     "Via [GND] on F.Cu - B.Cu"
+     81.53,
+     21.22,
+     "Track [GND] on F.Cu, length 6.0944 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -4190,7 +1446,7 @@
     [
      132.56,
      20.32,
-     "Track [GND] on F.Cu, length 1.0328 mm"
+     "Track [GND] on F.Cu, length 1.0312 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -4199,15 +1455,15 @@
   },
   {
    "at": [
-    [
-     99.85,
-     24.97,
-     "Via [GND] on F.Cu - B.Cu"
-    ],
     [
      100.15,
      20.32,
      "Pad 2 [GND] of R210 on F.Cu"
+    ],
+    [
+     98.84,
+     26.17,
+     "Track [GND] on F.Cu, length 1.0308 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -4217,133 +1473,14 @@
   {
    "at": [
     [
-     168.45,
-     69.11,
-     "Via [GND] on F.Cu - B.Cu"
+     171.68,
+     31.25,
+     "Pad 2 [GND] of C405 on F.Cu"
     ],
     [
-     170.78,
-     73.89,
-     "Track [GND] on F.Cu, length 0.9571 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     212.85,
-     73.91,
-     "Pad 2 [GND] of C417 on F.Cu"
-    ],
-    [
-     212.62,
-     68.75,
-     "Pad 2 [GND] of C410 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     232.34,
-     94.73,
-     "Via [GND] on F.Cu - B.Cu"
-    ],
-    [
-     237.63,
-     96.33,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     90.96,
-     128.57,
-     "Track [GND] on F.Cu, length 0.1854 mm"
-    ],
-    [
-     93.78,
-     133.53,
-     "Pad 2 [GND] of C704 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     73.03,
-     21.24,
-     "Track [GND] on F.Cu, length 1.3036 mm"
-    ],
-    [
-     77.21,
-     25.14,
-     "Pad 2 [GND] of R217 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     196.74,
-     69.11,
-     "Via [GND] on F.Cu - B.Cu"
-    ],
-    [
-     198.92,
-     75.0,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     81.87,
-     125.57,
-     "Track [GND] on F.Cu, length 0.9148 mm"
-    ],
-    [
-     81.53,
-     133.15,
-     "Track [GND] on F.Cu, length 0.6542 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     119.33,
-     129.93,
-     "Pad 35 [GND] of U10 on F.Cu"
-    ],
-    [
-     112.92,
-     128.02,
-     "Pad 47 [GND] of U10 on F.Cu"
+     173.55,
+     36.41,
+     "Pad 2 [GND] of C415 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -4370,14 +1507,14 @@
   {
    "at": [
     [
-     188.21,
-     89.38,
-     "Track [GND] on F.Cu, length 0.1574 mm"
+     112.92,
+     128.02,
+     "Pad 47 [GND] of U10 on F.Cu"
     ],
     [
-     188.33,
-     96.51,
-     "Track [GND] on F.Cu, length 0.9963 mm"
+     119.33,
+     129.93,
+     "Pad 35 [GND] of U10 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -4421,77 +1558,9 @@
   {
    "at": [
     [
-     204.19,
-     68.75,
-     "Pad 2 [GND] of C409 on F.Cu"
-    ],
-    [
-     196.74,
-     69.11,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     212.62,
-     68.75,
-     "Pad 2 [GND] of C410 on F.Cu"
-    ],
-    [
-     205.16,
-     69.11,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     145.08,
-     133.33,
-     "Track [GND] on F.Cu, length 0.8483 mm"
-    ],
-    [
-     140.3,
-     126.84,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     112.92,
-     128.02,
-     "Pad 47 [GND] of U10 on F.Cu"
-    ],
-    [
-     107.37,
-     133.96,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     144.59,
-     7.94,
-     "Via [GND] on F.Cu - B.Cu"
+     145.6,
+     9.42,
+     "Track [GND] on F.Cu, length 0.4818 mm"
     ],
     [
      136.68,
@@ -4506,14 +1575,14 @@
   {
    "at": [
     [
-     72.74,
-     136.24,
-     "Pad 2 [GND] of C708 on F.Cu"
+     160.56,
+     72.01,
+     "Track [GND] on F.Cu, length 1.6034 mm"
     ],
     [
-     71.47,
-     144.88,
-     "PTH pad 2 [GND] of J701"
+     170.58,
+     73.14,
+     "Pad 2 [GND] of R413 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -4540,77 +1609,9 @@
   {
    "at": [
     [
-     47.75,
-     45.75,
-     "Pad 2 [GND] of Q101 on F.Cu"
-    ],
-    [
-     58.38,
-     43.66,
-     "Track [GND] on F.Cu, length 0.5390 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     199.95,
-     88.7,
-     "Via [GND] on F.Cu - B.Cu"
-    ],
-    [
-     188.25,
-     88.15,
-     "Track [GND] on F.Cu, length 0.1054 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     10.6,
-     125.84,
-     "Track [GND] on F.Cu, length 0.0810 mm"
-    ],
-    [
-     27.56,
-     117.39,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     144.59,
-     7.94,
-     "Track [GND] on F.Cu, length 0.9397 mm"
-    ],
-    [
-     170.61,
-     2.22,
-     "PTH pad 8 [GND] of U401"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
      137.22,
      16.24,
-     "Track [ISENSE] on F.Cu, length 9.1683 mm"
+     "Track [ISENSE] on F.Cu, length 9.1662 mm"
     ],
     [
      141.09,
@@ -4625,31 +1626,14 @@
   {
    "at": [
     [
-     2.27,
-     45.68,
-     "PTH pad 1 [L_C] of C102"
+     27.02,
+     15.5,
+     "Track [L_F] on B.Cu, length 10.0692 mm"
     ],
-    [
-     27.77,
-     44.53,
-     "Track [L_C] on B.Cu, length 9.5700 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
     [
      34.14,
      3.38,
      "PTH pad 2 [L_F] of F101"
-    ],
-    [
-     34.14,
-     9.96,
-     "Track [L_F] on B.Cu, length 1.5800 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -4658,15 +1642,32 @@
   },
   {
    "at": [
+    [
+     27.02,
+     25.62,
+     "Track [L_F] on B.Cu, length 10.1200 mm"
+    ],
+    [
+     25.02,
+     36.17,
+     "PTH pad 1 [L_F] of C101"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     25.02,
+     36.17,
+     "PTH pad 1 [L_F] of C101"
+    ],
     [
      10.8,
      55.83,
      "PTH pad 1 [L_F] of L101"
-    ],
-    [
-     16.47,
-     36.17,
-     "Track [L_F] on B.Cu, length 2.8426 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -4676,14 +1677,14 @@
   {
    "at": [
     [
-     43.3,
+     51.84,
      31.79,
      "Pad 1 [L_F] of R101 on F.Cu"
     ],
     [
-     18.48,
+     27.02,
      25.62,
-     "Track [L_F] on B.Cu, length 22.1466 mm"
+     "Track [L_F] on B.Cu, length 10.1200 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -4733,8 +1734,8 @@
     ],
     [
      47.52,
-     19.17,
-     "Track [L_R] on B.Cu, length 5.1019 mm"
+     24.46,
+     "Track [L_R] on F.Cu, length 5.2866 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -4761,8 +1762,8 @@
   {
    "at": [
     [
-     155.36,
-     27.45,
+     187.16,
+     2.82,
      "PTH pad 24 [MOT_U] of U401"
     ],
     [
@@ -4778,14 +1779,14 @@
   {
    "at": [
     [
-     187.16,
-     27.45,
-     "PTH pad 18 [MOT_W] of U401"
+     171.26,
+     2.82,
+     "PTH pad 21 [MOT_V] of U401"
     ],
     [
      239.24,
-     7.07,
-     "PTH pad 3 [MOT_W] of J401"
+     12.15,
+     "PTH pad 2 [MOT_V] of J401"
     ]
    ],
    "code": "unconnected_items",
@@ -4795,14 +1796,14 @@
   {
    "at": [
     [
-     13.53,
-     45.68,
-     "PTH pad 1 [N_C] of C103"
+     155.36,
+     2.82,
+     "PTH pad 18 [MOT_W] of U401"
     ],
     [
-     33.66,
-     55.83,
-     "PTH pad 4 [N_C] of L101"
+     239.24,
+     7.07,
+     "PTH pad 3 [MOT_W] of J401"
     ]
    ],
    "code": "unconnected_items",
@@ -4829,14 +1830,14 @@
   {
    "at": [
     [
-     77.83,
-     2.88,
-     "PTH pad 3 [N_C] of BR101"
-    ],
-    [
      33.66,
      55.83,
      "PTH pad 4 [N_C] of L101"
+    ],
+    [
+     77.83,
+     2.88,
+     "PTH pad 3 [N_C] of BR101"
     ]
    ],
    "code": "unconnected_items",
@@ -4846,14 +1847,14 @@
   {
    "at": [
     [
-     45.88,
-     36.71,
-     "Track [N_IN] on F.Cu, length 11.7650 mm"
-    ],
-    [
-     52.03,
+     60.58,
      31.79,
      "Pad 2 [N_IN] of R102 on F.Cu"
+    ],
+    [
+     52.52,
+     41.17,
+     "Track [N_IN] on B.Cu, length 11.0324 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -4862,15 +1863,83 @@
   },
   {
    "at": [
-    [
-     25.98,
-     27.82,
-     "PTH pad 2 [N_IN] of RV101"
-    ],
     [
      6.74,
      5.07,
      "PTH pad 2 [N_IN] of J101"
+    ],
+    [
+     34.52,
+     27.82,
+     "Track [N_IN] on B.Cu, length 4.6500 mm"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     148.77,
+     39.35,
+     "Track [N_V] on In2.Cu, length 1.6811 mm"
+    ],
+    [
+     176.15,
+     36.41,
+     "Pad 1 [N_V] of R415 on F.Cu"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     149.79,
+     31.68,
+     "Pad 2 [OUT_U] of C401 on F.Cu"
+    ],
+    [
+     192.11,
+     28.05,
+     "PTH pad 1 [OUT_U] of U401"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     155.65,
+     31.68,
+     "Pad 2 [OUT_V] of C402 on F.Cu"
+    ],
+    [
+     177.86,
+     28.05,
+     "PTH pad 6 [OUT_V] of U401"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     161.5,
+     31.68,
+     "Pad 2 [OUT_W] of C403 on F.Cu"
+    ],
+    [
+     163.61,
+     28.05,
+     "PTH pad 11 [OUT_W] of U401"
     ]
    ],
    "code": "unconnected_items",
@@ -4914,14 +1983,14 @@
   {
    "at": [
     [
-     9.77,
-     45.68,
+     18.77,
+     23.27,
      "PTH pad 2 [PE] of C102"
     ],
     [
-     21.03,
-     45.68,
-     "PTH pad 2 [PE] of C103"
+     5.0,
+     28.0,
+     "PTH pad 1 [PE] of H1"
     ]
    ],
    "code": "unconnected_items",
@@ -4931,13 +2000,13 @@
   {
    "at": [
     [
-     5.0,
-     28.0,
-     "PTH pad 1 [PE] of H1"
+     18.77,
+     39.27,
+     "PTH pad 2 [PE] of C103"
     ],
     [
-     9.77,
-     45.68,
+     18.77,
+     23.27,
      "PTH pad 2 [PE] of C102"
     ]
    ],
@@ -4999,14 +2068,14 @@
   {
    "at": [
     [
-     115.42,
-     128.02,
-     "Pad 42 [STP_DIR] of U10 on F.Cu"
+     204.84,
+     86.95,
+     "Track [SOL_WIPE] on F.Cu, length 3.5935 mm"
     ],
     [
-     223.4,
-     98.1,
-     "Pad 23 [STP_DIR] of U501 on F.Cu"
+     119.33,
+     130.93,
+     "Pad 33 [SOL_WIPE] of U10 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -5084,26 +2153,9 @@
   {
    "at": [
     [
-     115.92,
-     128.02,
-     "Pad 41 [STP_STEP] of U10 on F.Cu"
-    ],
-    [
-     223.4,
-     100.06,
-     "Pad 20 [STP_STEP] of U501 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
      117.81,
-     95.17,
-     "Track [SW_PFC] on B.Cu, length 90.7500 mm"
+     4.42,
+     "PTH pad 2 [SW_PFC] of D201"
     ],
     [
      98.23,
@@ -5118,31 +2170,14 @@
   {
    "at": [
     [
-     42.94,
-     83.51,
-     "Track [TOP_C] on F.Cu, length 0.7968 mm"
+     127.42,
+     104.78,
+     "PTH pad 2 [SW_PFC] of L201"
     ],
     [
-     51.67,
-     90.2,
-     "Track [TOP_C] on F.Cu, length 4.0022 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     16.94,
-     120.3,
-     "Pad 3 [TOP_C] of U303 on F.Cu"
-    ],
-    [
-     51.67,
-     90.2,
-     "Track [TOP_C] on F.Cu, length 4.0022 mm"
+     117.81,
+     4.42,
+     "PTH pad 2 [SW_PFC] of D201"
     ]
    ],
    "code": "unconnected_items",
@@ -5203,9 +2238,60 @@
   {
    "at": [
     [
-     58.63,
-     97.03,
-     "Track [VBUS] on B.Cu, length 43.0826 mm"
+     191.86,
+     2.82,
+     "PTH pad 25 [VBUS] of U401"
+    ],
+    [
+     177.76,
+     2.82,
+     "PTH pad 22 [VBUS] of U401"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     179.84,
+     58.97,
+     "Track [VBUS] on B.Cu, length 7.3563 mm"
+    ],
+    [
+     173.51,
+     72.34,
+     "Pad 1 [VBUS] of R420 on F.Cu"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     177.76,
+     2.82,
+     "PTH pad 22 [VBUS] of U401"
+    ],
+    [
+     160.06,
+     2.82,
+     "PTH pad 19 [VBUS] of U401"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     56.7,
+     78.14,
+     "Pad 1 [VBUS] of R301 on F.Cu"
     ],
     [
      50.18,
@@ -5220,48 +2306,31 @@
   {
    "at": [
     [
+     174.58,
+     32.48,
+     "Pad 1 [VBUS] of C406 on F.Cu"
+    ],
+    [
+     190.24,
+     53.77,
+     "Track [VBUS] on B.Cu, length 5.2019 mm"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
      139.94,
      20.71,
      "Pad 1 [VBUS] of R214 on F.Cu"
     ],
     [
-     150.66,
-     27.45,
-     "PTH pad 25 [VBUS] of U401"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     164.76,
-     27.45,
-     "PTH pad 22 [VBUS] of U401"
-    ],
-    [
-     150.66,
-     27.45,
-     "PTH pad 25 [VBUS] of U401"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     182.46,
-     27.45,
+     160.06,
+     2.82,
      "PTH pad 19 [VBUS] of U401"
-    ],
-    [
-     164.76,
-     27.45,
-     "PTH pad 22 [VBUS] of U401"
     ]
    ],
    "code": "unconnected_items",
@@ -5271,111 +2340,77 @@
   {
    "at": [
     [
-     58.63,
-     97.03,
-     "Track [VBUS] on B.Cu, length 43.0826 mm"
+     139.94,
+     20.71,
+     "Pad 1 [VBUS] of R214 on F.Cu"
     ],
+    [
+     112.73,
+     8.62,
+     "Track [VBUS] on B.Cu, length 2.0881 mm"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     177.76,
+     2.82,
+     "PTH pad 22 [VBUS] of U401"
+    ],
+    [
+     174.58,
+     32.48,
+     "Pad 1 [VBUS] of C406 on F.Cu"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     79.93,
+     25.54,
+     "Pad 1 [VBUS] of R218 on F.Cu"
+    ],
+    [
+     112.73,
+     10.71,
+     "Track [VBUS] on B.Cu, length 1.6546 mm"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     5.45,
+     108.39,
+     "PTH pad 1 [VBUS] of T301"
+    ],
+    [
+     50.86,
+     104.87,
+     "Pad 1 [VBUS] of C303 on F.Cu"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
     [
      56.7,
      78.14,
      "Pad 1 [VBUS] of R301 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     182.46,
-     27.45,
-     "PTH pad 19 [VBUS] of U401"
-    ],
-    [
-     195.45,
-     46.06,
-     "Track [VBUS] on B.Cu, length 7.3709 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     219.04,
-     51.27,
-     "Track [VBUS] on B.Cu, length 7.3709 mm"
-    ],
-    [
-     215.62,
-     74.3,
-     "Pad 1 [VBUS] of R420 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     174.58,
-     69.97,
-     "Pad 1 [VBUS] of C406 on F.Cu"
-    ],
-    [
-     195.45,
-     46.06,
-     "Track [VBUS] on B.Cu, length 7.3709 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     164.76,
-     27.45,
-     "PTH pad 22 [VBUS] of U401"
-    ],
-    [
-     158.24,
-     51.27,
-     "PTH pad 1 [VBUS] of C221"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     139.94,
-     20.71,
-     "Pad 1 [VBUS] of R214 on F.Cu"
-    ],
-    [
-     111.56,
-     11.88,
-     "Track [VBUS] on B.Cu, length 32.2137 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     111.56,
-     11.88,
-     "Track [VBUS] on B.Cu, length 32.2137 mm"
     ],
     [
      79.93,
@@ -5390,13 +2425,13 @@
   {
    "at": [
     [
-     218.54,
-     74.3,
+     176.43,
+     72.34,
      "Pad 2 [VBUS_SNS_1] of R420 on F.Cu"
     ],
     [
-     221.43,
-     74.3,
+     179.32,
+     72.34,
      "Pad 1 [VBUS_SNS_1] of R421 on F.Cu"
     ]
    ],
@@ -5407,14 +2442,65 @@
   {
    "at": [
     [
-     224.35,
-     74.3,
+     182.24,
+     72.34,
      "Pad 2 [VBUS_SNS_2] of R421 on F.Cu"
     ],
     [
-     227.24,
-     74.3,
+     185.13,
+     72.34,
      "Pad 1 [VBUS_SNS_2] of R422 on F.Cu"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     146.84,
+     31.68,
+     "Pad 1 [VB_U] of C401 on F.Cu"
+    ],
+    [
+     189.76,
+     28.05,
+     "PTH pad 2 [VB_U] of U401"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     152.69,
+     31.68,
+     "Pad 1 [VB_V] of C402 on F.Cu"
+    ],
+    [
+     175.51,
+     28.05,
+     "PTH pad 7 [VB_V] of U401"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     158.55,
+     31.68,
+     "Pad 1 [VB_W] of C403 on F.Cu"
+    ],
+    [
+     161.26,
+     28.05,
+     "PTH pad 12 [VB_W] of U401"
     ]
    ],
    "code": "unconnected_items",
@@ -5429,9 +2515,26 @@
      "PTH pad 1 [VRECT] of BR101"
     ],
     [
-     59.14,
+     65.78,
      12.28,
-     "Track [VRECT] on F.Cu, length 6.6430 mm"
+     "PTH pad 1 [VRECT] of C104"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     117.07,
+     27.06,
+     "Track [VRECT] on B.Cu, length 31.5791 mm"
+    ],
+    [
+     65.78,
+     12.28,
+     "PTH pad 1 [VRECT] of C104"
     ]
    ],
    "code": "unconnected_items",
@@ -5475,12 +2578,12 @@
   {
    "at": [
     [
-     46.22,
+     54.76,
      31.79,
      "Pad 2 [XDIS] of R101 on F.Cu"
     ],
     [
-     49.11,
+     57.66,
      31.79,
      "Pad 1 [XDIS] of R102 on F.Cu"
     ]
@@ -5490,6 +2593,6 @@
    "text": "Missing connection between items"
   }
  ],
- "unconnected": 98,
- "warnings": 73
+ "unconnected": 84,
+ "warnings": 69
 }

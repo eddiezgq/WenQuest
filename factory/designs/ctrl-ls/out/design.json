@@ -68,24 +68,24 @@
  "date": "2026-11-12",
  "disclaimer": "示例设计，未经硬件验证，不能直接投产",
  "drc": {
-  "errors": 256,
-  "unconnected": 98,
-  "warnings": 73
+  "errors": 84,
+  "unconnected": 84,
+  "warnings": 69
  },
  "files": {
   "bom.csv": "9f20a8bc3946c9f2",
-  "drc.json": "7803c7907f4096a6",
-  "gerber.zip": "63e97d753409b2bb",
-  "kicad-project.zip": "e1531cd6df840391",
+  "drc.json": "0c23c7366373c8b6",
+  "gerber.zip": "f6baeb864d08ff62",
+  "kicad-project.zip": "998ef6f81e3483db",
   "netcheck.json": "9eddaa8fe06de745",
-  "pcb/B_Cu.svg": "73ffa754bfe33f5c",
-  "pcb/B_Silk.svg": "d6a9b1055dc02ec2",
-  "pcb/F_Cu.svg": "5b1bf56c33e5697f",
-  "pcb/F_Silk.svg": "f5d618f710df0faa",
-  "pcb/In1_Cu.svg": "2f890600aeeceec8",
-  "pcb/In2_Cu.svg": "bd1dd5ae19214f31",
-  "pos.csv": "4d57d391eb3f0365",
-  "safety.json": "927d9de15cd4d4e1",
+  "pcb/B_Cu.svg": "5b5b07737f33b32c",
+  "pcb/B_Silk.svg": "0a3f7dd17742cc7a",
+  "pcb/F_Cu.svg": "e1fab9972184461d",
+  "pcb/F_Silk.svg": "5a3a83a5bf2831a6",
+  "pcb/In1_Cu.svg": "f42672f3f69f5992",
+  "pcb/In2_Cu.svg": "236d899a45e06c64",
+  "pos.csv": "3e4a9a58d89b4e44",
+  "safety.json": "37a5f02a181fd7da",
   "schematic/ctrl-ls-1 交流输入、浪涌与整流.svg": "e0142d35c4b2b912",
   "schematic/ctrl-ls-2 功率因数校正与母线.svg": "d0b0075d62408796",
   "schematic/ctrl-ls-3 辅助电源.svg": "4fc48a7082c416a7",
@@ -2147,16 +2147,16 @@
    "key": "S-iso",
    "limit": 4.0,
    "name": "安全距离：隔离面板口 ↔ 其余电路",
-   "status": "fail",
-   "value": 3.605
+   "status": "pass",
+   "value": 4.0
   },
   {
    "example": true,
    "key": "S-pe",
    "limit": 4.0,
    "name": "安全距离：保护地（安装孔） ↔ 带电部分",
-   "status": "fail",
-   "value": 1.76
+   "status": "pass",
+   "value": 4.2
   },
   {
    "example": true,
@@ -2164,7 +2164,7 @@
    "limit": 2.5,
    "name": "安全距离：相线 ↔ 零线（保险丝之后）",
    "status": "pass",
-   "value": 2.65
+   "value": 2.607
   },
   {
    "example": true,
@@ -2172,7 +2172,7 @@
    "limit": 2.0,
    "name": "安全距离：390 V 母线与电机相线 ↔ 弱电",
    "status": "fail",
-   "value": 1.002
+   "value": 1.745
   }
  ],
  "sheets": [
