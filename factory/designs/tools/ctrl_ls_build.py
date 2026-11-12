@@ -202,7 +202,7 @@ def board_build(route, jar):
     stats = None
     if route:
         keep = tie = gb.tie_keepouts(board)
-        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=60, keepouts=keep)
+        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=20, keepouts=keep)
         del tie
     board.BuildConnectivity()
     gb.fill_zones(board)
