@@ -2,13 +2,13 @@
  {
   "at": [
    [
-    312.0,
-    220.17,
+    314.15,
+    216.0,
     "In1",
-    "zone GND_ISO zone:d4030943-6306-4716-9819-10b79a7e9579 ↔ zone GND zone:12d1289f-ae80-43bb-babf-036d533fd398"
+    "zone GND_ISO zone:595a294b-617d-4344-8519-eaa681fcc256 ↔ zone GND zone:2df93202-0502-440e-9181-a36675599d97"
    ]
   ],
-  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:d4030943-6306-4716-9819-10b79a7e9579 ↔ zone GND zone:12d1289f-ae80-43bb-babf-036d533fd398）",
+  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:595a294b-617d-4344-8519-eaa681fcc256 ↔ zone GND zone:2df93202-0502-440e-9181-a36675599d97）",
   "example": true,
   "groups": [
    [
@@ -178,13 +178,13 @@
  {
   "at": [
    [
-    116.33,
-    139.27,
+    121.63,
+    122.08,
     "In1",
-    "pth PE C103 ↔ track L_C"
+    "pth PE C102 ↔ zone GND zone:2df93202-0502-440e-9181-a36675599d97"
    ]
   ],
-  "detail": "最近 2.87 mm（In1 层，pth PE C103 ↔ track L_C）",
+  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:2df93202-0502-440e-9181-a36675599d97）",
   "example": true,
   "groups": [
    [
@@ -344,20 +344,20 @@
   "name": "安全距离：保护地（安装孔） ↔ 带电部分",
   "rule": "电气间隙 ≥ 3 mm、爬电距离 ≥ 4 mm（直线距离量，偏保守）",
   "source": "示例值",
-  "status": "fail",
+  "status": "pass",
   "unit": "mm",
-  "value": 2.874
+  "value": 4.2
  },
  {
   "at": [
    [
-    138.35,
-    129.41,
-    "F",
-    "track L_C ↔ pth N_IN RV101"
+    151.24,
+    154.56,
+    "B",
+    "track L_C ↔ track N_C"
    ]
   ],
-  "detail": "最近 2.60 mm（F 层，track L_C ↔ pth N_IN RV101）",
+  "detail": "最近 2.61 mm（B 层，track L_C ↔ track N_C）",
   "example": true,
   "groups": [
    [
@@ -379,7 +379,7 @@
   "source": "示例值",
   "status": "pass",
   "unit": "mm",
-  "value": 2.603
+  "value": 2.612
  },
  {
   "at": [
