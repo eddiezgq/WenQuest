@@ -203,14 +203,14 @@
       },
       {
         "bus_width": 12,
-        "clearance": 2.6,
+        "clearance": 0.5,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
         "line_style": 0,
         "microvia_diameter": 0.3,
         "microvia_drill": 0.1,
-        "name": "AC",
+        "name": "AC_L",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 2.5,
@@ -220,7 +220,24 @@
       },
       {
         "bus_width": 12,
-        "clearance": 1.0,
+        "clearance": 0.5,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "AC_N",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 2.5,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.5,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -237,7 +254,7 @@
       },
       {
         "bus_width": 12,
-        "clearance": 2.2,
+        "clearance": 0.5,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -254,7 +271,7 @@
       },
       {
         "bus_width": 12,
-        "clearance": 2.2,
+        "clearance": 0.5,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -271,7 +288,7 @@
       },
       {
         "bus_width": 12,
-        "clearance": 4.2,
+        "clearance": 0.5,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -302,6 +319,23 @@
         "via_diameter": 0.6,
         "via_drill": 0.3,
         "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.3,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Return",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 2.0,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
       }
     ],
     "meta": {
@@ -311,36 +345,28 @@
     "netclass_assignments": null,
     "netclass_patterns": [
       {
-        "netclass": "AC",
+        "netclass": "AC_L",
         "pattern": "L_IN"
       },
       {
-        "netclass": "AC",
-        "pattern": "N_IN"
-      },
-      {
-        "netclass": "AC",
+        "netclass": "AC_L",
         "pattern": "L_F"
       },
       {
-        "netclass": "AC",
-        "pattern": "N_C"
-      },
-      {
-        "netclass": "AC",
+        "netclass": "AC_L",
         "pattern": "L_C"
       },
       {
-        "netclass": "AC",
+        "netclass": "AC_L",
         "pattern": "L_R"
       },
       {
-        "netclass": "AC",
-        "pattern": "VRECT"
+        "netclass": "AC_N",
+        "pattern": "N_IN"
       },
       {
-        "netclass": "AC",
-        "pattern": "SW_PFC"
+        "netclass": "AC_N",
+        "pattern": "N_C"
       },
       {
         "netclass": "PE",
@@ -349,6 +375,14 @@
       {
         "netclass": "HV",
         "pattern": "VBUS"
+      },
+      {
+        "netclass": "HV",
+        "pattern": "VRECT"
+      },
+      {
+        "netclass": "HV",
+        "pattern": "SW_PFC"
       },
       {
         "netclass": "HV",
@@ -361,10 +395,6 @@
       {
         "netclass": "HV",
         "pattern": "MOT_W"
-      },
-      {
-        "netclass": "HV",
-        "pattern": "RECT_N"
       },
       {
         "netclass": "HVSig",
@@ -445,6 +475,10 @@
       {
         "netclass": "Boot",
         "pattern": "VB_W"
+      },
+      {
+        "netclass": "Return",
+        "pattern": "RECT_N"
       },
       {
         "netclass": "Power",
