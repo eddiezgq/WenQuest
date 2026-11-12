@@ -374,6 +374,16 @@ def board_exports():
         f.write(buf.getvalue())
 
 
+def refill():
+    """铺铜按工程文件里的线宽 / 间距类别、自定义规则重新填（布线那个进程没有这些设置，填出来的间距按缺省 0.3 mm）；
+    在出制造文件之前做，重跑一遍（--no-route）产物一字不差"""
+    m = pcbnew()
+    pcbf = os.path.join(KDIR, NAME + ".kicad_pcb")
+    brd = m.LoadBoard(pcbf)
+    m.ZONE_FILLER(brd).Fill(brd.Zones())
+    m.SaveBoard(pcbf, brd)
+
+
 def board_checks():
     """设计规则检查（KiCad）+ 安全距离（safety.yaml）→ out/drc.json、out/safety.json"""
     import yaml
@@ -383,12 +393,6 @@ def board_checks():
     from wqeda.readers import kicad as RK
 
     B.KDIR, B.NAME, B.PROJ = KDIR, NAME, PROJ
-    # 铺铜按工程文件里的线宽 / 间距类别重新填（布线那个进程没有这些设置，填出来的间距按缺省 0.3 mm）
-    m = pcbnew()
-    pcbf = os.path.join(KDIR, NAME + ".kicad_pcb")
-    brd = m.LoadBoard(pcbf)
-    m.ZONE_FILLER(brd).Fill(brd.Zones())
-    m.SaveBoard(pcbf, brd)
     dr = B.drc()
     with open(os.path.join(OUT, "drc.json"), "w", encoding="utf-8") as f:
         json.dump(dr, f, ensure_ascii=False, indent=1, sort_keys=True)
@@ -476,6 +480,7 @@ def main():
     n_bom = bom(os.path.join(OUT, "bom.csv"))
     brd = None
     if a.board:
+        refill()
         board_exports()
         brd = board_checks()
     s = summary(nc, n_bom, brd)
