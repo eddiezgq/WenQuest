@@ -267,15 +267,16 @@ def finish(board, class_of, clearance, width_of, layers_of, skip=("GND", "GND_IS
             for p in fp.Pads():
                 if p.GetNetname():
                     out.append((p.GetNetname(), set(p.GetLayerSet().CuStack()), _poly(p.GetEffectivePolygon()),
-                                fp.GetReference(), (mm(p.GetPosition().x), mm(p.GetPosition().y))))
+                                fp.GetReference(), [(mm(p.GetPosition().x), mm(p.GetPosition().y))]))
         for t in board.GetTracks():
             if t.GetClass() == "PCB_VIA":
                 c = (mm(t.GetPosition().x), mm(t.GetPosition().y))
                 g = Point(c).buffer(mm(t.GetWidth()) / 2)
-                out.append((t.GetNetname(), set(t.GetLayerSet().CuStack()), g, None, c))
+                out.append((t.GetNetname(), set(t.GetLayerSet().CuStack()), g, None, [c]))
             else:
                 a, b = (mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))
-                out.append((t.GetNetname(), {t.GetLayer()}, LineString([a, b]).buffer(mm(t.GetWidth()) / 2), None, a))
+                g = LineString([a, b]).buffer(mm(t.GetWidth()) / 2)
+                out.append((t.GetNetname(), {t.GetLayer()}, g, None, [a, b]))
         return out
 
     added = []
@@ -301,45 +302,44 @@ def finish(board, class_of, clearance, width_of, layers_of, skip=("GND", "GND_IS
                 continue
             g = list(groups.values())
             w = width_of(net)
-            best = None
-            for x in g[0]:
-                for y in [k for gg in g[1:] for k in gg]:
-                    pa, pb = its[x][4], its[y][4]
-                    d = Point(pa).distance(Point(pb))
-                    if best is None or d < best[0]:
-                        best = (d, x, y)
-            _, x, y = best
-            pa, pb = its[x][4], its[y][4]
-            refs = {its[x][3], its[y][3]} - {None}
-            for ln in layers_of(net):
-                if ln not in lid or not (lid[ln] in its[x][1] and lid[ln] in its[y][1]):
-                    continue
-                for path in ([pa, pb], [pa, (pb[0], pa[1]), pb], [pa, (pa[0], pb[1]), pb]):
-                    legs = zip(path, path[1:], strict=False)
-                    shape = unary_union([LineString([u, v]).buffer(w / 2) for u, v in legs])
-                    ok = not any(shape.intersects(k) for k in keepouts)
-                    for onet, olay, og, oref, _c in its if ok else ():
-                        if onet == net or lid[ln] not in olay:
-                            continue
-                        need = 0.15 if (oref in refs) else clearance(net, onet)
-                        if og.distance(shape) < need:
-                            ok = False
-                            break
-                    if not ok:
+            # 候选：第一块和其余各块之间，端点两两配对，近的先试（第十七次：只试最近一对时，那一对的路正好被挡）
+            cands = sorted(
+                (Point(pa).distance(Point(pb)), x, y, pa, pb)
+                for x in g[0] for y in [k for gg in g[1:] for k in gg]
+                for pa in its[x][4] for pb in its[y][4])[:40]
+            for _d, x, y, pa, pb in cands:
+                refs = {its[x][3], its[y][3]} - {None}
+                for ln in layers_of(net):
+                    if ln not in lid or not (lid[ln] in its[x][1] and lid[ln] in its[y][1]):
                         continue
-                    for u, v in zip(path, path[1:], strict=False):
-                        if u == v:
+                    for path in ([pa, pb], [pa, (pb[0], pa[1]), pb], [pa, (pa[0], pb[1]), pb]):
+                        legs = zip(path, path[1:], strict=False)
+                        shape = unary_union([LineString([u, v]).buffer(w / 2) for u, v in legs])
+                        ok = not any(shape.intersects(k) for k in keepouts)
+                        for onet, olay, og, oref, _c in its if ok else ():
+                            if onet == net or lid[ln] not in olay:
+                                continue
+                            need = 0.15 if (oref in refs) else clearance(net, onet)
+                            if og.distance(shape) < need:
+                                ok = False
+                                break
+                        if not ok:
                             continue
-                        t = pcbnew.PCB_TRACK(board)
-                        t.SetStart(pcbnew.VECTOR2I(pcbnew.FromMM(u[0]), pcbnew.FromMM(u[1])))
-                        t.SetEnd(pcbnew.VECTOR2I(pcbnew.FromMM(v[0]), pcbnew.FromMM(v[1])))
-                        t.SetWidth(pcbnew.FromMM(w))
-                        t.SetLayer(lid[ln])
-                        t.SetNet(board.FindNet(net))
-                        board.Add(t)
-                    added.append((net, ln, len(path) - 1))
-                    done = True
-                    break
+                        for u, v in zip(path, path[1:], strict=False):
+                            if u == v:
+                                continue
+                            t = pcbnew.PCB_TRACK(board)
+                            t.SetStart(pcbnew.VECTOR2I(pcbnew.FromMM(u[0]), pcbnew.FromMM(u[1])))
+                            t.SetEnd(pcbnew.VECTOR2I(pcbnew.FromMM(v[0]), pcbnew.FromMM(v[1])))
+                            t.SetWidth(pcbnew.FromMM(w))
+                            t.SetLayer(lid[ln])
+                            t.SetNet(board.FindNet(net))
+                            board.Add(t)
+                        added.append((net, ln, len(path) - 1))
+                        done = True
+                        break
+                    if done:
+                        break
                 if done:
                     break
             if done:
