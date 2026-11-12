@@ -86,6 +86,25 @@ jobs:
             docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://wqf-hub:8100/api/caddy/ask?domain=sewing.factory.wenquestrobotics.com\",timeout=5).read()[:200])" 2>&1 | tail -2
             docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://wqf-hub-c-sewing:8100/api/health\",timeout=5).read()[:200])" 2>&1 | tail -2' 2>&1 \
             | sed 's/^/site: /' | while IFS= read -r l; do echo "::notice::$l"; done
+      - name: AI 助手每页都有（第 154 轮验收：从外面看页面带按钮、/assist.js 与问答接口能通）
+        if: always()
+        run: |
+          if [ "${{ inputs.server }}" = cn ]; then
+            pages="https://wenquestech.online/ https://factory.wenquestech.online/"
+            hosts="https://factory.wenquestech.online"
+          else
+            pages="https://wenquestrobotics.com/ https://wenquestrobotics.com/cases/cam.html https://wenquestrobotics.com/pilot/ https://wenquestrobotics.com/kits.html https://wenquestrobotics.com/terms.html https://wenquestrobotics.com/factory/ https://factory.wenquestrobotics.com/ https://demo.wenquestrobotics.com/ https://sewing.factory.wenquestrobotics.com/"
+            hosts="https://factory.wenquestrobotics.com https://demo.wenquestrobotics.com https://sewing.factory.wenquestrobotics.com"
+          fi
+          for p in $pages; do
+            body=$(curl -sL -m 25 "$p"); n=$(printf '%s' "$body" | grep -c 'assist.js')
+            echo "::notice::assist page $p tag=$n"
+          done
+          for h in $hosts; do
+            js=$(curl -s -o /dev/null -m 25 -w "%{http_code} %{content_type}" "$h/assist.js")
+            ans=$(curl -s -m 90 -H 'Content-Type: application/json' -d '{"q":"How do I generate G-code?","page":"/","lang":"en"}' "$h/api/v1/public/assist" -w ' HTTP=%{http_code}' | tr '\n' ' ' | cut -c1-260)
+            echo "::notice::assist host $h js=$js ask=$ans"
+          done
       - name: 网关发信（11-11：试点邀请的验证码没收到，Brevo 日志里没有记录）
         if: always()
         run: |
