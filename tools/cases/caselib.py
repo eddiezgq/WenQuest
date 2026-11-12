@@ -95,7 +95,7 @@ class Case:
                                facts=[dict(name=n, name_en=ne, value=fmt(v) if not isinstance(v, str) else v, unit=u) for n, ne, v, u in facts])
 
     def check(self, step, what, what_en, value, op, limit, unit="", src=""):
-        ok = {">=": value >= limit, "<=": value <= limit, "==": value == limit}[op]
+        ok = {">=": value >= limit, "<=": value <= limit, "==": value == limit, "<": value < limit, ">": value > limit}[op]
         self.checks.append(dict(step=step, what=what, what_en=what_en, value=fmt(value), op=op, limit=fmt(limit), unit=unit, ok=bool(ok), src=src))
         return ok
 
@@ -299,7 +299,7 @@ def render_solid(solid, path, elev=30, azim=-72, color=(0.80, 0.84, 0.88), size=
 
 
 # ---------------------------------------------------------------- 仿真车间
-def run_shop(item, qty, wo, seed=7, fixes=()):
+def run_shop(item, qty, wo, seed=7, fixes=(), problems=()):
     """数字工厂仿真车间（sim/engine.py，和线上同一份代码）按现行工艺路线加工 qty 件。
     → dict(hours, measurements, events, cycle)：measurements 是 quality.measurement 的 data 列表。"""
     sys.path[:0] = [str(DIGITAL), str(ROOT / "factory")]
@@ -314,6 +314,8 @@ def run_shop(item, qty, wo, seed=7, fixes=()):
     out = []
     clock = Clock()
     eng = Engine(lambda tp, ty, src, data, corr: out.append((tp, ty, data)), clock, mode="teach", auto_start=True, seed=seed, status_every_s=1e9)
+    for pb in problems:                   # 注入车间故障（sim/errors.py 的 PROBLEMS，和实验里老师注入的同一个入口）：(名字, 幅度或 None)
+        eng.errors.inject(*pb) if isinstance(pb, tuple) else eng.errors.inject(pb)
     for f in fixes:                       # 改进措施（sim/errors.py 的 FIXES，和“质量 → 8D”下发措施同一个入口）
         eng.errors.apply_fix(f)
     ops = routing_for(item)
@@ -344,10 +346,10 @@ def shop_table(meas):
     by = {}
     multi = len({m["item"] for m in meas}) > 1
     for m in meas:
-        by.setdefault((m["item"], m["characteristic"], m["name"], m["lower_tol_mm"], m["upper_tol_mm"]), []).append(m["value_mm"])
+        by.setdefault((m["item"], m["characteristic"], m["name"], m["lower_tol_mm"], m["upper_tol_mm"], m.get("unit", "mm")), []).append(m["value_mm"])
     rows, low, stats = [], math.inf, {}
     fails = sum(1 for m in meas if m["result"] != "pass")
-    for (item, cid, name, lo, hi), vals in by.items():
+    for (item, cid, name, lo, hi, unit), vals in by.items():
         name = f"{item} {name}" if multi else name
         if lo == hi:
             bad = sum(1 for v in vals if v != lo)
@@ -358,7 +360,7 @@ def shop_table(meas):
         low = min(low, c)
         stats[cid if not multi else (item, cid)] = dict(name=name, mean=mu, sd=sd, cpk=c, lo=lo, hi=hi)
         # 公差带窄（尺寸、形位，mm）时标准差写成 μm；其余（力矩、角秒、粗糙度……）按这个特性自己的单位
-        sd_s = f"{sd * 1000:.1f} μm" if (hi - lo) <= 0.1 and "Ra" not in name else f"{sd:.3g}"
+        sd_s = f"{sd * 1000:.1f} μm" if (hi - lo) <= 0.1 and "Ra" not in name and unit == "mm" else f"{sd:.3g}"
         rows.append([name, f"{lo:g}–{hi:g}" if not one else f"≤ {hi:g}", len(vals), f"{mu:.4f}", sd_s, f"{c:.2f}{'（单边）' if one else ''}"])
     return rows, low, fails, stats
 
