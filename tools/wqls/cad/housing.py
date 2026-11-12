@@ -353,7 +353,7 @@ def lower_seats(hollow, solid, info):
 
 def feed_seats(hollow, solid, info):
     """G4.6 机座里的送布组支承（cad/feed.py 的零件装在这里；位置来自 G4/送布机构.json 的 geo）：
-    ① 送布摆轴（y 76、z −40）：前座 x 34…46（Ø20 凸台，一道 6 mm 的筋接机座顶板），后座在立柱下的左横筋（x 300…307）上，
+    ① 送布摆轴（y 76、z −40）：前座 x 34…46（Ø20 凸台，一道 4 mm 的筋接机座顶板），后座在立柱下的左横筋（x 300…307）上，
        筋上加 Ø20 凸台 x 297…310；孔 Ø14 H7 装含油轴套 Ø10 × Ø14；
     ② 抬牙摆轴（y −45、z −28）：两个座 x 25…37（Ø24 凸台，孔 Ø16 H7）、x 96…106（Ø20 凸台，孔 Ø14 H7），各一道 6 mm 的筋接前壁；
        前孔比后孔大一档，后孔的镗刀才能从前孔（铸出 Ø15）里穿过去；
@@ -366,7 +366,8 @@ def feed_seats(hollow, solid, info):
     (fy, fz), (ly, lz), (gy, gz) = g["Fr"], g["Lr"], g["G"]
     top = Part.makeBox(600, 400, 3.0, V(-200, -200, -BEDWALL - 1.0))
     feats = []
-    feats.append(Part.makeCylinder(10, 12, V(34, fy, fz), V(1, 0, 0)).fuse(Part.makeBox(12, 6, -fz, V(34, fy - 3, fz))))
+    # 前座的筋厚 4（6 厚时凝固仿真在筋和机座顶板的交接处有 3.5 cm³ 的孤立液相区）
+    feats.append(Part.makeCylinder(10, 12, V(34, fy, fz), V(1, 0, 0)).fuse(Part.makeBox(12, 4, -fz, V(34, fy - 2, fz))))
     feats.append(Part.makeCylinder(10, 13, V(297, fy, fz), V(1, 0, 0)))
     feats.append(Part.makeCylinder(9, 13, V(297, gy, gz), V(1, 0, 0)))
     for x0, L, r_ in ((25.0, 12.0, 12.0), (96.0, 10.0, 10.0)):

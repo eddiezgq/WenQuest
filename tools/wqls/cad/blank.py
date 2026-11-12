@@ -67,7 +67,19 @@ for f in part.Faces:
             continue
         shaft_pass = PART == "upper" and abs(r - 10.0) < 0.05 and abs(ax.x) > 0.99 and abs(p0.y) < 0.5 and abs(p0.z - 200) < 0.5
         hook_bore = PART == "lower" and abs(r - 7.0) < 0.05 and abs(ax.x) > 0.99 and abs(p0.y) < 0.5 and abs(p0.z + 21.5) < 0.5
-        if hole and hook_bore:
+        feed_axes = json.load(open(os.path.join(ROOT, "docs/设计/WQ-LS/G4/送布机构.json"), encoding="utf-8"))["geo"] if PART == "lower" else {}
+        feed_bore = None
+        if PART == "lower" and abs(ax.x) > 0.99:
+            for k_ in ("Fr", "Lr", "G"):
+                if abs(p0.y - feed_axes[k_][0]) < 0.5 and abs(p0.z - feed_axes[k_][1]) < 0.5:
+                    feed_bore = k_
+        if hole and feed_bore:
+            # G4.6 送布摆轴、抬牙摆轴、调节器轴的孔和端壁工艺孔都用砂芯铸出（否则凸台成了实心热节）：
+            # 抬牙摆轴前孔 Ø16 铸出 Ø15（后孔的 Ø14 镗刀要从这里穿过去），调节器孔 Ø10 铸出 Ø6，其余比成品小 5
+            dc = 15.0 if (feed_bore == "Lr" and abs(r - 8.0) < 0.05 and p0.x > 0) else (6.0 if (feed_bore == "G" and abs(r - 5.0) < 0.05) else 2 * r - 5.0)
+            adds.append(Part.makeCylinder(r + 0.4, L + 0.2, p0 - ax * 0.1, ax).cut(Part.makeCylinder(dc / 2, L + 2, p0 - ax, ax)))
+            log["bores"].append(dict(d=round(2 * r, 1), cast_d=dc, at=[round(x, 1) for x in p0], feed=feed_bore))
+        elif hole and hook_bore:
             # G4.5 旋梭轴孔 Ø14：铸出 Ø9（砂芯），否则 Ø28 的座成了实心，凝固仿真里是热节（加冷铁也去不掉）
             adds.append(Part.makeCylinder(r + 0.4, L + 0.2, p0 - ax * 0.1, ax).cut(Part.makeCylinder(4.5, L + 2, p0 - ax, ax)))
             log["bores"].append(dict(d=14.0, cast_d=9.0, at=[round(x, 1) for x in p0]))
