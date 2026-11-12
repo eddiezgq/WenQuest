@@ -1,0 +1,259 @@
+{
+ "geo": {
+  "O1": [
+   0.0,
+   200.0
+  ],
+  "O2": [
+   27.791774943072237,
+   -35.36485983577417
+  ],
+  "G": [
+   0.0,
+   -22.0
+  ],
+  "Fr": [
+   78.0,
+   -32.0
+  ],
+  "rc": 12.0,
+  "ra": 24.0,
+  "Lr": [
+   -45.0,
+   -28.0
+  ],
+  "rd": 12.0,
+  "yk": -30.0,
+  "d": 78.0
+ },
+ "params": {
+  "thF": 2.8447552730918098,
+  "eL": 1.2120780931893456,
+  "thL": 2.3075332412984366,
+  "hd": 8.147812451561752,
+  "dzk": -0.5211385571945399,
+  "eF": 3.0
+ },
+ "settings": [
+  {
+   "s": 1.0,
+   "reverse": false,
+   "alpha_deg": 5.189,
+   "dev_y": 0.175,
+   "dev_z": 0.084,
+   "y_mean": -0.099,
+   "check": {
+    "rise": 315.3,
+    "drop": 110.2,
+    "drag": 0.0149,
+    "net": 1.0,
+    "top": 0.8,
+    "feedrise": 57.0,
+    "stitch_err": 0.0001,
+    "ok": true
+   }
+  },
+  {
+   "s": 1.0,
+   "reverse": true,
+   "alpha_deg": -4.947,
+   "dev_y": 0.158,
+   "dev_z": 0.088,
+   "y_mean": -0.095,
+   "check": {
+    "rise": 315.2,
+    "drop": 110.1,
+    "drag": 0.0178,
+    "net": -1.0,
+    "top": 0.802,
+    "feedrise": 56.9,
+    "stitch_err": -0.0002,
+    "ok": true
+   }
+  },
+  {
+   "s": 2.0,
+   "reverse": false,
+   "alpha_deg": 10.156,
+   "dev_y": 0.183,
+   "dev_z": 0.079,
+   "y_mean": -0.1,
+   "check": {
+    "rise": 315.6,
+    "drop": 110.0,
+    "drag": 0.0131,
+    "net": 2.0,
+    "top": 0.799,
+    "feedrise": 57.3,
+    "stitch_err": 0.0002,
+    "ok": true
+   }
+  },
+  {
+   "s": 2.0,
+   "reverse": true,
+   "alpha_deg": -9.981,
+   "dev_y": 0.149,
+   "dev_z": 0.086,
+   "y_mean": -0.092,
+   "check": {
+    "rise": 315.4,
+    "drop": 109.8,
+    "drag": 0.0189,
+    "net": -2.0,
+    "top": 0.802,
+    "feedrise": 57.0,
+    "stitch_err": 0.0,
+    "ok": true
+   }
+  },
+  {
+   "s": 3.0,
+   "reverse": false,
+   "alpha_deg": 14.948,
+   "dev_y": 0.19,
+   "dev_z": 0.072,
+   "y_mean": -0.1,
+   "check": {
+    "rise": 316.0,
+    "drop": 109.6,
+    "drag": 0.0101,
+    "net": 3.0,
+    "top": 0.798,
+    "feedrise": 57.7,
+    "stitch_err": -0.0001,
+    "ok": true
+   }
+  },
+  {
+   "s": 3.0,
+   "reverse": true,
+   "alpha_deg": -14.899,
+   "dev_y": 0.139,
+   "dev_z": 0.08,
+   "y_mean": -0.088,
+   "check": {
+    "rise": 315.7,
+    "drop": 109.3,
+    "drag": 0.0198,
+    "net": -3.0,
+    "top": 0.803,
+    "feedrise": 57.3,
+    "stitch_err": -0.0,
+    "ok": true
+   }
+  },
+  {
+   "s": 4.0,
+   "reverse": false,
+   "alpha_deg": 19.551,
+   "dev_y": 0.198,
+   "dev_z": 0.063,
+   "y_mean": -0.101,
+   "check": {
+    "rise": 316.5,
+    "drop": 109.0,
+    "drag": 0.0092,
+    "net": 4.0,
+    "top": 0.796,
+    "feedrise": 58.2,
+    "stitch_err": 0.0001,
+    "ok": true
+   }
+  },
+  {
+   "s": 4.0,
+   "reverse": true,
+   "alpha_deg": -19.655,
+   "dev_y": 0.136,
+   "dev_z": 0.071,
+   "y_mean": -0.084,
+   "check": {
+    "rise": 316.1,
+    "drop": 108.6,
+    "drag": 0.0207,
+    "net": -4.0,
+    "top": 0.803,
+    "feedrise": 57.8,
+    "stitch_err": 0.0001,
+    "ok": true
+   }
+  },
+  {
+   "s": 5.0,
+   "reverse": false,
+   "alpha_deg": 23.927,
+   "dev_y": 0.205,
+   "dev_z": 0.054,
+   "y_mean": -0.101,
+   "check": {
+    "rise": 317.1,
+    "drop": 108.1,
+    "drag": 0.0078,
+    "net": 5.0,
+    "top": 0.795,
+    "feedrise": 58.8,
+    "stitch_err": -0.0,
+    "ok": true
+   }
+  },
+  {
+   "s": 5.0,
+   "reverse": true,
+   "alpha_deg": -24.206,
+   "dev_y": 0.133,
+   "dev_z": 0.059,
+   "y_mean": -0.079,
+   "check": {
+    "rise": 316.8,
+    "drop": 107.8,
+    "drag": 0.0221,
+    "net": -5.0,
+    "top": 0.802,
+    "feedrise": 58.4,
+    "stitch_err": 0.0,
+    "ok": true
+   }
+  }
+ ],
+ "reverse_by_mirror": [
+  {
+   "s": 1.0,
+   "reverse_stitch": 1.048,
+   "ratio": 1.048
+  },
+  {
+   "s": 2.0,
+   "reverse_stitch": 2.035,
+   "ratio": 1.0175
+  },
+  {
+   "s": 3.0,
+   "reverse_stitch": 3.01,
+   "ratio": 1.0033
+  },
+  {
+   "s": 4.0,
+   "reverse_stitch": 3.978,
+   "ratio": 0.9945
+  },
+  {
+   "s": 5.0,
+   "reverse_stitch": 4.941,
+   "ratio": 0.9882
+  }
+ ],
+ "dial": {
+  "alpha_per_mm_deg": 4.687,
+  "alpha0_deg": 0.693,
+  "stitch_err_linear_mm": [
+   0.038,
+   -0.018,
+   -0.042,
+   -0.025,
+   0.048
+  ]
+ },
+ "dev_worst_mm": 0.205,
+ "all_ok": true
+}

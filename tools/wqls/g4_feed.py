@@ -6,10 +6,10 @@
   前后（y，往后为正）：X(φ) = (S/2)·cos(φ − φF)，S = 针距 / 0.926，φF = 108.2°；
   上下（牙齿顶面高出针板）：Y(φ) = (h − A) + A·cos(φ − φL)，h 0.8、A 1.1、φL = 34°（G1 定送布定时提前 6°）。
 机构（都在垂直于 x 的平面里，坐标 (y, z)，与整机相同）：
-  送布链（x ≈ 331，立柱脚下的机座里）：上轴送布偏心 E → 送布连杆（竖直，长 L1）→ 调节器滑槽上的滑块 P（滑槽过 G，
+  送布链（x ≈ 331，立柱脚下的机座里）：上轴送布偏心 E → 送布连杆（竖直，长 L1，在上轴正下方）→ 调节器滑槽上的滑块 P（滑槽过 G，
     α = 0 时滑槽垂直于 L2；α 由针距旋钮、倒缝扳手定，α = 0 不送布，α < 0 倒缝）→ 水平连杆 L2 → 送布摆轴曲柄销 C
     （摆轴中心 Fr，曲柄 rc）→ 摆轴前端摆杆（ra，朝上）的销 T：牙架后铰点。
-  抬牙链（x ≈ 113）：下轴抬牙偏心 → 抬牙连杆 L3 → 抬牙摆轴曲柄销 D（摆轴中心 Lr，曲柄 rd）→ 摆轴前端叉子 K（rf）：
+  抬牙链（x ≈ 113）：下轴抬牙偏心 → 抬牙连杆 L3 → 抬牙摆轴曲柄销 D（摆轴中心 Lr，曲柄 rd）→ 摆轴前端叉子 K：
     牙架前端的滑块在叉子的槽里，只受上下约束。
   牙架：后铰点 T、前端叉子处的滑块，牙架上离 T 为 d 的地方装送布牙（牙齿顶面比牙架线高 hd）。
 尺寸：机座、立柱里的空间定下摆轴中心、摆杆长度等（见 GEO）；偏心量、偏心相位、调节器各档的 α、牙齿高度
@@ -41,13 +41,12 @@ STITCH = (1.0, 2.0, 3.0, 4.0, 5.0)
 GEO = dict(
     O1=(0.0, S.ZU),                 # 上轴
     O2=(S.YL, S.ZL),                # 下轴
-    G=(60.0, -22.0),                # 调节器滑槽中心（滑块 P 的平均位置），机座里、立柱脚下
-    Fr=(-18.0, -32.0), rc=12.0,     # 送布摆轴中心、曲柄（朝上）
+    G=(0.0, -22.0),                 # 调节器滑槽中心（滑块 P 的平均位置）：上轴正下方（送布连杆竖直），机座里、立柱脚下
+    Fr=(78.0, -32.0), rc=12.0,      # 送布摆轴（机座后部）中心、曲柄（朝上）
     ra=24.0,                        # 送布摆轴前端摆杆（朝上）→ 牙架后铰点 T
-    Lr=(55.0, -20.0), rd=12.0,      # 抬牙摆轴中心、曲柄
-    rf=27.3,                        # 抬牙叉子臂长（从 Lr 指向 (30, −9) 附近）
-    yk=30.0,                        # 叉子在牙架上的位置（牙架前端滑块的 y）
-    d=18.0,                         # 送布牙中心离 T 的距离（牙在针的位置 y = 0）
+    Lr=(-45.0, -28.0), rd=12.0,     # 抬牙摆轴（机座前部）中心、曲柄
+    yk=-30.0,                       # 叉子在牙架前端滑块处的 y
+    d=78.0,                         # 送布牙中心离 T 的距离（牙在针的位置 y = 0）
 )
 
 
@@ -79,7 +78,7 @@ def kin(p, alpha, full=False):
     """一转的送布牙位置。p：拟合参数 dict；alpha：调节器角（rad）"""
     O1, O2, G = GEO["O1"], GEO["O2"], GEO["G"]
     Fr, rc, ra = GEO["Fr"], GEO["rc"], GEO["ra"]
-    Lr, rd, rf = GEO["Lr"], GEO["rd"], GEO["rf"]
+    Lr, rd = GEO["Lr"], GEO["rd"]
     C0, D0 = mean_C(), mean_D()
     # α = 0 时滑槽垂直于水平连杆 L2（滑块沿槽动时，L2 只有二阶的动作 → 不送布）
     a0 = math.atan2(C0[1] - G[1], C0[0] - G[0]) - math.pi / 2
@@ -108,8 +107,10 @@ def kin(p, alpha, full=False):
         # 牙架：过 T，前端滑块在叉子里只受上下约束 → 牙架方向由 T 和 K 的高度定（K 的 y 只让滑块在槽里滑）
         dy, dz = K[0] - T[0], K[1] - T[1]
         psi = math.atan2(dz, dy)
-        dog_y = T[0] + GEO["d"] * math.cos(psi) - p["hd"] * math.sin(psi)
-        dog_z = T[1] + GEO["d"] * math.sin(psi) + p["hd"] * math.cos(psi)
+        by, bz = math.cos(psi), math.sin(psi)              # 牙架方向（从 T 指向叉子）
+        ny, nz = (-bz, by) if by > 0 else (bz, -by)       # 牙架的“上”法向
+        dog_y = T[0] + GEO["d"] * by + p["hd"] * ny
+        dog_z = T[1] + GEO["d"] * bz + p["hd"] * nz
         out["y"].append(dog_y)
         out["z"].append(dog_z)
         if full:
@@ -121,11 +122,15 @@ def kin(p, alpha, full=False):
     return out
 
 
-PNAMES = ["eF", "thF", "eL", "thL", "hd", "dzk"]
+PNAMES = ["thF", "eL", "thL", "hd", "dzk"]
+E_F = 3.0                                 # 送布偏心量（定值；针距由调节器角 α 定）
+LB = [-20, 0.3, -20, 2.0, -3.0]
+UB = [20, 5.0, 20, 12.0, 3.0]
 
 
 def unpack(x):
     p = dict(zip(PNAMES, x[:len(PNAMES)]))
+    p["eF"] = E_F
     al = x[len(PNAMES):]
     return p, al
 
@@ -134,22 +139,26 @@ def residual(x):
     p, al = unpack(x)
     r = []
     for i, s in enumerate(STITCH):
-        for rev, a in ((False, al[i]), (True, -al[len(STITCH) + i])):
+        for rev, a in ((False, al[i]), (True, al[len(STITCH) + i])):
             X, Y, _ = target(s, rev)
             try:
                 k = kin(p, a)
             except ValueError:
-                return np.full(len(STITCH) * 2 * N * 2 + len(STITCH) * 2, 50.0)
+                return np.full(len(STITCH) * 2 * (N * 2 + 1), 50.0)
             ym = k["y"] - np.mean(k["y"])
-            r += list(ym - X) + list(k["z"] - Y)
-    # 牙在针板槽里的平均位置不随针距漂移太多（≤ 0.5 mm 算合格，这里轻罚）
-    for i, s in enumerate(STITCH):
-        for a in (al[i], -al[len(STITCH) + i]):
-            r.append(0.2 * (np.mean(kin(p, a)["y"]) - 0.0))
+            r += list(ym - X) + list(k["z"] - Y) + [0.2 * np.mean(k["y"])]   # 牙的平均位置不随针距漂移（轻罚）
+            if PENALTY:                                  # 第二步：sewcore 判据——拖布留 30% 余量、牙顶高度 0.8
+                c = feed_check(k, s, rev)
+                if "drag" in c:
+                    r += [20 * max(0.0, c["drag"] - 0.035), 3 * (c["top"] - S.SEW["h"])]
+                else:
+                    r += [5.0, 5.0]
     return np.array(r)
 
 
 _TC = {}
+PENALTY = False
+FAB = "cotton"
 
 
 def target(s, rev=False):  # noqa: F811  （带缓存）
@@ -164,20 +173,125 @@ def target(s, rev=False):  # noqa: F811  （带缓存）
 
 
 def synth():
-    x0 = [2.5, 0.0, 1.3, 0.0, 6.0, 0.0] + [0.05 * s for s in STITCH] * 2
+    """先只拟合抬牙（α = 0），再只拟合送布相位和 5 mm 的 α，最后全部一起拟合"""
+    X5, Y5, _ = target(5.0)
     best = None
-    for thF0 in np.radians(np.arange(0, 360, 90)):
-        for thL0 in np.radians(np.arange(0, 360, 90)):
-            x = list(x0)
-            x[1], x[3] = thF0, thL0
-            try:
-                r = least_squares(residual, x, method="lm", max_nfev=120)
-            except Exception:  # noqa: BLE001
-                continue
-            if best is None or r.cost < best.cost:
-                best = r
-    r = least_squares(residual, best.x, method="lm", max_nfev=4000)
-    return r
+    for t in np.radians(range(0, 360, 30)):
+        def rz(x):
+            p = dict(eF=E_F, thF=0.0, eL=x[0], thL=x[1], hd=x[2], dzk=x[3])
+            return kin(p, 0.0)["z"] - Y5
+        r = least_squares(rz, [1.3, t, 7.0, 0.0], bounds=([0.3, -20, 2, -3], [5, 20, 12, 3]))
+        if best is None or r.cost < best.cost:
+            best = r
+    eL, thL, hd, dzk = best.x
+    best2 = None
+    for t in np.radians(range(0, 360, 30)):
+        def ry(x):
+            k = kin(dict(eF=E_F, thF=x[0], eL=eL, thL=thL, hd=hd, dzk=dzk), x[1])
+            return k["y"] - k["y"].mean() - X5
+        try:
+            r = least_squares(ry, [t, 0.4], bounds=([-20, -1.4], [20, 1.4]))
+        except ValueError:
+            continue
+        if best2 is None or r.cost < best2.cost:
+            best2 = r
+    thF, a5 = best2.x
+    al0 = [a5 * s / 5 for s in STITCH] + [-a5 * s / 5 for s in STITCH]
+    x0 = [thF, eL, thL, hd, dzk] + al0
+    lb = LB + [-1.4] * len(al0)
+    ub = UB + [1.4] * len(al0)
+    r = least_squares(residual, x0, bounds=(lb, ub), max_nfev=3000)
+    return refine(r.x)
+
+
+def criteria_cost(xp, al_guess, out=None):
+    """sewcore 判据的目标函数：拖布留余量（≤ 0.04）、牙顶 0.8、针距用 α 二分法对准，再加一点椭圆偏差"""
+    p = dict(zip(PNAMES, xp))
+    p["eF"] = E_F
+    cost, als = 0.0, []
+    try:
+        for i, s in enumerate(STITCH):
+            for j, rev in enumerate((False, True)):
+                a = alpha_for(p, s, rev, al_guess[i + j * len(STITCH)])
+                k = kin(p, a)
+                c = feed_check(k, s, rev)
+                if "drag" not in c:
+                    return 1e3
+                X, Y, _ = target(s, rev)
+                dev = np.mean((k["y"] - k["y"].mean() - X) ** 2 + (k["z"] - Y) ** 2)
+                cost += 200 * max(0.0, c["drag"] - 0.04) ** 2 + 20 * (c["top"] - S.SEW["h"]) ** 2 + 0.01 * dev + 50 * c["stitch_err"] ** 2
+                cost += 2 * max(0.0, 25 - c["feedrise"]) ** 2 / 100
+                als.append(a)
+    except ValueError:
+        return 1e3
+    if out is not None:
+        out[:] = als
+    return cost
+
+
+def refine(x):
+    """最小二乘拟合椭圆之后，按判据用单纯形法再调相位、抬牙偏心、牙齿高度"""
+    from scipy.optimize import minimize
+    xp, al = list(x[:len(PNAMES)]), list(x[len(PNAMES):])
+    r = minimize(lambda v: criteria_cost(v, al), xp, method="Nelder-Mead", options=dict(maxiter=600, xatol=1e-4, fatol=1e-7))
+    als = []
+    criteria_cost(r.x, al, als)
+    class R:  # noqa: N801
+        pass
+    R.x = np.r_[r.x, als]
+    return R
+
+
+
+
+def feed_check(k, s_nom, rev=False):
+    """按 sewcore 的送布判据校核机构的实际轨迹（同 kit.feed_model 的算法，只是轨迹换成机构算出来的）：
+    牙齿顶面高出针板（z > 0）的区间是送布区间；拖布 = 针在布里（ain < φ < 360 − ain）时牙还在动的水平距离；
+    实际针距 = 送布区间里牙走的水平距离；起牙定时 = 起牙角离针出布的角度（20…180°）。"""
+    from app.sewcore.kit import FEED_FAB
+    m = Mech()
+    t = FEED_FAB[FAB]["t"]
+    ain = m.cross(t)
+    y, z = k["y"], k["z"]
+    up = z > 0
+    i_r = [i for i in range(N) if up[i] and not up[i - 1]]
+    i_d = [i for i in range(N) if not up[i] and up[i - 1]]
+    if len(i_r) != 1 or len(i_d) != 1:
+        return dict(ok=False, why="牙一转里出针板的次数不是一次")
+
+    def cross_ang(i):                          # 线性插值求 z = 0 的角度
+        z0, z1 = z[i - 1], z[i]
+        return (PHI[i - 1] + 2.0 * (0 - z0) / (z1 - z0)) % 360
+    rise, drop = cross_ang(i_r[0]), cross_ang(i_d[0])
+    # 细分一转（插值）算拖布和实际针距
+    ph = np.arange(0, 360, 0.25)
+    yi = np.interp(ph, np.r_[PHI, 360], np.r_[y, y[0]])
+    zi = np.interp(ph, np.r_[PHI, 360], np.r_[z, z[0]])
+    dy = np.diff(np.r_[yi, yi[0]])
+    on = zi > 0
+    pm = (ph + 0.125) % 360
+    infab = (pm > ain) & (pm < 360 - ain)
+    drag = float(np.sum(np.abs(dy[on & infab])))
+    net = float(np.sum(dy[on]))
+    fr = (rise - (360 - ain) + 360) % 360
+    sgn = -1 if rev else 1
+    err = (net * sgn - s_nom) / s_nom
+    return dict(rise=round(float(rise), 1), drop=round(float(drop), 1), drag=round(drag, 4), net=round(net, 3), top=round(float(z.max()), 3),
+                feedrise=round(float(fr), 1), stitch_err=round(float(err), 4),
+                ok=bool(drag <= 0.05 and 20 <= fr < 180 and abs(err) <= 0.05))
+
+
+def alpha_for(p, s_nom, rev, a_guess):
+    """调节器角：二分法使实际针距 = 名义针距"""
+    from scipy.optimize import brentq
+    sgn = -1 if rev else 1
+    f = lambda a: feed_check(kin(p, a), s_nom, rev)["net"] * sgn - s_nom      # noqa: E731
+    b = min(1.0, 2 * abs(a_guess) + 0.1)
+    lo, hi = (0.0, b) if not rev else (-b, 0.0)
+    try:
+        return brentq(f, lo, hi, xtol=1e-6) if f(lo) * f(hi) < 0 else a_guess
+    except ValueError:
+        return a_guess
 
 
 def main():
@@ -188,17 +302,40 @@ def main():
                settings=[])
     worst = 0.0
     for i, s in enumerate(STITCH):
-        for rev, a in ((False, al[i]), (True, -al[len(STITCH) + i])):
+        for rev, a0 in ((False, al[i]), (True, al[len(STITCH) + i])):
+            a = alpha_for(p, s, rev, a0)
             X, Y, F = target(s, rev)
             k = kin(p, a)
             ym = k["y"] - np.mean(k["y"])
             ey, ez = np.max(np.abs(ym - X)), np.max(np.abs(k["z"] - Y))
-            stitch = abs(ym.max() - ym.min()) * 0.926
             worst = max(worst, ey, ez)
-            res["settings"].append(dict(s=s, reverse=rev, alpha_deg=round(math.degrees(a), 3), err_y=round(float(ey), 4), err_z=round(float(ez), 4),
-                                        y_mean=round(float(np.mean(k["y"])), 3), stitch_est=round(float(stitch), 3)))
-    res["worst_mm"] = round(float(worst), 4)
-    print(json.dumps(res, ensure_ascii=False, indent=1)[:3000])
+            res["settings"].append(dict(s=s, reverse=rev, alpha_deg=round(math.degrees(a), 3), dev_y=round(float(ey), 3), dev_z=round(float(ez), 3),
+                                        y_mean=round(float(np.mean(k["y"])), 3), check=feed_check(k, s, rev)))
+    # 倒缝扳手：把调节器从 +α 扳到 −α（对称），倒缝针距与正缝之比
+    mirror = []
+    fw = {x["s"]: x["alpha_deg"] for x in res["settings"] if not x["reverse"]}
+    for s_, a_ in fw.items():
+        c = feed_check(kin(p, -math.radians(a_)), s_, True)
+        mirror.append(dict(s=float(s_), reverse_stitch=round(-c["net"], 3), ratio=round(-c["net"] / s_, 4)))
+    res["reverse_by_mirror"] = mirror
+    # 针距旋钮：α 与针距的线性拟合，按直线刻度时的针距误差
+    ss = np.array(list(fw.keys()))
+    aa = np.array(list(fw.values()))
+    k_, b_ = np.polyfit(ss, aa, 1)
+    lin = []
+    for s_, a_ in zip(ss, aa):
+        c = feed_check(kin(p, math.radians(k_ * s_ + b_)), s_)
+        lin.append(round(c["net"] - s_, 3))
+    res["dial"] = dict(alpha_per_mm_deg=round(float(k_), 3), alpha0_deg=round(float(b_), 3), stitch_err_linear_mm=[float(v) for v in lin])
+    res["dev_worst_mm"] = round(float(worst), 3)
+    res["all_ok"] = bool(all(x["check"]["ok"] for x in res["settings"]) and all(abs(m["ratio"] - 1) <= 0.05 for m in mirror)
+                     and max(abs(v) for v in lin) <= 0.2)
+    (out / "送布机构.json").write_text(json.dumps(res, ensure_ascii=False, indent=1))
+    for x in res["settings"]:
+        print(x["s"], "倒" if x["reverse"] else "正", x["alpha_deg"], x["dev_y"], x["dev_z"], x["check"])
+    print("倒缝（对称）", mirror)
+    print("旋钮", res["dial"])
+    print("params", res["params"], "all_ok", res["all_ok"])
 
 
 if __name__ == "__main__":
