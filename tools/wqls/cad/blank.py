@@ -75,8 +75,8 @@ for f in part.Faces:
                     feed_bore = k_
         if hole and feed_bore:
             # G4.6 送布摆轴、抬牙摆轴、调节器轴的孔和端壁工艺孔都用砂芯铸出（否则凸台成了实心热节）：
-            # 抬牙摆轴前孔 Ø16 铸出 Ø15（后孔的 Ø14 镗刀要从这里穿过去），调节器孔 Ø10 铸出 Ø6，其余比成品小 5
-            dc = 15.0 if (feed_bore == "Lr" and abs(r - 8.0) < 0.05 and p0.x > 0) else (6.0 if (feed_bore == "G" and abs(r - 5.0) < 0.05) else 2 * r - 5.0)
+            # 抬牙摆轴前孔 Ø16 铸出 Ø15（后孔的 Ø14 镗刀要从这里穿过去），调节器孔 Ø10 铸出 Ø6，其余比成品小 3
+            dc = 15.0 if (feed_bore == "Lr" and abs(r - 8.0) < 0.05 and p0.x > 0) else (6.0 if (feed_bore == "G" and abs(r - 5.0) < 0.05) else 2 * r - 3.0)
             adds.append(Part.makeCylinder(r + 0.4, L + 0.2, p0 - ax * 0.1, ax).cut(Part.makeCylinder(dc / 2, L + 2, p0 - ax, ax)))
             log["bores"].append(dict(d=round(2 * r, 1), cast_d=dc, at=[round(x, 1) for x in p0], feed=feed_bore))
         elif hole and hook_bore:
