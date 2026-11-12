@@ -75,7 +75,7 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline):
             need[k] = (a, max(c, need.get(k, (a, 0))[1]))
     pads = [(p, _poly(p.GetEffectivePolygon())) for fp in board.GetFootprints() for p in fp.Pads() if p.GetNetname()]
     lid = {"F.Cu": pcbnew.F_Cu, "B.Cu": pcbnew.B_Cu, "In2.Cu": pcbnew.In2_Cu}
-    n = 0
+    made = []  # 已经引出的线也算障碍：(网络, 层, 形状)
     for (_ref, _num), (p, c) in sorted(need.items(), key=lambda kv: (kv[0][0], kv[0][1])):
         net = p.GetNetname()
         w = width_of(net)
@@ -101,6 +101,9 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline):
                     if other and g.distance(seg.buffer(w / 2)) < clearance(net, q.GetNetname()):
                         d = min(d, -1.0)
                     score = min(score, d)
+                for onet, olay, og in made:
+                    if onet != net and olay == ln:
+                        score = min(score, og.distance(seg.buffer(w / 2)) - clearance(net, onet))
                 if best is None or score > best[0]:
                     best = (score, ln, end)
         if not best or best[0] < 0:
@@ -113,8 +116,37 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline):
         t.SetNet(p.GetNet())
         t.SetLocked(True)
         board.Add(t)
-        n += 1
-    return n
+        made.append((net, best[1], LineString([(x0, y0), best[2]]).buffer(w / 2)))
+    return len(made)
+
+
+def drop_dangling(board):
+    """布完以后，没有别的线、过孔接到（焊盘以外那一截）的引出线删掉：布线器从别处接通了这个焊盘，引出线用不上。返回删的段数"""
+    from shapely.geometry import LineString, Point
+
+    def geom(t):
+        mm = pcbnew.ToMM
+        if t.GetClass() == "PCB_VIA":
+            return Point(mm(t.GetPosition().x), mm(t.GetPosition().y)).buffer(mm(t.GetWidth()) / 2)
+        return LineString([(mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))]).buffer(
+            mm(t.GetWidth()) / 2)
+
+    tracks = list(board.GetTracks())
+    drop = []
+    for t in tracks:
+        if t.GetClass() == "PCB_VIA" or not t.IsLocked():
+            continue
+        mm = pcbnew.ToMM
+        a, b = (mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))
+        outer = LineString([(a[0] + 0.6 * (b[0] - a[0]), a[1] + 0.6 * (b[1] - a[1])), b])
+        used = any(o is not t and o.GetNetname() == t.GetNetname() and not o.IsLocked() and
+                   (o.GetClass() == "PCB_VIA" or o.GetLayer() == t.GetLayer()) and geom(o).distance(outer) < 0.01
+                   for o in tracks)
+        if not used:
+            drop.append(t)
+    for t in drop:
+        board.Remove(t)
+    return len(drop)
 
 
 def dedupe(board):

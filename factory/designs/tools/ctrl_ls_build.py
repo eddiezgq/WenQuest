@@ -284,7 +284,7 @@ def board_build(route, jar):
         print("引出线（器件自己引脚比布线间距近的焊盘）：", n_stub)
         stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep, pairs=gb.pairs_of(D.X),
                              timeout=3000)
-        print("去掉重复的固定线：", RF.dedupe(board))
+        print("去掉重复的固定线：", RF.dedupe(board), "；用不上的引出线：", RF.drop_dangling(board))
         targets = {n: c["track_mm"] for c in D.X["net_classes"] if c.get("route_mm") for n in c["nets"]}
         print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance))
     board.BuildConnectivity()

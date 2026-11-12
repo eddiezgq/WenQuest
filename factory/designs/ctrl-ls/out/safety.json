@@ -5,10 +5,10 @@
     314.15,
     216.0,
     "In1",
-    "zone GND_ISO zone:ade42437-6f14-4fad-90d0-41724cbe0c35 ↔ zone GND zone:1665b7b7-7e2d-472e-ad55-0a873d71974e"
+    "zone GND_ISO zone:a6e7e767-8dcc-475a-9268-0accabde1d35 ↔ zone GND zone:736a5163-a20f-4f18-91bf-e5abd5726d45"
    ]
   ],
-  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:ade42437-6f14-4fad-90d0-41724cbe0c35 ↔ zone GND zone:1665b7b7-7e2d-472e-ad55-0a873d71974e）",
+  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:a6e7e767-8dcc-475a-9268-0accabde1d35 ↔ zone GND zone:736a5163-a20f-4f18-91bf-e5abd5726d45）",
   "example": true,
   "groups": [
    [
@@ -178,13 +178,13 @@
  {
   "at": [
    [
-    119.96,
-    136.41,
+    121.63,
+    122.08,
     "In1",
-    "pth PE C103 ↔ zone GND zone:1665b7b7-7e2d-472e-ad55-0a873d71974e"
+    "pth PE C102 ↔ zone GND zone:736a5163-a20f-4f18-91bf-e5abd5726d45"
    ]
   ],
-  "detail": "最近 4.20 mm（In1 层，pth PE C103 ↔ zone GND zone:1665b7b7-7e2d-472e-ad55-0a873d71974e）",
+  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:736a5163-a20f-4f18-91bf-e5abd5726d45）",
   "example": true,
   "groups": [
    [
@@ -351,13 +351,13 @@
  {
   "at": [
    [
-    135.46,
-    126.38,
+    120.4,
+    148.4,
     "F",
-    "track L_C ↔ pth N_IN RV101"
+    "track L_F ↔ pth N_C C103"
    ]
   ],
-  "detail": "最近 2.17 mm（F 层，track L_C ↔ pth N_IN RV101）",
+  "detail": "最近 2.60 mm（F 层，track L_F ↔ pth N_C C103）",
   "example": true,
   "groups": [
    [
@@ -377,20 +377,20 @@
   "name": "安全距离：相线 ↔ 零线（保险丝之后）",
   "rule": "电气间隙 ≥ 2.5 mm、爬电距离 ≥ 2.5 mm（直线距离量，偏保守）",
   "source": "示例值",
-  "status": "fail",
+  "status": "pass",
   "unit": "mm",
-  "value": 2.175
+  "value": 2.602
  },
  {
   "at": [
    [
-    259.42,
-    151.77,
-    "In2",
-    "pth VBUS C221 ↔ track N_V"
+    276.07,
+    171.72,
+    "F",
+    "pad VBUS R420 ↔ pad GND R413"
    ]
   ],
-  "detail": "最近 1.63 mm（In2 层，pth VBUS C221 ↔ track N_V）",
+  "detail": "最近 1.75 mm（F 层，pad VBUS R420 ↔ pad GND R413）",
   "example": true,
   "groups": [
    [
@@ -542,6 +542,6 @@
   "source": "示例值",
   "status": "fail",
   "unit": "mm",
-  "value": 1.63
+  "value": 1.75
  }
 ]

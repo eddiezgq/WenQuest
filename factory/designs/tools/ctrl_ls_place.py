@@ -25,6 +25,9 @@ GAP = 1.2
 # 高压功能块里器件之间多留：高压线布线间距 2.2–2.6 mm、线宽 2–2.5 mm，器件挨得太紧线穿不过去（159d2b 第七次布线 71 处没连上）
 GAP_HV = {"mains": 3.5, "pfc": 3.0, "aux": 2.5}
 EDGE = 1.0
+# 带高压网络（safety.yaml 的相线、零线、母线组）的器件和不带的器件之间至少隔这么多：
+# 安全距离“母线 ↔ 弱电”要 2.0 mm，焊盘贴着外框，两边器件挨着放时焊盘之间就不够（159d2b 第十二次：分压电阻 ↔ 接地电阻 1.75 mm）
+GAP_HV_LOW = 2.6
 
 # 区：功能块 → [(x0, y0, x1, y1)]（可以几块）
 REGIONS = {
@@ -82,19 +85,28 @@ def overlaps(a, b):
     return not (a[2] <= b[0] or b[2] <= a[0] or a[3] <= b[1] or b[3] <= a[1])
 
 
+def hv_nets():
+    import yaml
+    with open(os.path.join(os.path.dirname(D.DESIGN_PATH), "safety.yaml"), encoding="utf-8") as f:
+        g = yaml.safe_load(f)["groups"]
+    return set(g["ac_l"]) | set(g["ac_n"]) | set(g["bus_hv"])
+
+
 def main():
-    place, used = {}, [(hx - 8, hy - 8, hx + 8, hy + 8) for hx, hy in D.X["holes"]]   # 安装孔周围留空（孔焊盘 + 4 mm）
+    hv = hv_nets()
+    is_hv = {p["ref"]: bool(set(p["pins"].values()) & hv) for p in D.PARTS}
+    place, used = {}, [(hx - 8, hy - 8, hx + 8, hy + 8, None) for hx, hy in D.X["holes"]]   # 安装孔周围留空（孔焊盘 + 4 mm）
     bw = B["w"] / 2 + 1.0                                                                       # 隔离带两边再各留 1 mm
-    used += [(B["x"] - bw, B["y"] - bw, B["x"] + bw, H), (B["x"] - bw, B["y"] - bw, W, B["y"] + bw)]
+    used += [(B["x"] - bw, B["y"] - bw, B["x"] + bw, H, None), (B["x"] - bw, B["y"] - bw, W, B["y"] + bw, None)]
     parts = {p["ref"]: p for p in D.PARTS}
     for ref, (x, y, rot) in FIXED_POS.items():
         bx, by, bw_, bh = bbox(parts[ref]["fp"], rot)
         place[ref] = (round(x, 2), round(y, 2), rot, "F")
-        used.append((x + bx, y + by, x + bx + bw_, y + by + bh))
+        used.append((x + bx, y + by, x + bx + bw_, y + by + bh, is_hv[ref]))
     for ref, (x, y, rot) in FIXED.items():
         bx, by, bw, bh = bbox(parts[ref]["fp"], rot)
         place[ref] = (round(x - bx, 2), round(y - by, 2), rot, "F")
-        used.append((x, y, x + bw, y + bh))
+        used.append((x, y, x + bw, y + bh, is_hv[ref]))
     order = {k: [p for p in D.PARTS if p["sheet"] == k and p["ref"] not in FIXED and p["ref"] not in FIXED_POS] for k in REGIONS}
     left = []
     global GAP
@@ -112,9 +124,9 @@ def main():
                         cx, cy, rowh = x0, cy + rowh + GAP, 0.0
                         continue
                     r = (cx, cy, cx + bw, cy + bh)
-                    hit = next((u for u in used if overlaps(r, (u[0] - GAP, u[1] - GAP, u[2] + GAP, u[3] + GAP))), None)
+                    hit = next((u for u in used if overlaps(r, _grow(u, _gap(is_hv[p["ref"]], u[4])))), None)
                     if hit:
-                        cx = hit[2] + GAP
+                        cx = hit[2] + _gap(is_hv[p["ref"]], hit[4])
                         continue
                     ok = True
                     break
@@ -122,7 +134,7 @@ def main():
                     rest.append(p)
                     continue
                 place[p["ref"]] = (round(cx - bx, 2), round(cy - by, 2), 0, "F")
-                used.append(r)
+                used.append(r + (is_hv[p["ref"]],))
                 cx += bw + GAP
                 rowh = max(rowh, bh)
             queue = rest
@@ -131,6 +143,15 @@ def main():
         raise SystemExit("放不下：" + " ".join(left))
     write(place)
     print("摆好 {} 个器件，写回 design.yaml".format(len(place)))
+
+
+def _gap(a, b):
+    """两个器件之间留多少：一个带高压、一个不带时至少 GAP_HV_LOW；其余按所在区的间隙"""
+    return max(GAP, GAP_HV_LOW) if (a is not None and b is not None and a != b) else GAP
+
+
+def _grow(u, g):
+    return (u[0] - g, u[1] - g, u[2] + g, u[3] + g)
 
 
 def write(place):
