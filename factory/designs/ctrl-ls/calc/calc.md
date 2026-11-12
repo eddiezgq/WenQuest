@@ -19,7 +19,7 @@
 
 ## 结论
 
-通过 9 项，不通过 0 项，待核对 56 项，未知 1 项。
+通过 9 项，不通过 0 项，待核对 60 项，未知 2 项。
 
 ## 交流输入、电磁兼容与浪涌（AC input, EMI and inrush）
 
@@ -83,6 +83,13 @@
 | 掉电保持时间（降到 300 V） | 45.88 ms | t = C·(V_o² − V_min²) / (2·P_o) |  |
 | 母线分压上臂 | 3.1 MΩ | R_上 = R_下 · (V_o / V_VSREF − 1) | R_下 = 20k；ICE3PCS01G Standalone Power Factor Correction (PFC) Controller in Continuous Conduction Mode (CCM), Datasheet Version 3.0, 03 April 2017，p.20 4.3.11 |
 | 过压保护动作的母线电压 | 421.2 V | 1.08 × V_o（OVP1 = 108 % 额定，规格书 4.3.6） |  |
+| 升压电感：要的面积积 | 9.387 cm⁴ | A_p = L · I_峰 · I_有效 / (B_max · J · K_u) | B_max 0.3 T、J 4 A/mm²、K_u 0.4（按理论，教材取值） |
+| 升压电感：磁芯面积积 | 13.45 cm⁴ | A_e · A_N | ETD59-N87；ETD 59/31/22 core B66397, coil former B66398 (Ferrites and accessories) 08/01，p.497；ETD 59/31/22 core B66397, coil former B66398 (Ferrites and accessories) 08/01，p.499 |
+| 升压电感：匝数 | 53 匝 | N = ⌈L · I_峰 / (B_max · A_e)⌉ |  |
+| 升压电感：气隙（总） | 2.879 mm | l_g ≈ μ0 · N² · A_e / L | 不计边缘磁通，绕制厂按实测电感调 |
+| 升压电感：峰值磁密 | 0.2948 T | B = L · I_峰 / (N · A_e) |  |
+| 升压电感：导线截面 | 1.959 mm² | A_w = I_有效 / J | 用多股绞线（利兹线） |
+| 升压电感：铜损（100 ℃） | 4.054 W | I² · ρ · N · l_N / A_w | 不含高频趋肤、邻近效应 |
 
 | 判定 | 要求 | 实有 | 规则 | 结论 | 说明 |
 |---|---|---|---|---|---|
@@ -98,6 +105,9 @@
 | 母线纹波不超过要求 | 5.524 V | 20 V | ΔV ≤ 20 V | **待核对** | Rubycon MXH series SNAP-IN aluminum electrolytic capacitors catalog page 115-116 (no revision printed)，p.1 Specifications; p.2 table |
 | 掉电保持时间 | 20 ms | 45.88 ms | t ≥ 0.02 s | **待核对** | Rubycon MXH series SNAP-IN aluminum electrolytic capacitors catalog page 115-116 (no revision printed)，p.1 Specifications; p.2 table |
 | 控制器供电绝对最大值 | 15 V | 26 V | V_CC,max ≥ 辅助 15 V | **待核对** | 待核对；ICE3PCS01G Standalone Power Factor Correction (PFC) Controller in Continuous Conduction Mode (CCM), Datasheet Version 3.0, 03 April 2017，p.15 4.1 |
+| 升压电感：磁芯面积积够 | 9.387 cm⁴ | 13.45 cm⁴ | A_e · A_N ≥ 要的 | **待核对** |  |
+| 升压电感：窗口放得下 | 0.284 | 0.4 | N · A_w / A_N ≤ K_u | **待核对** |  |
+| 升压电感：铁损 | — | — | 要材料损耗曲线 | **未知** | 铁损要磁芯材料的损耗曲线（N87 的 Steinmetz 系数），本版没录 |
 | 仿真：电感电流纹波（峰峰，V_x = V_o/2 处） | 3.325 A | 3.328 A | 要求列是公式值、实有列是仿真值，相差 ≤ 3% | **通过** | 相差 0.09% |
 | 仿真：母线二倍工频纹波（峰峰） | 5.524 V | 5.524 V | 要求列是公式值、实有列是仿真值，相差 ≤ 5% | **通过** | 相差 0.00% |
 | 仿真：掉电保持时间 | 45.88 ms | 45.68 ms | 要求列是公式值、实有列是仿真值，相差 ≤ 3% | **通过** | 相差 0.42% |
@@ -119,6 +129,15 @@
 | 匝比 N_p : N_24V | 4.008 | n = V_OR / (V_o + V_F) |  |
 | 开关管最高漏极电压 | 571.2 V | 过压点 + 钳位电压 | 钳位 150 V |
 | 24 V 整流管反向电压 | 129.1 V | V_o + V_max / n |  |
+| 反激变压器：要的面积积 | 0.1142 cm⁴ | A_p = L_p · I_p · I_p,有效 / (B_max · J · K_u) | B_max 0.3 T、J 4 A/mm²、K_u 0.25（按理论，教材取值）；I_p,有效 = I_p · √(D/3) |
+| 反激变压器：磁芯面积积 | 0.7372 cm⁴ | A_e · A_N | ETD29-N87；ETD 29/16/10 core B66358, coil former B66359 (Ferrites and accessories) core 08/01, accessories 18.09.03，p.477 |
+| 反激变压器：初级匝数 | 36 匝 | N_p = ⌈L_p · I_p / (B_max · A_e)⌉ | 次级：24 V 9 匝、15 V 6 匝、5 V 2 匝 |
+| 反激变压器：气隙（总） | 0.1644 mm | l_g ≈ μ0 · N_p² · A_e / L_p | 绕制厂按实测电感调 |
+| 反激变压器：窗口占用 | 0.1655 | Σ N · I_有效 / J / A_N |  |
+| 漏感（按理论） | 15.06 µH | L_lk = 比例 × L_p | 比例 0.02（教材经验值 1–3 %，按样机实测改） |
+| 钳位电阻功耗 | 1.721 W | ½ · L_lk · I_p² · f · V_c / (V_c − V_OR) |  |
+| 钳位电阻（最多） | 13.07 kΩ | R = V_c² / P |  |
+| 钳位电容（最少） | 11.59 nF | C ≥ 10 / (R · f)（钳位电压纹波 ≤ 10 %） |  |
 
 | 判定 | 要求 | 实有 | 规则 | 结论 | 说明 |
 |---|---|---|---|---|---|
@@ -129,6 +148,8 @@
 | 钳位电压高于反射电压 | 140 V | 150 V | V_钳位 ≥ 1.4 × V_OR | **通过** |  |
 | 24 V 整流管耐压 | 161.4 V | 200 V | V_RRM ≥ 1.25 × 反向电压 | **待核对** | 待核对；ES3A - ES3J Fast Rectifiers Rev. 2.11, June 2016，p.2 Absolute Maximum Ratings |
 | 24 V 整流管电流 | 800 mA | 3 A | I_F(AV) ≥ 24 V 平均电流 | **待核对** | 待核对；ES3A - ES3J Fast Rectifiers Rev. 2.11, June 2016，p.2 Absolute Maximum Ratings |
+| 反激变压器：磁芯面积积够 | 0.1142 cm⁴ | 0.7372 cm⁴ | A_e · A_N ≥ 要的 | **待核对** |  |
+| 反激变压器：窗口放得下 | 0.1655 | 0.25 | 占用 ≤ K_u | **待核对** |  |
 
 ## 智能功率模块逆变（IPM inverter）
 
@@ -294,6 +315,8 @@
 | BSC040N08NS5 | Infineon | BSC040N08NS5 OptiMOS 5 Power-Transistor, 80 V, Final Data Sheet Rev. 2.2, 2020-05-15 | https://www.infineon.com/assets/row/public/documents/24/49/infineon-bsc040n08ns5-datasheet-en.pdf |
 | C3D06060A | Wolfspeed (Cree) | C3D06060A Silicon Carbide Schottky Diode Z-Rec Rectifier Rev. F, 10-2015 | https://www.lcsc.com/datasheet/C5693025.pdf |
 | ES3D | onsemi (Fairchild) | ES3A - ES3J Fast Rectifiers Rev. 2.11, June 2016 | https://www.lcsc.com/datasheet/C241735.pdf |
+| ETD29-N87 | TDK (EPCOS) | ETD 29/16/10 core B66358, coil former B66359 (Ferrites and accessories) core 08/01, accessories 18.09.03 | https://storage.sea.com.ua/tech_info//epcos/B66358, B66359.pdf |
+| ETD59-N87 | TDK (EPCOS) | ETD 59/31/22 core B66397, coil former B66398 (Ferrites and accessories) 08/01 | https://www.elsin.ru/pdf/B66397.pdf |
 | G5LE-1-E DC12 | Omron | Power Relay G5LE-G / G5LE-E (no revision printed) | https://www.lcsc.com/datasheet/C152711.pdf |
 | GBU1006 | LGE (Luguang) | GBU1001 - GBU1007 Single Phase 10.0 AMP. Glass Passivated Bridge Rectifiers Version: A06 | https://www.lcsc.com/datasheet/C5183365.pdf |
 | ICE3PCS01G | Infineon | ICE3PCS01G Standalone Power Factor Correction (PFC) Controller in Continuous Conduction Mode (CCM), Datasheet Version 3.0, 03 April 2017 | https://www.lcsc.com/datasheet/C192050.pdf |

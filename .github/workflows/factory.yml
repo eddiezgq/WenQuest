@@ -129,7 +129,7 @@ jobs:
           cd factory/designs/tools
           python3 build.py --no-route
           python3 build.py --no-route --rev B          # 第 98 轮：B 版（放上 WQ-ENCIF，设计对照）
-          python3 ctrl_ls_build.py                     # 第 159 轮：平缝机控制器 CTRL-LS 原理图（网表与设计描述逐脚对照）
+          python3 ctrl_ls_build.py --board --no-route  # 第 159 轮：平缝机控制器 CTRL-LS（原理图网表逐脚对照；板子沿用仓库里布好的，重出制造文件、重做检查）
           cd "$GITHUB_WORKSPACE"
           # 三维（STEP 的网格化、GLB）随 OpenCASCADE 版本有细微差别，不比逐字；其余产物必须一字不差
           git status --porcelain factory/designs
