@@ -2,13 +2,13 @@
  {
   "at": [
    [
-    310.15,
-    216.0,
+    308.51,
+    226.75,
     "In1",
-    "zone GND_ISO zone:8b62a594-2285-4cb3-b5d9-f0be633aaa22 ↔ zone GND zone:5ccaf7d9-9f26-4e47-bb70-57f77a77ec2f"
+    "via GND_ISO via@311.317,-226.747 ↔ zone GND zone:c1ede70d-ee9f-436c-971a-31261383a2d7"
    ]
   ],
-  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:8b62a594-2285-4cb3-b5d9-f0be633aaa22 ↔ zone GND zone:5ccaf7d9-9f26-4e47-bb70-57f77a77ec2f）",
+  "detail": "最近 5.02 mm（In1 层，via GND_ISO via@311.317,-226.747 ↔ zone GND zone:c1ede70d-ee9f-436c-971a-31261383a2d7）",
   "example": true,
   "groups": [
    [
@@ -173,7 +173,7 @@
   "source": "示例值；数字隔离器 ADuM1201 本身的爬电与电气间隙各 4.0 mm（规格书 Rev. L p.21），板上不应比它小",
   "status": "pass",
   "unit": "mm",
-  "value": 4.0
+  "value": 5.017
  },
  {
   "at": [
@@ -181,10 +181,10 @@
     121.63,
     122.08,
     "In1",
-    "pth PE C102 ↔ zone GND zone:5ccaf7d9-9f26-4e47-bb70-57f77a77ec2f"
+    "pth PE C102 ↔ zone GND zone:c1ede70d-ee9f-436c-971a-31261383a2d7"
    ]
   ],
-  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:5ccaf7d9-9f26-4e47-bb70-57f77a77ec2f）",
+  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:c1ede70d-ee9f-436c-971a-31261383a2d7）",
   "example": true,
   "groups": [
    [
@@ -351,13 +351,13 @@
  {
   "at": [
    [
-    133.54,
-    173.87,
-    "B",
-    "track L_C ↔ pth N_IN L101"
+    136.05,
+    129.41,
+    "F",
+    "track L_C ↔ pth N_IN RV101"
    ]
   ],
-  "detail": "最近 2.61 mm（B 层，track L_C ↔ pth N_IN L101）",
+  "detail": "最近 2.61 mm（F 层，track L_C ↔ pth N_IN RV101）",
   "example": true,
   "groups": [
    [
@@ -379,18 +379,18 @@
   "source": "示例值",
   "status": "pass",
   "unit": "mm",
-  "value": 2.607
+  "value": 2.612
  },
  {
   "at": [
    [
-    229.27,
-    111.88,
-    "F",
-    "pth VRECT D202 ↔ pad RECT_N R203"
+    293.01,
+    129.47,
+    "B",
+    "pth OUT_U U401 ↔ track IN_UL"
    ]
   ],
-  "detail": "最近 1.75 mm（F 层，pth VRECT D202 ↔ pad RECT_N R203）",
+  "detail": "最近 1.03 mm（B 层，pth OUT_U U401 ↔ track IN_UL）",
   "example": true,
   "groups": [
    [
@@ -542,6 +542,6 @@
   "source": "示例值",
   "status": "fail",
   "unit": "mm",
-  "value": 1.745
+  "value": 1.03
  }
 ]

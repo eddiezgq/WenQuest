@@ -24,7 +24,7 @@ ROOT_TEXT = ("平缝机控制器 CTRL-LS：单相 90–250 V 输入 → 功率�
 SCH_AUTO_PAPER = True
 # 隔离带（159d2b）：右下角是隔离面板口（GND_ISO 一侧）。竖带中心 x、横带中心 y、宽度 mm；带里不走线、不打过孔、不铺铜。
 # 隔离电源 B0505S 的 2、3 脚只隔 2.54 mm（器件自己的引脚，按它的额定），带在那里收窄成 NOTCH 宽
-BARRIER = {"x": 208.0, "y": 116.0, "w": 4.0, "notch_y": (130.5, 133.5), "notch_w": 1.4}
+BARRIER = {"x": 212.0, "y": 116.0, "w": 4.0, "notch_y": (130.5, 133.5), "notch_w": 1.4}
 SHEETS = X["sheets"]
 PARTS = [{"ref": q["ref"], "lib": q["lib"], "value": q["value"], "fp": q["fp"], "sheet": q["block"], "pins": q["pins"],
           "item": q["item"], "note": q["note"]} for q in X["parts"]]
