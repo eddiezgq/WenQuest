@@ -97,8 +97,8 @@ jobs:
             hosts="https://factory.wenquestrobotics.com https://demo.wenquestrobotics.com https://sewing.factory.wenquestrobotics.com"
           fi
           for p in $pages; do
-            body=$(curl -sL -m 25 "$p"); n=$(printf '%s' "$body" | grep -c 'assist.js')
-            echo "::notice::assist page $p tag=$n"
+            body=$(curl -sL -m 25 "$p"); n=$(printf '%s' "$body" | grep -c 'assist.js' || true); h=$(printf '%s' "$body" | grep -o 'index-[A-Za-z0-9_-]*\.js' | head -1)
+            echo "::notice::assist page $p tag=$n len=${#body} $h"
           done
           for h in $hosts; do
             js=$(curl -s -o /dev/null -m 25 -w "%{http_code} %{content_type}" "$h/assist.js")
