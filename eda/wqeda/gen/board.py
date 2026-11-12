@@ -191,9 +191,40 @@ def tie_keepouts(board):
     return out
 
 
+def _drop_classes(txt):
+    """去掉 KiCad 自己导出的网络分类（工程文件 .kicad_pro 里有分类时它也写一份，间距、层是上次的旧值，
+    排在我们的分类后面会把它们盖掉——159d2b 第八、九次布线就是这样没按新间距布）；只留 kicad_default，
+    去掉的分类里的网络放回 kicad_default（再由 dsn_rules 按新分类拿出去）"""
+    out, k, back = [], 0, []
+    for m in re.finditer(r"\(class (?!kicad_default\b|_class)", txt):
+        if m.start() < k:
+            continue
+        depth, j = 0, m.start()
+        while True:
+            ch = txt[j]
+            depth += ch == "("
+            depth -= ch == ")"
+            j += 1
+            if depth == 0:
+                break
+        blk = txt[m.start():j]
+        back += re.findall(r'"[^"]*"|[^\s()]+', blk[: blk.index("(", 1)])[2:]
+        out.append(txt[k:m.start()])
+        k = j
+        while k < len(txt) and txt[k] in " \t\n":
+            k += 1
+    out.append(txt[k:])
+    txt = "".join(out)
+    if back:
+        i = txt.index("(class kicad_default") + len("(class kicad_default")
+        txt = txt[:i] + " " + " ".join(back) + txt[i:]
+    return txt
+
+
 def dsn_rules(dsn_text, classes, pairs=()):
     """改 DSN 的线宽 / 间距类别：classes = {类名: (线宽 mm, 间距 mm, [网络], [层]?)}；这些网络从缺省类别里拿出来。
     pairs = [(类名 A, 类名 B, 间距 mm)]：两个分类之间另定的间距（Specctra class_class；Default 即缺省类别 kicad_default）"""
+    dsn_text = _drop_classes(dsn_text)
     i = dsn_text.index("(class kicad_default")
     j = dsn_text.index("(circuit", i)
     head = dsn_text[i:j]

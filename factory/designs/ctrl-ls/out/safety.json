@@ -2,13 +2,13 @@
  {
   "at": [
    [
-    311.61,
-    226.86,
-    "F",
-    "pad GND_ISO U601 ↔ track GND"
+    312.0,
+    220.17,
+    "In1",
+    "zone GND_ISO zone:d4030943-6306-4716-9819-10b79a7e9579 ↔ zone GND zone:12d1289f-ae80-43bb-babf-036d533fd398"
    ]
   ],
-  "detail": "最近 4.09 mm（F 层，pad GND_ISO U601 ↔ track GND）",
+  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:d4030943-6306-4716-9819-10b79a7e9579 ↔ zone GND zone:12d1289f-ae80-43bb-babf-036d533fd398）",
   "example": true,
   "groups": [
    [
@@ -173,18 +173,18 @@
   "source": "示例值；数字隔离器 ADuM1201 本身的爬电与电气间隙各 4.0 mm（规格书 Rev. L p.21），板上不应比它小",
   "status": "pass",
   "unit": "mm",
-  "value": 4.086
+  "value": 4.0
  },
  {
   "at": [
    [
-    115.91,
-    124.46,
+    116.33,
+    139.27,
     "In1",
-    "pth PE C102 ↔ zone GND zone:4043a74d-05cb-4cff-8fd8-6c7192ce82f1"
+    "pth PE C103 ↔ track L_C"
    ]
   ],
-  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:4043a74d-05cb-4cff-8fd8-6c7192ce82f1）",
+  "detail": "最近 2.87 mm（In1 层，pth PE C103 ↔ track L_C）",
   "example": true,
   "groups": [
    [
@@ -344,20 +344,20 @@
   "name": "安全距离：保护地（安装孔） ↔ 带电部分",
   "rule": "电气间隙 ≥ 3 mm、爬电距离 ≥ 4 mm（直线距离量，偏保守）",
   "source": "示例值",
-  "status": "pass",
+  "status": "fail",
   "unit": "mm",
-  "value": 4.2
+  "value": 2.874
  },
  {
   "at": [
    [
-    120.41,
-    148.41,
+    138.35,
+    129.41,
     "F",
-    "track L_F ↔ pth N_C C103"
+    "track L_C ↔ pth N_IN RV101"
    ]
   ],
-  "detail": "最近 2.63 mm（F 层，track L_F ↔ pth N_C C103）",
+  "detail": "最近 2.60 mm（F 层，track L_C ↔ pth N_IN RV101）",
   "example": true,
   "groups": [
    [
@@ -379,18 +379,18 @@
   "source": "示例值",
   "status": "pass",
   "unit": "mm",
-  "value": 2.628
+  "value": 2.603
  },
  {
   "at": [
    [
-    265.29,
-    133.41,
+    276.07,
+    171.72,
     "F",
-    "pad VB_W C403 ↔ track +3V3"
+    "pad VBUS R420 ↔ pad GND R413"
    ]
   ],
-  "detail": "最近 1.01 mm（F 层，pad VB_W C403 ↔ track +3V3）",
+  "detail": "最近 1.75 mm（F 层，pad VBUS R420 ↔ pad GND R413）",
   "example": true,
   "groups": [
    [
@@ -542,6 +542,6 @@
   "source": "示例值",
   "status": "fail",
   "unit": "mm",
-  "value": 1.012
+  "value": 1.75
  }
 ]
