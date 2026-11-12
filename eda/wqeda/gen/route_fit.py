@@ -248,3 +248,108 @@ def widen(board, targets, clearance):
             none += 1
         t.SetWidth(pcbnew.FromMM(round(nw, 2)))
     return full, part, none
+
+
+def finish(board, class_of, clearance, width_of, layers_of, skip=("GND", "GND_ISO")):
+    """布线器两遍都没接上的几根：同一网络还分成几块时，在两块最近的两点之间试一段直线或一个拐角（两段），
+    哪一层、哪条路上离别的网络的铜都够远就加上。器件自己引脚之间的间距照旧不算（与 stubs 同一口径）。
+    skip = 平面网络（由内层平面连通，不在这里补）。返回 [(网络, 层, 段数)]"""
+    from shapely.geometry import LineString, Point
+    from shapely.ops import unary_union
+
+    mm = pcbnew.ToMM
+    lid = {"F.Cu": pcbnew.F_Cu, "B.Cu": pcbnew.B_Cu, "In2.Cu": pcbnew.In2_Cu}
+
+    def items():
+        out = []
+        for fp in board.GetFootprints():
+            for p in fp.Pads():
+                if p.GetNetname():
+                    out.append((p.GetNetname(), set(p.GetLayerSet().CuStack()), _poly(p.GetEffectivePolygon()),
+                                fp.GetReference(), (mm(p.GetPosition().x), mm(p.GetPosition().y))))
+        for t in board.GetTracks():
+            if t.GetClass() == "PCB_VIA":
+                c = (mm(t.GetPosition().x), mm(t.GetPosition().y))
+                g = Point(c).buffer(mm(t.GetWidth()) / 2)
+                out.append((t.GetNetname(), set(t.GetLayerSet().CuStack()), g, None, c))
+            else:
+                a, b = (mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))
+                out.append((t.GetNetname(), {t.GetLayer()}, LineString([a, b]).buffer(mm(t.GetWidth()) / 2), None, a))
+        return out
+
+    added = []
+    for _ in range(3):
+        its = items()
+        nets = {}
+        for k, it in enumerate(its):
+            nets.setdefault(it[0], []).append(k)
+        done = False
+        for net, ks in sorted(nets.items()):
+            if net in skip or len(ks) < 2:
+                continue
+            parent = {k: k for k in ks}
+            for i, a in enumerate(ks):
+                for b in ks[i + 1:]:
+                    ia, ib = its[a], its[b]
+                    if ia[1] & ib[1] and ia[2].distance(ib[2]) < 1e-3:
+                        parent[_root(parent, a)] = _root(parent, b)
+            groups = {}
+            for k in ks:
+                groups.setdefault(_root(parent, k), []).append(k)
+            if len(groups) < 2:
+                continue
+            g = list(groups.values())
+            w = width_of(net)
+            best = None
+            for x in g[0]:
+                for y in [k for gg in g[1:] for k in gg]:
+                    pa, pb = its[x][4], its[y][4]
+                    d = Point(pa).distance(Point(pb))
+                    if best is None or d < best[0]:
+                        best = (d, x, y)
+            _, x, y = best
+            pa, pb = its[x][4], its[y][4]
+            refs = {its[x][3], its[y][3]} - {None}
+            for ln in layers_of(net):
+                if ln not in lid or not (lid[ln] in its[x][1] and lid[ln] in its[y][1]):
+                    continue
+                for path in ([pa, pb], [pa, (pb[0], pa[1]), pb], [pa, (pa[0], pb[1]), pb]):
+                    legs = zip(path, path[1:], strict=False)
+                    shape = unary_union([LineString([u, v]).buffer(w / 2) for u, v in legs])
+                    ok = True
+                    for onet, olay, og, oref, _c in its:
+                        if onet == net or lid[ln] not in olay:
+                            continue
+                        need = 0.15 if (oref in refs) else clearance(net, onet)
+                        if og.distance(shape) < need:
+                            ok = False
+                            break
+                    if not ok:
+                        continue
+                    for u, v in zip(path, path[1:], strict=False):
+                        if u == v:
+                            continue
+                        t = pcbnew.PCB_TRACK(board)
+                        t.SetStart(pcbnew.VECTOR2I(pcbnew.FromMM(u[0]), pcbnew.FromMM(u[1])))
+                        t.SetEnd(pcbnew.VECTOR2I(pcbnew.FromMM(v[0]), pcbnew.FromMM(v[1])))
+                        t.SetWidth(pcbnew.FromMM(w))
+                        t.SetLayer(lid[ln])
+                        t.SetNet(board.FindNet(net))
+                        board.Add(t)
+                    added.append((net, ln, len(path) - 1))
+                    done = True
+                    break
+                if done:
+                    break
+            if done:
+                break
+        if not done:
+            break
+    return added
+
+
+def _root(parent, k):
+    while parent[k] != k:
+        parent[k] = parent[parent[k]]
+        k = parent[k]
+    return k
