@@ -9,6 +9,8 @@
 #              质量 ERP 的开通程序（crontab 的 pilot-runner），重启网关；试点名额改成 5 家（企业服务器 8 GB）
 #   bridge-off：回退。去掉教育服务器上的钥匙、恢复它的开通程序、重启网关
 #   caddy-reset：证书签发卡住时用（11-11 切换后 qms 的锁文件坏了）：删 Caddy 的签发锁、重启 Caddy、看证书
+#   edu-qms-stop：切换次日（第 146 轮 7.4 第 5 步，11-12 Eddie：“停”）停掉教育服务器上的旧质量 ERP——只停容器、不删数据卷，前后各看一次内存
+#   edu-qms-start：回退用，把上面停掉的旧质量 ERP 重新启动（同时要把 DNS 改回、bridge-off）
 name: Enterprise server 企业服务器
 
 on:
@@ -17,7 +19,7 @@ on:
       task:
         description: "pubkey（打印部署公钥）/ check（检查企业服务器）/ bootstrap（初始化企业服务器）/ deploy（装前门 Caddy 与交接桥）"
         type: choice
-        options: [pubkey, check, bootstrap, deploy, bridge-on, bridge-off, caddy-reset]
+        options: [pubkey, check, bootstrap, deploy, bridge-on, bridge-off, caddy-reset, edu-qms-stop, edu-qms-start]
         default: check
       host:
         description: "企业服务器 IP（11-10 开的：161.35.185.35）"
@@ -198,3 +200,30 @@ jobs:
           ssh "deploy@$EDU" 'cd /opt/wenquest && exec 9>/tmp/wenquest-deploy.lock && flock -w 1500 9 && docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps --no-build gateway </dev/null 2>&1 | tail -n 3'
           sleep 30
           echo "企业服务器交接桥日志："; ssh "deploy@$HOST" 'tail -n 5 /opt/wenquest/edge/bridge.log 2>/dev/null; ls /opt/wenquest/edge/allow /opt/wenquest/pilot-queue'
+
+  edu-qms:
+    if: inputs.task == 'edu-qms-stop' || inputs.task == 'edu-qms-start'
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      - name: ${{ inputs.task }}
+        env:
+          EDU: ${{ secrets.DEPLOY_HOST }}
+          TASK: ${{ inputs.task }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 "$EDU" > ~/.ssh/known_hosts 2>/dev/null
+          act=stop; [ "$TASK" = edu-qms-start ] && act=start
+          # 只动工作目录在 /opt/wenquest/qms 下的 compose 项目（演示 qms 与各试点 qms-<企业>）；学习平台、工业园不碰
+          ssh "deploy@$EDU" "act=$act bash -s" <<'SH'
+          echo "== 之前"; free -m | head -2
+          projs=$(docker ps -a --format '{{.Label "com.docker.compose.project"}} {{.Label "com.docker.compose.project.working_dir"}}' | awk '$2 ~ /^\/opt\/wenquest\/qms/ {print $1}' | sort -u)
+          echo "项目: $projs"
+          for p in $projs; do echo "-- $act $p"; docker compose -p "$p" $act </dev/null 2>&1 | tail -n 3; done
+          sleep 20
+          echo "== 之后"; free -m | head -2
+          echo "仍在运行的 qms 容器："; docker ps --format '{{.Names}} {{.Status}}' | grep -E '^qms' || echo "  （无）"
+          echo "数据卷保留："; docker volume ls --format '{{.Name}}' | grep -E '^qms' | sed 's/^/  /'
+          SH
