@@ -149,8 +149,8 @@
    10
   ],
   "b_indexes": 1,
-  "time_min": 1.12,
-  "cut_min": 0.72,
+  "time_min": 1.08,
+  "cut_min": 0.68,
   "checks": [],
   "sim": [
    {
@@ -189,11 +189,9 @@
    {
     "frame": "TOP",
     "steps": 5,
-    "issues": [
-     "过切：8 格比目标低，最多 7.000 mm"
-    ],
-    "over_cells": 8,
-    "dev_min": -7.0,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": -0.0,
     "ap_max": 4.0
    }
   ]

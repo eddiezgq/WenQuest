@@ -299,7 +299,7 @@ def lower_vmc(stage):
         hx, hy, _ = to_frame("LB0", (-105.0, 0.0, ZH))
         r = rpm(100, 13)
         ops.append(op("B0 阶梯粗镗杆粗镗旋梭轴孔 Ø9 → Ø13", "LB0", 10, "阶梯粗镗杆 Ø13", 13, 100,
-                      cam.bore([(hx, hy)], 66 + 105, 0.12 * r, r_plane=-(24 + 105 - 2)), machine="HMC-01", kind="linebar"))
+                      cam.bore([(hx, hy)], 66 + 105, 0.12 * r, r_plane=-(30 + 105 - 2)), machine="HMC-01", kind="linebar"))
         lx, ly, lz = to_frame("B180", (412.0, YL, ZL))
         r = rpm(110, 31)
         ops.append(op("B180 下轴粗镗杆两孔一刀粗镗 Ø27 → Ø31", "B180", 9, "下轴粗镗杆", 31, 110,
@@ -318,7 +318,7 @@ def lower_vmc(stage):
         ps = cam.mill_pocket([(-23 - 153, -58 - 34), (23 - 153, -58 - 34), (23 - 153, -22 - 34), (-23 - 153, -22 - 34)], 1.5, 16, 0.45, 1.5,
                              0.05 * 4 * r, 0.02 * 4 * r)
         ops.append(op("铣滑板座（深 1.5）", "TOP", 2, "立铣刀 Ø16", 16, 180, ps, machine="VMC-01"))
-        nh = [to_frame("TOP", (x, y, -2.5))[:2] for x, y in ((-27, -17), (27, -17), (-27, 17), (27, 17))]
+        nh = [to_frame("TOP", (x, y, -2.5))[:2] for x, y in ((-27, -19.5), (27, -19.5), (-27, 19.5), (27, 19.5))]      # G4.6：针板螺孔 y ±17 → ±19.5（cad/housing.py）
         ops.append(op("钻 M3 底孔 Ø2.5", "TOP", 6, "钻头 Ø2.5", 2.5, 50, cam.drill(nh, 9.5, 0, 0.06 * rpm(50, 2.5, "VMC-01")), machine="VMC-01",
                       kind="drill"))
         ops.append(op("攻 M3", "TOP", 18, "丝锥 M3（仿真按底孔 Ø2.5）", 2.5, 6, cam.tap(nh, 8.0, 0.5, rpm(6, 3, "VMC-01")), machine="VMC-01", kind="drill"))
