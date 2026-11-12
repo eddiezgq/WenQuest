@@ -200,19 +200,31 @@ board:
   # 母线（390 V）铺在底层：散热器边的升压二极管、母线电容、功率模块 P 脚之间大电流走铺铜
   pours:
   - {net: VBUS, layer: B.Cu, points: [[110, 1], [236, 1], [236, 9], [248, 9], [248, 68], [110, 68]]}
+  # 布线间距分两层（159d2b 第九次布线起）：每个分类自己的间距小（同组网络之间：分压电阻一串、功率模块相邻脚），
+  # 组和组之间要多大写在 class_pairs 里——只给一个分类整体设大间距时，它自己的电阻两脚（1206 脚间 1.6 mm）都“违规”，布线器接不上
+  # （第八次 59 处没连上大多是这个）。真正的安全要求由安全距离检查（safety.yaml）按铜间距量，这里的数比它略大一点留余量
   net_classes:
-  - {name: AC, track_mm: 2.5, clearance_mm: 2.6, nets: [L_IN, N_IN, L_F, N_C, L_C, L_R, VRECT, SW_PFC], layers: [F.Cu, B.Cu]}
-  - {name: PE, track_mm: 1.5, clearance_mm: 4.2, nets: [PE], layers: [F.Cu, B.Cu]}
-  - {name: HV, track_mm: 2.0, clearance_mm: 2.2, nets: [VBUS, MOT_U, MOT_V, MOT_W, RECT_N], layers: [F.Cu, B.Cu]}
-  - {name: HVSig, track_mm: 0.5, clearance_mm: 2.2, nets: [XDIS, BRO_A, BRO_B, TOP_V1, TOP_V, FLY_D, CLAMP, CLAMP_M, VSENSE_1, VSENSE_2,
+  - {name: AC_L, track_mm: 2.5, clearance_mm: 0.5, nets: [L_IN, L_F, L_C, L_R], layers: [F.Cu, B.Cu]}
+  - {name: AC_N, track_mm: 2.5, clearance_mm: 0.5, nets: [N_IN, N_C], layers: [F.Cu, B.Cu]}
+  - {name: PE, track_mm: 1.5, clearance_mm: 0.5, nets: [PE], layers: [F.Cu, B.Cu]}
+  - {name: HV, track_mm: 2.0, clearance_mm: 0.5, nets: [VBUS, VRECT, SW_PFC, MOT_U, MOT_V, MOT_W], layers: [F.Cu, B.Cu]}
+  - {name: HVSig, track_mm: 0.5, clearance_mm: 0.5, nets: [XDIS, BRO_A, BRO_B, TOP_V1, TOP_V, FLY_D, CLAMP, CLAMP_M, VSENSE_1, VSENSE_2,
                                                        OVP_1, OVP_2, VBUS_SNS_1, VBUS_SNS_2],
      layers: [F.Cu, B.Cu]}
-  # 自举电容的两根线（上桥浮地）只在功率模块脚旁边一小段（电容紧贴模块控制脚一排）。模块脚距 2.35 mm：间距取 2.0 时布线器卡住（第二次就是这样），取 1.0
-  - {name: Boot, track_mm: 0.5, clearance_mm: 1.0, nets: [OUT_U, OUT_V, OUT_W, VB_U, VB_V, VB_W], layers: [F.Cu, B.Cu]}
+  # 自举电容的两根线（上桥浮地，跟着电机相线跳到 390 V）：模块脚距 2.35 mm，同组之间 0.5
+  - {name: Boot, track_mm: 0.5, clearance_mm: 0.5, nets: [OUT_U, OUT_V, OUT_W, VB_U, VB_V, VB_W], layers: [F.Cu, B.Cu]}
+  # 整流桥负端到采样电阻：电流大但电位贴着地（弱电一侧）
+  - {name: Return, track_mm: 2.0, clearance_mm: 0.3, nets: [RECT_N], layers: [F.Cu, B.Cu]}
   - {name: Power, track_mm: 1.0, clearance_mm: 0.3, nets: [+24V, +15V, N_U, N_V, N_W, SOL1_D, SOL2_D, SOL3_D, SOL4_D, SOL1_K, SOL2_K,
                                                        SOL3_K, SOL4_K, STP_OA1, STP_OA2, STP_OB1, STP_OB2, FLY_24, FLY_15, FLY_5, +5V],
      layers: [F.Cu, In2.Cu, B.Cu]}
   - {name: Ground, track_mm: 0.4, clearance_mm: 0.2, nets: [GND, GND_ISO]}
+  # 组和组之间的布线间距（Default = 其余网络）；安全距离规则（safety.yaml 示例值）：相线↔零线 2.5、高压↔弱电 2.0、保护地 4.0
+  class_pairs:
+  - {a: [AC_L], b: [AC_N], clearance_mm: 2.6}
+  - {a: [AC_L, AC_N], b: [HV, HVSig, Boot], clearance_mm: 1.5}
+  - {a: [AC_L, AC_N, HV, HVSig, Boot], b: [Return, Power, Ground, Default], clearance_mm: 2.2}
+  - {a: [PE], b: [AC_L, AC_N, HV, HVSig, Boot, Return, Power, Ground, Default], clearance_mm: 4.2}
   placement:
     BR101: [71.67, 2.88, 0, F]
     C40: [66.94, 126.48, 0, F]

@@ -262,7 +262,8 @@ def board_build(route, jar):
     os.makedirs(TMP, exist_ok=True)
     stats = None
     if route:
-        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep)
+        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep,
+                               pairs=gb.pairs_of(D.X), timeout=3000)
     board.BuildConnectivity()
     gb.fill_zones(board)
     pcbnew().SaveBoard(path, board)
@@ -358,6 +359,19 @@ def board_checks():
     return dr, res
 
 
+def dru():
+    """KiCad 自定义规则：分类之间的间距（设计描述 board.class_pairs，和布线器一致）；同一个器件自己的焊盘之间放宽"""
+    from wqeda.gen import board as gb
+    s = "(version 1)\n"
+    for a, b, c in gb.pairs_of(D.X):
+        s += ('(rule "{a}-{b}"\n  (condition "(A.NetClass == \'{a}\' && B.NetClass == \'{b}\') || '
+              '(A.NetClass == \'{b}\' && B.NetClass == \'{a}\')")\n  (constraint clearance (min {c:g}mm)))\n').format(a=a, b=b, c=c)
+    # 放在最后：KiCad 规则后写的优先（引脚间距是器件自己的事；安全距离另查，见 safety.yaml）
+    s += ('(rule "same_footprint_pads"\n  (condition "A.Type == \'Pad\' && B.Type == \'Pad\' && '
+          'A.Parent.Reference == B.Parent.Reference")\n  (constraint clearance (min 0.15mm)))\n')
+    return s
+
+
 def main():
     import argparse
     ap = argparse.ArgumentParser()
@@ -375,8 +389,7 @@ def main():
         B._project_settings()
         # 同一个器件自己的焊盘之间不按网络分类的间距查（引脚间距是器件自己的事；安全距离另查，见 safety.yaml）
         with open(os.path.join(KDIR, NAME + ".kicad_dru"), "w", encoding="utf-8") as f:
-            f.write('(version 1)\n(rule "same_footprint_pads"\n  (condition "A.Type == \'Pad\' && B.Type == \'Pad\' && '
-                    'A.Parent.Reference == B.Parent.Reference")\n  (constraint clearance (min 0.15mm)))\n')
+            f.write(dru())
     schematic()
     net = exports()
     nc = netcheck(net)

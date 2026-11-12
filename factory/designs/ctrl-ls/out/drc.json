@@ -1,50 +1,16 @@
 {
- "errors": 74,
+ "errors": 60,
  "items": [
   {
    "at": [
     [
-     94.67,
-     19.06,
-     "Reference 'Q202'"
+     212.0,
+     126.0,
+     "Reference 'U602'"
     ],
     [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     57.56,
-     133.06,
-     "Line on F.Silkscreen"
-    ],
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.6,
-     133.06,
+     212.0,
+     126.56,
      "Line on F.Silkscreen"
     ]
    ],
@@ -55,13 +21,13 @@
   {
    "at": [
     [
-     56.56,
-     136.52,
-     "Reference 'C307'"
+     212.0,
+     126.0,
+     "Reference 'U602'"
     ],
     [
-     57.64,
-     133.06,
+     212.0,
+     126.56,
      "Line on F.Silkscreen"
     ]
    ],
@@ -72,711 +38,31 @@
   {
    "at": [
     [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.68,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.72,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.76,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.8,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.84,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.88,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.92,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.96,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     58.0,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     56.56,
-     132.02,
-     "Circle on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     57.24,
-     128.0,
-     "Line on F.Silkscreen"
-    ],
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     55.14,
-     146.57,
-     "Reference 'R307'"
-    ],
-    [
-     56.56,
-     141.77,
-     "Circle on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.0,
-     127.96,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.04,
-     127.97,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.08,
-     127.97,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.12,
-     127.98,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.16,
-     127.98,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.2,
-     127.99,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.28,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.32,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     57.36,
-     133.06,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     56.88,
-     127.95,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     56.92,
-     127.96,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     56.96,
-     127.96,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     56.72,
-     127.94,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     56.76,
-     127.94,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     56.8,
-     127.95,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     56.56,
-     136.52,
-     "Reference 'C307'"
-    ],
-    [
-     56.84,
-     127.95,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     2.95,
-     115.7,
-     "Reference 'U302'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     75.37,
-     6.18,
-     "Reference 'BR101'"
-    ],
-    [
-     73.28,
-     7.03,
-     "Reference 'C104'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     45.97,
-     127.02,
-     "Reference 'D303'"
-    ],
-    [
-     46.54,
-     121.27,
-     "Circle on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     45.97,
-     127.02,
-     "Reference 'D303'"
-    ],
-    [
-     46.54,
-     116.19,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     46.54,
-     115.02,
-     "Reference 'C304'"
-    ],
-    [
-     41.06,
-     114.67,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     47.94,
-     42.4,
-     "Reference 'Q101'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     36.27,
-     29.67,
-     "Reference 'C101'"
-    ],
-    [
-     23.02,
-     29.17,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     42.42,
-     42.08,
-     "Reference 'D101'"
-    ],
-    [
-     22.9,
-     41.54,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     149.03,
-     29.83,
-     "Reference 'C406'"
-    ],
-    [
-     194.46,
-     29.21,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     167.47,
-     29.82,
-     "Reference 'C407'"
-    ],
-    [
-     194.46,
-     29.21,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     154.75,
-     29.82,
-     "Reference 'R401'"
-    ],
-    [
-     194.46,
-     29.21,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     190.94,
-     30.15,
-     "Reference 'C401'"
-    ],
-    [
-     192.11,
+     196.11,
      30.65,
      "Reference 'U401'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
+    ],
     [
-     190.23,
+     194.23,
      31.09,
      "Line on F.Silkscreen"
-    ],
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
     [
-     192.11,
+     196.11,
      30.65,
      "Reference 'U401'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     211.73,
-     93.23,
-     "Reference 'D508'"
     ],
     [
-     209.59,
-     92.63,
-     "Line on F.Silkscreen"
+     194.94,
+     30.15,
+     "Reference 'C401'"
     ]
    ],
    "code": "silk_overlap",
@@ -786,131 +72,12 @@
   {
    "at": [
     [
-     208.0,
-     126.0,
-     "Reference 'U602'"
-    ],
-    [
-     208.0,
-     126.56,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     208.0,
-     126.0,
-     "Reference 'U602'"
-    ],
-    [
-     208.0,
-     126.56,
-     "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     194.46,
-     29.21,
-     "Line on F.Silkscreen"
-    ],
-    [
-     195.97,
-     29.82,
-     "Reference 'R402'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     193.6,
-     36.93,
-     "Line on F.Silkscreen"
-    ],
-    [
-     195.24,
-     37.52,
-     "Reference 'C222'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     189.56,
-     93.45,
-     "Reference 'Q508'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     167.98,
-     92.63,
-     "Line on F.Silkscreen"
-    ],
-    [
-     170.12,
-     93.23,
-     "Reference 'D507'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     147.94,
-     93.45,
-     "Reference 'Q507'"
-    ],
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     194.46,
+     198.46,
      1.06,
      "Line on F.Silkscreen"
     ],
     [
-     195.97,
+     199.97,
      29.82,
      "Reference 'R402'"
     ]
@@ -922,7 +89,41 @@
   {
    "at": [
     [
-     202.18,
+     199.24,
+     37.52,
+     "Reference 'C222'"
+    ],
+    [
+     197.6,
+     36.93,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     199.97,
+     29.82,
+     "Reference 'R402'"
+    ],
+    [
+     198.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     206.18,
      85.5,
      "Reference 'Q506'"
     ],
@@ -939,7 +140,143 @@
   {
    "at": [
     [
-     160.56,
+     193.56,
+     93.45,
+     "Reference 'Q508'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     174.12,
+     93.23,
+     "Reference 'D507'"
+    ],
+    [
+     171.98,
+     92.63,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     213.59,
+     92.63,
+     "Line on F.Silkscreen"
+    ],
+    [
+     215.73,
+     93.23,
+     "Reference 'D508'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     14.19,
+     117.0,
+     "Reference 'U302'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     144.03,
+     20.87,
+     "Reference 'Q202'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     79.37,
+     6.18,
+     "Reference 'BR101'"
+    ],
+    [
+     77.28,
+     7.03,
+     "Reference 'C104'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     48.91,
+     63.95,
+     "Reference 'Q101'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     158.75,
+     29.82,
+     "Reference 'R401'"
+    ],
+    [
+     198.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     164.56,
      85.5,
      "Reference 'Q505'"
     ],
@@ -956,7 +293,58 @@
   {
    "at": [
     [
-     192.11,
+     151.94,
+     93.45,
+     "Reference 'Q507'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     153.03,
+     29.83,
+     "Reference 'C406'"
+    ],
+    [
+     198.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     171.47,
+     29.82,
+     "Reference 'C407'"
+    ],
+    [
+     198.46,
+     29.21,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     196.11,
      30.65,
      "Reference 'U401'"
     ]
@@ -968,7 +356,7 @@
   {
    "at": [
     [
-     208.0,
+     212.0,
      126.0,
      "Reference 'U602'"
     ]
@@ -976,6 +364,40 @@
    "code": "silk_over_copper",
    "severity": "warning",
    "text": "Silkscreen clipped by solder mask"
+  },
+  {
+   "at": [
+    [
+     248.0,
+     150.0,
+     "Line on Edge.Cuts"
+    ],
+    [
+     26.09,
+     149.54,
+     "Via [FB_K] on F.Cu - B.Cu"
+    ]
+   ],
+   "code": "copper_edge_clearance",
+   "severity": "error",
+   "text": "Board edge clearance violation (board setup constraints edge clearance 0.3000 mm; actual 0.1644 mm)"
+  },
+  {
+   "at": [
+    [
+     2.0,
+     0.0,
+     "Line on Edge.Cuts"
+    ],
+    [
+     102.23,
+     0.17,
+     "Reference 'Q201'"
+    ]
+   ],
+   "code": "silk_edge_clearance",
+   "severity": "warning",
+   "text": "Silkscreen clipped by board edge"
   },
   {
    "at": [
@@ -1002,24 +424,7 @@
      "Line on Edge.Cuts"
     ],
     [
-     98.23,
-     0.17,
-     "Reference 'Q201'"
-    ]
-   ],
-   "code": "silk_edge_clearance",
-   "severity": "warning",
-   "text": "Silkscreen clipped by board edge"
-  },
-  {
-   "at": [
-    [
-     2.0,
-     0.0,
-     "Line on Edge.Cuts"
-    ],
-    [
-     115.27,
+     119.27,
      0.15,
      "Reference 'D201'"
     ]
@@ -1031,65 +436,14 @@
   {
    "at": [
     [
-     43.38,
-     42.99,
-     "Track [+15V] on F.Cu, length 0.0016 mm"
-    ],
-    [
-     44.07,
-     44.08,
-     "Pad 2 [RLY_K] of D101 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Power' clearance 0.3000 mm; actual 0.1264 mm)"
-  },
-  {
-   "at": [
-    [
-     42.29,
-     44.08,
-     "Track [+15V] on F.Cu, length 1.5364 mm"
-    ],
-    [
-     44.07,
-     44.08,
-     "Pad 2 [RLY_K] of D101 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Power' clearance 0.3000 mm; actual 0.1100 mm)"
-  },
-  {
-   "at": [
-    [
-     43.38,
-     42.99,
-     "Track [+15V] on F.Cu, length 0.2505 mm"
-    ],
-    [
-     44.07,
-     44.08,
-     "Pad 2 [RLY_K] of D101 on F.Cu"
-    ]
-   ],
-   "code": "clearance",
-   "severity": "error",
-   "text": "Clearance violation (netclass 'Power' clearance 0.3000 mm; actual 0.1264 mm)"
-  },
-  {
-   "at": [
-    [
-     217.65,
+     221.65,
      96.16,
      "Pad 3 [+24V] of U501 on F.Cu"
     ],
     [
-     213.88,
+     217.88,
      96.23,
-     "Track [+24V] on F.Cu, length 1.5228 mm"
+     "Track [+24V] on F.Cu, length 0.8704 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -1099,14 +453,14 @@
   {
    "at": [
     [
-     217.65,
-     96.16,
-     "Pad 3 [+24V] of U501 on F.Cu"
-    ],
-    [
-     223.4,
+     227.4,
      96.16,
      "Pad 26 [+24V] of U501 on F.Cu"
+    ],
+    [
+     221.65,
+     96.16,
+     "Pad 3 [+24V] of U501 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -1116,14 +470,14 @@
   {
    "at": [
     [
-     206.73,
+     210.73,
      132.0,
      "PTH pad 2 [+5V] of U602"
     ],
     [
-     198.47,
-     132.23,
-     "Track [+5V] on B.Cu, length 2.3237 mm"
+     142.66,
+     129.47,
+     "Track [+5V] on F.Cu, length 60.3375 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -1133,13 +487,13 @@
   {
    "at": [
     [
-     111.89,
-     21.34,
+     85.76,
+     116.78,
      "Pad 1 [BRO_A] of D204 on F.Cu"
     ],
     [
-     119.46,
-     20.71,
+     95.13,
+     116.14,
      "Pad 1 [BRO_A] of R211 on F.Cu"
     ]
    ],
@@ -1150,13 +504,13 @@
   {
    "at": [
     [
-     103.59,
-     21.34,
+     75.67,
+     116.78,
      "Pad 1 [BRO_A] of D203 on F.Cu"
     ],
     [
-     111.89,
-     21.34,
+     85.76,
+     116.78,
      "Pad 1 [BRO_A] of D204 on F.Cu"
     ]
    ],
@@ -1167,13 +521,13 @@
   {
    "at": [
     [
-     122.38,
-     20.71,
+     98.05,
+     116.14,
      "Pad 2 [BRO_B] of R211 on F.Cu"
     ],
     [
-     125.27,
-     20.71,
+     102.74,
+     116.14,
      "Pad 1 [BRO_B] of R212 on F.Cu"
     ]
    ],
@@ -1184,14 +538,14 @@
   {
    "at": [
     [
-     44.76,
-     104.45,
-     "Track [CLAMP] on B.Cu, length 8.4361 mm"
+     57.15,
+     108.77,
+     "Pad 2 [CLAMP] of C303 on F.Cu"
     ],
     [
-     47.8,
-     104.84,
-     "Pad 2 [CLAMP] of R310 on F.Cu"
+     48.69,
+     108.73,
+     "Track [CLAMP] on F.Cu, length 0.2399 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -1201,46 +555,12 @@
   {
    "at": [
     [
-     46.57,
-     99.58,
-     "Pad 2 [FLY_D] of D301 on F.Cu"
-    ],
-    [
-     42.38,
-     87.07,
-     "Pad 6 [FLY_D] of U301 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     15.61,
-     108.39,
-     "PTH pad 3 [FLY_D] of T301"
-    ],
-    [
-     46.57,
-     99.58,
-     "Pad 2 [FLY_D] of D301 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     223.4,
+     227.4,
      98.75,
      "Pad 22 [GND] of U501 on F.Cu"
     ],
     [
-     223.4,
+     227.4,
      97.46,
      "Pad 24 [GND] of U501 on F.Cu"
     ]
@@ -1252,14 +572,14 @@
   {
    "at": [
     [
-     117.42,
-     136.34,
-     "Pad 23 [GND] of U10 on F.Cu"
-    ],
-    [
-     115.42,
+     119.42,
      136.34,
      "Pad 19 [GND] of U10 on F.Cu"
+    ],
+    [
+     121.42,
+     136.34,
+     "Pad 23 [GND] of U10 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -1269,46 +589,12 @@
   {
    "at": [
     [
-     100.15,
-     20.32,
-     "Pad 2 [GND] of R210 on F.Cu"
+     156.29,
+     33.69,
+     "Track [GND] on F.Cu, length 1.7084 mm"
     ],
     [
-     99.59,
-     24.39,
-     "Via [GND] on F.Cu - B.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     137.12,
-     20.57,
-     "Pad 2 [GND] of C208 on F.Cu"
-    ],
-    [
-     132.56,
-     20.32,
-     "Track [GND] on F.Cu, length 1.1011 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     151.08,
-     32.48,
-     "Track [GND] on F.Cu, length 1.8101 mm"
-    ],
-    [
-     148.28,
+     152.28,
      36.41,
      "Pad 2 [GND] of C412 on F.Cu"
     ]
@@ -1320,13 +606,13 @@
   {
    "at": [
     [
-     77.21,
-     25.14,
-     "Pad 2 [GND] of R217 on F.Cu"
+     123.33,
+     129.93,
+     "Pad 35 [GND] of U10 on F.Cu"
     ],
     [
-     74.95,
-     19.88,
+     128.81,
+     127.05,
      "Via [GND] on F.Cu - B.Cu"
     ]
    ],
@@ -1337,12 +623,12 @@
   {
    "at": [
     [
-     119.33,
+     123.33,
      129.93,
      "Pad 35 [GND] of U10 on F.Cu"
     ],
     [
-     117.42,
+     121.42,
      136.34,
      "Pad 23 [GND] of U10 on F.Cu"
     ]
@@ -1354,31 +640,14 @@
   {
    "at": [
     [
-     119.33,
-     129.93,
-     "Pad 35 [GND] of U10 on F.Cu"
-    ],
-    [
-     112.92,
+     116.92,
      128.02,
      "Pad 47 [GND] of U10 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
+    ],
     [
-     119.33,
+     123.33,
      129.93,
      "Pad 35 [GND] of U10 on F.Cu"
-    ],
-    [
-     125.83,
-     127.03,
-     "Pad 1 [GND] of TP5 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -1388,29 +657,12 @@
   {
    "at": [
     [
-     106.73,
-     10.22,
-     "Via [GND] on F.Cu - B.Cu"
+     164.55,
+     72.0,
+     "Track [GND] on F.Cu, length 1.6097 mm"
     ],
     [
-     114.19,
-     9.76,
-     "Pad 2 [GND] of R202 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     161.69,
-     73.14,
-     "Track [GND] on F.Cu, length 1.5790 mm"
-    ],
-    [
-     170.58,
+     174.58,
      73.14,
      "Pad 2 [GND] of R413 on F.Cu"
     ]
@@ -1422,13 +674,13 @@
   {
    "at": [
     [
-     42.38,
+     43.26,
      79.95,
      "Pad 2 [GND] of U301 on F.Cu"
     ],
     [
-     51.89,
-     79.81,
+     52.76,
+     81.58,
      "Via [GND] on F.Cu - B.Cu"
     ]
    ],
@@ -1439,14 +691,14 @@
   {
    "at": [
     [
-     146.72,
-     36.41,
-     "Pad 1 [IN_VL] of C412 on F.Cu"
+     173.56,
+     28.05,
+     "Track [IN_VL] on F.Cu, length 3.5279 mm"
     ],
     [
-     172.01,
-     25.6,
-     "Track [IN_VL] on F.Cu, length 3.4657 mm"
+     150.72,
+     36.41,
+     "Pad 1 [IN_VL] of C412 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -1456,14 +708,14 @@
   {
    "at": [
     [
-     138.59,
-     9.76,
+     90.31,
+     22.12,
      "Pad 2 [ISENSE] of R204 on F.Cu"
     ],
     [
-     141.21,
-     9.76,
-     "Track [ISENSE] on F.Cu, length 3.9633 mm"
+     94.72,
+     22.12,
+     "Pad 1 [ISENSE] of C205 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -1473,9 +725,26 @@
   {
    "at": [
     [
-     34.14,
-     18.5,
-     "Track [L_F] on B.Cu, length 10.1200 mm"
+     53.52,
+     20.44,
+     "Track [L_C] on F.Cu, length 17.5121 mm"
+    ],
+    [
+     43.79,
+     57.12,
+     "Track [L_C] on F.Cu, length 9.3931 mm"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     29.33,
+     13.19,
+     "Track [L_F] on B.Cu, length 6.8024 mm"
     ],
     [
      34.14,
@@ -1490,31 +759,14 @@
   {
    "at": [
     [
-     51.84,
-     31.79,
+     29.33,
+     36.47,
+     "Track [L_F] on B.Cu, length 10.8500 mm"
+    ],
+    [
+     56.45,
+     34.1,
      "Pad 1 [L_F] of R101 on F.Cu"
-    ],
-    [
-     27.02,
-     25.62,
-     "Track [L_F] on B.Cu, length 10.0692 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     10.8,
-     55.83,
-     "PTH pad 1 [L_F] of L101"
-    ],
-    [
-     25.02,
-     36.17,
-     "Track [L_F] on B.Cu, length 2.8284 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -1558,14 +810,14 @@
   {
    "at": [
     [
-     72.75,
+     76.75,
      2.88,
      "PTH pad 2 [L_R] of BR101"
     ],
     [
      47.52,
      19.17,
-     "Track [L_R] on B.Cu, length 7.4605 mm"
+     "PTH pad 3 [L_R] of K101"
     ]
    ],
    "code": "unconnected_items",
@@ -1575,14 +827,14 @@
   {
    "at": [
     [
-     107.59,
-     21.34,
-     "Pad 2 [L_R] of D203 on F.Cu"
+     58.74,
+     59.32,
+     "Track [L_R] on B.Cu, length 4.0147 mm"
     ],
     [
-     72.75,
-     2.88,
-     "PTH pad 2 [L_R] of BR101"
+     79.67,
+     116.78,
+     "Pad 2 [L_R] of D203 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -1592,12 +844,12 @@
   {
    "at": [
     [
-     187.16,
+     191.16,
      2.82,
      "PTH pad 24 [MOT_U] of U401"
     ],
     [
-     239.24,
+     243.24,
      17.23,
      "PTH pad 1 [MOT_U] of J401"
     ]
@@ -1609,12 +861,12 @@
   {
    "at": [
     [
-     171.26,
+     175.26,
      2.82,
      "PTH pad 21 [MOT_V] of U401"
     ],
     [
-     239.24,
+     243.24,
      12.15,
      "PTH pad 2 [MOT_V] of J401"
     ]
@@ -1626,12 +878,12 @@
   {
    "at": [
     [
-     155.36,
+     159.36,
      2.82,
      "PTH pad 18 [MOT_W] of U401"
     ],
     [
-     239.24,
+     243.24,
      7.07,
      "PTH pad 3 [MOT_W] of J401"
     ]
@@ -1643,14 +895,14 @@
   {
    "at": [
     [
-     115.89,
-     21.34,
-     "Pad 2 [N_C] of D204 on F.Cu"
-    ],
-    [
-     77.83,
+     81.83,
      2.88,
      "PTH pad 3 [N_C] of BR101"
+    ],
+    [
+     33.66,
+     55.83,
+     "PTH pad 4 [N_C] of L101"
     ]
    ],
    "code": "unconnected_items",
@@ -1662,12 +914,12 @@
     [
      33.66,
      55.83,
-     "PTH pad 4 [N_C] of L101"
+     "Track [N_C] on B.Cu, length 5.8300 mm"
     ],
     [
-     77.83,
-     2.88,
-     "PTH pad 3 [N_C] of BR101"
+     89.76,
+     116.78,
+     "Pad 2 [N_C] of D204 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -1677,13 +929,13 @@
   {
    "at": [
     [
-     47.52,
-     36.17,
-     "Track [N_IN] on B.Cu, length 8.2154 mm"
+     33.66,
+     65.43,
+     "Track [N_IN] on B.Cu, length 22.8537 mm"
     ],
     [
-     60.58,
-     31.79,
+     50.73,
+     48.65,
      "Pad 2 [N_IN] of R102 on F.Cu"
     ]
    ],
@@ -1694,14 +946,14 @@
   {
    "at": [
     [
+     36.83,
+     27.82,
+     "PTH pad 2 [N_IN] of RV101"
+    ],
+    [
      6.74,
      5.07,
      "PTH pad 2 [N_IN] of J101"
-    ],
-    [
-     34.52,
-     27.82,
-     "Track [N_IN] on B.Cu, length 6.7664 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -1711,64 +963,13 @@
   {
    "at": [
     [
-     192.11,
-     28.05,
-     "PTH pad 1 [OUT_U] of U401"
-    ],
-    [
-     192.42,
-     32.0,
-     "Pad 2 [OUT_U] of C401 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     177.86,
-     28.05,
-     "PTH pad 6 [OUT_V] of U401"
-    ],
-    [
-     178.17,
-     32.0,
-     "Pad 2 [OUT_V] of C402 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     163.61,
-     28.05,
-     "PTH pad 11 [OUT_W] of U401"
-    ],
-    [
-     163.92,
-     32.0,
-     "Pad 2 [OUT_W] of C403 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     82.85,
-     25.54,
+     71.85,
+     122.69,
      "Pad 2 [OVP_1] of R218 on F.Cu"
     ],
     [
-     85.74,
-     25.54,
+     76.54,
+     122.69,
      "Pad 1 [OVP_1] of R219 on F.Cu"
     ]
    ],
@@ -1779,13 +980,13 @@
   {
    "at": [
     [
-     88.66,
-     25.54,
+     79.46,
+     122.69,
      "Pad 2 [OVP_2] of R219 on F.Cu"
     ],
     [
-     91.55,
-     25.54,
+     84.15,
+     122.69,
      "Pad 1 [OVP_2] of R220 on F.Cu"
     ]
    ],
@@ -1830,13 +1031,47 @@
   {
    "at": [
     [
-     82.91,
+     117.3,
+     40.28,
+     "Track [PFC_OFF] on In2.Cu, length 86.5176 mm"
+    ],
+    [
+     68.76,
+     115.75,
+     "Pad 1 [PFC_OFF] of R210 on F.Cu"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     88.66,
+     22.12,
+     "Pad 1 [RECT_N] of R204 on F.Cu"
+    ],
+    [
+     88.66,
+     13.44,
+     "Track [RECT_N] on F.Cu, length 1.5198 mm"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     86.91,
      2.88,
      "PTH pad 4 [RECT_N] of BR101"
     ],
     [
-     81.35,
-     12.85,
+     84.78,
+     12.28,
      "Track [RECT_N] on F.Cu, length 0.8078 mm"
     ]
    ],
@@ -1847,46 +1082,12 @@
   {
    "at": [
     [
-     84.89,
-     12.85,
-     "Track [RECT_N] on F.Cu, length 2.9858 mm"
-    ],
-    [
-     136.94,
-     9.76,
-     "Pad 1 [RECT_N] of R204 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     217.65,
-     95.5,
-     "Pad 2 [STP_BRB] of U501 on F.Cu"
-    ],
-    [
-     234.16,
-     95.56,
-     "Pad 1 [STP_BRB] of R510 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     188.97,
+     192.97,
      144.88,
      "PTH pad 1 [STP_OA1] of J502"
     ],
     [
-     223.4,
+     227.4,
      94.85,
      "Pad 28 [STP_OA1] of U501 on F.Cu"
     ]
@@ -1898,12 +1099,12 @@
   {
    "at": [
     [
-     191.47,
+     195.47,
      144.88,
      "PTH pad 2 [STP_OA2] of J502"
     ],
     [
-     223.4,
+     227.4,
      96.81,
      "Pad 25 [STP_OA2] of U501 on F.Cu"
     ]
@@ -1915,12 +1116,12 @@
   {
    "at": [
     [
-     193.97,
+     197.97,
      144.88,
      "PTH pad 3 [STP_OB1] of J502"
     ],
     [
-     217.65,
+     221.65,
      94.85,
      "Pad 1 [STP_OB1] of U501 on F.Cu"
     ]
@@ -1932,12 +1133,12 @@
   {
    "at": [
     [
-     196.47,
+     200.47,
      144.88,
      "PTH pad 4 [STP_OB2] of J502"
     ],
     [
-     217.65,
+     221.65,
      96.81,
      "Pad 4 [STP_OB2] of U501 on F.Cu"
     ]
@@ -1949,14 +1150,14 @@
   {
    "at": [
     [
-     98.23,
-     3.62,
-     "PTH pad 2 [SW_PFC] of Q201"
+     121.81,
+     4.42,
+     "PTH pad 2 [SW_PFC] of D201"
     ],
     [
-     117.81,
-     4.42,
-     "Track [SW_PFC] on B.Cu, length 4.6018 mm"
+     102.23,
+     3.62,
+     "PTH pad 2 [SW_PFC] of Q201"
     ]
    ],
    "code": "unconnected_items",
@@ -1966,13 +1167,30 @@
   {
    "at": [
     [
-     42.38,
+     131.42,
+     104.78,
+     "PTH pad 2 [SW_PFC] of L201"
+    ],
+    [
+     121.81,
+     4.42,
+     "PTH pad 2 [SW_PFC] of D201"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     43.26,
      78.17,
      "Pad 1 [TOP_V] of U301 on F.Cu"
     ],
     [
-     44.76,
-     90.59,
+     45.65,
+     91.89,
      "Pad 2 [TOP_V] of R302 on F.Cu"
     ]
    ],
@@ -1983,12 +1201,12 @@
   {
    "at": [
     [
-     41.84,
-     90.59,
+     42.73,
+     91.89,
      "Pad 1 [TOP_V1] of R302 on F.Cu"
     ],
     [
-     59.62,
+     61.8,
      78.14,
      "Pad 2 [TOP_V1] of R301 on F.Cu"
     ]
@@ -2000,14 +1218,14 @@
   {
    "at": [
     [
-     50.18,
-     99.75,
-     "Pad 1 [VBUS] of R303 on F.Cu"
+     68.93,
+     122.69,
+     "Pad 1 [VBUS] of R218 on F.Cu"
     ],
     [
-     50.86,
-     104.87,
-     "Pad 1 [VBUS] of C303 on F.Cu"
+     54.67,
+     113.13,
+     "Track [VBUS] on B.Cu, length 7.6617 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -2017,12 +1235,29 @@
   {
    "at": [
     [
-     52.18,
-     71.69,
-     "Via [VBUS] on F.Cu - B.Cu"
+     162.24,
+     53.77,
+     "PTH pad 1 [VBUS] of C221"
     ],
     [
-     56.7,
+     177.51,
+     72.34,
+     "Pad 1 [VBUS] of R420 on F.Cu"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     52.36,
+     102.34,
+     "Track [VBUS] on F.Cu, length 0.9793 mm"
+    ],
+    [
+     58.88,
      78.14,
      "Pad 1 [VBUS] of R301 on F.Cu"
     ]
@@ -2034,14 +1269,14 @@
   {
    "at": [
     [
-     143.7,
-     32.48,
-     "Via [VBUS] on F.Cu - B.Cu"
+     110.0,
+     1.0,
+     "Zone [VBUS] on B.Cu"
     ],
     [
-     139.94,
-     20.71,
-     "Pad 1 [VBUS] of R214 on F.Cu"
+     110.0,
+     1.0,
+     "Zone [VBUS] on B.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -2051,30 +1286,13 @@
   {
    "at": [
     [
-     50.18,
-     99.75,
-     "Pad 1 [VBUS] of R303 on F.Cu"
+     110.0,
+     1.0,
+     "Zone [VBUS] on B.Cu"
     ],
     [
-     40.97,
-     84.27,
-     "Track [VBUS] on B.Cu, length 3.0962 mm"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     139.94,
-     20.71,
-     "Pad 1 [VBUS] of R214 on F.Cu"
-    ],
-    [
-     117.95,
-     11.88,
+     67.88,
+     24.24,
      "PTH pad 1 [VBUS] of D202"
     ]
    ],
@@ -2085,31 +1303,14 @@
   {
    "at": [
     [
-     173.51,
-     72.34,
-     "Pad 1 [VBUS] of R420 on F.Cu"
-    ],
-    [
-     158.24,
-     53.77,
-     "PTH pad 1 [VBUS] of C221"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     112.73,
-     4.42,
-     "PTH pad 1 [VBUS] of D201"
-    ],
-    [
-     79.93,
-     25.54,
+     68.93,
+     122.69,
      "Pad 1 [VBUS] of R218 on F.Cu"
+    ],
+    [
+     122.81,
+     116.14,
+     "Pad 1 [VBUS] of R214 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -2119,12 +1320,29 @@
   {
    "at": [
     [
-     176.43,
+     67.88,
+     24.24,
+     "PTH pad 1 [VBUS] of D202"
+    ],
+    [
+     58.88,
+     78.14,
+     "Pad 1 [VBUS] of R301 on F.Cu"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     180.43,
      72.34,
      "Pad 2 [VBUS_SNS_1] of R420 on F.Cu"
     ],
     [
-     179.32,
+     183.32,
      72.34,
      "Pad 1 [VBUS_SNS_1] of R421 on F.Cu"
     ]
@@ -2136,12 +1354,12 @@
   {
    "at": [
     [
-     182.24,
+     186.24,
      72.34,
      "Pad 2 [VBUS_SNS_2] of R421 on F.Cu"
     ],
     [
-     185.13,
+     189.13,
      72.34,
      "Pad 1 [VBUS_SNS_2] of R422 on F.Cu"
     ]
@@ -2153,82 +1371,14 @@
   {
    "at": [
     [
-     84.8,
-     128.57,
-     "Track [VB_OK] on In2.Cu, length 104.1295 mm"
-    ],
-    [
-     51.76,
-     43.66,
-     "Pad 1 [VB_OK] of R103 on F.Cu"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     189.46,
-     32.0,
-     "Pad 1 [VB_U] of C401 on F.Cu"
-    ],
-    [
-     189.76,
-     28.05,
-     "PTH pad 2 [VB_U] of U401"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     175.21,
-     32.0,
-     "Pad 1 [VB_V] of C402 on F.Cu"
-    ],
-    [
-     175.51,
-     28.05,
-     "PTH pad 7 [VB_V] of U401"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     160.96,
-     32.0,
-     "Pad 1 [VB_W] of C403 on F.Cu"
-    ],
-    [
-     161.26,
-     28.05,
-     "PTH pad 12 [VB_W] of U401"
-    ]
-   ],
-   "code": "unconnected_items",
-   "severity": "error",
-   "text": "Missing connection between items"
-  },
-  {
-   "at": [
-    [
-     67.67,
+     71.67,
      2.88,
      "PTH pad 1 [VRECT] of BR101"
     ],
     [
-     63.27,
-     14.79,
-     "Track [VRECT] on B.Cu, length 3.5471 mm"
+     77.67,
+     20.17,
+     "Track [VRECT] on F.Cu, length 11.1555 mm"
     ]
    ],
    "code": "unconnected_items",
@@ -2238,14 +1388,14 @@
   {
    "at": [
     [
-     64.1,
-     25.54,
-     "Pad 1 [VSENSE_1] of R215 on F.Cu"
+     125.73,
+     116.14,
+     "Pad 2 [VSENSE_1] of R214 on F.Cu"
     ],
     [
-     142.86,
-     20.71,
-     "Pad 2 [VSENSE_1] of R214 on F.Cu"
+     130.42,
+     116.14,
+     "Pad 1 [VSENSE_1] of R215 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -2255,13 +1405,13 @@
   {
    "at": [
     [
-     67.02,
-     25.54,
+     133.34,
+     116.14,
      "Pad 2 [VSENSE_2] of R215 on F.Cu"
     ],
     [
-     69.91,
-     25.54,
+     138.03,
+     116.14,
      "Pad 1 [VSENSE_2] of R216 on F.Cu"
     ]
    ],
@@ -2272,14 +1422,14 @@
   {
    "at": [
     [
-     54.76,
-     31.79,
-     "Pad 2 [XDIS] of R101 on F.Cu"
+     47.81,
+     48.65,
+     "Pad 1 [XDIS] of R102 on F.Cu"
     ],
     [
-     57.66,
-     31.79,
-     "Pad 1 [XDIS] of R102 on F.Cu"
+     59.37,
+     34.1,
+     "Pad 2 [XDIS] of R101 on F.Cu"
     ]
    ],
    "code": "unconnected_items",
@@ -2287,6 +1437,6 @@
    "text": "Missing connection between items"
   }
  ],
- "unconnected": 71,
- "warnings": 61
+ "unconnected": 59,
+ "warnings": 25
 }

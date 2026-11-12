@@ -2,13 +2,13 @@
  {
   "at": [
    [
-    308.51,
-    226.75,
-    "In1",
-    "via GND_ISO via@311.317,-226.747 ↔ zone GND zone:c1ede70d-ee9f-436c-971a-31261383a2d7"
+    311.61,
+    226.86,
+    "F",
+    "pad GND_ISO U601 ↔ track GND"
    ]
   ],
-  "detail": "最近 5.02 mm（In1 层，via GND_ISO via@311.317,-226.747 ↔ zone GND zone:c1ede70d-ee9f-436c-971a-31261383a2d7）",
+  "detail": "最近 4.09 mm（F 层，pad GND_ISO U601 ↔ track GND）",
   "example": true,
   "groups": [
    [
@@ -173,18 +173,18 @@
   "source": "示例值；数字隔离器 ADuM1201 本身的爬电与电气间隙各 4.0 mm（规格书 Rev. L p.21），板上不应比它小",
   "status": "pass",
   "unit": "mm",
-  "value": 5.017
+  "value": 4.086
  },
  {
   "at": [
    [
-    121.63,
-    122.08,
+    115.91,
+    124.46,
     "In1",
-    "pth PE C102 ↔ zone GND zone:c1ede70d-ee9f-436c-971a-31261383a2d7"
+    "pth PE C102 ↔ zone GND zone:4043a74d-05cb-4cff-8fd8-6c7192ce82f1"
    ]
   ],
-  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:c1ede70d-ee9f-436c-971a-31261383a2d7）",
+  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:4043a74d-05cb-4cff-8fd8-6c7192ce82f1）",
   "example": true,
   "groups": [
    [
@@ -351,13 +351,13 @@
  {
   "at": [
    [
-    136.05,
-    129.41,
+    120.41,
+    148.41,
     "F",
-    "track L_C ↔ pth N_IN RV101"
+    "track L_F ↔ pth N_C C103"
    ]
   ],
-  "detail": "最近 2.61 mm（F 层，track L_C ↔ pth N_IN RV101）",
+  "detail": "最近 2.63 mm（F 层，track L_F ↔ pth N_C C103）",
   "example": true,
   "groups": [
    [
@@ -379,18 +379,18 @@
   "source": "示例值",
   "status": "pass",
   "unit": "mm",
-  "value": 2.612
+  "value": 2.628
  },
  {
   "at": [
    [
-    293.01,
-    129.47,
-    "B",
-    "pth OUT_U U401 ↔ track IN_UL"
+    265.29,
+    133.41,
+    "F",
+    "pad VB_W C403 ↔ track +3V3"
    ]
   ],
-  "detail": "最近 1.03 mm（B 层，pth OUT_U U401 ↔ track IN_UL）",
+  "detail": "最近 1.01 mm（F 层，pad VB_W C403 ↔ track +3V3）",
   "example": true,
   "groups": [
    [
@@ -542,6 +542,6 @@
   "source": "示例值",
   "status": "fail",
   "unit": "mm",
-  "value": 1.03
+  "value": 1.012
  }
 ]
