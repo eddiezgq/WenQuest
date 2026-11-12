@@ -30,6 +30,8 @@ COPY factory/ factory/
 # 服务器首次安装时用它把减速器厂数据导入 ERPNext（第 3 轮 D6）
 COPY seed.py seed.py
 COPY plants/ plants/
+# 第 161 轮：设计案例（tools/cases 生成的 case.json、图、模型、程序；网页“设计案例”读这里）
+COPY cases/ cases/
 # 第 88 轮：电路板设计的产物（KiCad 在 CI 里生成，随仓库发布；网页“电路板设计”读这里）
 COPY designs/drv-joint/out/ designs/drv-joint/out/
 COPY designs/wq-encif/out/ designs/wq-encif/out/
