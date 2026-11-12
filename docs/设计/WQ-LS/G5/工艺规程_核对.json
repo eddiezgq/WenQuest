@@ -154,7 +154,7 @@
     "ok": true
    }
   ],
-  "pdf": "/home/claude/wenquest/docs/设计/WQ-LS/G5/工艺卡_上件.pdf"
+  "pdf": "docs/设计/WQ-LS/G5/工艺卡_上件.pdf"
  },
  "HSG-LS-L": {
   "ops": [
@@ -276,7 +276,7 @@
     "ok": true
    }
   ],
-  "pdf": "/home/claude/wenquest/docs/设计/WQ-LS/G5/工艺卡_下件.pdf"
+  "pdf": "docs/设计/WQ-LS/G5/工艺卡_下件.pdf"
  },
  "HSG-LS-P": {
   "ops": [
@@ -288,12 +288,12 @@
    [
     70,
     "镗轴承孔",
-    25.5
+    30.5
    ],
    [
     80,
     "钻攻螺纹孔",
-    5.0
+    8.0
    ],
    [
     90,
@@ -301,7 +301,7 @@
     30
    ]
   ],
-  "total_min": 74.5,
+  "total_min": 82.5,
   "review": [],
   "cards_check": [],
   "holes": [
@@ -404,6 +404,36 @@
     "z_min": 0.9,
     "z_max": 1.065,
     "ok": true
+   },
+   {
+    "feature": "送布摆轴孔",
+    "from_": 70,
+    "to": 70,
+    "d_from": 13.7,
+    "d_to": 14.0,
+    "z_min": 0.137,
+    "z_max": 0.159,
+    "ok": true
+   },
+   {
+    "feature": "抬牙摆轴前孔",
+    "from_": 70,
+    "to": 70,
+    "d_from": 15.7,
+    "d_to": 16.0,
+    "z_min": 0.137,
+    "z_max": 0.159,
+    "ok": true
+   },
+   {
+    "feature": "调节器轴孔",
+    "from_": 70,
+    "to": 70,
+    "d_from": 9.7,
+    "d_to": 10.0,
+    "z_min": 0.132,
+    "z_max": 0.158,
+    "ok": true
    }
   ],
   "power": [
@@ -424,6 +454,6 @@
     "ok": true
    }
   ],
-  "pdf": "/home/claude/wenquest/docs/设计/WQ-LS/G5/工艺卡_合件.pdf"
+  "pdf": "docs/设计/WQ-LS/G5/工艺卡_合件.pdf"
  }
 }
