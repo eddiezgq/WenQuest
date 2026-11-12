@@ -138,7 +138,7 @@ def summary(nc, n_bom, brd=None):
     for i, (key, _, _) in enumerate(D.SHEETS):
         files[key] = next((s for s in sheets if s.startswith("{}-{} ".format(NAME, i + 1))), None)
     d = {
-        "name": "平缝机控制器 CTRL-LS", "item": "CTRL-LS", "rev": "示例 A", "date": DATE, "stage": "159d1 原理图（PCB 在 159d2）",
+        "name": "平缝机控制器 CTRL-LS", "item": "CTRL-LS", "rev": "示例 A", "date": DATE, "stage": "159d2b 原理图与 PCB（网页在 159d3）",
         "disclaimer": "示例设计，未经硬件验证，不能直接投产",
         "tool": "KiCad 7.0.11", "board_mm": list(D.X["board_mm"]), "layers": D.X["layers"],
         "sheets": [{"key": k, "name": n, "name_en": e, "svg": files.get(k), "note": D.SHEET_NOTES.get(k, "")} for k, n, e in D.SHEETS],
