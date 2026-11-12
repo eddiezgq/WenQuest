@@ -26,9 +26,13 @@ def P(x, y):
     return pcbnew.VECTOR2I(MM(ORIGIN[0] + x), MM(ORIGIN[1] + y))
 
 
+# 工程自带封装库：库名 → 目录（第 159 轮：平缝机控制器的 wq.pretty；调用方按需登记，不登记就只用 KiCad 官方库）
+LOCAL_FPDIRS = {}
+
+
 def load_fp(fpid):
     lib, name = fpid.split(":", 1)
-    fp = pcbnew.FootprintLoad(os.path.join(FPDIR, lib + ".pretty"), name)
+    fp = pcbnew.FootprintLoad(os.path.join(LOCAL_FPDIRS.get(lib, FPDIR), lib + ".pretty"), name)
     if fp is None:
         raise KeyError(fpid)
     return fp

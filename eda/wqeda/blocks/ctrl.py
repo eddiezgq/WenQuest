@@ -18,6 +18,8 @@ from __future__ import annotations
 import math
 
 from . import common as c
+from . import magnetics
+from .mains import fly
 
 FP_R = "Resistor_SMD:R_0603_1608Metric"
 FP_R1206 = "Resistor_SMD:R_1206_3216Metric"
@@ -32,7 +34,6 @@ FP_SMB = "Diode_SMD:D_SMB"
 FP_SMC = "Diode_SMD:D_SMC"
 FP_TDSON = "Package_TO_SOT_SMD:TDSON-8-1"
 FP_TERM3 = "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal"
-FP_MAG = "wq:Magnetics_TBD"  # 定制磁性元件：磁芯与骨架 159d2 定，封装随之
 
 
 def _r(ref, val, a, b, k, note="", fp=FP_R, item="RES-0603"):
@@ -50,6 +51,16 @@ def _d(ref, val, anode, cathode, k, fp, item, note=""):
 def _nfet(ref, g, d_, s, k, note=""):
     """小信号 N 沟道管 2N7002（SOT-23：1 G、2 S、3 D）"""
     return c.part(ref, "Transistor_FET:2N7002", "2N7002", FP_SOT23, k, {"1": g, "2": s, "3": d_}, "MOS-2N7002", note)
+
+
+def _e24_below(x):
+    """E24 里不超过 x 的最大值"""
+    return max(v for v in (m * 10**d for d in range(-1, 8) for m in c.SERIES["E24"]) if v <= x * (1 + 1e-9))
+
+
+def _e6_above(x):
+    """E6 里不小于 x 的最小值"""
+    return min(v for v in (m * 10**d for d in range(-13, -3) for m in c.SERIES["E6"]) if v >= x * (1 - 1e-9))
 
 
 def _divider_top(refs, a, b, val, k, note):
@@ -241,11 +252,11 @@ def gen_pfc_boost(block, spec, d):
             "L201",
             "wq:L_PFC",
             "{:.0f}uH".format(_pfc_l(spec, p, d)),
-            FP_MAG,
+            "wq:L_ETD59_Horizontal",
             k,
             {"1": "VRECT", "2": "SW_PFC"},
             "IND-PFC-CUSTOM",
-            "升压电感（定制：电感量、峰值电流见计算书；磁芯与封装 159d2 定）",
+            "升压电感（定制：ETD59 + 骨架 B66398，匝数、气隙、线径见计算书“按理论”）",
         ),
         c.part(
             "Q201",
@@ -388,6 +399,10 @@ def gen_flyback_aux(block, spec, d):
     F 脚接 C 选 66 kHz（p.5）、C 脚 47 µF（p.8 的例子）。整块板共地，三路输出都以 GND 为参考（不隔离），
     稳压取 24 V 与 15 V 加权（TL431 + 光耦）。"""
     p, k = block["params"], block["key"]
+    fl = fly(spec, p)
+    cl = magnetics.rcd_clamp(fl["lp"], fl["i_pk"], fl["f"], p["v_clamp"], fl["vor"], p["llk_ratio"])
+    rc = c.fmt(_e24_below(cl["r"] / 2))
+    cc = _e6_above(cl["c_min"])
     return [
         c.part(
             "U301",
@@ -437,34 +452,19 @@ def gen_flyback_aux(block, spec, d):
             "T301",
             "wq:Transformer_FLY3",
             "FLY-24/15/5",
-            FP_MAG,
+            "Transformer_THT:Transformer_EPCOS_B66359A1013T_Horizontal",
             k,
-            {"1": "VBUS", "2": "FLY_D", "3": "FLY_24", "4": "GND", "5": "FLY_15", "6": "GND", "7": "FLY_5", "8": "GND"},
+            {"1": "VBUS", "3": "FLY_D", "8": "FLY_24", "9": "GND", "10": "FLY_15", "11": "GND", "12": "FLY_5", "13": "GND"},
             "XFMR-FLY-CUSTOM",
-            "反激变压器（定制：初级电感、匝比见计算书；三路次级共地，不要求加强绝缘；磁芯与封装 159d2 定）",
+            "反激变压器（定制：ETD29 + 卧式骨架 B66359A1013T，匝数、气隙见计算书“按理论”；三路次级共地，不要求加强绝缘）",
         ),
-        # 初级钳位（RCD）：漏感未知，R、C 按样机调（第一版取常见值）
+        # 初级钳位（RCD，按理论：漏感取初级电感的比例，见计算书）
         _d("D301", "US1M", "FLY_D", "CLAMP", k, "Diode_SMD:D_SMA", "DIO-US1M", "钳位二极管（快恢复 1000 V）"),
-        _r(
-            "R303",
-            "100k",
-            "VBUS",
-            "CLAMP",
-            k,
-            "RCD 钳位电阻：要变压器漏感才能算，第一版取常见值、按样机调（待定）",
-            FP_R2512,
-            "RES-2512",
-        ),
-        c.part(
-            "C303",
-            "Device:C",
-            "1n/1kV",
-            FP_C1206,
-            k,
-            {"1": "VBUS", "2": "CLAMP"},
-            "CAP-1206-1KV",
-            "RCD 钳位电容（待定，同上）",
-        ),
+        _r("R303", rc, "VBUS", "CLAMP_M", k, "RCD 钳位电阻：两只 2512 串联 = {}（计算书 R ≤ {:.3g} kΩ，功耗 {:.2g} W 两只分担）".format(
+            c.fmt(2 * c.parse(rc)), cl["r"] / 1e3, cl["p"]), FP_R2512, "RES-2512"),
+        _r("R310", rc, "CLAMP_M", "CLAMP", k, fp=FP_R2512, item="RES-2512"),
+        c.part("C303", "Device:C", "{}/1kV".format(c.fmt(cc)), FP_C1812, k, {"1": "VBUS", "2": "CLAMP"}, "CAP-1812-1KV",
+               "RCD 钳位电容（计算书：≥ {}）".format(c.fmt(cl["c_min"]))),
         _d("D302", p["out_diode"], "FLY_24", "+24V", k, FP_SMC, "DIO-ES3D", "24 V 整流"),
         c.part(
             "C304",

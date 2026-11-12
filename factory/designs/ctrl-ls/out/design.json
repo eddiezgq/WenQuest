@@ -1,7 +1,7 @@
 {
  "board_mm": [
-  200,
-  140
+  246,
+  150
  ],
  "bom_by_item": {
   "BRG-GBU1006": 1,
@@ -9,8 +9,8 @@
   "CAP-0603": 34,
   "CAP-0805": 3,
   "CAP-1206": 10,
-  "CAP-1206-1KV": 1,
   "CAP-1210": 1,
+  "CAP-1812-1KV": 1,
   "CAP-1812-630V": 1,
   "CAP-BULK-330U-500V": 3,
   "CAP-EL-1000U-10V": 1,
@@ -56,7 +56,7 @@
   "RES-0603": 66,
   "RES-1206": 15,
   "RES-2010-0R12": 2,
-  "RES-2512": 1,
+  "RES-2512": 2,
   "RES-SHUNT-10M": 1,
   "RES-SHUNT-25M": 3,
   "RLY-G5LE": 1,
@@ -68,11 +68,11 @@
  "date": "2026-11-12",
  "disclaimer": "示例设计，未经硬件验证，不能直接投产",
  "files": {
-  "bom.csv": "b331b3bba5d98146",
-  "netcheck.json": "f503c998631c0107",
+  "bom.csv": "9ccf2d3bd4b0d552",
+  "netcheck.json": "9eddaa8fe06de745",
   "schematic/ctrl-ls-1 交流输入、浪涌与整流.svg": "6e838f858b991632",
   "schematic/ctrl-ls-2 功率因数校正与母线.svg": "d0b0075d62408796",
-  "schematic/ctrl-ls-3 辅助电源.svg": "80ff077791499fcd",
+  "schematic/ctrl-ls-3 辅助电源.svg": "4fc48a7082c416a7",
   "schematic/ctrl-ls-4 主轴伺服逆变与电流采样.svg": "e989a8807fc40f73",
   "schematic/ctrl-ls-5 电磁铁与步进.svg": "ee228cd5fbb892f2",
   "schematic/ctrl-ls-6 主控与传感器输入.svg": "9912be3f1d53be69",
@@ -81,16 +81,16 @@
   "schematic/ctrl-ls.svg": "5be3d304c7a1f898"
  },
  "item": "CTRL-LS",
- "layers": 2,
+ "layers": 4,
  "name": "平缝机控制器 CTRL-LS",
  "netcheck": {
-  "nets_design": 149,
-  "nets_schematic": 149,
-  "parts_design": 221,
-  "parts_schematic": 221,
+  "nets_design": 150,
+  "nets_schematic": 150,
+  "parts_design": 222,
+  "parts_schematic": 222,
   "pass": true
  },
- "nets": 149,
+ "nets": 150,
  "parts": [
   {
    "fp": "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal",
@@ -273,10 +273,10 @@
    "value": "100n"
   },
   {
-   "fp": "wq:Magnetics_TBD",
+   "fp": "wq:L_ETD59_Horizontal",
    "item": "IND-PFC-CUSTOM",
    "lib": "wq:L_PFC",
-   "note": "升压电感（定制：电感量、峰值电流见计算书；磁芯与封装 159d2 定）",
+   "note": "升压电感（定制：ETD59 + 骨架 B66398，匝数、气隙、线径见计算书“按理论”）",
    "ref": "L201",
    "sheet": "pfc",
    "value": "451uH"
@@ -633,10 +633,10 @@
    "value": "100n"
   },
   {
-   "fp": "wq:Magnetics_TBD",
+   "fp": "Transformer_THT:Transformer_EPCOS_B66359A1013T_Horizontal",
    "item": "XFMR-FLY-CUSTOM",
    "lib": "wq:Transformer_FLY3",
-   "note": "反激变压器（定制：初级电感、匝比见计算书；三路次级共地，不要求加强绝缘；磁芯与封装 159d2 定）",
+   "note": "反激变压器（定制：ETD29 + 卧式骨架 B66359A1013T，匝数、气隙见计算书“按理论”；三路次级共地，不要求加强绝缘）",
    "ref": "T301",
    "sheet": "aux",
    "value": "FLY-24/15/5"
@@ -654,19 +654,28 @@
    "fp": "Resistor_SMD:R_2512_6332Metric",
    "item": "RES-2512",
    "lib": "Device:R",
-   "note": "RCD 钳位电阻：要变压器漏感才能算，第一版取常见值、按样机调（待定）",
+   "note": "RCD 钳位电阻：两只 2512 串联 = 12.4k（计算书 R ≤ 13.1 kΩ，功耗 1.7 W 两只分担）",
    "ref": "R303",
    "sheet": "aux",
-   "value": "100k"
+   "value": "6.2k"
   },
   {
-   "fp": "Capacitor_SMD:C_1206_3216Metric",
-   "item": "CAP-1206-1KV",
+   "fp": "Resistor_SMD:R_2512_6332Metric",
+   "item": "RES-2512",
+   "lib": "Device:R",
+   "note": "",
+   "ref": "R310",
+   "sheet": "aux",
+   "value": "6.2k"
+  },
+  {
+   "fp": "Capacitor_SMD:C_1812_4532Metric",
+   "item": "CAP-1812-1KV",
    "lib": "Device:C",
-   "note": "RCD 钳位电容（待定，同上）",
+   "note": "RCD 钳位电容（计算书：≥ 11.6n）",
    "ref": "C303",
    "sheet": "aux",
-   "value": "1n/1kV"
+   "value": "15n/1kV"
   },
   {
    "fp": "Diode_SMD:D_SMC",
