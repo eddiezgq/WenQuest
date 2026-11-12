@@ -1,0 +1,205 @@
+{
+ "note": "G4.6 送布组一转干涉检查：每 2° 一帧，送布、抬牙、油泵的运动件对整机所有零件和机壳（设计的配合除外）；三档各查一遍。最后两处改动（顶板厚度里开口右端放到 x 29.5、送布牙侧梁改 2.8）只动了牙架和开口，牙架对最终机壳再查一遍（feed_bar 一项取复查的结果）。",
+ "limit_mm": 1.0,
+ "step_deg": 2,
+ "settings": {
+  "s3": {
+   "name": "3 mm 正缝",
+   "too_close": [],
+   "closest": [
+    [
+     "regulator | casting",
+     1.0,
+     0
+    ],
+    [
+     "reg_slider | casting",
+     1.0,
+     0
+    ],
+    [
+     "hook | feed_bar",
+     1.073,
+     198
+    ],
+    [
+     "lift_rock | casting",
+     1.19,
+     22
+    ],
+    [
+     "regulator | feed_link",
+     1.199,
+     340
+    ],
+    [
+     "feed_rod | casting",
+     1.376,
+     352
+    ],
+    [
+     "lower_shaft | oil_plunger",
+     1.6,
+     180
+    ],
+    [
+     "feed_bar | casting",
+     1.818,
+     0
+    ],
+    [
+     "feed_rock | casting",
+     2.0,
+     358
+    ],
+    [
+     "lift_link | casting",
+     2.0,
+     344
+    ],
+    [
+     "shaft | feed_rod",
+     2.048,
+     166
+    ],
+    [
+     "hook_shaft | feed_bar",
+     2.083,
+     202
+    ]
+   ]
+  },
+  "s5": {
+   "name": "5 mm 正缝",
+   "too_close": [],
+   "closest": [
+    [
+     "regulator | casting",
+     1.0,
+     0
+    ],
+    [
+     "reg_slider | casting",
+     1.0,
+     0
+    ],
+    [
+     "hook | feed_bar",
+     1.073,
+     196
+    ],
+    [
+     "feed_bar | casting",
+     1.169,
+     106
+    ],
+    [
+     "lift_rock | casting",
+     1.19,
+     22
+    ],
+    [
+     "regulator | feed_link",
+     1.199,
+     298
+    ],
+    [
+     "feed_rod | casting",
+     1.353,
+     338
+    ],
+    [
+     "lower_shaft | oil_plunger",
+     1.6,
+     180
+    ],
+    [
+     "feed_rock | casting",
+     1.999,
+     186
+    ],
+    [
+     "lift_link | casting",
+     2.0,
+     344
+    ],
+    [
+     "shaft | feed_rod",
+     2.048,
+     184
+    ],
+    [
+     "hook_shaft | feed_bar",
+     2.084,
+     200
+    ]
+   ]
+  },
+  "r5": {
+   "name": "5 mm 倒缝",
+   "too_close": [],
+   "closest": [
+    [
+     "regulator | casting",
+     1.0,
+     0
+    ],
+    [
+     "reg_slider | casting",
+     1.0,
+     0
+    ],
+    [
+     "hook | feed_bar",
+     1.072,
+     206
+    ],
+    [
+     "feed_bar | casting",
+     1.143,
+     290
+    ],
+    [
+     "lift_rock | casting",
+     1.19,
+     22
+    ],
+    [
+     "regulator | feed_link",
+     1.199,
+     324
+    ],
+    [
+     "feed_rod | casting",
+     1.356,
+     56
+    ],
+    [
+     "lower_shaft | oil_plunger",
+     1.6,
+     180
+    ],
+    [
+     "feed_rock | casting",
+     1.999,
+     202
+    ],
+    [
+     "lift_link | casting",
+     2.0,
+     344
+    ],
+    [
+     "shaft | feed_rod",
+     2.048,
+     172
+    ],
+    [
+     "hook_shaft | feed_bar",
+     2.073,
+     206
+    ]
+   ]
+  }
+ }
+}

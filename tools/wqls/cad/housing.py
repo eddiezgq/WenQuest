@@ -266,11 +266,13 @@ def details(solid, hollow, info):
     # ④ 机座顶面：针板座、滑板座（沉孔），针板下、滑板下开口
     hollow = hollow.cut(Part.makeBox(64, 44, 2.5, V(-32, -22, -2.5)))
     hollow = hollow.cut(Part.makeBox(46, 36, 1.5, V(-23, -58, -1.5)))
-    # G4.6：针板下开口右端由 x 28 放到 29.5——送布牙两侧梁的右端（x 27.5）伸到顶板底面以上，一转干涉检查里离开口端面只剩 0.5
-    op = Part.makeBox(51.5, 36, 20, V(-22, -18, -15)).fuse(Part.makeBox(40, 34, 20, V(-20, -52, -15)))
+    op = Part.makeBox(50, 36, 20, V(-22, -18, -15)).fuse(Part.makeBox(40, 34, 20, V(-20, -52, -15)))
     op = op.removeSplitter()
     op, _ = try_fillet(op, [e for e in op.Edges if e.BoundBox.ZLength > 19], (4.0, 3.0, 2.0))
     hollow = hollow.cut(op)
+    # G4.6：送布牙两侧梁的右端（x 27.5）伸到顶板底面以上，一转干涉检查里离开口右端面（x 28）只剩 0.5 →
+    # 只在顶板厚度里（z −6…0）把开口右端放到 x 29.5。整个开口放宽不行：开口下半段会贴到旋梭轴座端面（x 30）上，只剩 0.5 的薄片
+    hollow = hollow.cut(Part.makeBox(1.6, 36, 6.5, V(27.9, -18, -6)))
     npts = [(-27, -19.5, -2.5), (27, -19.5, -2.5), (-27, 19.5, -2.5), (27, 19.5, -2.5)]      # G4.6：y ±17 → ±19.5（原来右边两个落在针板下开口里）
     hollow = tap_holes(hollow, npts, 2.5, 8, V(0, 0, -1))                                    # 针板螺钉 M3
     # ⑤ 机座底边法兰（内侧一圈，宽 10、厚 6，底面加工）和后面两个铰链耳
