@@ -2,43 +2,8 @@
  "limit_mm": 1.0,
  "step_deg": 4,
  "frames": 90,
- "seconds": 6468,
+ "seconds": 6331,
  "pairs": [
-  [
-   "motor_housing | stator_winding",
-   0.0,
-   0
-  ],
-  [
-   "shaft | feed_rod",
-   0.049,
-   348
-  ],
-  [
-   "lift_rock | casting",
-   0.258,
-   24
-  ],
-  [
-   "feed_bar | casting",
-   0.48,
-   284
-  ],
-  [
-   "lower_shaft | oil_plunger",
-   0.6,
-   180
-  ],
-  [
-   "feed_rod | casting",
-   0.999,
-   324
-  ],
-  [
-   "regulator | feed_link",
-   0.999,
-   340
-  ],
   [
    "rocker | casting",
    1.0,
@@ -85,6 +50,21 @@
    4
   ],
   [
+   "lift_rock | casting",
+   1.19,
+   24
+  ],
+  [
+   "regulator | feed_link",
+   1.199,
+   340
+  ],
+  [
+   "feed_rod | casting",
+   1.299,
+   324
+  ],
+  [
    "hook_shaft | bobbin_case",
    1.47,
    352
@@ -118,6 +98,16 @@
    "lever | crank",
    1.5,
    356
+  ],
+  [
+   "lower_shaft | oil_plunger",
+   1.6,
+   180
+  ],
+  [
+   "feed_bar | casting",
+   1.818,
+   0
   ],
   [
    "motor_housing | rotor",
@@ -170,6 +160,11 @@
    344
   ],
   [
+   "shaft | feed_rod",
+   2.049,
+   348
+  ],
+  [
    "hook_shaft | feed_bar",
    2.083,
    200
@@ -193,11 +188,6 @@
    "gear_hook | casting",
    2.87,
    356
-  ],
-  [
-   "pulley_upper | feed_rod",
-   2.898,
-   244
   ],
   [
    "pulley_lower | casting",
@@ -225,6 +215,11 @@
    240
   ],
   [
+   "pulley_upper | feed_rod",
+   3.083,
+   296
+  ],
+  [
    "stator_winding | rotor_magnets",
    3.499,
    4
@@ -236,7 +231,7 @@
   ],
   [
    "oil_ecc | oil_pump",
-   3.563,
+   3.555,
    8
   ],
   [
@@ -290,11 +285,6 @@
    336
   ],
   [
-   "bobbin_case | feed_bar",
-   5.011,
-   240
-  ],
-  [
    "needle | casting",
    5.19,
    356
@@ -308,6 +298,11 @@
    "oil_plunger | casting",
    5.5,
    0
+  ],
+  [
+   "bobbin_case | feed_bar",
+   5.724,
+   152
   ],
   [
    "shaft | belt",
@@ -395,6 +390,11 @@
    32
   ],
   [
+   "oil_ecc | casting",
+   9.484,
+   8
+  ],
+  [
    "stator_core | encoder_disc",
    9.682,
    356
@@ -425,11 +425,6 @@
    312
   ],
   [
-   "oil_ecc | casting",
-   10.399,
-   24
-  ],
-  [
    "shaft | motor_bolts",
    10.749,
    4
@@ -456,8 +451,8 @@
   ],
   [
    "lower_shaft | feed_rod",
-   17.451,
-   0
+   17.221,
+   308
   ],
   [
    "shaft | rotor_magnets",
@@ -501,7 +496,7 @@
   ],
   [
    "feed_ecc | casting",
-   37.053,
+   36.999,
    336
   ],
   [
@@ -516,7 +511,7 @@
   ],
   [
    "bearings_lower | regulator",
-   47.386,
+   47.584,
    0
   ],
   [
@@ -535,41 +530,5 @@
    336
   ]
  ],
- "too_close": [
-  [
-   "motor_housing | stator_winding",
-   0.0,
-   0
-  ],
-  [
-   "shaft | feed_rod",
-   0.049,
-   348
-  ],
-  [
-   "lift_rock | casting",
-   0.258,
-   24
-  ],
-  [
-   "feed_bar | casting",
-   0.48,
-   284
-  ],
-  [
-   "lower_shaft | oil_plunger",
-   0.6,
-   180
-  ],
-  [
-   "feed_rod | casting",
-   0.999,
-   324
-  ],
-  [
-   "regulator | feed_link",
-   0.999,
-   340
-  ]
- ]
+ "too_close": []
 }
