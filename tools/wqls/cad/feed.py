@@ -65,6 +65,12 @@ def build():
     plate = Part.makeBox(X["reg"][1] - X["reg"][0] - 0.2, 22.0, 16.0, V(X["reg"][0], -11.0, -8.0))     # 厚 7.8：离 L2 1.2
     slot = Part.makeBox(X["reg"][1] - X["reg"][0] + 2, 15.0, 7.0, V(X["reg"][0] - 1, -7.5, -3.5))
     plate = plate.cut(slot)
+    # G4.7：板上一条朝前（−y）的臂，长 20，端头的销 Ø4 伸到 x 326，插在针距拉杆下端的眼里（cad/ctrl.py）；α = 0 时臂朝 −y
+    # 板是按槽方向 u 转的（α = 0 时 u = (0, −1)，板转 −90°），臂先按 α = 0 画好，再跟着板一起转
+    arm = Part.makeBox(X["reg"][1] - X["reg"][0] - 0.2, 6.0, 20.0, V(X["reg"][0], -3.0, -20.0))   # 沿 −z 画，板转 −90° 后朝 −y
+    arm = arm.fuse(Part.makeCylinder(4.0, X["reg"][1] - X["reg"][0] - 0.2, V(X["reg"][0], 0.0, -20.0), V(1, 0, 0)))
+    arm = arm.fuse(Part.makeCylinder(2.0, 326.0 - X["reg"][0], V(X["reg"][0], 0.0, -20.0), V(1, 0, 0)))
+    plate = plate.fuse(arm)
     plate.rotate(V(0, 0, 0), V(1, 0, 0), ang)
     plate.translate(V(0, *G))
     plate = plate.fuse(xcyl(4.0, 297.5, X["reg"][0], *G))            # 调节器轴 Ø8（装在立柱下左横筋的座里，x 297…310）

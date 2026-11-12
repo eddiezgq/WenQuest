@@ -26,7 +26,11 @@ TK = json.loads((T.OUT / "挑线机构.json").read_text())["lk"]
 import os  # noqa: E402
 FD = json.loads((T.OUT / "送布机构.json").read_text())
 FP = FD["poses"][os.environ.get("WQ_FEED", "s3")]          # G4.6 送布组：哪一档（s3 动画，s5 / r5 干涉检查）
+PRESS = os.environ.get("WQ_PRESS", "down")                  # G4.7 压脚：down 放下 / hand 手抬 / knee 膝抬
 MK = T.Mech2(r=R, l=L, mr=S.SEW["mr"], lk=TK)
+_CT = json.loads((T.OUT / "操纵件.json").read_text())["geo"]["tension"] if (T.OUT / "操纵件.json").exists() else None
+TENSION_PATH = ([[_CT["x"] + 8.0, _CT["y_wall"] - 7.2, _CT["z"] + 14.0], [_CT["x"], _CT["y_wall"] - 7.2, _CT["z"] - 3.2],
+                 [_CT["x"] - 19.0, _CT["y_wall"] - 3.5, _CT["z"] + 10.0]] if _CT else [])      # 进线 → 夹线盘之间 → 挑线簧钩
 X = S.MECH_X
 
 
@@ -107,13 +111,17 @@ def frames(step=2):
                  lift_rock=rot_x(math.degrees(FP["gam"][i] - FP["gam"][0]), *g["Lr"]),
                  oil_ecc=low,                                                           # 油泵偏心（偏心 0.4，φ = 0 朝下）
                  oil_plunger=trans(0.0, 0.4 * (1 - math.cos(phi * DEG))))              # 柱塞跟着偏心最下点上下
+        # G4.7 压脚组：压脚放下时（没有布）被送布牙顶起 max(0, 牙顶高出针板)；抬起时送布牙够不着，不动
+        pz = max(0.0, fi["dog"][1]) if PRESS == "down" else 0.0
+        M.update({k: trans(0.0, pz) for k in ("presser_bar", "presser_collar", "presser_foot", "lift_bracket")})
         # 面线：A → 线眼 → B → 针杆线钩 → 针眼（x 取各自所在平面）
         tip = Bv + ZU - X["nb_below"] - X["tip_below"]
         Ey, Ez = w(lp["E"])
         Ay, Az = w(TK["A"])
         By, Bz = w(TK["B"])
         nb_bot = Bv + ZU - X["nb_below"]
-        thread = [[40.0, Ay, Az], [X["lever"][0] + X["lever"][1] / 2, Ey, Ez], [0.0, By, Bz], [0.0, -6.0, nb_bot + 3.5],
+        # G4.7：从夹线器开始——两片夹线盘之间（绕夹线柱下面）→ 挑线簧的钩 → 过线点 A
+        thread = TENSION_PATH + [[40.0, Ay, Az], [X["lever"][0] + X["lever"][1] / 2, Ey, Ez], [0.0, By, Bz], [0.0, -6.0, nb_bot + 0.3],
                   [0.0, -0.3, tip + 2.8]]
         out.append(dict(phi=phi, M={k: [round(v, 5) for v in m.flatten()] for k, m in M.items()}, thread=thread,
                         tip_z=round(tip, 3), eye=[round(Ey, 3), round(Ez, 3)]))

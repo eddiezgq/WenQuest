@@ -59,6 +59,7 @@ _tkj = os.path.join(os.path.dirname(os.path.abspath(__file__)) if "__file__" in 
 TK_JSON = json.load(open(_tkj)) if os.path.exists(_tkj) else None
 TK_JSON_EXISTS = TK_JSON is not None
 REALMECH = os.environ.get("WQ_REALMECH", "1" if TK_JSON_EXISTS else "0") == "1"   # 有 G4 实体机构时，外观件里不再画示意的针杆、挑线杆
+CTRL_REAL = REALMECH and os.path.exists(os.path.join(os.path.dirname(_tkj), "操纵件.json"))   # G4.7：压脚等外观件换成 cad/ctrl.py 的实体零件
 if TK_JSON:
     _ev = TK_JSON["result"]["E_v"]
     TK_SLOT = (round(200.0 + _ev[0] - 8), round(200.0 + _ev[1] + 8))
@@ -302,6 +303,7 @@ def details(solid, hollow, info):
     if os.environ.get("WQ_NOHOOK") != "1":
         hollow = lower_seats(hollow, solid, info)
         hollow = feed_seats(hollow, solid, info)
+        hollow = ctrl_seats(hollow, solid, info)
     if SPLIT and os.environ.get("WQ_NOJOINT") != "1" and not FEA_SIMPLE:   # 有限元模型：接合面按刚性连接，凸台、螺孔、销孔不进网格
         hollow = joint(hollow, solid, info)
     return hollow.removeSplitter()
@@ -400,6 +402,64 @@ def feed_seats(hollow, solid, info):
                               regulator=dict(axis=(gy, gz), x=(297, 310), d=10), rod_hole=dict(x=(326, 339), y=(-10, 12)),
                               fork_relief=dict(x=(17, 24.5), y=(-42, -21), depth=1.3),
                               process_holes=dict(left_wall=dict(d16=(fy, fz), d18=(ly, lz)), right=dict(d16=(fy, fz), d14=(gy, gz))))
+    return hollow
+
+
+def ctrl_seats(hollow, solid, info):
+    """G4.7 压脚与操纵件的支承（cad/ctrl.py 的零件装在这里；位置来自 G4/操纵件.json 的 geo）：
+    机头：① 压脚杆上导套座（Ø18，z 170…182，和针杆上导套座连成一块），下导套座（G3 已有的凸台）镗 Ø12；
+          ② 机头顶上调压螺钉座（Ø26），攻 M18 × 1.5；③ 手抬扳手轴座（后壁，Ø18，孔 Ø8）；
+          ④ 膝抬角杠杆 C2 的轴座（从后壁伸出的 Ø14 凸台，销孔 Ø6）；⑤ 松线轴座（后壁，Ø14，孔 Ø6）；
+    机臂：⑥ 松线拨杆座（机臂底板上的 Ø12 凸台，孔 Ø6）；⑦ 夹线柱孔（前壁，Ø5）；
+    立柱：⑧ 针距旋钮轴座（前壁，Ø20，孔 Ø8）；⑨ 倒缝扳手轴座（前壁，Ø18，孔 Ø8）；⑩ 膝抬角杠杆 C1 的轴座（后壁伸出，Ø16，孔 Ø6）；
+          ⑪ 下横隔板上挂拉簧的孔 Ø3、拉杆过孔 Ø10，上横隔板开缺口 14 × 12（拉杆和耳子上下走 ±6）；
+    机座顶板：⑫ 针距拉杆过孔 Ø10、膝抬推杆过孔 Ø12。"""
+    cj = os.path.join(os.path.dirname(_tkj), "操纵件.json")
+    if not os.path.exists(cj):
+        return hollow
+    C = json.load(open(cj, encoding="utf-8"))
+    g = C["geo"]
+    bx, by = g["bar"]["x"], g["bar"]["y"]
+    hz = C["hand"]["shaft_z"]
+    kn, rl, dl, rv = g["knee"], g["release"], g["dial"], g["reverse"]
+    feats = [
+        Part.makeCylinder(9.0, 12.0, V(bx, by, g["guide_up"]["z"][0]), V(0, 0, 1)),                                   # ①
+        Part.makeCylinder(13.0, 22.0, V(bx, by, 240.0), V(0, 0, 1)),                                                  # ②
+        Part.makeCylinder(9.0, 14.0, V(g["hand"]["x"], 58.0, hz), V(0, 1, 0)),                                         # ③
+        Part.makeCylinder(7.0, 20.0, V(kn["C2"]["x"], 47.0, kn["C2"]["z"]), V(0, 1, 0)),                               # ④
+        Part.makeCylinder(7.0, 14.0, V(rl["shaft"][0], 58.0, rl["shaft"][1]), V(0, 1, 0)),                             # ⑤
+        Part.makeCylinder(6.0, 12.0, V(rl["pivot"][0], rl["pivot"][1], 156.0), V(0, 0, 1)),                            # ⑥
+        Part.makeCylinder(10.0, 10.0, V(dl["x"], -62.0, dl["z"]), V(0, 1, 0)),                                         # ⑧
+        Part.makeCylinder(9.0, 12.0, V(rv["x"], -62.0, rv["z"]), V(0, 1, 0)),                                          # ⑨
+        Part.makeCylinder(8.0, 66.0, V(kn["C1"]["x"], 47.0, kn["C1"]["z"]), V(0, 1, 0)),                               # ⑩
+    ]
+    for f_ in feats:
+        hollow = fuse_fillet(hollow, f_.common(solid))
+    if FEA_SIMPLE:
+        return hollow
+    holes = [
+        Part.makeCylinder(6.0, 160.0, V(bx, by, 30.0), V(0, 0, 1)).common(Part.makeBox(40, 40, 22, V(bx - 20, by - 20, 30.0))),   # 下导套孔 z 30…52
+        Part.makeCylinder(6.0, 20.0, V(bx, by, 166.0), V(0, 0, 1)),                                                   # 上导套孔
+        Part.makeCylinder(8.25, 40.0, V(bx, by, 236.0), V(0, 0, 1)),                                                  # M18 × 1.5 底孔 Ø16.5
+        Part.makeCylinder(4.05, 30.0, V(g["hand"]["x"], 50.0, hz), V(0, 1, 0)),
+        Part.makeCylinder(3.05, 20.0, V(kn["C2"]["x"], 45.0, kn["C2"]["z"]), V(0, 1, 0)),
+        Part.makeCylinder(3.05, 30.0, V(rl["shaft"][0], 50.0, rl["shaft"][1]), V(0, 1, 0)),
+        Part.makeCylinder(3.05, 14.0, V(rl["pivot"][0], rl["pivot"][1], 156.0), V(0, 0, 1)),
+        Part.makeCylinder(2.5, 20.0, V(g["tension"]["x"], -30.0, g["tension"]["z"]), V(0, -1, 0)),                     # ⑦
+        Part.makeCylinder(4.05, 20.0, V(dl["x"], -66.0, dl["z"]), V(0, 1, 0)),
+        Part.makeCylinder(4.05, 20.0, V(rv["x"], -66.0, rv["z"]), V(0, 1, 0)),
+        Part.makeCylinder(3.05, 62.0, V(kn["C1"]["x"], 45.0, kn["C1"]["z"]), V(0, 1, 0)),
+        Part.makeCylinder(1.5, 12.0, V(g["pull_rod"]["x"], g["spring_rev"]["anchor"][1], 52.0), V(0, 0, 1)),          # ⑪
+        Part.makeCylinder(5.0, 16.0, V(g["pull_rod"]["x"], g["pull_rod"]["y"], 50.0), V(0, 0, 1)),                     # ⑪ 拉杆穿过下横隔板
+        Part.makeBox(14.0, 12.0, 15.0, V(g["pull_rod"]["x"] - 4.0, g["pull_rod"]["y"] - 8.0, 108.0)),                 # ⑪ 上横隔板开缺口：拉杆和耳子（上下 ±6）
+        Part.makeCylinder(5.0, 20.0, V(g["pull_rod"]["x"], g["pull_rod"]["y"], -12.0), V(0, 0, 1)),                    # ⑫
+        Part.makeCylinder(6.0, 20.0, V(kn["push"]["x"] - 0.7, kn["y"], -12.0), V(0, 0, 1)),
+    ]
+    for h_ in holes:
+        hollow = hollow.cut(h_)
+    info["ctrl_seats"] = dict(presser_bar=(bx, by), hand_shaft=(g["hand"]["x"], round(hz, 2)), C2=(kn["C2"]["x"], kn["C2"]["z"]),
+                              C1=(kn["C1"]["x"], kn["C1"]["z"]), release_shaft=rl["shaft"][:2], release_pivot=rl["pivot"][:2],
+                              dial=(dl["x"], dl["z"]), reverse=(rv["x"], rv["z"]), tension=(g["tension"]["x"], g["tension"]["z"]))
     return hollow
 
 
@@ -972,10 +1032,11 @@ def parts_visible(cast, hollow=None, info=None):
         g["chrome"].append(cyl(4, 32, V(0, 0, HEAD["z0"] - 30), V(0, 0, 1)))                # 针杆（上止点附近）
         g["metal"].append(Part.makeBox(10, 10, 9, V(-5, -5, 14)))                           # 针夹
         g["chrome"].append(cyl(0.9, 20, V(0, 0, -1.5), V(0, 0, 1)).fuse(cyl(1.0, 8, V(0, 0, 13), V(0, 0, 1))))
-    g["chrome"].append(cyl(4, 40, V(-16, 6, HEAD["z0"] - 38), V(0, 0, 1)))              # 压脚杆
-    foot = Part.makeBox(30, 26, 4, V(-20, -14, 0.2)).fuse(Part.makeBox(8, 8, 18, V(-20, 2, 3)))
-    foot = foot.cut(cyl(2.4, 10, V(0, 0, -1), V(0, 0, 1)))
-    g["metal"].append(foot)
+    if not CTRL_REAL:                                   # G4.7 起压脚、夹线器、针距旋钮、倒缝扳手是实体零件（cad/ctrl.py）
+        g["chrome"].append(cyl(4, 40, V(-16, 6, HEAD["z0"] - 38), V(0, 0, 1)))          # 压脚杆
+        foot = Part.makeBox(30, 26, 4, V(-20, -14, 0.2)).fuse(Part.makeBox(8, 8, 18, V(-20, 2, 3)))
+        foot = foot.cut(cyl(2.4, 10, V(0, 0, -1), V(0, 0, 1)))
+        g["metal"].append(foot)
     # 针板、滑板（嵌在机座顶面）
     g["metal"].append(Part.makeBox(64, 44, 0.6, V(-32, -22, -0.2)).cut(cyl(1.2, 2, V(0, 0, -1), V(0, 0, 1))))
     g["chrome"].append(Part.makeBox(46, 36, 0.6, V(-23, -58, -0.2)))
@@ -992,19 +1053,21 @@ def parts_visible(cast, hollow=None, info=None):
     if not REALMECH:
         g["chrome"].append(lev.fuse(eye))
     tz, tx = 210, 66
-    g["chrome"].append(cyl(3, 22, V(tx, -46, tz), V(0, -1, 0)))
-    for dy in (-52, -55.5):
-        g["chrome"].append(cyl(11, 1.4, V(tx, dy, tz), V(0, -1, 0)))
-    g["chrome"].append(Part.makeTorus(9, 0.6, V(tx, -50, tz), V(0, -1, 0), 0, 360, 200))   # 挑线簧（示意）
+    if not CTRL_REAL:
+        g["chrome"].append(cyl(3, 22, V(tx, -46, tz), V(0, -1, 0)))
+        for dy in (-52, -55.5):
+            g["chrome"].append(cyl(11, 1.4, V(tx, dy, tz), V(0, -1, 0)))
+        g["chrome"].append(Part.makeTorus(9, 0.6, V(tx, -50, tz), V(0, -1, 0), 0, 360, 200))   # 挑线簧（示意）
+        kn = cyl(9, 10, V(tx, -58, tz), V(0, -1, 0))
+        g["graphite"].append(fil(kn, 2.5, circ_far(kn, V(0, -1, 0))))
     g["chrome"].append(cyl(1.6, 16, V(tx + 22, -46, tz + 14), V(0, -1, 0)))                # 过线钩
-    kn = cyl(9, 10, V(tx, -58, tz), V(0, -1, 0))
-    g["graphite"].append(fil(kn, 2.5, circ_far(kn, V(0, -1, 0))))
     # 针距旋钮、倒缝扳手、操作面板、照明
-    dl = cyl(19, 10, V(340, PIL["y0"] + 2, 170), V(0, -1, 0))
-    g["graphite"].append(fil(dl, 2, circ_far(dl, V(0, -1, 0))))
-    g["blue"].append(cyl(19.3, 1.2, V(340, PIL["y0"] - 7.2, 170), V(0, -1, 0)).cut(cyl(17, 2, V(340, PIL["y0"] - 6.7, 170), V(0, -1, 0))))
-    lev = Part.makeBox(10, 8, 56, V(347, PIL["y0"] - 8, 60)).fuse(cyl(7, 10, V(352, PIL["y0"] + 2, 116), V(0, -1, 0)))
-    g["graphite"].append(lev)
+    if not CTRL_REAL:
+        dl = cyl(19, 10, V(340, PIL["y0"] + 2, 170), V(0, -1, 0))
+        g["graphite"].append(fil(dl, 2, circ_far(dl, V(0, -1, 0))))
+        g["blue"].append(cyl(19.3, 1.2, V(340, PIL["y0"] - 7.2, 170), V(0, -1, 0)).cut(cyl(17, 2, V(340, PIL["y0"] - 6.7, 170), V(0, -1, 0))))
+        lev = Part.makeBox(10, 8, 56, V(347, PIL["y0"] - 8, 60)).fuse(cyl(7, 10, V(352, PIL["y0"] + 2, 116), V(0, -1, 0)))
+        g["graphite"].append(lev)
     pan = Part.makeBox(76, 9, 46, V(118, -47, 168))
     pan = pan.makeFillet(4, [e for e in pan.Edges if abs(e.BoundBox.YLength) < 1e-6])
     g["black"].append(pan)

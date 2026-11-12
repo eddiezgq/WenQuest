@@ -55,7 +55,19 @@ JOINT = {frozenset(p) for p in [
     ("regulator", "reg_slider"), ("feed_link", "feed_rock"), ("feed_rock", "feed_bar"), ("feed_bar", "lift_rock"),
     ("lift_ecc", "lower_shaft"), ("lift_ecc", "lift_link"), ("lift_link", "lift_rock"),
     ("motor_housing", "stator_winding"),   # 定子绕组端部贴着电机壳（G4.3 的电机实体，绝缘纸隔开），不是运动副
-    ("oil_ecc", "lower_shaft"), ("oil_ecc", "oil_plunger"), ("oil_plunger", "oil_pump"), ("casting", "oil_pump")]}
+    ("oil_ecc", "lower_shaft"), ("oil_ecc", "oil_plunger"), ("oil_plunger", "oil_pump"), ("casting", "oil_pump"),
+    # G4.7 压脚与操纵件：导套、销孔、螺纹、弹簧座、凸轮和钩的接触（cad/ctrl.py）
+    ("presser_bar", "presser_bushes"), ("presser_bar", "presser_foot"), ("presser_bar", "presser_collar"), ("presser_bar", "lift_bracket"),
+    ("presser_collar", "presser_spring"), ("presser_spring", "presser_screw"), ("presser_screw", "casting"), ("presser_spring", "casting"),
+    ("presser_bushes", "casting"), ("presser_foot", "feed_bar"), ("hand_lifter", "casting"), ("hand_lifter", "lift_bracket"),
+    ("knee_c2", "casting"), ("knee_c1", "casting"), ("knee_rod", "knee_c2"), ("knee_rod", "knee_c1"), ("knee_link", "knee_c2"),
+    ("knee_link", "lift_bracket"), ("knee_push", "knee_c1"), ("knee_push", "casting"),
+    ("release_shaft", "casting"), ("release_shaft", "lift_bracket"), ("release_shaft", "release_rod"), ("release_rod", "release_lever"),
+    ("release_lever", "casting"), ("release_lever", "release_pin"), ("release_pin", "tension_post"), ("tension_post", "casting"),
+    ("tension_post", "tension_discs"), ("tension_discs", "release_pin"), ("tension_discs", "tension_spring"), ("tension_spring", "tension_nut"),
+    ("tension_nut", "tension_post"), ("check_spring", "tension_post"), ("tension_spring", "tension_post"),
+    ("stitch_dial", "casting"), ("stitch_dial", "pull_rod"), ("pull_rod", "regulator"), ("pull_rod", "reverse_lever"), ("reverse_lever", "casting"),
+    ("reverse_spring", "pull_rod"), ("reverse_spring", "casting")]}
 
 
 def mat(m):
@@ -73,6 +85,8 @@ def placed(k, f):
 
 names = list(parts) + ["casting"]
 ONLY = set(x for x in os.environ.get("WQ_ONLY", "").split(",") if x)    # 只查和这些零件有关的组合（G4.5：只查旋梭组，机头部分 G4.1–4.3 查过）
+# G4.7：某个状态下由控制器联锁排除的组合（例如膝抬 13 mm 时只在针杆上面停针，针夹和压脚不会相遇），用 WQ_SKIP="a|b;c|d" 给出
+SKIP = {frozenset(p.split("|")) for p in os.environ.get("WQ_SKIP", "").split(";") if "|" in p}
 worst = {}
 t0 = time.time()
 first = True
@@ -81,7 +95,7 @@ for f in FR[::max(1, STEP // 2)]:
     sh["casting"] = near
     for i, a in enumerate(names):
         for b in names[i + 1:]:
-            if frozenset((a, b)) in JOINT:
+            if frozenset((a, b)) in JOINT or frozenset((a, b)) in SKIP:
                 continue
             if ONLY and a not in ONLY and b not in ONLY:
                 continue

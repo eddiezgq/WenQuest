@@ -196,6 +196,16 @@ def strength(FD, FP, KIN, dog, vd, above, w, dphi, P_foot, mu, F_rod):
                            SF_fatigue=round(1 / (2 * (sig / 2) / 480 + (sig / 2) / 1080), 2))
     pins = dict(P=(5.9, Fr_max), C=(5.9, mx(F_L2)), T=(4.9, float(np.max(np.linalg.norm(F_A, axis=1)))), K=(4.9, mx(F_Kz)))
     out["pins_tau_MPa"] = {k: round(F / (math.pi * dd ** 2 / 4), 2) for k, (dd, F) in pins.items()}
+    # G4.7：调节器受的力矩（针距旋钮、倒缝扳手要顶住它）。滑块在槽里只能沿槽 u 走，送布连杆和 L2 的力垂直于槽的分量由槽承受，
+    # 对调节器轴 G 的力矩 = |GP| × 法向力。两根杆的力的正负号没有统一约定，取两者法向分量的绝对值相加（上界）
+    G0 = np.array(g["G"]) / 1000
+    us = np.array(FP["u"]) / np.linalg.norm(FP["u"])
+    ur = (Pp - mm("E")) / np.linalg.norm(Pp - mm("E"), axis=1)[:, None]
+    n_r = np.abs(ur[:, 0] * us[1] - ur[:, 1] * us[0])
+    n_l = np.abs(e2[:, 0] * us[1] - e2[:, 1] * us[0])
+    M_reg = np.linalg.norm(Pp - G0, axis=1) * (np.abs(np.nan_to_num(F_rod)) * n_r + np.abs(np.nan_to_num(F_L2)) * n_l)
+    out["regulator"] = dict(M_max_Nmm=round(float(np.max(M_reg)) * 1000, 1), GP_max_mm=round(float(np.max(np.linalg.norm(Pp - G0, axis=1))) * 1000, 2),
+                            note="上界：两根杆垂直于槽的分量取绝对值相加")
     return out
 
 

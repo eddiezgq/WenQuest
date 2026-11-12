@@ -115,9 +115,11 @@ parts["needle_bar"], mats["needle_bar"] = nb, "chrome"
 
 # 针夹（套在针杆下端）和机针 DB×1：针尖到针杆下端 tip_below
 # 针夹做短（针杆下端 −4…+4）：上止点时针夹顶只进到机头底孔里 0.5 mm；紧针螺钉在针夹中部朝前，线钩在下面
-clamp = Part.makeCylinder(5.5, 8, V(0, 0, zb - 4), V(0, 0, 1)).cut(Part.makeCylinder(4.0, 10, V(0, 0, zb - 5), V(0, 0, 1)))
-clamp = clamp.fuse(Part.makeCylinder(2.0, 4, V(0, -5, zb), V(0, -1, 0)))                                   # 紧针螺钉 M4
-clamp = clamp.fuse(Part.makeBox(3, 3, 3.5, V(-1.5, -7.5, zb - 4)).cut(Part.makeCylinder(0.9, 5, V(-2, -6, zb - 2.2), V(1, 0, 0))))  # 针杆线钩
+# G4.7：针夹上移 2.5（针杆下端 −1.5…+6.5）——手抬压脚 5.5 时针杆走到下止点，针夹底离压脚顶 1.5（原来压在压脚上 1 mm）；
+# 上止点时针夹顶到 z 49，机头底沉孔到 z 50
+clamp = Part.makeCylinder(5.5, 8, V(0, 0, zb - 1.5), V(0, 0, 1)).cut(Part.makeCylinder(4.0, 10, V(0, 0, zb - 2.5), V(0, 0, 1)))
+clamp = clamp.fuse(Part.makeCylinder(2.0, 4, V(0, -5, zb + 2.5), V(0, -1, 0)))                             # 紧针螺钉 M4
+clamp = clamp.fuse(Part.makeBox(3, 3, 3.5, V(-1.5, -7.5, zb - 1.5)).cut(Part.makeCylinder(0.9, 5, V(-2, -6, zb + 0.3), V(1, 0, 0))))  # 针杆线钩
 parts["needle_clamp"], mats["needle_clamp"] = clamp, "metal"
 tip_z = zb - X["tip_below"]
 shank = Part.makeCylinder(0.81, 10.0, V(0, 0, zb - 0.0), V(0, 0, 1))
@@ -280,6 +282,14 @@ spec_f.loader.exec_module(feedm)
 for k, (s, mat_, rk, spin) in feedm.build().items():
     parts[k], mats[k], dens[k] = s, mat_, feedm.RHO[rk]
 bal["feed_setting"] = feedm.SET
+
+# G4.7 压脚与操纵件（cad/ctrl.py）：压脚组、手抬、膝抬、松线、夹线器、针距旋钮、倒缝扳手
+spec_c = importlib.util.spec_from_file_location("wq_ctrl", os.path.join(HERE, "ctrl.py"))
+ctrlm = importlib.util.module_from_spec(spec_c)
+spec_c.loader.exec_module(ctrlm)
+for k, (s, mat_, rk, spin) in ctrlm.build().items():
+    parts[k], mats[k], dens[k] = s, mat_, ctrlm.RHO[rk]
+bal["press_state"] = ctrlm.PRESS
 
 out = dict(lk=TK, x=X, balance=bal, parts={})
 for k, s in parts.items():
