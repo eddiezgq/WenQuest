@@ -152,6 +152,7 @@ def build_mesh(g, h_gap=0.25, h=1.2):
                 tris.append([idx[int(n)] for n in row])
                 region.append(name)
     tris = np.array(tris)
+    g["_polys"] = polys
     # 以三角形质心再分一次（gmsh 实体质心对环形区域会落在原点）
     cen = xy[tris].mean(axis=1) * 1000
     rr = np.hypot(cen[:, 0], cen[:, 1])
@@ -283,3 +284,44 @@ def arkkio_torque(xy, tris, region, A, g, Lstk):
     area = 0.5 * np.abs(M[:, 0, 0] * M[:, 1, 1] - M[:, 0, 1] * M[:, 1, 0])
     r1, r2 = (g["R_si"] - g["gap"]) / 1000, g["R_si"] / 1000
     return Lstk / (MU0 * (r2 - r1)) * np.sum(area * r * Br_ * Bt_)
+
+
+def slot_halves(xy, tris, region, g):
+    """每个槽的左右两半各是哪些三角形、面积多大：(Q, 2) 的三角形下标列表与面积"""
+    cen = xy[tris].mean(axis=1)
+    th = np.arctan2(cen[:, 1], cen[:, 0]) % (2 * math.pi)
+    P = xy[tris]
+    area = 0.5 * np.abs((P[:, 1, 0] - P[:, 0, 0]) * (P[:, 2, 1] - P[:, 0, 1]) - (P[:, 2, 0] - P[:, 0, 0]) * (P[:, 1, 1] - P[:, 0, 1]))
+    Q = g["Q"]
+    halves = [[None, None] for _ in range(Q)]
+    for k in range(Q):
+        c = 2 * math.pi * (k + 0.5) / Q
+        d = ((th - c + math.pi) % (2 * math.pi)) - math.pi
+        for side, msk in ((0, d < 0), (1, d >= 0)):
+            sel = np.where((region == "slot") & msk & (np.abs(d) < math.pi / Q))[0]
+            halves[k][side] = (sel, area[sel].sum())
+    return halves
+
+
+def current_density(xy, tris, region, g, coils, Nc, i_abc):
+    """三相电流 i_abc = {A, B, C}（A，瞬时值）→ 每个三角形的电流密度 A/m²。线圈 k：去边在槽 k−1 右半，回边在槽 k 左半"""
+    Q = g["Q"]
+    halves = slot_halves(xy, tris, region, g)
+    J = np.zeros(len(tris))
+    for k, ph, sgn in coils:
+        I = sgn * Nc * i_abc[ph]
+        sel, a = halves[(k - 1) % Q][1]
+        J[sel] += I / a
+        sel, a = halves[k][0]
+        J[sel] -= I / a
+    return J
+
+
+def element_B(xy, tris, A):
+    """每个三角形的 |B|（T）"""
+    P = xy[tris]
+    a = A[tris]
+    M = np.stack([P[:, 1] - P[:, 0], P[:, 2] - P[:, 0]], axis=1)
+    dA = np.stack([a[:, 1] - a[:, 0], a[:, 2] - a[:, 0]], axis=1)
+    gr = np.linalg.solve(M, dA[..., None])[..., 0]
+    return np.hypot(gr[:, 0], gr[:, 1])
