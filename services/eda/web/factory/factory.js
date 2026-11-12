@@ -6,6 +6,8 @@ const T = {
     factory: "按哪家工厂的工艺能力查", gerber: "光绘和钻孔（一个 zip，或多个文件）", bom: "物料清单（CSV）", cpl: "贴片坐标（CSV）",
     demo: "用演示资料包", go: "检查", scope: "演示工厂都是虚构的，工艺能力是示例值。演示资料包是驱动板 A 版，故意漏了一个物料编号。",
     board: "板图", top: "顶面", bottom: "底面", boardHint: "点检查结果的一行，问题位置在板图上标出来。",
+    bomT: "物料清单（到外部库查）", bomHint: "同一物料编号、数值、封装合为一行。链接只拼对方网站的搜索地址、新窗口打开，内容以对方为准；不参与任何检查。LCSC 是嘉立创贴片用的深圳现货库。",
+    look: "到外部库查", noLink: "—（不猜）",
     qty: "数量统计（报价依据，只算量）", results: "检查结果", maps: "列映射与层（认错了在这里改，再点“检查”）",
     issues: "工程问题单", issuesHint: "AI 只拿到没通过的检查结果，不拿你的文件；每条问题必须引用一条检查结果。",
     draft: "AI 起草问题单", add: "加一条", confirm: "我已逐条看过，确认这份问题单", dlY: "下载问题单（YAML，给设计端）",
@@ -23,6 +25,8 @@ const T = {
     factory: "Factory capability table", gerber: "Gerber and drill (one zip or several files)", bom: "BOM (CSV)", cpl: "Placement (CSV)",
     demo: "Use the demo pack", go: "Check", scope: "Demo factories are fictional with example values. The demo pack is drive board A with one part number left out on purpose.",
     board: "Board", top: "Top", bottom: "Bottom", boardHint: "Click a result row to mark its locations on the board.",
+    bomT: "Bill of materials (look up outside)", bomHint: "Same part number, value and package merged into one row. Links only build a search address on the other website and open it in a new window; their content is theirs. Not part of any check. LCSC is the Shenzhen stock used by JLCPCB assembly.",
+    look: "Look up outside", noLink: "— (no guess)",
     qty: "Quantities (basis for quoting; counts only)", results: "Check results", maps: "Column and layer mapping (fix here, then Check again)",
     issues: "Engineering query", issuesHint: "AI sees only the open check results, never your files; every question must cite a result.",
     draft: "Draft the query with AI", add: "Add one", confirm: "I have read every item and confirm this query", dlY: "Download query (YAML, for design)",
@@ -124,10 +128,27 @@ function render() {
       `${r.refs && r.refs.length ? `<small>${esc(r.refs.slice(0, 20).join(" "))}</small>` : ""}</td></tr>`).join("");
   $("#qty").innerHTML = `<tr><th>${esc(t("name"))}</th><th>${esc(t("count"))}</th><th>${esc(t("note"))}</th></tr>` +
     S.quantity.rows.map(r => `<tr><td>${esc(r.name)}</td><td><b>${esc(r.value ?? "—")}</b></td><td>${esc(r.note)}</td></tr>`).join("");
+  renderBom();
   drawBoard();
   renderMaps();
   renderIssues();
 }
+
+// 第 158 轮：物料清单 + “到外部库查”（规则在 extlinks.js，模块加载后挂到 window.wqBomLinks）
+function renderBom() {
+  const box = $("#bomx");
+  if (!box || !S) return;
+  const rows = S.bom || [];
+  const fn = window.wqBomLinks || (() => []);
+  const k = t("keys");
+  box.innerHTML = rows.length ? `<tr><th>${esc(k.item)}</th><th>${esc(k.value)}</th><th>${esc(k.package)}</th><th>${esc(k.qty)}</th><th>${esc(t("look"))}</th></tr>` +
+    rows.map(r => {
+      const links = fn(r);
+      return `<tr><td>${esc(r.item)}</td><td>${esc(r.value)}</td><td><small>${esc(r.package)}</small></td><td>${esc(r.qty)}</td><td>` +
+        (links.length ? links.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener external">${esc(l.name)}</a>`).join(" · ") : esc(t("noLink"))) + `</td></tr>`;
+    }).join("") : "";
+}
+window.wqRenderBom = renderBom;
 
 // 板图：服务器给的 SVG（gerbonara 画的）；标记点用和铜层同一个坐标变换
 function drawBoard() {

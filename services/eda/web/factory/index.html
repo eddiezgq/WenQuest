@@ -57,6 +57,10 @@
     <h2 data-t="results">检查结果</h2>
     <div class="wrap"><table id="res"></table></div>
 
+    <h2 data-t="bomT">物料清单（到外部库查）</h2>
+    <p class="hint" data-t="bomHint">同一物料编号、数值、封装合为一行。链接只拼对方网站的搜索地址、新窗口打开，内容以对方为准；不参与任何检查。LCSC 是嘉立创贴片用的深圳现货库。</p>
+    <div class="wrap"><table id="bomx"></table></div>
+
     <details id="mapBox" class="unit">
       <summary data-t="maps">列映射与层（认错了在这里改，再点“检查”）</summary>
       <div id="maps"></div>
@@ -76,5 +80,11 @@
   </section>
 </main>
 <script src="factory.js"></script>
+<script type="module">
+  // 第 158 轮：“到外部库查”的链接规则（与数字工厂零件库同一份代码的副本，测试核对逐字相同）
+  import { bomLinks } from './extlinks.js';
+  window.wqBomLinks = bomLinks;
+  if (window.wqRenderBom) window.wqRenderBom();
+</script>
 </body>
 </html>
