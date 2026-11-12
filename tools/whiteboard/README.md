@@ -18,3 +18,16 @@
 ## 平台上（第 35 轮第 3 步）
 
 核心代码在网关 `services/gateway/app/production/whiteboard/`（编译、AI 写稿排板、声音处理），老师的白板课由 `app/whiteboards.py`（存储、后台生成、出 MP4）和 `app/whiteboard_api.py`（接口）管理；编辑器源码在 `apps/web/wb-editor/`（网页端镜像打包到 `/wb-editor/`）。这里的 `wb.py` 只用于本机做样片。使用说明见 `docs/帮助/白板课使用说明.md`。
+
+## 三维简画讲故事（第 162 轮）
+
+手绘线条的三维人物在三维场景里走动、说话、做事，镜头推拉摇移，用来讲工作场景的小故事（机构、零件动画仍用三维模型、Blender、Manim）。
+
+- 播放器：`services/gateway/app/production/whiteboard/scene3d.js`（人物骨架与约 25 种姿势、表情、发型和衣着；道具和场景；镜头；对话气泡与旁白字幕；每个镜头开头一笔一笔画出来）。
+- 故事：`<故事目录>/story.yaml`——演员（外形、声音）、场景（道具清单）、镜头（机位关键帧、人物站位、每一拍谁说什么、谁做什么）。时间全部按配音长度自动排。
+- 出片：
+
+      WQ_TTS_MODELS=<kokoro 模型目录> python3 tools/whiteboard/story.py <故事目录> [--mp4] [--snap 秒,秒]
+
+  输出在 `<故事目录>/out/`（不进仓库）：`story.html`（网页版，暂停时可拖动画面转视角）、`story.mp4`（1280×720，30 帧/秒，每帧约 0.1 秒）。
+- 样片：`samples/白板讲课/三维故事/老板不在的那一周/`（原创人物与情节，AI 配音）。
