@@ -67,7 +67,18 @@ JOINT = {frozenset(p) for p in [
     ("tension_post", "tension_discs"), ("tension_discs", "release_pin"), ("tension_discs", "tension_spring"), ("tension_spring", "tension_nut"),
     ("tension_nut", "tension_post"), ("check_spring", "tension_post"), ("tension_spring", "tension_post"),
     ("stitch_dial", "casting"), ("stitch_dial", "pull_rod"), ("pull_rod", "regulator"), ("pull_rod", "reverse_lever"), ("reverse_lever", "casting"),
-    ("reverse_spring", "pull_rod"), ("reverse_spring", "casting"), ("thread_guide", "casting")]}
+    ("reverse_spring", "pull_rod"), ("reverse_spring", "casting"), ("thread_guide", "casting"),
+    # G4.8 选配件（cad/opt.py）：轴和轴套、球头、滚子在凸轮槽里、动刀贴着定刀剪、电磁铁推杆、支架螺在机壳上
+    ("moving_knife", "knife_shaft"), ("moving_knife", "fixed_knife"), ("knife_shaft", "trim_base"), ("moving_knife", "trim_base"),
+    ("trim_base", "casting"), ("trim_link", "knife_shaft"), ("trim_link", "trim_rock"), ("trim_rock", "trim_lever"),
+    ("trim_lever", "trim_roller"), ("trim_roller", "trim_cam"), ("trim_cam", "lower_shaft"), ("trim_rock", "trim_brackets"),
+    ("trim_brackets", "casting"), ("trim_solenoid", "trim_brackets"), ("trim_solenoid", "trim_lever"),
+    ("wiper", "casting"), ("wiper", "wiper_solenoid"), ("wiper_solenoid", "casting"), ("release_arm_t", "release_lever"),
+    ("release_solenoid", "release_arm_t"), ("release_solenoid", "casting"), ("estep_motor", "estep_bracket"),
+    ("estep_bracket", "casting"), ("estep_pulley_m", "estep_motor"), ("estep_pulley_m", "estep_belt"), ("estep_pulley_r", "estep_belt"),
+    ("estep_pulley_r", "regulator"), ("estep_pulley_r", "casting"), ("reverse_button", "casting"), ("estep_pulley_m", "estep_bracket")]}
+# G4.8：动刀在针板和旋梭之间，和旋梭、梭壳、送布牙排的间隙按 0.5 mm 查（真机这里也只有零点几毫米）
+TIGHT = {frozenset(p): 0.5 for p in [("moving_knife", "hook"), ("moving_knife", "bobbin_case"), ("moving_knife", "feed_bar")]}
 
 
 def mat(m):
@@ -113,7 +124,7 @@ for f in FR[::max(1, STEP // 2)]:
                 worst[key] = (round(d, 3), f["phi"])
     first = False
 res = sorted(([k, v[0], v[1]] for k, v in worst.items()), key=lambda x: x[1])
-bad = [r for r in res if r[1] < LIMIT]
+bad = [r for r in res if r[1] < TIGHT.get(frozenset(r[0].split(" | ")), LIMIT)]
 out = dict(limit_mm=LIMIT, step_deg=STEP, frames=len(FR[::max(1, STEP // 2)]), seconds=round(time.time() - t0), pairs=res, too_close=bad)
 json.dump(out, open(os.path.join(D, "clearance.json"), "w"), ensure_ascii=False, indent=1)
 print(json.dumps(dict(too_close=bad, closest=res[:8], seconds=out["seconds"]), ensure_ascii=False))

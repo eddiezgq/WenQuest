@@ -291,6 +291,17 @@ for k, (s, mat_, rk, spin) in ctrlm.build().items():
     parts[k], mats[k], dens[k] = s, mat_, ctrlm.RHO[rk]
 bal["press_state"] = ctrlm.PRESS
 
+# G4.8 选配件（cad/opt.py）：WQ_OPT=T,E。带 E 的去掉 G4.7 的机械针距件（针距拉杆、旋钮、倒缝扳手、拉簧）
+spec_o = importlib.util.spec_from_file_location("wq_opt", os.path.join(HERE, "opt.py"))
+optm = importlib.util.module_from_spec(spec_o)
+spec_o.loader.exec_module(optm)
+if "E" in optm.OPT:
+    for k in optm.E_REMOVE:
+        parts.pop(k, None)
+for k, (s, mat_, rk, spin) in optm.build().items():
+    parts[k], mats[k], dens[k] = s, mat_, optm.RHO[rk]
+bal["options"] = sorted(optm.OPT)
+
 out = dict(lk=TK, x=X, balance=bal, parts={})
 for k, s in parts.items():
     s.exportStep(os.path.join(OUT, f"{k}.step"))

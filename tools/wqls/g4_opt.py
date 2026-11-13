@@ -42,7 +42,7 @@ GEO = dict(
     knife_plane=(-5.9, -4.9),
     plate_bottom=-2.5,
     # ③ 动刀：轴竖直，在针的左后方；刀尖在最前时越过针 3 mm，最后时退到 x −15
-    knife=dict(pivot=(-10.0, 40.0), tip_fwd=(3.0, 1.0), tip_rest_x=-15.0, arm_z=(-9.0, -7.0), hub_r=6.0,
+    knife=dict(pivot=(-10.0, 40.0), tip_fwd=(3.0, 1.0), tip_rest_x=-13.0, arm_z=(-9.0, -7.0), hub_r=6.0,
                shaft_d=8.0, shaft_z=(-52.0, -7.0), crank_z=-50.0, crank_r=8.0, edge_back=6.0),
     fixed=dict(x_edge=-12.0, y=(-5.0, 4.0), z=(-4.9, -2.5), x_back=-22.0, screw_x=-16.0),
     base=dict(z=(-14.0, -10.0), bushing=(-30.0, -14.0)),        # 动刀轴座（钢板，螺在机座顶板下面两个凸台上）
@@ -52,10 +52,11 @@ GEO = dict(
     solenoid_trim=dict(x=(108.0, 124.0), stroke=5.0, d=22.0),     # 推摆杆沿摆轴进槽（沿 +x）
     # ⑤ 松线电磁铁：拉立轴拨杆上加的第三条臂（朝 +y 10）往 −x；拨线器：机头左前下方的竖轴
     sol_release=dict(arm=(0.0, 10.0), x=(40.0, 62.0), d=16.0, stroke=3.0),
-    wiper=dict(pivot=(-36.0, -22.0), z=(4.0, 38.0), wire_d=1.2, wire_z=4.2, r=34.0, rest_deg=200.0, sweep_deg=75.0,
-               sol=dict(x=(-58.0, -40.0), z=60.0, d=16.0, stroke=6.0)),
+    # 拨线器：竖轴 (−30, −10) 从机头底板的轴座伸下来；钢丝 Ø1.2 在 z 4.6，长 31；收回时朝 −100°（在压脚前面外侧），扫到 +15° 时钩尖过针前
+    wiper=dict(pivot=(-30.0, -10.0), wire_d=1.2, wire_z=4.6, r=31.0, rest_deg=-100.0, sweep_deg=115.0,
+               sol=dict(x=(-26.0, -12.0), z=61.5, d=16.0, stroke=10.0)),
     # ⑥ 电子针距：步进电机在机座里，轴沿 x，经同步带转调节器轴（G4.6 调节器轴 x 297…310、y 0、z −50）
-    estep=dict(motor_axis=(-24.0, -40.0), x_face=270.0, pulley_x=(286.0, 296.0)),
+    estep=dict(motor_axis=(-24.0, -35.0), x_face=270.0, pulley_x=(286.0, 296.0)),
 )
 
 
@@ -208,15 +209,21 @@ def solenoids():
                SF=round(15.0 / need_rel, 2), opening_mm=round(GEO["sol_release"]["stroke"] * r_pin / r_sol - 0.5, 2),
                note="行程 3 mm：先走完松线销 0.5 mm 的空程，再推开夹线盘")
     w = GEO["wiper"]
-    wip = dict(pick="24 V 推拉式电磁铁 Ø16（示例：行程 6 mm 时 12 N）", sweep_deg=w["sweep_deg"], r_mm=w["r"],
-               t_sweep_ms=60, note="电磁铁经机头里的小曲柄（半径 4.6）转拨线轴 75°；拨线钩是 Ø1.2 弹簧钢丝")
+    wip = dict(pick="24 V 拉式电磁铁 Ø16（示例：行程 10 mm 时 8 N）", sweep_deg=w["sweep_deg"], r_mm=w["r"],
+               t_sweep_ms=60, note="电磁铁经机头里的小曲柄（半径 5）转拨线轴 115°（曲柄过死点前后各 57.5°，行程 2 × 5 sin 57.5° = 8.4）；拨线钩是 Ø1.2 弹簧钢丝",
+               needle_tip_min_mm=round(w["wire_z"] + w["wire_d"] / 2 + 1.0, 1))
     return dict(trim=trim, release=rel, wiper=wip, ok=trim["SF"] >= 1.5 and rel["SF"] >= 1.5)
 
 
 def trim_speed(t, kn):
     """剪线转速上限：① 动刀回到最后（75°）以后、针尖碰布（留 5°）以前停住；② 电磁铁合上：凸轮入口段（静止段）要装得下延迟变化"""
     stop_lo = SEG["ret"][1] - 360
-    stop_hi = t["needle_reaches_fabric"] - 5.0
+    # 停针上限：针尖碰布面前留 5°；拨线钩要从停住的针尖下面扫过（针尖离钢丝顶 ≥ 1.0）
+    fr = t["_fr"]
+    tip_min = GEO["wiper"]["wire_z"] + GEO["wiper"]["wire_d"] / 2 + 1.0
+    ph = [p for p, z in zip(fr["phi"], fr["tip"]) if 60 <= p <= 120 and z >= tip_min]
+    stop_wiper = max(ph)
+    stop_hi = min(t["needle_reaches_fabric"] - 5.0, stop_wiper)
     W = (stop_hi - stop_lo) * DEG
     n_stop = math.sqrt(2 * ALPHA_STOP * W) * 60 / (2 * math.pi)
     gate = (100.0, SEG["rise"][0] - 5.0)                 # 滚子可以进槽的入口段（退出斜面之后、进刀之前留 5°）
@@ -224,7 +231,8 @@ def trim_speed(t, kn):
     dt = (15 - 5) / 1000.0
     n_gate = (gate_w - 10.0) / (6 * dt) if gate_w > 10 else 0.0
     n_ok = 300.0
-    return dict(stop_window=[stop_lo, round(stop_hi, 1)], n_stop_max=round(n_stop), gate=list(gate),
+    return dict(stop_window=[stop_lo, round(stop_hi, 1)], stop_hi_fabric=round(t["needle_reaches_fabric"] - 5.0, 1), stop_hi_wiper=stop_wiper,
+                n_stop_max=round(n_stop), gate=list(gate),
                 gate_deg=gate_w, n_gate_max=round(n_gate), n_trim_max=round(min(n_stop, n_gate)),
                 n_trim_default=n_ok, ok=min(n_stop, n_gate) >= n_ok)
 
@@ -312,7 +320,9 @@ def main():
     frames = json.loads((D / "frames.json").read_text())["frames"]
     t, fr = timing(frames)
     kn = knife()
-    res = dict(geo=GEO, timing={k: (round(v, 1) if isinstance(v, float) else v) for k, v in t.items()}, cam_segments=SEG,
+    t["_fr"] = {k: [float(x) for x in v] for k, v in fr.items()}
+    tt = {k: (round(v, 1) if isinstance(v, float) else v) for k, v in t.items() if not k.startswith("_")}
+    res = dict(geo=GEO, timing=tt, cam_segments=SEG,
                knife=kn | {"cut_deg": cut_angle(kn)}, forces=forces(kn, 300.0), solenoids=solenoids(),
                trim_speed=trim_speed(t, kn), thread_tail=thread_tail(t, kn, fr), efeed=efeed_all(t))
     res["all_ok"] = all(res[k]["ok"] for k in ("forces", "solenoids", "trim_speed", "efeed"))
