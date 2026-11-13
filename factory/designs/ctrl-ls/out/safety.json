@@ -5,10 +5,10 @@
     314.15,
     216.0,
     "In1",
-    "zone GND_ISO zone:f83128a4-33fe-4780-ab68-b6c5279a2903 ↔ zone GND zone:eb4afa8d-d3e8-44b0-bf48-e81c23f16be9"
+    "zone GND_ISO zone:57c6c8d0-77b4-4ded-afaf-96bbc3f6bbe7 ↔ zone GND zone:5473236d-1a04-47ec-8f38-16826acb8edf"
    ]
   ],
-  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:f83128a4-33fe-4780-ab68-b6c5279a2903 ↔ zone GND zone:eb4afa8d-d3e8-44b0-bf48-e81c23f16be9）",
+  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:57c6c8d0-77b4-4ded-afaf-96bbc3f6bbe7 ↔ zone GND zone:5473236d-1a04-47ec-8f38-16826acb8edf）",
   "example": true,
   "groups": [
    [
@@ -178,13 +178,13 @@
  {
   "at": [
    [
-    121.63,
-    122.08,
+    115.91,
+    140.46,
     "In1",
-    "pth PE C102 ↔ zone GND zone:eb4afa8d-d3e8-44b0-bf48-e81c23f16be9"
+    "pth PE C103 ↔ zone GND zone:5473236d-1a04-47ec-8f38-16826acb8edf"
    ]
   ],
-  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:eb4afa8d-d3e8-44b0-bf48-e81c23f16be9）",
+  "detail": "最近 4.20 mm（In1 层，pth PE C103 ↔ zone GND zone:5473236d-1a04-47ec-8f38-16826acb8edf）",
   "example": true,
   "groups": [
    [
@@ -351,13 +351,13 @@
  {
   "at": [
    [
-    120.63,
-    148.63,
+    135.31,
+    126.23,
     "F",
-    "track L_F ↔ pth N_C C103"
+    "track L_C ↔ pth N_IN RV101"
    ]
   ],
-  "detail": "最近 3.27 mm（F 层，track L_F ↔ pth N_C C103）",
+  "detail": "最近 2.60 mm（F 层，track L_C ↔ pth N_IN RV101）",
   "example": true,
   "groups": [
    [
@@ -379,18 +379,18 @@
   "source": "示例值",
   "status": "pass",
   "unit": "mm",
-  "value": 3.265
+  "value": 2.603
  },
  {
   "at": [
    [
-    305.18,
-    129.96,
+    303.45,
+    142.2,
     "B",
-    "zone VBUS zone:906c4344-d8cf-4f46-b57f-6e86cf358135 ↔ track N_U"
+    "zone VBUS zone:51764e8f-2d92-467d-9a4d-e426d2fbdc65 ↔ track N_U"
    ]
   ],
-  "detail": "最近 2.20 mm（B 层，zone VBUS zone:906c4344-d8cf-4f46-b57f-6e86cf358135 ↔ track N_U）",
+  "detail": "最近 2.20 mm（B 层，zone VBUS zone:51764e8f-2d92-467d-9a4d-e426d2fbdc65 ↔ track N_U）",
   "example": true,
   "groups": [
    [
