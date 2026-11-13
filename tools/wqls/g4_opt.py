@@ -44,14 +44,14 @@ GEO = dict(
     # ③ 动刀：轴竖直，在针的左后方；刀尖在最前时越过针 3 mm，最后时退到 x −15
     knife=dict(pivot=(-10.0, 40.0), tip_fwd=(3.0, 1.0), tip_rest_x=-13.0, arm_z=(-9.0, -7.0), hub_r=6.0,
                shaft_d=8.0, shaft_z=(-52.0, -7.0), crank_z=-50.0, crank_r=8.0, edge_back=6.0),
-    fixed=dict(x_edge=-12.0, y=(-5.0, 4.0), z=(-4.9, -2.5), x_back=-22.0, screw_x=-16.0),
+    fixed=dict(x_edge=-12.0, y=(-5.0, 4.0), z=(-4.9, -2.5), x_back=-20.5, screw_x=-16.0),
     base=dict(z=(-14.0, -10.0), bushing=(-30.0, -14.0)),        # 动刀轴座（钢板，螺在机座顶板下面两个凸台上）
     rock=dict(y=60.0, z=-30.0, x=(-25.0, 150.0), d=10.0, crank_r=20.0, crank_x=-18.0, boss_x=(-12.0, 138.0)),
-    cam=dict(x=(140.0, 150.0), rho0=14.0, groove_w=8.4, roller_d=8.0, groove_depth=4.0, lever_x=(126.0, 136.0)),
+    cam=dict(x=(140.0, 150.0), rho0=14.0, groove_w=8.4, roller_d=8.0, groove_depth=4.0, lever_x=(126.0, 134.0)),
     link=dict(d=6.0, ball_d=8.0),
     solenoid_trim=dict(x=(108.0, 124.0), stroke=5.0, d=22.0),     # 推摆杆沿摆轴进槽（沿 +x）
     # ⑤ 松线电磁铁：拉立轴拨杆上加的第三条臂（朝 +y 10）往 −x；拨线器：机头左前下方的竖轴
-    sol_release=dict(arm=(0.0, 10.0), x=(40.0, 62.0), d=16.0, stroke=3.0),
+    sol_release=dict(arm=(0.0, 10.0), x=(47.0, 64.0), d=16.0, stroke=3.0),
     # 拨线器：竖轴 (−30, −10) 从机头底板的轴座伸下来；钢丝 Ø1.2 在 z 4.6，长 31；收回时朝 −100°（在压脚前面外侧），扫到 +15° 时钩尖过针前
     wiper=dict(pivot=(-30.0, -10.0), wire_d=1.2, wire_z=4.6, r=31.0, rest_deg=-100.0, sweep_deg=115.0,
                sol=dict(x=(-26.0, -12.0), z=61.5, d=16.0, stroke=10.0)),

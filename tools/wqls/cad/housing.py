@@ -473,7 +473,7 @@ def opt_seats(hollow, solid, info):
       ① 动刀轴座 2 × M4（x −28、8，y 40）；② 剪线摆轴座 4 × M5（x −8、99，y 55、65）；③ 电子针距电机板 2 × M5（x 275，y −42、−6）；
     机头：④ 拨线轴座（底板上 Ø12 凸台 z 42…54，孔 Ø4 H7，从下面钻铰）；⑤ 拨线电磁铁托板 M4（底板上 Ø12 凸台，从下面钻通攻丝）；
           ⑥ 倒缝按钮孔 Ø12（前壁 x −30、z 80）；
-    机臂：⑦ 松线电磁铁 2 × Ø4.5 通孔（前壁 x 45、58，z 188；内面 Ø12 凸台，螺钉从外面拧进电磁铁支架）。"""
+    机臂：⑦ 松线电磁铁 2 × Ø4.5 通孔（前壁 x 50、58，z 188；内面 Ø12 凸台，螺钉从外面拧进电磁铁支架）。"""
     oj = os.path.join(os.path.dirname(_tkj), "选配件.json")
     if not os.path.exists(oj):
         return hollow
@@ -485,7 +485,7 @@ def opt_seats(hollow, solid, info):
     feats = [Part.makeCylinder(6.0, 5.5, V(x_, y_, -10.5), V(0, 0, 1)) for x_, y_, _ in pads_l]
     feats += [Part.makeCylinder(6.0, 12.0, V(wx, wy, 42.0), V(0, 0, 1)),                                   # ④
               Part.makeCylinder(6.0, 3.0, V(-19.0, wy - 5.0, 50.0), V(0, 0, 1)),                            # ⑤
-              Part.makeCylinder(6.0, 5.0, V(45.0, -43.0, 188.0), V(0, 1, 0)), Part.makeCylinder(6.0, 5.0, V(58.0, -43.0, 188.0), V(0, 1, 0))]   # ⑦
+              Part.makeCylinder(6.0, 5.0, V(50.0, -43.0, 188.0), V(0, 1, 0)), Part.makeCylinder(6.0, 5.0, V(58.0, -43.0, 188.0), V(0, 1, 0))]   # ⑦
     for f_ in feats:
         hollow = fuse_fillet(hollow, f_.common(solid))
     if FEA_SIMPLE:
@@ -494,10 +494,10 @@ def opt_seats(hollow, solid, info):
     holes += [Part.makeCylinder(2.05, 16.0, V(wx, wy, 40.0), V(0, 0, 1)),
               Part.makeCylinder(1.65, 12.0, V(-19.0, wy - 5.0, 43.0), V(0, 0, 1)),
               Part.makeCylinder(6.0, 12.0, V(-30.0, -52.0, 80.0), V(0, 1, 0)),
-              Part.makeCylinder(2.25, 14.0, V(45.0, -50.0, 188.0), V(0, 1, 0)), Part.makeCylinder(2.25, 14.0, V(58.0, -50.0, 188.0), V(0, 1, 0))]
+              Part.makeCylinder(2.25, 14.0, V(50.0, -50.0, 188.0), V(0, 1, 0)), Part.makeCylinder(2.25, 14.0, V(58.0, -50.0, 188.0), V(0, 1, 0))]
     for h_ in holes:
         hollow = hollow.cut(h_)
-    info["opt_seats"] = dict(pads_lower=[p[:2] for p in pads_l], wiper=(wx, wy), reverse_button=(-30.0, 80.0), release_sol=[(45.0, 188.0), (58.0, 188.0)])
+    info["opt_seats"] = dict(pads_lower=[p[:2] for p in pads_l], wiper=(wx, wy), reverse_button=(-30.0, 80.0), release_sol=[(50.0, 188.0), (58.0, 188.0)])
     return hollow
 
 

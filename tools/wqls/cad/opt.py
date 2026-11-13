@@ -116,11 +116,12 @@ def roller_rest():
 
 
 def knife_poly():
-    """动刀（前进到最前时）的折线：刀轴 → 竖直往前到 y 18（这一段在机座顶板下面，z −9…−7）→ 拐到 (−7.5, 9) → 刀尖；
+    """动刀（前进到最前时）的折线：刀轴 → 拐点 (−9.5, 7) → 抬起点 (−6, 5.3) → 刀尖；前两段在 z −8.6…−6.6
+    （从机座顶板下面过去，离顶板底 1.0；这一段都在 x < −6.5，送布牙排侧梁从 x −6.5 才开始），从抬起点到刀尖是刀片（z −5.9…−4.9）。
     再按 a_rest − a_fwd 转回最后的位置画（零件按静止位置画）"""
     k = GEO["knife"]
     px, py = k["pivot"]
-    fwd = [(px, py), (-10.0, 17.0), (-7.5, 8.6), tuple(k["tip_fwd"])]
+    fwd = [(px, py), (-9.5, 7.0), (-6.0, 5.3), tuple(k["tip_fwd"])]
     back = (OP["knife"]["a_rest_deg"] - OP["knife"]["a_fwd_deg"]) * DEG
     return [rot_z(p, (px, py), back) for p in fwd], back
 
@@ -132,15 +133,15 @@ def build_T():
     kz0, kz1 = GEO["knife_plane"]
     # ---- 动刀：刀轴 Ø8（z −52…−7）+ 刀座（z −9…−7）+ 下端曲柄（朝 −x，半径 8，z −52…−48）+ 刀片
     poly, back = knife_poly()
-    arm = strip(poly[:3], 5.0, -9.0, -7.0)                          # 机座顶板下面的一段（离顶板底 1.4）
-    rise = strip(poly[1:3], 5.0, -9.0, kz1)                         # 进了针板座开口（|y| < 18）以后抬到刀片平面
-    blade = strip(poly[2:], 4.0, kz0, kz1)
+    arm = strip(poly[:2], 5.0, -8.6, -6.6).fuse(strip(poly[1:3], 4.0, -8.6, -6.6))     # 低的一段（离机座顶板底 1.0）
+    rise = cyl(2.0, (poly[2][0], poly[2][1], -8.6), (poly[2][0], poly[2][1], kz1))           # 抬到刀片平面
+    blade = strip(poly[2:], 3.5, kz0, kz1)
+    hub = cyl(k["hub_r"], (px, py, -9.0), (px, py, -6.6))
     tip = poly[3]
     # 刀尖的钩：刀尖往后 6 处朝 −y 开一个 2 宽的缺口（钩线），内刃在缺口里
     hook = cyl(1.2, (tip[0] - 4.0 * math.cos(back), tip[1] - 4.0 * math.sin(back) - 1.6, kz0 - 1), (tip[0] - 4.0 * math.cos(back), tip[1] - 4.0 * math.sin(back) - 1.6, kz1 + 1))
     knife = arm.fuse(rise).fuse(blade).cut(hook)
     shaft = cyl(k["shaft_d"] / 2, (px, py, k["shaft_z"][0]), (px, py, k["shaft_z"][1]))
-    hub = cyl(k["hub_r"], (px, py, -9.0), (px, py, -7.0))
     crank = strip([(px, py), (px - k["crank_r"], py)], 8.0, k["crank_z"] - 2.0, k["crank_z"] + 2.0)
     pin = cyl(2.0, (px - k["crank_r"], py, k["crank_z"] - 6.0), (px - k["crank_r"], py, k["crank_z"]))
     P["moving_knife"] = (knife.fuse(hub), "chrome", "steel", "knife")
@@ -170,8 +171,8 @@ def build_T():
             b_ = b_.cut(cyl(2.75, ((xa + xb) / 2, yy, -21.0), ((xa + xb) / 2, yy, -9.0)))
         brk = b_ if brk is None else brk.fuse(b_)
     st_ = GEO["solenoid_trim"]
-    shelf = box(94.0, st_["x"][1], Sy - 6.0, Sy + 6.0, Sz - 16.0 - st_["d"] / 2 - 3.0, Sz - 16.0 - st_["d"] / 2).fuse(
-        box(94.0, 104.0, Sy - 6.0, Sy + 6.0, Sz - 16.0 - st_["d"] / 2 - 3.0, Sz - 8.0))
+    shelf = box(94.0, st_["x"][1], Sy - 6.0, Sy + 6.0, Sz - 18.0 - st_["d"] / 2 - 3.0, Sz - 18.0 - st_["d"] / 2).fuse(
+        box(94.0, 104.0, Sy - 6.0, Sy + 6.0, Sz - 18.0 - st_["d"] / 2 - 3.0, Sz - 8.0))
     P["trim_brackets"] = (brk.fuse(shelf), "metal", "steel", None)
     # ---- 球头拉杆：沿 y，从动刀曲柄销 (−18, 40, −50) 到摆轴曲柄销 (−18, 60, −50)
     lk = GEO["link"]
@@ -188,8 +189,8 @@ def build_T():
     armL = Part.makeBox(lx1 - lx0, L, 8.0, V(lx0, 0.0, -4.0))
     armL.rotate(V(0, 0, 0), V(1, 0, 0), ang)                 # 沿 +y 画的臂转到朝滚子
     armL.translate(V(0, Sy, Sz))
-    stud = cyl(2.0, (lx1 - 1.0, Ry, Rz), (lx1 + 4.0, Ry, Rz))
-    roll = cyl(cm["roller_d"] / 2, (lx1 - 1.0 + 0.0, Ry, Rz), (lx1 + 3.0, Ry, Rz))
+    stud = cyl(2.0, (lx1 - 1.0, Ry, Rz), (lx1 + 5.5, Ry, Rz))
+    roll = cyl(cm["roller_d"] / 2, (lx1 + 1.0, Ry, Rz), (lx1 + 5.0, Ry, Rz))           # 静止时 x 135…139，剪线时推进 5 到 140…144（槽深 4）
     P["trim_lever"] = (hubl.fuse(armL).fuse(stud).fuse(cyl(4.5, (lx0, Ry, Rz), (lx1, Ry, Rz))), "metal", "steel", "tlever")
     P["trim_roller"] = (roll, "chrome", "steel", "tlever")
     # ---- 剪线凸轮：下轴 x 140…150 上的盘，左端面开槽（深 4、宽 8.4）；槽中心线半径 = rho0 + s(φ)
@@ -234,9 +235,10 @@ def build_T():
     P["trim_cam"] = (disc.cut(groove), "metal", "steel", "low")
     # ---- 剪线电磁铁：在摆轴下面（z −46），平行于摆轴，推杆顶摆杆的叉（沿 +x）
     st = GEO["solenoid_trim"]
-    sol = cyl(st["d"] / 2, (st["x"][0], Sy, Sz - 16.0), (st["x"][1], Sy, Sz - 16.0)).fuse(
-        cyl(2.5, (st["x"][1], Sy, Sz - 16.0), (lx0 - 0.5, Sy, Sz - 16.0)))
-    sol = sol.fuse(box(lx0 - 0.5, lx0 + 2.0, Sy - 2.0, Sy + 2.0, Sz - 18.5, Sz - 9.0))       # 推杆头上的叉，顶摆杆轮毂
+    zs = Sz - 18.0                                                  # 电磁铁在摆轴下面（顶离摆轴 2）
+    sol = cyl(st["d"] / 2, (st["x"][0], Sy, zs), (st["x"][1], Sy, zs)).fuse(
+        cyl(2.5, (st["x"][1], Sy, zs), (lx0 - 0.5, Sy, zs)))
+    sol = sol.fuse(box(lx0 - 0.5, lx0 + 2.0, Sy - 2.0, Sy + 2.0, zs - 2.5, Sz - 9.0))       # 推杆头上的叉，顶摆杆轮毂
     P["trim_solenoid"] = (sol, "graphite", "copper", None)
     # ---- 拨线器：竖轴在 (−30, −10)，从机头底板（z 46…50.5）的轴座伸下来到 z 4；钢丝 Ø1.2 在 z 4.6，收回时朝 −y 偏 −100°
     wp = GEO["wiper"]
@@ -259,7 +261,7 @@ def build_T():
     rarm = strip([(pvx, pvy), tipr], 6.0, 186.0, 190.0).cut(cyl(2.55, (pvx, pvy, 185.0), (pvx, pvy, 191.0)))
     P["release_arm_t"] = (rarm, "metal", "steel", None)
     P["release_solenoid"] = (cyl(sr["d"] / 2, (sr["x"][0], tipr[1], 188.0), (sr["x"][1], tipr[1], 188.0)).fuse(
-        cyl(1.5, (sr["x"][1], tipr[1], 188.0), (tipr[0] - 1.5, tipr[1], 188.0))).fuse(box(43.0, 60.0, -38.0, tipr[1] - 6.0, 184.0, 192.0)), "graphite", "copper", None)
+        cyl(1.5, (sr["x"][1], tipr[1], 188.0), (tipr[0] - 1.5, tipr[1], 188.0))).fuse(box(47.0, 60.0, -38.0, tipr[1] - 6.0, 184.0, 192.0)), "graphite", "copper", None)
     return P
 
 
