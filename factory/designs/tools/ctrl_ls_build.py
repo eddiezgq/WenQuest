@@ -286,21 +286,15 @@ def board_build(route, jar):
                           lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"]), box(ox, oy, ox + w_, oy + h_),
                           kos)
         print("引出线（器件自己引脚比布线间距近的焊盘）：", n_stub)
-        # 给加宽留地方：大电流分类先用细线布，布线间距多留（目标线宽 − 布线线宽）/ 2，别的线、过孔就不会贴着细线放，
-        # 布完才加得宽（159d2c：交流、升压线在接地过孔旁边加不宽，大电流线宽查不过；直接用粗线布又布不通）。
-        # 只给布线器用；设计规则检查、安全距离按原来的数
-        grow = {c["name"]: (c["track_mm"] - c["route_mm"]) / 2 for c in D.X["net_classes"]
-                if c.get("route_mm") and c["route_mm"] >= 1.0}
-        r_cls = {k: (v[0], v[1] + 2 * grow.get(k, 0.0)) + tuple(v[2:]) for k, v in gb.classes_of(D.X).items()}
-        r_pairs = [(a, b, round(c + grow.get(a, 0.0) + grow.get(b, 0.0), 3)) for a, b, c in gb.pairs_of(D.X)]
-        stats = gb.autoroute(board, TMP, jar, r_cls, passes=30, keepouts=keep, pairs=r_pairs, timeout=3000)
+        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep, pairs=gb.pairs_of(D.X),
+                             timeout=3000)
         print("去掉重复的固定线：", RF.dedupe(board))
         # 第二遍：带着第一遍的线再给布线器，只补没连上的（第十三次布线剩 8 处，多是第一遍绕不开的几根）
         board.BuildConnectivity()
         left = board.GetConnectivity().GetUnconnectedCount(False)
         if left:
-            stats = gb.autoroute(board, TMP, jar, r_cls, passes=30, keepouts=keep, pairs=r_pairs, timeout=1500,
-                                 replace=True)
+            stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep, pairs=gb.pairs_of(D.X),
+                                 timeout=1500, replace=True)
             print("第二遍（第一遍剩 {} 处）：".format(left), stats, "；去重：", RF.dedupe(board))
         print("补线（两遍都没接上的，直线或一个拐角）：", RF.finish(board, class_of, clearance, lambda n: width.get(n, 0.25),
                                                        lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"]), keepouts=kos))

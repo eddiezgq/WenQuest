@@ -329,10 +329,13 @@ def finish(board, class_of, clearance, width_of, layers_of, skip=("GND", "GND_IS
                         legs = zip(path, path[1:], strict=False)
                         shape = unary_union([LineString([u, v]).buffer(w / 2) for u, v in legs])
                         ok = not any(lid[ln] in lays and shape.intersects(k) for k, lays in keepouts)
+                        ends = [g for g in (its[x][2], its[y][2])]
                         for onet, olay, og, oref, _c in its if ok else ():
                             if onet == net or lid[ln] not in olay:
                                 continue
-                            need = 0.15 if (oref in refs) else clearance(net, onet)
+                            need = clearance(net, onet)
+                            if oref in refs:  # 两头焊盘所在器件的邻脚：不比两个焊盘之间更近（与 widen 同一口径）
+                                need = min(need, min(e.distance(og) for e in ends))
                             if og.distance(shape) < need:
                                 ok = False
                                 break
