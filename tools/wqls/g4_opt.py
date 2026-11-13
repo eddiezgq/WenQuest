@@ -44,7 +44,7 @@ GEO = dict(
     # ③ 动刀：轴竖直，在针的左后方；刀尖在最前时越过针 3 mm，最后时退到 x −15
     knife=dict(pivot=(-10.0, 40.0), tip_fwd=(3.0, 1.0), tip_rest_x=-13.0, arm_z=(-9.0, -7.0), hub_r=6.0,
                shaft_d=8.0, shaft_z=(-52.0, -7.0), crank_z=-50.0, crank_r=8.0, edge_back=6.0),
-    fixed=dict(x_edge=-12.0, y=(-5.0, 4.0), z=(-4.9, -2.5), x_back=-20.5, screw_x=-16.0),
+    fixed=dict(x_edge=-8.0, y=(-5.0, 4.0), z=(-4.9, -2.5), x_back=-20.5, screw_x=-16.0),
     base=dict(z=(-14.0, -10.0), bushing=(-30.0, -14.0)),        # 动刀轴座（钢板，螺在机座顶板下面两个凸台上）
     rock=dict(y=60.0, z=-30.0, x=(-25.0, 150.0), d=10.0, crank_r=20.0, crank_x=-18.0, boss_x=(-12.0, 138.0)),
     cam=dict(x=(140.0, 150.0), rho0=14.0, groove_w=8.4, roller_d=8.0, groove_depth=4.0, lever_x=(126.0, 134.0)),
@@ -248,7 +248,9 @@ def thread_tail(t, kn, fr):
     loop = math.pi * 11.2
     L = eye_h + plane + horiz + loop
     return dict(cut_deg=pc, eye_above_plate=round(eye_h, 1), tail_est_mm=round(L, 1), tail_min_mm=35.0,
-                bobbin_tail_est_mm=round(plane - GEO["plate_bottom"] + 1.5, 1), ok=bool(L >= 35.0),
+                bobbin_tail_est_mm=round(plane + horiz, 1), bobbin_tail_max_mm=15.0,
+                bobbin_note="布底下的底线头 ≈ 刀片平面到布面的深度 + 针孔到定刀刃的距离；定刃不能再靠近针孔：x −6.5…−3.5 是送布牙排",
+                ok=bool(L >= 35.0 and plane + horiz <= 15.0),
                 note="估算；首件试缝量实际线头，偏短就把定刀刃往左挪")
 
 

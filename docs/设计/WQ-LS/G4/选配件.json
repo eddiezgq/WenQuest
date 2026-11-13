@@ -30,7 +30,7 @@
    "edge_back": 6.0
   },
   "fixed": {
-   "x_edge": -12.0,
+   "x_edge": -8.0,
    "y": [
     -5.0,
     4.0
@@ -182,7 +182,7 @@
   "lever_L": 29.495762407505257,
   "cam_h": 4.657866026902854,
   "CS": 32.64965543462902,
-  "cut_deg": 64.7
+  "cut_deg": 52.4
  },
  "forces": {
   "F_cut_N": 15.0,
@@ -245,11 +245,13 @@
   "ok": true
  },
  "thread_tail": {
-  "cut_deg": 64.7,
-  "eye_above_plate": 13.9,
-  "tail_est_mm": 66.5,
+  "cut_deg": 52.4,
+  "eye_above_plate": 16.2,
+  "tail_est_mm": 64.8,
   "tail_min_mm": 35.0,
-  "bobbin_tail_est_mm": 9.4,
+  "bobbin_tail_est_mm": 13.4,
+  "bobbin_tail_max_mm": 15.0,
+  "bobbin_note": "布底下的底线头 ≈ 刀片平面到布面的深度 + 针孔到定刀刃的距离；定刃不能再靠近针孔：x −6.5…−3.5 是送布牙排",
   "ok": true,
   "note": "估算；首件试缝量实际线头，偏短就把定刀刃往左挪"
  },
