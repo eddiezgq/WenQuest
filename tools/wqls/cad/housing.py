@@ -457,7 +457,7 @@ def ctrl_seats(hollow, solid, info):
         Part.makeCylinder(6.0, 16.0, V(g["pull_rod"]["x"], g["pull_rod"]["y"], 50.0), V(0, 0, 1)),                     # ⑪ 拉杆穿过下横隔板
         Part.makeBox(14.0, 14.0, 15.0, V(g["pull_rod"]["x"] - 4.0, g["pull_rod"]["y"] - 8.0, 108.0)),                 # ⑪ 上横隔板开缺口：拉杆和耳子（上下 ±6）
         Part.makeCylinder(5.0, 20.0, V(g["pull_rod"]["x"], g["pull_rod"]["y"], -12.0), V(0, 0, 1)),                    # ⑫
-        Part.makeCylinder(6.0, 20.0, V(kn["push"]["x"] - 0.7, kn["y"], -12.0), V(0, 0, 1)),
+        Part.makeCylinder(5.0, 20.0, V(kn["push"]["x"] + 0.1, kn["y"], -12.0), V(0, 0, 1)),     # 膝抬推杆过孔 Ø10：左边是下轴右轴承座（x 378.2），右边是机座右壁（x 390），钻头只能从这 11.8 宽的缝里上来
     ]
     for h_ in holes:
         hollow = hollow.cut(h_)
