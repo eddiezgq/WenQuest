@@ -1,8 +1,8 @@
 {
  "board_file": "kicad/ctrl-ls.kicad_pcb",
  "count": {
-  "fail": 1,
-  "pass": 32,
+  "fail": 0,
+  "pass": 33,
   "pending": 60,
   "unknown": 3
  },
@@ -768,7 +768,7 @@
    "name": "最小线距（铜到铜）",
    "status": "pass",
    "unit": "mm",
-   "value": 0.15,
+   "value": 0.151,
    "why": "板厂蚀刻能做到的最小线距；两块不相连的铜靠得比这还近，蚀刻不开就短路"
   },
   {
@@ -850,9 +850,9 @@
    "key": "K1",
    "limit": "错误 0、未连接 0",
    "name": "KiCad 设计规则检查（DRC）",
-   "status": "fail",
+   "status": "pass",
    "unit": "",
-   "value": "错误 1、未连接 0、警告 58",
+   "value": "错误 0、未连接 0、警告 58",
    "why": "KiCad 按工程里的线宽、间距、连通规则查一遍；有错误或没连上的焊盘，板子就不能做"
   }
  ],
@@ -902,7 +902,7 @@
   "vin_max_vac": 250,
   "vin_min_vac": 90
  },
- "status": "fail",
+ "status": "unknown",
  "thermal": {
   "ambient_c": 50.0,
   "detail": "简化模型：板子当一块平板，没算器件本体、外壳和过孔导热；只作布局阶段的估算，不替代样板实测",
