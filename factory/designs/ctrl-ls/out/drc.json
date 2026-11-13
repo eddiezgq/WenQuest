@@ -1,6 +1,23 @@
 {
- "errors": 1,
+ "errors": 2,
  "items": [
+  {
+   "at": [
+    [
+     75.0,
+     16.5,
+     "Reference 'D204'"
+    ],
+    [
+     68.16,
+     16.4,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
   {
    "at": [
     [
@@ -28,24 +45,7 @@
     [
      82.5,
      16.5,
-     "Reference 'D204'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     131.26,
-     129.97,
-     "Reference 'R710'"
-    ],
-    [
-     128.78,
-     129.37,
-     "Line on F.Silkscreen"
+     "Reference 'D203'"
     ]
    ],
    "code": "silk_overlap",
@@ -89,14 +89,31 @@
   {
    "at": [
     [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
+     131.26,
+     129.97,
+     "Reference 'R710'"
     ],
+    [
+     128.78,
+     129.37,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
     [
      48.91,
      63.95,
      "Reference 'Q101'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
     ]
    ],
    "code": "silk_overlap",
@@ -123,9 +140,26 @@
   {
    "at": [
     [
-     206.18,
+     165.78,
+     101.23,
+     "Reference 'R512'"
+    ],
+    [
+     159.36,
+     100.58,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     164.56,
      85.5,
-     "Reference 'Q506'"
+     "Reference 'Q505'"
     ],
     [
      -101.16,
@@ -140,48 +174,65 @@
   {
    "at": [
     [
-     153.03,
-     29.83,
-     "Reference 'C406'"
+     161.56,
+     101.23,
+     "Reference 'R511'"
     ],
+    [
+     159.36,
+     100.58,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     212.0,
+     126.56,
+     "Line on F.Silkscreen"
+    ],
+    [
+     212.0,
+     126.0,
+     "Reference 'U602'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     212.0,
+     126.56,
+     "Line on F.Silkscreen"
+    ],
+    [
+     212.0,
+     126.0,
+     "Reference 'U602'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
     [
      198.46,
      29.21,
      "Line on F.Silkscreen"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     -101.16,
-     -101.51,
-     "Polygon on F.Silkscreen"
     ],
     [
-     193.56,
-     93.45,
-     "Reference 'Q508'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     174.12,
-     93.23,
-     "Reference 'D507'"
-    ],
-    [
-     171.98,
-     92.63,
-     "Line on F.Silkscreen"
+     153.03,
+     29.83,
+     "Reference 'C406'"
     ]
    ],
    "code": "silk_overlap",
@@ -225,99 +276,82 @@
   {
    "at": [
     [
-     212.0,
-     126.56,
-     "Line on F.Silkscreen"
-    ],
-    [
-     212.0,
-     126.0,
-     "Reference 'U602'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     212.0,
-     126.56,
-     "Line on F.Silkscreen"
-    ],
-    [
-     212.0,
-     126.0,
-     "Reference 'U602'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     159.36,
-     100.58,
-     "Line on F.Silkscreen"
-    ],
-    [
-     167.98,
-     101.23,
-     "Reference 'C504'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     159.36,
-     100.58,
-     "Line on F.Silkscreen"
-    ],
-    [
-     159.12,
-     101.23,
-     "Reference 'C502'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     159.36,
-     100.58,
-     "Line on F.Silkscreen"
-    ],
-    [
-     163.55,
-     101.23,
-     "Reference 'C503'"
-    ]
-   ],
-   "code": "silk_overlap",
-   "severity": "warning",
-   "text": "Silkscreen overlap"
-  },
-  {
-   "at": [
-    [
-     164.56,
+     206.18,
      85.5,
-     "Reference 'Q505'"
+     "Reference 'Q506'"
     ],
     [
      -101.16,
      -101.51,
      "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     193.56,
+     93.45,
+     "Reference 'Q508'"
+    ],
+    [
+     -101.16,
+     -101.51,
+     "Polygon on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     171.98,
+     92.63,
+     "Line on F.Silkscreen"
+    ],
+    [
+     174.12,
+     93.23,
+     "Reference 'D507'"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     215.73,
+     93.23,
+     "Reference 'D508'"
+    ],
+    [
+     213.59,
+     92.63,
+     "Line on F.Silkscreen"
+    ]
+   ],
+   "code": "silk_overlap",
+   "severity": "warning",
+   "text": "Silkscreen overlap"
+  },
+  {
+   "at": [
+    [
+     223.81,
+     93.28,
+     "Reference 'R509'"
+    ],
+    [
+     213.59,
+     92.63,
+     "Line on F.Silkscreen"
     ]
    ],
    "code": "silk_overlap",
@@ -347,6 +381,23 @@
    "code": "silk_over_copper",
    "severity": "warning",
    "text": "Silkscreen clipped by solder mask"
+  },
+  {
+   "at": [
+    [
+     0.0,
+     148.0,
+     "Line on Edge.Cuts"
+    ],
+    [
+     0.48,
+     7.61,
+     "Reference 'J101'"
+    ]
+   ],
+   "code": "silk_edge_clearance",
+   "severity": "warning",
+   "text": "Silkscreen clipped by board edge"
   },
   {
    "at": [
@@ -385,26 +436,21 @@
   {
    "at": [
     [
-     0.0,
-     148.0,
-     "Line on Edge.Cuts"
-    ],
-    [
-     0.48,
-     7.61,
-     "Reference 'J101'"
+     185.46,
+     28.05,
+     "Track [+15V] on F.Cu, length 3.6000 mm"
     ]
    ],
-   "code": "silk_edge_clearance",
+   "code": "track_dangling",
    "severity": "warning",
-   "text": "Silkscreen clipped by board edge"
+   "text": "Track has unconnected end"
   },
   {
    "at": [
     [
-     210.73,
-     132.0,
-     "Track [+5V] on F.Cu, length 1.9000 mm"
+     209.52,
+     122.09,
+     "Track [+3V3] on F.Cu, length 2.0000 mm"
     ]
    ],
    "code": "track_dangling",
@@ -427,8 +473,8 @@
    "at": [
     [
      6.74,
-     5.07,
-     "Track [N_IN] on B.Cu, length 4.8000 mm"
+     10.15,
+     "Track [L_IN] on F.Cu, length 4.8000 mm"
     ]
    ],
    "code": "track_dangling",
@@ -438,9 +484,9 @@
   {
    "at": [
     [
-     186.46,
-     2.82,
-     "Track [N_U] on B.Cu, length 4.5000 mm"
+     6.74,
+     5.07,
+     "Track [N_IN] on B.Cu, length 4.8000 mm"
     ]
    ],
    "code": "track_dangling",
@@ -453,6 +499,18 @@
      170.36,
      6.67,
      "Track [N_V] on B.Cu, length 0.0011 mm"
+    ]
+   ],
+   "code": "track_dangling",
+   "severity": "warning",
+   "text": "Track has unconnected end"
+  },
+  {
+   "at": [
+    [
+     209.52,
+     124.63,
+     "Track [PNL_TX] on F.Cu, length 2.0000 mm"
     ]
    ],
    "code": "track_dangling",
@@ -558,14 +616,31 @@
   {
    "at": [
     [
-     195.47,
-     144.88,
-     "PTH pad 2 [STP_OA2] of J502"
+     175.26,
+     2.82,
+     "PTH pad 21 [MOT_V] of U401"
     ],
     [
-     227.4,
-     96.81,
-     "Pad 25 [STP_OA2] of U501 on F.Cu"
+     243.24,
+     12.15,
+     "PTH pad 2 [MOT_V] of J401"
+    ]
+   ],
+   "code": "unconnected_items",
+   "severity": "error",
+   "text": "Missing connection between items"
+  },
+  {
+   "at": [
+    [
+     189.5,
+     71.84,
+     "Track [N_U] on F.Cu, length 2.4310 mm"
+    ],
+    [
+     186.46,
+     2.82,
+     "PTH pad 23 [N_U] of U401"
     ]
    ],
    "code": "unconnected_items",
@@ -573,6 +648,6 @@
    "text": "Missing connection between items"
   }
  ],
- "unconnected": 1,
- "warnings": 37
+ "unconnected": 2,
+ "warnings": 41
 }
