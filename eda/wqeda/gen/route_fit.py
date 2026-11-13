@@ -179,74 +179,78 @@ def dedupe(board):
     return len(drop)
 
 
-def widen(board, targets, clearance):
+def widen(board, targets, clearance, passes=2):
     """targets = {网络名: 目标线宽 mm}；clearance(网络 A, 网络 B) → 要求间距 mm。
-    每段线按“离别的网络的铜还有多远”加宽，最多到目标线宽；别的网络若也要加宽，按它加宽后的宽度算（偏保守）。
+    每段线按“离别的网络的铜还有多远”加宽，最多到目标线宽。一段一段来，已加宽的按加宽后的宽度给后面的段让路；走两遍
+    （第一遍让路让多了的，第二遍再补）。线头接着的焊盘所在器件，它别的焊盘按“器件自己引脚间距”算
+    （与 stubs、设计规则检查里的引脚规则同一口径：线贴着自己的焊盘，离邻脚不比两个焊盘之间更近）。
     返回 (加宽到目标的段数, 只加宽一部分的段数, 没动的段数)"""
     from shapely import STRtree
     from shapely.geometry import LineString, Point
 
-    layers = {}
-
-    def add(layer, net, geom, grow=0.0):
-        layers.setdefault(layer, []).append((net, geom.buffer(grow) if grow else geom))
-
+    mm = pcbnew.ToMM
+    static = {}  # 层 → [(网络, 形状, 器件, 焊盘形状)]
+    pads = []
     for fp in board.GetFootprints():
         for p in fp.Pads():
             g = _poly(p.GetEffectivePolygon())
+            pads.append((p.GetNetname(), g, fp.GetReference()))
             for lid in p.GetLayerSet().CuStack():
-                add(lid, p.GetNetname(), g)
+                static.setdefault(lid, []).append((p.GetNetname(), g, fp.GetReference()))
     segs = []
     for t in board.GetTracks():
-        lid, net = t.GetLayer(), t.GetNetname()
+        net = t.GetNetname()
         if t.GetClass() == "PCB_VIA":
-            g = Point(pcbnew.ToMM(t.GetPosition().x), pcbnew.ToMM(t.GetPosition().y)).buffer(
-                pcbnew.ToMM(t.GetWidth()) / 2
-            )
+            g = Point(mm(t.GetPosition().x), mm(t.GetPosition().y)).buffer(mm(t.GetWidth()) / 2)
             for l2 in t.GetLayerSet().CuStack():
-                add(l2, net, g)
+                static.setdefault(l2, []).append((net, g, None))
             continue
-        line = LineString(
-            [
-                (pcbnew.ToMM(t.GetStart().x), pcbnew.ToMM(t.GetStart().y)),
-                (pcbnew.ToMM(t.GetEnd().x), pcbnew.ToMM(t.GetEnd().y)),
-            ]
-        )
-        w = pcbnew.ToMM(t.GetWidth())
-        add(lid, net, line.buffer(max(w, targets.get(net, w)) / 2))
+        line = LineString([(mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))])
+        w = mm(t.GetWidth())
         if net in targets and targets[net] > w + 1e-6:
-            segs.append((t, line, w))
-    for z in board.Zones():
-        if z.GetIsRuleArea() or not z.GetNetname():
-            continue
-        for lid in z.GetLayerSet().CuStack():
-            fill = z.GetFilledPolysList(lid)
-            for i in range(fill.OutlineCount()):
-                o = fill.Outline(i)
-                from shapely.geometry import Polygon
-
-                pg = Polygon([(pcbnew.ToMM(o.CPoint(k).x), pcbnew.ToMM(o.CPoint(k).y)) for k in range(o.PointCount())])
-                if pg.is_valid and not pg.is_empty:
-                    add(lid, z.GetNetname(), pg)
-    trees = {lid: (STRtree([g for _, g in v]), v) for lid, v in layers.items()}
+            segs.append([t, line, w, t.GetLayer()])
+        else:
+            static.setdefault(t.GetLayer(), []).append((net, line.buffer(w / 2), None))
+    # 铺铜不算：它在线之后填，会给线让路（板上已填好的铺铜正好贴着现在的线宽，算进来就加不宽了）
+    trees = {lid: (STRtree([g for _, g, _ in v]), v) for lid, v in static.items()}
+    # 每段线头接着哪些焊盘：{段号: [(器件, 焊盘形状)]}
+    own = {}
+    for k, (t, line, _w, _l) in enumerate(segs):
+        ends = [Point(line.coords[0]), Point(line.coords[-1])]
+        own[k] = [(ref, g) for n, g, ref in pads
+                  if n == t.GetNetname() and any(g.buffer(0.01).contains(e) for e in ends)]
+    width = [sg[2] for sg in segs]
+    for npass in range(passes):
+        for k, (t, line, w0, lid) in enumerate(segs):
+            net, goal = t.GetNetname(), targets[t.GetNetname()]
+            half = goal / 2
+            win = line.buffer(goal / 2 + 6.0)
+            tree, items = trees.get(lid, (None, []))
+            near = [items[int(i)] for i in tree.query(win)] if tree is not None else []
+            for onet, g, ref in near:
+                if onet == net:
+                    continue
+                c = clearance(net, onet)
+                if ref is not None:
+                    for oref, pg in own[k]:
+                        if oref == ref:
+                            c = min(c, pg.distance(g))
+                half = min(half, line.distance(g) - c)
+            for m, (t2, line2, _w, lid2) in enumerate(segs):
+                if m == k or lid2 != lid or t2.GetNetname() == net or line2.distance(line) > goal + 6.0:
+                    continue
+                half = min(half, line.distance(line2) - width[m] / 2 - clearance(net, t2.GetNetname()))
+            width[k] = max(w0, min(goal, int(2 * half / STEP + 1e-9) * STEP), width[k] if npass else w0)
     full = part = none = 0
-    for t, line, w in segs:
-        net, goal = t.GetNetname(), targets[t.GetNetname()]
-        tree, items = trees[t.GetLayer()]
-        half = goal / 2
-        for i in tree.query(line.buffer(goal / 2 + 6.0)):
-            onet, g = items[int(i)]
-            if onet == net:
-                continue
-            half = min(half, line.distance(g) - clearance(net, onet))
-        nw = max(w, min(goal, int(2 * half / STEP + 1e-9) * STEP))
-        if nw >= goal - 1e-6:
+    for k, (t, _line, w0, _l) in enumerate(segs):
+        goal = targets[t.GetNetname()]
+        if width[k] >= goal - 1e-6:
             full += 1
-        elif nw > w + 1e-6:
+        elif width[k] > w0 + 1e-6:
             part += 1
         else:
             none += 1
-        t.SetWidth(pcbnew.FromMM(round(nw, 2)))
+        t.SetWidth(pcbnew.FromMM(round(width[k], 2)))
     return full, part, none
 
 
