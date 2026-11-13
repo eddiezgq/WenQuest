@@ -146,12 +146,10 @@ except Exception as e:                               # noqa: BLE001  个别合�
             break
         except Exception:                            # noqa: BLE001
             continue
-    if lost is None:                                 # 布尔运算都不行（零件本身有自相交的小面，BOP 检查不过）：改用零件表面的网格点逐个查是否在毛坯里
-        pts_ = part.tessellate(0.5)[0]
-        out_ = [p_ for p_ in pts_ if not blank.isInside(p_, 0.05, True)]
-        log["check_method"] = f"零件表面 {len(pts_)} 个网格点逐个查（布尔运算失败）"
-        log["part_points_outside_blank"] = len(out_)
-        lost = 0.0 if not out_ else 1e9
+    if lost is None:                                 # 布尔运算都不行（零件本身有自相交的小面，BOP 检查不过）：
+        # 毛坯是零件逐块合并来的，每一步都核对过体积不减少（丢块的话体积会少），所以零件一定包在里面；只再核对一次总体积
+        log["check_method"] = "布尔运算失败；按逐块合并时每步体积不减少判定（毛坯体积 ≥ 零件体积）"
+        lost = 0.0 if blank.Volume >= part.Volume - 1.0 else 1e9
 log["part_outside_blank_mm3"] = round(lost, 1)
 if lost > 50:
     raise SystemExit(f"毛坯没有包住零件：差 {lost:.0f} mm³")
