@@ -253,7 +253,7 @@ for k, (name, z0, ln, Do, Di, col) in enumerate(parts):
         ax.add_patch(Rectangle((z0, Di / 2 if sg > 0 else -Do / 2), ln, (Do - Di) / 2, fc=col, ec="k", lw=0.6, alpha=0.85))
     ax.text(z0 + ln / 2, Do / 2 + 4 + (k % 2) * 9, name, ha="center", fontsize=8)
 ax.axvline(H_mod, color=L.BAD, ls="--", lw=1)
-ax.text(H_mod + 2, -64, f"模型里的模组长 {H_mod:.0f}", color=L.BAD, fontsize=8.5)
+ax.text(H_mod + 2, -64, f"模型里的模组长 {H_mod:.0f}", color=L.BAD if H_mod < L_need else L.MUTED, fontsize=8.5)
 ax.text(L_need / 2, 0, "空心轴 Ø50（走线）", ha="center", va="center", fontsize=8.5)
 ax.set_xlim(-10, L_need + 30)
 ax.set_ylim(-70, 80)
@@ -267,15 +267,22 @@ solid = bd.Compound([bd.Pos(0, 0, z0) * (bd.Cylinder(Do / 2, ln, align=A0) - bd.
                     + [(bd.Cylinder(R_mod, L_need, align=A0) - bd.Cylinder(R_mod - 4, L_need, align=A0)) - cut])
 bd.export_step(solid, str(case.path("WQJ-L-示意.step")))
 L.render_solid(solid, case.path("5_三维剖视.png"), elev=25, azim=-50, size=(7, 4.4))
+if H_mod >= L_need:
+    LEN_NOTE = (f"- **模组长度**：零件排下来约 **{L_need:.0f} mm**。最初的动力学模型（`wqcr5.MODULES`）只写了 110 mm——光输出法兰、两只轴承、减速器就占 {L_out:.0f} mm，"
+                f"放不下抱闸、电机和编码器；这个案例发现后，第 165 轮把模型改成 {H_mod:.0f} mm（质量不变，惯量跟着变；案例 A、C 和实验 24–28 已复核）。"
+                "抱闸、电机、编码器的长度还是示意值，电机厂定了 WQ-SM400 的外形后再核一次。")
+    LEN_SHORT = f"零件排下来约 {L_need:.0f} mm，模型已按它改（第 165 轮）；电机外形定了以后再核。"
+else:
+    LEN_NOTE = (f"- **长度对不上**：动力学模型里（`wqcr5.MODULES`）WQJ-L 长 {H_mod:.0f} mm；光输出法兰、两只轴承、减速器就占 {L_out:.0f} mm，"
+                f"只剩 {H_mod - L_out:.0f} mm 给抱闸、电机、编码器和驱动板，放不下。按示意长度排下来约 **{L_need:.0f} mm**，模型要回头改。")
+    LEN_SHORT = f"零件排下来约 {L_need:.0f} mm，模型里只有 {H_mod:.0f} mm——要回头改模型，再复算案例 A。"
 cadmd = f"""# 结构：零件沿轴向排开
 
 {L.md_table(["零件", "长 mm", "外径", "出处"], [[n, f"{ln:g}", f"Ø{Do:g}", src] for n, ln, Do, Di, col, src in STACK])}
 
 - 从输出端起：输出法兰 → 一对 6010（背靠背并排）→ 谐波减速器 CSF-32 → 失电制动抱闸 → 400 W 电机 → 电机端编码器与驱动板；输出端编码器读输出法兰；中间 Ø50 空心轴走线。
 - 模组外径 Ø{2 * R_mod:.0f} 由减速器外径定。
-- **长度对不上**：动力学模型里（`wqcr5.MODULES`）WQJ-L 长 {H_mod:.0f} mm；光输出法兰、两只轴承、减速器就占 {L_out:.0f} mm，
-  只剩 {H_mod - L_out:.0f} mm 给抱闸、电机、编码器和驱动板，放不下。按示意长度排下来约 **{L_need:.0f} mm**。
-  这是整机设计要回头改的数据：模组长度、质量、惯量要等电机厂定了 WQ-SM400 的外形以后更新到模型里（案例 C 和实验 24–28 都用这份模型，改的时候一起核对）。
+{LEN_NOTE}
 - 输出轴承因此只能并排（中心距 = 轴承宽 16 mm），第 3 步按这个跨距算了 J1 的轴承寿命。
 """
 cadmd += f"""
@@ -346,7 +353,7 @@ review = f"""# 总结
 2. 减速器按**平均负载转矩**（决定寿命）和启停峰值核对，不是只看额定。
 3. **刚度在减速器上**：末端变形一大半来自 J2 的谐波减速器扭转，加粗铝管用处不大。
 4. 抱闸保持力矩每只都测，要盖过 J2 最大重力矩的 {W.SAFETY} 倍。
-5. **模组长度要回头改**：零件排下来约 {L_need:.0f} mm，模型里只有 {H_mod:.0f} mm——等电机厂定了 WQ-SM400 的外形，更新模型（质量、惯量跟着变），再复算案例 A。
+5. **模组长度**：{LEN_SHORT}
 
 ## 留给学生的问题
 
@@ -357,7 +364,7 @@ review = f"""# 总结
 
 相关：《机器人学》第 30 章（模组选择）、第 31 章（刚度、模态）、第 32 章（齿轮与谐波传动）；实验 9、24、25；案例 A（选型）、案例 C（整机）。
 """
-case.step("review", f"{sum(c['ok'] for c in case.checks)} / {len(case.checks)} 项校核通过；J2 考减速器、J1 考轴承，刚度在减速器上；模型里的模组长度偏短，要回头改。",
+case.step("review", f"{sum(c['ok'] for c in case.checks)} / {len(case.checks)} 项校核通过；J2 考减速器、J1 考轴承，刚度在减速器上；模组长约 {L_need:.0f} mm。",
           f"{sum(c['ok'] for c in case.checks)} / {len(case.checks)} checks pass; J2 loads the gear, J1 the bearings; stiffness sits in the gear.",
           md=case.text("8_总结.md", review), tools=tools("library"))
 case.write()
