@@ -116,12 +116,12 @@ def roller_rest():
 
 
 def knife_poly():
-    """动刀（前进到最前时）的折线：刀轴 → 拐点 (−9.5, 7) → 抬起点 (−6, 5.3) → 刀尖；前两段在 z −8.6…−6.6
+    """动刀（前进到最前时）的折线：刀轴 → 拐点 (−9.5, 7) → 抬起点 (−5, 4.9) → 刀尖；前两段在 z −8.6…−6.6
     （从机座顶板下面过去，离顶板底 1.0；这一段都在 x < −6.5，送布牙排侧梁从 x −6.5 才开始），从抬起点到刀尖是刀片（z −5.9…−4.9）。
     再按 a_rest − a_fwd 转回最后的位置画（零件按静止位置画）"""
     k = GEO["knife"]
     px, py = k["pivot"]
-    fwd = [(px, py), (-9.5, 7.0), (-6.0, 5.3), tuple(k["tip_fwd"])]
+    fwd = [(px, py), (-9.5, 7.0), (-5.0, 4.9), tuple(k["tip_fwd"])]
     back = (OP["knife"]["a_rest_deg"] - OP["knife"]["a_fwd_deg"]) * DEG
     return [rot_z(p, (px, py), back) for p in fwd], back
 
@@ -189,8 +189,8 @@ def build_T():
     armL = Part.makeBox(lx1 - lx0, L, 8.0, V(lx0, 0.0, -4.0))
     armL.rotate(V(0, 0, 0), V(1, 0, 0), ang)                 # 沿 +y 画的臂转到朝滚子
     armL.translate(V(0, Sy, Sz))
-    stud = cyl(2.0, (lx1 - 1.0, Ry, Rz), (lx1 + 5.5, Ry, Rz))
-    roll = cyl(cm["roller_d"] / 2, (lx1 + 1.0, Ry, Rz), (lx1 + 5.0, Ry, Rz))           # 静止时 x 135…139，剪线时推进 5 到 140…144（槽深 4）
+    stud = cyl(2.0, (lx1 - 1.0, Ry, Rz), (lx1 + 4.5, Ry, Rz))
+    roll = cyl(cm["roller_d"] / 2, (lx1 + 0.8, Ry, Rz), (lx1 + 4.8, Ry, Rz))           # 静止时 x 134.8…138.8，剪线时推进 5 到 139.8…143.8（槽深 4，离槽底 0.2）
     P["trim_lever"] = (hubl.fuse(armL).fuse(stud).fuse(cyl(4.5, (lx0, Ry, Rz), (lx1, Ry, Rz))), "metal", "steel", "tlever")
     P["trim_roller"] = (roll, "chrome", "steel", "tlever")
     # ---- 剪线凸轮：下轴 x 140…150 上的盘，左端面开槽（深 4、宽 8.4）；槽中心线半径 = rho0 + s(φ)
