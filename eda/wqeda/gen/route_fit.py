@@ -179,16 +179,18 @@ def dedupe(board):
     return len(drop)
 
 
-def widen(board, targets, clearance, passes=2):
+def widen(board, targets, clearance, passes=2, outline=None, edge_mm=0.5):
     """targets = {网络名: 目标线宽 mm}；clearance(网络 A, 网络 B) → 要求间距 mm。
     每段线按“离别的网络的铜还有多远”加宽，最多到目标线宽。一段一段来，已加宽的按加宽后的宽度给后面的段让路；走两遍
     （第一遍让路让多了的，第二遍再补）。线头接着的焊盘所在器件，它别的焊盘按“器件自己引脚间距”算
     （与 stubs、设计规则检查里的引脚规则同一口径：线贴着自己的焊盘，离邻脚不比两个焊盘之间更近）。
+    outline = 板框（shapely 多边形）：线离板边至少 edge_mm（159d2c：端子旁的线加宽后压到板边）。
     返回 (加宽到目标的段数, 只加宽一部分的段数, 没动的段数)"""
     from shapely import STRtree
     from shapely.geometry import LineString, Point
 
     mm = pcbnew.ToMM
+    edge = outline.exterior if outline is not None else None
     static = {}  # 层 → [(网络, 形状, 器件, 焊盘形状)]
     pads = []
     for fp in board.GetFootprints():
@@ -224,6 +226,8 @@ def widen(board, targets, clearance, passes=2):
         for k, (t, line, w0, lid) in enumerate(segs):
             net, goal = t.GetNetname(), targets[t.GetNetname()]
             half = goal / 2
+            if edge is not None:
+                half = min(half, line.distance(edge) - edge_mm)
             win = line.buffer(goal / 2 + 6.0)
             tree, items = trees.get(lid, (None, []))
             near = [items[int(i)] for i in tree.query(win)] if tree is not None else []

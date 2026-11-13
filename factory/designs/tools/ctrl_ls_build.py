@@ -301,7 +301,7 @@ def board_build(route, jar):
         # 先补线再删用不上的引出线：引出线的线头正好是补线的好起点（第十七次：隔离电源 +5V 脚的引出线先被删了，补线找不到路）
         print("用不上的引出线：", RF.drop_dangling(board))
         targets = {n: c["track_mm"] for c in D.X["net_classes"] if c.get("route_mm") for n in c["nets"]}
-        print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance))
+        print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance, outline=box(ox, oy, ox + w_, oy + h_)))
     # 功率铺铜（设计描述 board.pours）布完线再加：给布线器当平面时，别的网络从底层穿过去把它切成几块、块和块之间没连上
     # （第十二、十三次布线的“铺铜孤岛”）；现在母线全部按走线布通，铺铜只是加宽电流通路，连不上的碎块自动去掉
     for net, layer, pts in D.X["pours"]:
@@ -426,9 +426,12 @@ def _pin_rules():
         if (ref, na, nb) in seen:
             continue
         seen.add((ref, na, nb))
+        # 只放宽“这个器件自己的焊盘”和别的东西之间（焊盘对焊盘、引出线对邻脚）；铺铜不在内——它很大，
+        # 和器件外框沾边就会把整块铺铜都放宽（159d2c 第一次布线：母线铺铜离 N_U 线只剩 1.6 mm，规则检查没报）
         s += ('(rule "pins_{r}_{a}_{b}"\n  (condition "((A.NetName == \'{a}\' && B.NetName == \'{b}\') || '
-              '(A.NetName == \'{b}\' && B.NetName == \'{a}\')) && A.intersectsCourtyard(\'{r}\') && '
-              'B.intersectsCourtyard(\'{r}\')")\n  (constraint clearance (min {c:g}mm)))\n').format(
+              '(A.NetName == \'{b}\' && B.NetName == \'{a}\')) && A.Type != \'Zone\' && B.Type != \'Zone\' && '
+              '((A.Type == \'Pad\' && A.Parent.Reference == \'{r}\') || (B.Type == \'Pad\' && B.Parent.Reference == \'{r}\')) && '
+              'A.intersectsCourtyard(\'{r}\') && B.intersectsCourtyard(\'{r}\')")\n  (constraint clearance (min {c:g}mm)))\n').format(
             r=ref, a=na, b=nb, c=max(0.15, int((g - 0.05) / 0.05) * 0.05))
     return s
 
