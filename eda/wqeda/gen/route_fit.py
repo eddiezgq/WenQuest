@@ -607,3 +607,50 @@ def shrink_close(board, clearance, min_w=0.15, most=0.06):
             t.SetWidth(pcbnew.FromMM(round(w - 2 * (short + 0.005), 3)))
             n += 1
     return n
+
+
+def close_slivers(board, gap=SAME_NET_GAP):
+    """同一网络、同一层上两块不相连的铜离得比 gap 还近（只剩一条细缝，板厂蚀刻难做，工艺检查 F2 报）：
+    在两者最近的两点之间加一小段线把缝补上（159d2c：功率模块 N_W 脚旁的线在底层离自己的焊盘 0.086 mm）。返回补的处数"""
+    from shapely.geometry import LineString, Point
+    from shapely.ops import nearest_points
+
+    mm = pcbnew.ToMM
+    its = []
+    for fp in board.GetFootprints():
+        for p in fp.Pads():
+            if p.GetNetname():
+                for lid in p.GetLayerSet().CuStack():
+                    its.append((p.GetNetname(), lid, _poly(p.GetEffectivePolygon())))
+    tracks = []
+    for t in board.GetTracks():
+        if t.GetClass() == "PCB_VIA":
+            g = Point(mm(t.GetPosition().x), mm(t.GetPosition().y)).buffer(mm(t.GetWidth()) / 2)
+            for lid in t.GetLayerSet().CuStack():
+                its.append((t.GetNetname(), lid, g))
+        else:
+            g = LineString([(mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))]).buffer(
+                mm(t.GetWidth()) / 2)
+            its.append((t.GetNetname(), t.GetLayer(), g))
+            tracks.append((t, g))
+    n = 0
+    for t, g in tracks:
+        for net, lid, og in its:
+            if net != t.GetNetname() or lid != t.GetLayer() or og is g:
+                continue
+            d = g.distance(og)
+            if 1e-3 < d < gap:
+                a, b = nearest_points(g, og)
+                w = min(mm(t.GetWidth()), 0.3)
+                s = pcbnew.PCB_TRACK(board)
+                # 两头各往里伸半个线宽，保证和两边都搭上
+                dx, dy = b.x - a.x, b.y - a.y
+                k = (w / 2) / max(d, 1e-6)
+                s.SetStart(pcbnew.VECTOR2I(pcbnew.FromMM(a.x - dx * k), pcbnew.FromMM(a.y - dy * k)))
+                s.SetEnd(pcbnew.VECTOR2I(pcbnew.FromMM(b.x + dx * k), pcbnew.FromMM(b.y + dy * k)))
+                s.SetWidth(pcbnew.FromMM(w))
+                s.SetLayer(lid)
+                s.SetNet(t.GetNet())
+                board.Add(s)
+                n += 1
+    return n

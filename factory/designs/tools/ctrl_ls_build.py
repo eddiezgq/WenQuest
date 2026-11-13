@@ -310,6 +310,7 @@ def board_build(route, jar):
         print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance, outline=box(ox, oy, ox + w_, oy + h_),
                                                              keepouts=kos))
         print("差一点点的线收细：", RF.shrink_close(board, clearance))
+        print("同网络细缝补上：", RF.close_slivers(board))
     # 功率铺铜（设计描述 board.pours）布完线再加：给布线器当平面时，别的网络从底层穿过去把它切成几块、块和块之间没连上
     # （第十二、十三次布线的“铺铜孤岛”）；现在母线全部按走线布通，铺铜只是加宽电流通路，连不上的碎块自动去掉
     for net, layer, pts in D.X["pours"]:
