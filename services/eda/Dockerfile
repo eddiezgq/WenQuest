@@ -17,6 +17,8 @@ COPY eda/examples/factories eda/examples/factories
 # 第 112 轮：工厂端演示资料包（故意带错，标明）：驱动板 A 版的光绘 + 漏了 C47 物料编号的物料清单和坐标
 COPY factory/designs/drv-joint/out/gerber.zip factory/designs/drv-joint/out/gerber.zip
 COPY eda/examples/pcba-demo/bom.csv eda/examples/pcba-demo/pos.csv eda/examples/pcba-demo/
+# 第 159 轮 159d3：问渠贴片“用平缝机控制器 CTRL-LS 的资料包”
+COPY factory/designs/ctrl-ls/out/gerber.zip factory/designs/ctrl-ls/out/bom.csv factory/designs/ctrl-ls/out/pos.csv factory/designs/ctrl-ls/out/
 # 第 113 轮：KiCad 插件（下载时现场打包）
 COPY eda/kicad-plugin eda/kicad-plugin
 # 第 113 轮：网页审图看的示例设计（KiCad 原理图、板子、工程文件）和它们的报告

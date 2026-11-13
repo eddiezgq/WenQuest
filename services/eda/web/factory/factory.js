@@ -4,7 +4,7 @@ const T = {
   zh: {brand: "问渠贴片", desk: "新产品导入", toDesk: "起草台", help: "帮助", view: "网页审图", title: "客户的资料包，进厂前先查一遍",
     lede: "上传光绘、钻孔、物料清单和坐标，按本厂的工艺能力查：资料对不对得上、板子做不做得出、好不好贴。查出的问题由 AI 起草成给客户的问题单，你改完、确认后才导出。文件算完就删，不存服务器。",
     factory: "按哪家工厂的工艺能力查", gerber: "光绘和钻孔（一个 zip，或多个文件）", bom: "物料清单（CSV）", cpl: "贴片坐标（CSV）",
-    demo: "用演示资料包", go: "检查", scope: "演示工厂都是虚构的，工艺能力是示例值。演示资料包是驱动板 A 版，故意漏了一个物料编号。",
+    demo: "用演示资料包", demoC: "用平缝机控制器 CTRL-LS 的资料包", go: "检查", scope: "演示工厂都是虚构的，工艺能力是示例值。演示资料包是驱动板 A 版，故意漏了一个物料编号。平缝机控制器 CTRL-LS 的资料包是第 159 轮设计软件生成的真文件，没有故意改错，检查结果照实显示。",
     board: "板图", top: "顶面", bottom: "底面", boardHint: "点检查结果的一行，问题位置在板图上标出来。",
     bomT: "物料清单（到外部库查）", bomHint: "同一物料编号、数值、封装合为一行。链接只拼对方网站的搜索地址、新窗口打开，内容以对方为准；不参与任何检查。LCSC 是嘉立创贴片用的深圳现货库。",
     look: "到外部库查", noLink: "—（不猜）",
@@ -23,7 +23,7 @@ const T = {
   en: {brand: "WenQuest PCBA", desk: "New product introduction", toDesk: "Drafting desk", help: "Help", view: "Web review", title: "Check the customer's data pack before it reaches the line",
     lede: "Upload the Gerber, drill, BOM and placement files and check them against this factory's capability: do the files agree, can the board be made, can it be assembled. AI drafts the findings into an engineering query; you edit and confirm before export. Files are deleted after the check and never stored.",
     factory: "Factory capability table", gerber: "Gerber and drill (one zip or several files)", bom: "BOM (CSV)", cpl: "Placement (CSV)",
-    demo: "Use the demo pack", go: "Check", scope: "Demo factories are fictional with example values. The demo pack is drive board A with one part number left out on purpose.",
+    demo: "Use the demo pack", demoC: "Use the sewing machine controller CTRL-LS pack", go: "Check", scope: "Demo factories are fictional with example values. The demo pack is drive board A with one part number left out on purpose. The CTRL-LS pack is the real output of the design tools (round 159), not altered on purpose; results are shown as they come.",
     board: "Board", top: "Top", bottom: "Bottom", boardHint: "Click a result row to mark its locations on the board.",
     bomT: "Bill of materials (look up outside)", bomHint: "Same part number, value and package merged into one row. Links only build a search address on the other website and open it in a new window; their content is theirs. Not part of any check. LCSC is the Shenzhen stock used by JLCPCB assembly.",
     look: "Look up outside", noLink: "— (no guess)",
@@ -89,7 +89,7 @@ async function check(ev) {
   if (ev) ev.preventDefault();
   const fd = new FormData();
   fd.append("factory", $("#factory").value);
-  if (demoMode) fd.append("demo", "1");
+  if (demoMode) fd.append("demo", demoMode);
   else {
     const g = $("#gerber").files;
     if (!g.length) { status(esc(t("needFiles")), true); return; }
@@ -207,7 +207,7 @@ async function draftIssues() {
   status(esc(t("drafting")));
   try {
     const r = await call("../api/factory/issues", {method: "POST", headers: {"content-type": "application/json"},
-      body: JSON.stringify({results: S.results, factory: S.factory, package: demoMode ? "demo" : "", lang})});
+      body: JSON.stringify({results: S.results, factory: S.factory, package: demoMode === "1" ? "demo" : (demoMode || ""), lang})});
     S.issues = r.issues; S.rejected = r.rejected;
     renderIssues(); status("");
   } catch (e) { failed(e); }
@@ -267,7 +267,8 @@ async function download(kind) {
 }
 
 $("#up").addEventListener("submit", ev => { demoMode = false; check(ev); });
-$("#demo").addEventListener("click", () => { demoMode = true; layersFix = null; S = null; check(); });
+$("#demo").addEventListener("click", () => { demoMode = "1"; layersFix = null; S = null; check(); });
+$("#demoC").addEventListener("click", () => { demoMode = "ctrl-ls"; layersFix = null; S = null; check(); });  // 第 159 轮 159d3
 $("#lang").addEventListener("click", () => { lang = lang === "en" ? "zh" : "en"; localSet("eda.lang", lang); applyLang(); });
 $("#res").addEventListener("click", ev => { const tr = ev.target.closest("tr[data-id]"); if (!tr) return; sel = sel === tr.dataset.id ? null : tr.dataset.id; render(); });
 $("#res").addEventListener("keydown", ev => { if (ev.key === "Enter") ev.target.click(); });

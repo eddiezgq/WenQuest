@@ -218,9 +218,13 @@ import factory_api  # noqa: E402
 
 factory_api.register(app, factory_dir=REPO / "eda" / "examples" / "factories", gateway=GATEWAY, headers_of=_headers,
                      gw_errors=GW_ERRORS, client=lambda: _client(),
-                     demo={"gerber": REPO / "factory" / "designs" / "drv-joint" / "out" / "gerber.zip",
-                           "bom": REPO / "eda" / "examples" / "pcba-demo" / "bom.csv",
-                           "cpl": REPO / "eda" / "examples" / "pcba-demo" / "pos.csv"})
+                     demo={"1": {"gerber": REPO / "factory" / "designs" / "drv-joint" / "out" / "gerber.zip",
+                                 "bom": REPO / "eda" / "examples" / "pcba-demo" / "bom.csv",
+                                 "cpl": REPO / "eda" / "examples" / "pcba-demo" / "pos.csv"},
+                           # 第 159 轮 159d3：平缝机控制器 CTRL-LS 生成的真文件
+                           "ctrl-ls": {"gerber": REPO / "factory" / "designs" / "ctrl-ls" / "out" / "gerber.zip",
+                                       "bom": REPO / "factory" / "designs" / "ctrl-ls" / "out" / "bom.csv",
+                                       "cpl": REPO / "factory" / "designs" / "ctrl-ls" / "out" / "pos.csv"}})
 
 import view_api  # noqa: E402  第 113 轮：网页审图
 

@@ -163,3 +163,16 @@ def test_demo_package_returns_merged_bom_rows(client):
     assert {(r["item"], r["value"], r["package"]): r["qty"] for r in rows} == want
     gdr = next(r for r in rows if r["value"] == "IR2101S")
     assert gdr["item"] == "IC-GDRV" and gdr["qty"] == 3
+
+
+def test_ctrl_ls_package_button(client):
+    """第 159 轮 159d3：“用平缝机控制器 CTRL-LS 的资料包”——本板生成的真文件，结果照实回来（不改判）"""
+    import csv
+    j = client.post("/api/factory/check", data={"factory": "example-smt", "demo": "ctrl-ls"}).json()
+    assert j["results"]
+    src = REPO / "factory" / "designs" / "ctrl-ls" / "out" / "bom.csv"
+    n = sum(int(r["数量"]) for r in csv.DictReader(src.open(encoding="utf-8")))
+    assert sum(r["qty"] for r in j["bom"]) == n
+    # 不认得的名字不当资料包
+    r = client.post("/api/factory/check", data={"factory": "example-smt", "demo": "../x"})
+    assert r.status_code == 400
