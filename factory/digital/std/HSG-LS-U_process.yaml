@@ -34,7 +34,7 @@ part:
   source: tools/wqls/cad/housing.py（G5.2）
 blank:
   kind: 铸件
-  spec: HT250 砂型铸件 16.43 kg
+  spec: HT250 砂型铸件 16.45 kg
   length_mm: ''
   material_item: CS-HSG-LS-U
   drawing: docs/设计/WQ-LS/G5/机壳铸造工艺.md
