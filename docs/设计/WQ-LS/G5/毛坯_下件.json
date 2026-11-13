@@ -1,5 +1,5 @@
 {
- "filled_holes": 20,
+ "filled_holes": 22,
  "pads": [
   {
    "area_cm2": 4.6,
@@ -29,6 +29,15 @@
    "allowance": 4.0
   },
   {
+   "area_cm2": 797.9,
+   "normal": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "allowance": 4.0
+  },
+  {
    "area_cm2": 224.1,
    "normal": [
     -0.0,
@@ -36,15 +45,6 @@
     -1.0
    ],
    "allowance": 3.0
-  },
-  {
-   "area_cm2": 799.9,
-   "normal": [
-    0.0,
-    0.0,
-    1.0
-   ],
-   "allowance": 4.0
   }
  ],
  "bores": [
@@ -89,26 +89,6 @@
    "feed": "G"
   },
   {
-   "d": 18.0,
-   "allowance": 2.5,
-   "outer": true,
-   "at": [
-    297.0,
-    0.0,
-    -50.0
-   ]
-  },
-  {
-   "d": 18.0,
-   "allowance": 2.5,
-   "outer": true,
-   "at": [
-    307.0,
-    0.0,
-    -50.0
-   ]
-  },
-  {
    "d": 16.0,
    "cast_d": 13.0,
    "at": [
@@ -127,6 +107,26 @@
     -50.0
    ],
    "feed": "G"
+  },
+  {
+   "d": 18.0,
+   "allowance": 2.5,
+   "outer": true,
+   "at": [
+    307.0,
+    0.0,
+    -50.0
+   ]
+  },
+  {
+   "d": 18.0,
+   "allowance": 2.5,
+   "outer": true,
+   "at": [
+    297.0,
+    0.0,
+    -50.0
+   ]
   },
   {
    "d": 14.0,
@@ -209,7 +209,7 @@
  "part_outside_blank_mm3": 0.0,
  "part": "lower",
  "valid": true,
- "mass_part_kg": 8.51,
+ "mass_part_kg": 8.5,
  "mass_blank_kg": 11.6,
  "allowance": {
   "side": 3.0,

@@ -34,7 +34,7 @@ part:
   source: tools/wqls/cad/housing.py（G5.2）
 blank:
   kind: 铸件
-  spec: HT250 砂型铸件 16.21 kg
+  spec: HT250 砂型铸件 16.43 kg
   length_mm: ''
   material_item: CS-HSG-LS-U
   drawing: docs/设计/WQ-LS/G5/机壳铸造工艺.md
@@ -90,6 +90,21 @@ characteristics:
   name: 铸件质量
   spec: HT250：硬度 190–240 HBW；首件 X 光检查电机座、立柱脚、针杆导套座无缩松
   kind: other
+- id: C9
+  name: 压脚杆导套孔（上、下）
+  spec: 2 × Ø12 H7（+0.018/0），Ra 1.6；轴线 x −16、y 6（G4.7）
+  nominal: 12
+  es: 0.018
+  ei: 0.0
+  kind: dim
+  key: true
+- id: C10
+  name: 压脚杆孔对针杆孔的平行度
+  spec: 0.03/100（同一次装夹由机床保证）
+  nominal: 0.0
+  es: 0.03
+  ei: 0.0
+  kind: geo
 tool_list:
 - id: T01
   name: 面铣刀 Ø80
@@ -372,6 +387,16 @@ operations:
     passes: 1
     tb_min: 0.06
     ta_min: 0.3
+  - step: 8
+    content: 直角铣头：钻压脚杆孔 Ø11.5（x −16、y 6），一次钻通上、下两个导套座（G4.7）
+    tool: T06
+    gauge: G08
+    vc: 60
+    f: 0.15
+    ap: null
+    passes: 1
+    tb_min: 0.62
+    ta_min: 0.3
   inspect:
   - char: 两轴承孔 Ø34.0、Ø31.0（+0.1/0）（C5）
     gauge: G03
@@ -379,7 +404,7 @@ operations:
   - char: 止口 Ø53.0（0/−0.1）
     gauge: G05
     freq: 首件、每 5 件
-  minutes: 9.0
+  minutes: 10.0
 - seq: 40
   operation: 时效 Stress relieving
   workstation: 热处理炉 HT-01
@@ -446,6 +471,26 @@ operations:
     passes: 1
     tb_min: 1.75
     ta_min: 0.3
+  - step: 4
+    content: 扩压脚杆孔 Ø11.5 → Ø11.85（同一把刀，两孔一次扩通）（G4.7）
+    tool: T15
+    gauge: G03
+    vc: 60
+    f: 0.12
+    ap: null
+    passes: 1
+    tb_min: 0.76
+    ta_min: 0.3
+  - step: 5
+    content: 铰压脚杆孔 Ø12 H7，上下两孔一次铰通；和针杆孔同一次装夹，平行度 0.03/100 由机床保证
+    tool: T15
+    gauge: G04
+    vc: 12
+    f: 0.25
+    ap: null
+    passes: 1
+    tb_min: 1.85
+    ta_min: 0.3
   inspect:
   - char: C 面平面度 0.02（C1）
     gauge: G09
@@ -459,7 +504,7 @@ operations:
   - char: C 到上轴两孔（粗镗）中心 200 ± 0.1（C4）
     gauge: G01
     freq: 首件
-  minutes: 7.5
+  minutes: 11.0
 - seq: 60
   operation: 零件检验 Part inspection
   workstation: 检验站 QC-01
@@ -496,6 +541,12 @@ operations:
   - char: C8
     gauge: G10
     freq: 每 5 件
+  - char: C9
+    gauge: G01
+    freq: 每件
+  - char: C10
+    gauge: G01
+    freq: 每 5 件
 hole_sizes:
   前轴承孔（粗）:
   - op: 铸出
@@ -516,6 +567,19 @@ hole_sizes:
     es: 0.1
     ei: 0.0
   针杆孔:
+  - op: 20
+    d: 11.5
+    es: 0.1
+    ei: 0.0
+  - op: 50
+    d: 11.85
+    es: 0.027
+    ei: 0.0
+  - op: 50
+    d: 12.0
+    es: 0.018
+    ei: 0.0
+  压脚杆孔:
   - op: 20
     d: 11.5
     es: 0.1

@@ -29,7 +29,7 @@
  "O1202": {
   "title": "上件 工序 20 卧加粗加工",
   "machine": "HMC-01",
-  "lines": 286,
+  "lines": 302,
   "tools": [
    2,
    3,
@@ -39,8 +39,8 @@
    18
   ],
   "b_indexes": 2,
-  "time_min": 4.09,
-  "cut_min": 3.21,
+  "time_min": 4.85,
+  "cut_min": 3.88,
   "checks": [],
   "sim": [
    {
@@ -61,7 +61,7 @@
    },
    {
     "frame": "DOWN_HEAD",
-    "steps": 2,
+    "steps": 3,
     "issues": [],
     "over_cells": 0,
     "dev_min": 0.0,
@@ -72,20 +72,20 @@
  "O1205": {
   "title": "上件 工序 50 精铣接合面、扩铰针杆孔",
   "machine": "VMC-01",
-  "lines": 64,
+  "lines": 90,
   "tools": [
    1,
    7,
    20
   ],
   "b_indexes": 0,
-  "time_min": 7.62,
-  "cut_min": 7.37,
+  "time_min": 13.16,
+  "cut_min": 12.76,
   "checks": [],
   "sim": [
    {
     "frame": "C_UP",
-    "steps": 3,
+    "steps": 5,
     "issues": [],
     "over_cells": 0,
     "dev_min": -0.0,
@@ -199,7 +199,7 @@
  "O1401": {
   "title": "合件 工序 70、80 锥销、测针杆轴线、精加工、钻攻",
   "machine": "HMC-01",
-  "lines": 654,
+  "lines": 944,
   "tools": [
    2,
    4,
@@ -224,13 +224,30 @@
    35,
    36,
    37,
-   38
+   38,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47,
+   48,
+   49
   ],
-  "b_indexes": 4,
-  "time_min": 14.96,
-  "cut_min": 11.57,
+  "b_indexes": 7,
+  "time_min": 22.32,
+  "cut_min": 16.92,
   "checks": [],
   "sim": [
+   {
+    "frame": "ARMUP",
+    "steps": 2,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.0
+   },
    {
     "frame": "B0",
     "steps": 3,
@@ -249,7 +266,15 @@
    },
    {
     "frame": "B270",
-    "steps": 2,
+    "steps": 8,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   },
+   {
+    "frame": "B90",
+    "steps": 6,
     "issues": [],
     "over_cells": 0,
     "dev_min": 0.0,
@@ -257,7 +282,7 @@
    },
    {
     "frame": "TOPARM",
-    "steps": 2,
+    "steps": 4,
     "issues": [],
     "over_cells": 0,
     "dev_min": 0.0,
@@ -265,7 +290,7 @@
    },
    {
     "frame": "UNDER",
-    "steps": 2,
+    "steps": 4,
     "issues": [],
     "over_cells": 0,
     "dev_min": 0.0,

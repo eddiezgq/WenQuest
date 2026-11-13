@@ -264,6 +264,17 @@ characteristics:
   name: 送布摆轴、抬牙摆轴、调节器轴的位置
   spec: 对旋梭轴孔 ± 0.1（y、z）；F、L 对下轴公共轴线 D 的平行度 0.05/100
   kind: other
+- id: P28
+  name: 压脚与操纵件的轴孔、销孔（G4.7）
+  spec: 夹线柱 Ø5 H7；针距旋钮、倒缝扳手、手抬扳手轴孔 Ø8 H7；松线轴、C1、C2、松线拨杆 Ø6 H7；位置 ± 0.1
+  nominal: 6
+  es: 0.012
+  ei: 0.0
+  kind: dim
+- id: P29
+  name: 调压螺钉孔
+  spec: M18 × 1.5-6H 螺纹深 15（机头顶，压脚杆轴线上）
+  kind: other
 tool_list:
 - id: T01
   name: 直角铣头
@@ -344,6 +355,21 @@ tool_list:
 - id: T16
   name: 碗形堵盖压装工具
   spec: Ø14、Ø16、Ø18 碗形堵盖（DIN 443，涂厌氧密封胶）的压头
+  ops:
+  - 80
+- id: T17
+  name: 钻头 Ø4.8 / Ø5.8 / Ø7.8、铰刀 Ø5 / Ø6 / Ø8 H7
+  spec: 硬质合金；G4.7 操纵件的轴孔、销孔（Ø6 加长一套，有效长 80，钻 C1 销孔）
+  ops:
+  - 80
+- id: T18
+  name: 钻头 Ø16.5、丝锥 M18 × 1.5
+  spec: 直角铣头用，机头顶上的调压螺钉孔
+  ops:
+  - 80
+- id: T19
+  name: 加长钻头 Ø12
+  spec: 直角铣头用，有效长 100：机座底下向上钻针距拉杆、膝抬推杆过孔（拉杆孔穿过机座顶板和立柱下横隔板）
   ops:
   - 80
 gauges:
@@ -804,7 +830,7 @@ operations:
   operation: 钻攻螺纹孔 Drilling & tapping
   workstation: 卧式加工中心 HMC-01
   shop: 机加
-  content: 同工序 70 的夹具。B 180° 钻攻电机座 4 × M5（PCD 40）；B 0° 钻攻面板口 4 × M4；B 270° 钻攻前窗口 6 × M4；直角铣头从上面钻攻顶盖 4 × M4
+  content: 同工序 70 的夹具。B 180° 钻攻电机座 4 × M5（PCD 40）；B 0° 钻攻面板口 4 × M4；B 270° 钻攻前窗口 6 × M4；直角铣头从上面钻攻顶盖 4 × M4；G4.7 压脚与操纵件的轴孔、销孔（B 270°、B 90°、直角铣头从上面、机座底下、机臂下面）
   datum: 下件底面 A、两工艺孔（一面两销）
   clamping: 同工序 70
   fixture: 专用夹具 FX-HSG-P-70
@@ -842,6 +868,55 @@ operations:
     tb_min: 1.04
     ta_min: 0.3
   - step: 4
+    content: B 270°：钻、铰夹线柱孔 Ø5 H7（机臂前壁）；钻、铰针距旋钮轴孔、倒缝扳手轴孔 2 × Ø8 H7（立柱前壁）；加长钻、铰松线轴座孔 Ø6 H7（穿机头前窗口，压脚杆上导套座伸出的耳子）
+    tool: T17
+    gauge: G03
+    vc: 60
+    f: 0.1
+    ap: null
+    passes: 1
+    tb_min: 0.68
+    ta_min: 0.3
+  - step: 5
+    content: B 90°：钻、铰手抬扳手轴孔 Ø8 H7、C2 销孔 Ø6 H7（机头后壁）；加长钻、铰 C1 销孔 Ø6 H7 深 71（立柱后壁）
+    tool: T17
+    gauge: G03
+    vc: 60
+    f: 0.08
+    ap: null
+    passes: 1
+    tb_min: 1.39
+    ta_min: 0.3
+  - step: 6
+    content: 直角铣头从上面：钻机头顶调压螺钉底孔 Ø16.5 深 23、攻 M18 × 1.5 深 15
+    tool: T18
+    gauge: G06
+    vc: 70
+    f: 0.15
+    ap: null
+    passes: 1
+    tb_min: 0.32
+    ta_min: 0.3
+  - step: 7
+    content: 直角铣头在机座底下向上：钻针距拉杆过孔 Ø12（穿机座顶板、立柱下横隔板）、膝抬推杆过孔 Ø12
+    tool: T19
+    vc: 60
+    f: 0.12
+    ap: null
+    passes: 1
+    tb_min: 0.58
+    ta_min: 0.3
+  - step: 8
+    content: 直角铣头伸进机臂下面的空档向上：加长钻、铰松线拨杆座孔 Ø6 H7 深 50（穿机臂底板进立柱）
+    tool: T17
+    gauge: G03
+    vc: 60
+    f: 0.08
+    ap: null
+    passes: 1
+    tb_min: 0.74
+    ta_min: 0.3
+  - step: 9
     content: 卸下后清洗，压 4 个碗形堵盖：左端壁 Ø16、Ø18，右端壁 Ø16、Ø14（右横筋上的两个工艺孔在机座里面，不堵）
     tool: T16
     vc: null
@@ -851,10 +926,13 @@ operations:
     tb_min: 0.0
     ta_min: 2.5
   inspect:
-  - char: M5-6H、M4-6H（P20）
+  - char: M5-6H、M4-6H、M18 × 1.5-6H（P20、P29）
     gauge: G06
     freq: 每件
-  minutes: 8.0
+  - char: 操纵件轴孔、销孔 Ø5 / Ø6 / Ø8 H7（P28）
+    gauge: G03
+    freq: 首件、每 5 件
+  minutes: 14.0
 - seq: 90
   operation: 零件检验 Part inspection
   workstation: 检验站 QC-01
@@ -946,6 +1024,12 @@ operations:
     gauge: G01
     freq: 每 5 件
   - char: P27
+    gauge: G01
+    freq: 每 5 件
+  - char: P28
+    gauge: G01
+    freq: 每 5 件
+  - char: P29
     gauge: G01
     freq: 每 5 件
 hole_sizes:

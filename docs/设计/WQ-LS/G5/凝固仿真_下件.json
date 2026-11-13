@@ -47,9 +47,9 @@
  "chvorinov_B_s_cm2": 322.0,
  "t_solid_total_s": 200.1,
  "modulus_max_cm": 0.79,
- "steps": 2175,
+ "steps": 2154,
  "dt_s": 0.0975,
- "seconds": 298,
+ "seconds": 122,
  "pockets": [
   {
    "volume_cm3": 2.84,
@@ -492,6 +492,32 @@
    "t_end_s": 6.0,
    "in_casting": true,
    "modulus_cm": 0.16
+  },
+  {
+   "volume_cm3": 0.02,
+   "center_mm": [
+    316.2,
+    -38.8,
+    -1.2
+   ],
+   "box_mm": [
+    [
+     315.0,
+     317.5
+    ],
+    [
+     -40.0,
+     -37.5
+    ],
+    [
+     -2.5,
+     0.0
+    ]
+   ],
+   "t_isolated_s": 126.1,
+   "t_end_s": 128.0,
+   "in_casting": true,
+   "modulus_cm": 0.75
   }
  ],
  "pockets_over_limit": [
