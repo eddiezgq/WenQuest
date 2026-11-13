@@ -412,7 +412,7 @@ def ctrl_seats(hollow, solid, info):
           ④ 膝抬角杠杆 C2 的轴座（从后壁伸出的 Ø14 凸台，销孔 Ø6）；⑤ 松线轴座（后壁，Ø14，孔 Ø6）；
     机臂：⑥ 松线拨杆座（机臂底板上的 Ø12 凸台，孔 Ø6）；⑦ 夹线柱孔（前壁，Ø5）；
     立柱：⑧ 针距旋钮轴座（前壁，Ø20，孔 Ø8）；⑨ 倒缝扳手轴座（前壁，Ø18，孔 Ø8）；⑩ 膝抬角杠杆 C1 的轴座（后壁伸出，Ø16，孔 Ø6）；
-          ⑪ 下横隔板上挂拉簧的孔 Ø3、拉杆过孔 Ø12，上横隔板开缺口 14 × 14（拉杆和耳子上下走 ±6）；
+          ⑪ 下横隔板上挂拉簧的方孔 4 × 4（铸出）、拉杆过孔 Ø12，上横隔板开缺口 14 × 14（拉杆和耳子上下走 ±6）；
     机座顶板：⑫ 针距拉杆过孔 Ø10、膝抬推杆过孔 Ø12。"""
     cj = os.path.join(os.path.dirname(_tkj), "操纵件.json")
     if not os.path.exists(cj):
@@ -449,7 +449,7 @@ def ctrl_seats(hollow, solid, info):
         Part.makeCylinder(4.05, 20.0, V(dl["x"], -66.0, dl["z"]), V(0, 1, 0)),
         Part.makeCylinder(4.05, 20.0, V(rv["x"], -66.0, rv["z"]), V(0, 1, 0)),
         Part.makeCylinder(3.05, 62.0, V(kn["C1"]["x"], 45.0, kn["C1"]["z"]), V(0, 1, 0)),
-        Part.makeCylinder(1.5, 12.0, V(g["pull_rod"]["x"], g["spring_rev"]["anchor"][1], 52.0), V(0, 0, 1)),          # ⑪
+        Part.makeBox(4.0, 4.0, 12.0, V(g["pull_rod"]["x"] - 2.0, g["spring_rev"]["anchor"][1] - 2.0, 52.0)),          # ⑪ 方孔 4 × 4 铸出（不加工）
         Part.makeCylinder(6.0, 16.0, V(g["pull_rod"]["x"], g["pull_rod"]["y"], 50.0), V(0, 0, 1)),                     # ⑪ 拉杆穿过下横隔板
         Part.makeBox(14.0, 14.0, 15.0, V(g["pull_rod"]["x"] - 4.0, g["pull_rod"]["y"] - 8.0, 108.0)),                 # ⑪ 上横隔板开缺口：拉杆和耳子（上下 ±6）
         Part.makeCylinder(5.0, 20.0, V(g["pull_rod"]["x"], g["pull_rod"]["y"], -12.0), V(0, 0, 1)),                    # ⑫
