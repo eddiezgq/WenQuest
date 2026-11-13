@@ -110,8 +110,8 @@
     -30.0,
     -10.0
    ],
-   "wire_d": 1.2,
-   "wire_z": 4.6,
+   "wire_d": 0.8,
+   "wire_z": 5.2,
    "r": 31.0,
    "rest_deg": -100.0,
    "sweep_deg": 115.0,
@@ -221,26 +221,26 @@
    "sweep_deg": 115.0,
    "r_mm": 31.0,
    "t_sweep_ms": 60,
-   "note": "电磁铁经机头里的小曲柄（半径 5）转拨线轴 115°（曲柄过死点前后各 57.5°，行程 2 × 5 sin 57.5° = 8.4）；拨线钩是 Ø1.2 弹簧钢丝",
-   "needle_tip_min_mm": 6.2
+   "note": "电磁铁经机头里的小曲柄（半径 5）转拨线轴 115°（曲柄过死点前后各 57.5°，行程 2 × 5 sin 57.5° = 8.4）；拨线钩是 Ø0.8 弹簧钢丝",
+   "needle_tip_min_mm": 6.6
   },
   "ok": true
  },
  "trim_speed": {
   "stop_window": [
    75.0,
-   84.0
+   82.0
   ],
   "stop_hi_fabric": 91.3,
-  "stop_hi_wiper": 84.0,
-  "n_stop_max": 406,
+  "stop_hi_wiper": 82.0,
+  "n_stop_max": 358,
   "gate": [
    100.0,
    275.0
   ],
   "gate_deg": 175.0,
   "n_gate_max": 2750,
-  "n_trim_max": 406,
+  "n_trim_max": 358,
   "n_trim_default": 300.0,
   "ok": true
  },

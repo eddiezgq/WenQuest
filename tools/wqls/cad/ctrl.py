@@ -74,7 +74,7 @@ def build():
     f = g["foot"]
     sx0, sx1, sy0, sy1, sz0, sz1 = f["sole"]
     sole = box(sx0, sx1, sy0, sy1, sz0 + L, sz1 + L)
-    sole = sole.fuse(box(sx0, sx1, sy0 - 4.0, sy0 + 0.01, sz0 + 1.5 + L, sz1 + 1.5 + L))                      # 前端翘起
+    sole = sole.fuse(box(sx0, sx1, sy0 - 4.0, sy0 + 0.01, sz0 + 1.5 + L, sz1 + 0.5 + L))                      # 前端翘起 1.5，翘起的一段厚 2（G4.8：拨线钩从上面扫过）
     sole = sole.cut(cyl(2.4, (0, 0, -1 + L), (0, 0, 5 + L)))                                                   # 针孔 Ø4.8
     shank = box(*f["shank"][:4], f["shank"][4] + L, f["shank"][5] + L)
     shank = shank.fuse(box(sx0, sx0 + 6.0, -2.0, 2.0, sz1 - 0.5 + L, f["shank"][4] + 0.5 + L))                 # 铰接耳（销沿 x）

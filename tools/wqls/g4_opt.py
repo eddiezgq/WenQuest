@@ -52,8 +52,8 @@ GEO = dict(
     solenoid_trim=dict(x=(108.0, 124.0), stroke=5.0, d=22.0),     # 推摆杆沿摆轴进槽（沿 +x）
     # ⑤ 松线电磁铁：拉立轴拨杆上加的第三条臂（朝 +y 10）往 −x；拨线器：机头左前下方的竖轴
     sol_release=dict(arm=(0.0, 10.0), x=(47.0, 64.0), d=16.0, stroke=3.0),
-    # 拨线器：竖轴 (−30, −10) 从机头底板的轴座伸下来；钢丝 Ø1.2 在 z 4.6，长 31；收回时朝 −100°（在压脚前面外侧），扫到 +15° 时钩尖过针前
-    wiper=dict(pivot=(-30.0, -10.0), wire_d=1.2, wire_z=4.6, r=31.0, rest_deg=-100.0, sweep_deg=115.0,
+    # 拨线器：竖轴 (−30, −10) 从机头底板的轴座伸下来；钢丝 Ø0.8 在 z 5.2（压脚面 3.3、压脚前端翘起 3.8、耳子 6.8 都让开 ≥ 1.0），长 31；收回时朝 −100°（在压脚前面外侧），扫到 +15° 时钩尖过针前
+    wiper=dict(pivot=(-30.0, -10.0), wire_d=0.8, wire_z=5.2, r=31.0, rest_deg=-100.0, sweep_deg=115.0,
                sol=dict(x=(-26.0, -12.0), z=61.5, d=16.0, stroke=10.0)),
     # ⑥ 电子针距：步进电机在机座里，轴沿 x，经同步带转调节器轴（G4.6 调节器轴 x 297…310、y 0、z −50）
     estep=dict(motor_axis=(-24.0, -35.0), x_face=270.0, pulley_x=(286.0, 296.0)),
@@ -210,7 +210,7 @@ def solenoids():
                note="行程 3 mm：先走完松线销 0.5 mm 的空程，再推开夹线盘")
     w = GEO["wiper"]
     wip = dict(pick="24 V 拉式电磁铁 Ø16（示例：行程 10 mm 时 8 N）", sweep_deg=w["sweep_deg"], r_mm=w["r"],
-               t_sweep_ms=60, note="电磁铁经机头里的小曲柄（半径 5）转拨线轴 115°（曲柄过死点前后各 57.5°，行程 2 × 5 sin 57.5° = 8.4）；拨线钩是 Ø1.2 弹簧钢丝",
+               t_sweep_ms=60, note="电磁铁经机头里的小曲柄（半径 5）转拨线轴 115°（曲柄过死点前后各 57.5°，行程 2 × 5 sin 57.5° = 8.4）；拨线钩是 Ø0.8 弹簧钢丝",
                needle_tip_min_mm=round(w["wire_z"] + w["wire_d"] / 2 + 1.0, 1))
     return dict(trim=trim, release=rel, wiper=wip, ok=trim["SF"] >= 1.5 and rel["SF"] >= 1.5)
 
