@@ -81,10 +81,13 @@ for f in part.Faces:
                 ctrl_bore = "presser"                    # 压脚杆两孔 Ø12、调压螺钉底孔 Ø16.5
             if abs(ax.y) > 0.99 and abs(p0.x - cg["geo"]["hand"]["x"]) < 0.5 and abs(p0.z - hz_) < 0.5 and r > 3.5:
                 ctrl_bore = "hand"                       # 手抬扳手轴孔 Ø8
+            for k_ in ("dial", "reverse"):               # 针距旋钮、倒缝扳手轴孔 Ø8
+                if abs(ax.y) > 0.99 and abs(p0.x - cg["geo"][k_]["x"]) < 0.5 and abs(p0.z - cg["geo"][k_]["z"]) < 0.5 and r > 3.5:
+                    ctrl_bore = k_
         if hole and ctrl_bore:
             # G4.7 压脚杆孔、调压螺钉孔、手抬扳手轴孔用砂芯铸出（不铸出时 Ø18–Ø26 的凸台成了实心热节，凝固仿真 9–18 cm³ 的孤立液相区）：
-            # 比成品小 3（Ø12 → Ø9，Ø16.5 → Ø13.5），手抬轴孔 Ø8 → Ø5
-            dc = 5.0 if ctrl_bore == "hand" else 2 * r - 3.0
+            # 比成品小 3（Ø12 → Ø9，Ø16.5 → Ø13.5），手抬、针距旋钮、倒缝扳手轴孔 Ø8 → Ø5
+            dc = 5.0 if ctrl_bore in ("hand", "dial", "reverse") else 2 * r - 3.0
             adds.append(Part.makeCylinder(r + 0.4, L + 0.2, p0 - ax * 0.1, ax).cut(Part.makeCylinder(dc / 2, L + 2, p0 - ax, ax)))
             log["bores"].append(dict(d=round(2 * r, 1), cast_d=dc, at=[round(x, 1) for x in p0], ctrl=ctrl_bore))
         elif hole and feed_bore:

@@ -267,7 +267,7 @@ def ctrl_holes():
                   cam.drill(P, 66 + 16, 5, 0.12 * rpm(60, 12), r_plane=-6, safe=55), kind="drill"))
     P = [to_frame("UNDER", (kn["push"]["x"] - 0.7, kn["y"], -16.0))[:2]]
     ops.append(op("UNDER 钻膝抬推杆过孔 Ø12（机座顶板）", "UNDER", 49, "钻头 Ø12（加长）", 12, 60,
-                  cam.drill(P, 2 + 16, 0, 0.12 * rpm(60, 12), r_plane=-6, safe=55), kind="drill"))
+                  cam.drill(P, 2 + 16, 0, 0.12 * rpm(60, 12), r_plane=-2, safe=55), kind="drill"))
     # 直角铣头伸进机臂下面的空档向上：松线拨杆座孔 Ø6 H7（机臂底面 z 120 穿过底板，进底板上的立柱到 z 170）；立轴销从下面压入，过盈自封
     P = [to_frame("ARMUP", (rl["pivot"][0], rl["pivot"][1], 120.0))[:2]]
     ops.append(op("ARMUP 钻 Ø5.8（松线拨杆座，加长）", "ARMUP", 45, "钻头 Ø5.8（直角铣头，加长）", 5.8, 50, cam.drill(P, 50, 4, 0.06 * rpm(50, 5.8), r_plane=2, safe=8), kind="drill"))
