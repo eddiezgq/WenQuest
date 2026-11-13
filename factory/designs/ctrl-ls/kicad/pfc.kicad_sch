@@ -314,7 +314,7 @@
         (effects
           (font
             (size 1.27 1.27))))
-      (property "Footprint" "wq:Magnetics_TBD"
+      (property "Footprint" "wq:L_ETD59_Horizontal"
         (at 0 -6.35 0)
         (effects
           (font
@@ -324,7 +324,7 @@
         (effects
           (font
             (size 1.27 1.27)) hide))
-      (property "ki_description" "升压电感（平缝机控制器 CTRL-LS，定制件；磁芯 159d2 定）"
+      (property "ki_description" "升压电感（平缝机控制器 CTRL-LS，定制件；ETD59 磁芯按理论选，见计算书）"
         (at 0 0 0)
         (effects
           (font
@@ -1730,7 +1730,7 @@
       (effects
         (font
           (size 1.27 1.27))))
-    (property "Footprint" "wq:Magnetics_TBD"
+    (property "Footprint" "wq:L_ETD59_Horizontal"
       (at 266.7 53.34 0)
       (effects
         (font
@@ -1745,7 +1745,7 @@
       (effects
         (font
           (size 1.27 1.27)) hide))
-    (property "说明" "升压电感（定制：电感量、峰值电流见计算书；磁芯与封装 159d2 定）"
+    (property "说明" "升压电感（定制：ETD59 + 骨架 B66398，匝数、气隙、线径见计算书“按理论”）"
       (at 266.7 53.34 0)
       (effects
         (font

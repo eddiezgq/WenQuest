@@ -17,8 +17,8 @@ CAP-0805,3.3u/25V,C_0805_2012Metric,1,C208,,,,规格书 p.7 CBRO 3 µF，取 3.3
 CAP-1206,10u/25V,C_1206_3216Metric,5,C309 C310 C404 C604 C605,,,,
 CAP-1206,1u/50V,C_1206_3216Metric,1,C305,,,,
 CAP-1206,4.7u/25V,C_1206_3216Metric,4,C401 C402 C403 C603,,,,自举电容：静态电流 300 µA（规格书）× 每个 PWM 周期 62.5 µs ≪ 4.7 µF × 1 V
-CAP-1206-1KV,1n/1kV,C_1206_3216Metric,1,C303,,,,RCD 钳位电容（待定，同上）
 CAP-1210,10u/50V,C_1210_3225Metric,1,C505,,,,VS 去耦
+CAP-1812-1KV,15n/1kV,C_1812_4532Metric,1,C303,,,,RCD 钳位电容（计算书：≥ 11.6n）
 CAP-1812-630V,100n/630V,C_1812_4532Metric,1,C406,,,,母线高频旁路，紧靠 P、N 引脚（规格书 4.1 节）
 CAP-BULK-330U-500V,330u/500V,CP_Radial_D30.0mm_P10.00mm_SnapIn,3,C221 C222 C223,500MXH330MEFCSN30X50,Rubycon,C472902,500MXH330MEFCSN30X50（母线电容，计算书：3 只并联）
 CAP-EL-1000U-10V,1000u/10V,CP_Radial_D8.0mm_P3.50mm,1,C307,,,,5 V 输出
@@ -29,7 +29,7 @@ CAP-FILM-1U-450V,1u/450V,C_Rect_L18.0mm_W8.0mm_P15.00mm_FKS3_FKP3,1,C104,,,,整�
 CAP-X2-470N,470n X2,C_Rect_L26.5mm_W10.5mm_P22.50mm_MKS4,1,C101,BFC233920474,Vishay,C511073,BFC233920474（封装待核对）
 CAP-Y-2N2,2n2 Y1,C_Disc_D8.0mm_W5.0mm_P7.50mm,2,C102 C103,DE1E3RA222MA4BP01F,Murata,C907949,Y 电容（封装待核对）
 CMC-8118RC,7.3mH 9.3A,L_CommonMode_Toroid_Vertical_L41.9mm_W20.3mm_Px15.24mm_Py22.86mm_Bourns_8100,1,L101,8118-RC,Bourns,,8118-RC（Bourns 8100 系列，KiCad 官方库同系列封装；159d2 由 FC-HLF2018 换来：那颗规格书读不出、库里没有封装）
-CONN-AC,AC IN L/N/PE,"TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal",1,J101,,,,交流输入：1 相线、2 零线、3 保护地
+CONN-AC,AC IN L/N,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",1,J101,,,,交流输入：1 相线、2 零线。保护地线不上板：直接接电控箱的接地螺柱；板上的 Y 电容经安装孔 H1 接箱体（159d2b）
 CONN-MOT,MOTOR U/V/W,"TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal",1,J401,,,,电机三相
 CONN-VH8,SOLENOIDS,JST_VH_B8P-VH_1x08_P3.96mm_Vertical,1,J501,,,,电磁铁 4 路（每路 +24 V 与漏极）：剪线、拨线、倒缝、抬压脚
 CONN-XH3,PEDAL,JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical,1,J702,,,,脚踏板（霍尔，0.5–4.5 V）
@@ -53,7 +53,7 @@ IC-RS485,MAX3485ESA+T,SOIC-8_3.9x4.9mm_P1.27mm,1,U604,MAX3485ESA+T,Analog Device
 IC-TL431,TL431AIDBZR,SOT-23,1,U302,TL431AIDBZR,Texas Instruments,C23892,反馈基准
 IC-TMC2226,TMC2226-SA,HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP2.75x6.2mm_ThermalVias,1,U501,TMC2226-SA,ADI / Trinamic,C6718351,针距步进驱动：MS1、MS2 接地（8 细分）、SPREAD 接地（静音模式）、CLK 接地（片内时钟）、PDN_UART 接地（停转时电流减半）、STDBY 接地；以上独立模式接法待核对规格书
 IC-TOP266KG,TOP266KG,PowerIntegrations_eSOP-12B,1,U301,TOP266KG,Power Integrations,C568204,反激控制器（集成 725 V 开关管）；X 接 S、F 接 C
-IND-PFC-CUSTOM,451uH,Magnetics_TBD,1,L201,,,,升压电感（定制：电感量、峰值电流见计算书；磁芯与封装 159d2 定）
+IND-PFC-CUSTOM,451uH,L_ETD59_Horizontal,1,L201,,,,升压电感（定制：ETD59 + 骨架 B66398，匝数、气隙、线径见计算书“按理论”）
 IPM-STGIPS14K60T,STGIPS14K60T,ST_SDIP-25L,1,U401,STGIPS14K60T,STMicroelectronics,C5268145,三相智能功率模块（装在散热器上）。OUT_x 是上桥浮地参考，自举电容接在 VB_x 与 OUT_x 之间
 MOS-2N7002,2N7002,SOT-23,6,Q101 Q202 Q505 Q506 Q507 Q508,,,,母线充好（校正控制器 VB_OK = 5 V）后吸合
 MOS-80V,BSC040N08NS5,TDSON-8-1,4,Q501 Q502 Q503 Q504,BSC040N08NS5,Infineon,C534333,剪线电磁铁
@@ -87,10 +87,10 @@ RES-1206,1M,R_1206_3216Metric,5,R101 R102 R420 R421 R422,,,,X 电容放电：2 M
 RES-1206,2M,R_1206_3216Metric,2,R301 R302,,,,V 脚线路检测 4 MΩ（规格书 p.6），两只 1206 串联分压；离 V 脚 10 mm 内（p.21）
 RES-1206,3.9M,R_1206_3216Metric,2,R211 R212,,,,规格书 p.7 RBRO1、RBRO2 3.9 MΩ
 RES-2010-0R12,120m,R_2010_5025Metric,2,R509 R510,,,,采样电阻 0.12 Ω / 1 W（BOB 物料清单）
-RES-2512,100k,R_2512_6332Metric,1,R303,,,,RCD 钳位电阻：要变压器漏感才能算，第一版取常见值、按样机调（待定）
+RES-2512,6.2k,R_2512_6332Metric,2,R303 R310,,,,RCD 钳位电阻：两只 2512 串联 = 12.4k（计算书 R ≤ 13.1 kΩ，功耗 1.7 W 两只分担）
 RES-SHUNT-10M,10m,R_2512_6332Metric,1,R203,,,,电流采样电阻（整流桥负端到地，ISENSE 取负压；型号与额定功率 159d2 定）
 RES-SHUNT-25M,25m,R_2512_6332Metric,3,R411 R412 R413,WSLT2512R0250FEA,Vishay,C4210426,WSLT2512R0250FEA（下桥采样电阻）
 RLY-G5LE,G5LE-1 DC12,Relay_SPDT_Omron-G5LE-1,1,K101,G5LE-1-E DC12,Omron,C152711,G5LE-1-E DC12：1 公共端、3 常开（短接热敏电阻）、2/5 线圈。线圈 12 V 用在 15 V 上——线圈最高允许电压待核对规格书
 TVS-SMBJ24A,SMBJ24A,D_SMB,4,D505 D506 D507 D508,SMBJ24A,Littelfuse,C224017,钳位稳压管（反接，击穿电压 + 二极管压降 + 24 V = 关断时漏极电压）
-XFMR-FLY-CUSTOM,FLY-24/15/5,Magnetics_TBD,1,T301,,,,反激变压器（定制：初级电感、匝比见计算书；三路次级共地，不要求加强绝缘；磁芯与封装 159d2 定）
+XFMR-FLY-CUSTOM,FLY-24/15/5,Transformer_EPCOS_B66359A1013T_Horizontal,1,T301,,,,反激变压器（定制：ETD29 + 卧式骨架 B66359A1013T，匝数、气隙见计算书“按理论”；三路次级共地，不要求加强绝缘）
 XTAL,8MHz,Crystal_SMD_3225-4Pin_3.2x2.5mm,1,Y1,,,,

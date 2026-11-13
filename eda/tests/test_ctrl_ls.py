@@ -227,3 +227,29 @@ def test_stepper_current_and_panel_isolation_by_hand(book):
     assert check(book, "stepper", "i_set")["status"] == c.PENDING
     assert item(book, "panel_iso", "iso_pk") == pytest.approx(2500 * math.sqrt(2), rel=1e-9)
     assert check(book, "panel_iso", "iso_v")["status"] == c.PENDING
+
+
+def test_magnetics_by_theory(book):
+    """159d2b 按理论选磁芯（面积积法）：升压电感 ETD59（A_e 368 mm²、A_N 365.6 mm²），反激 ETD29（76 mm²、97 mm²）"""
+    po = 550 / 0.90 / 0.97 + 40
+    iin = po / 0.95 / 90
+    ipk = math.sqrt(2) * iin
+    di = 0.3 * ipk
+    L = 195 * (1 - 195 / 390) / (65000 * di)
+    i_l_pk = ipk + di / 2
+    ap = L * i_l_pk * iin / (0.3 * 4e6 * 0.4)
+    assert item(book, "pfc_boost", "l_ap_need") == pytest.approx(ap * 1e8, rel=1e-9)
+    n = math.ceil(L * i_l_pk / (0.3 * 368e-6))
+    assert item(book, "pfc_boost", "l_n") == n
+    assert item(book, "pfc_boost", "l_lg") == pytest.approx(4e-7 * math.pi * n**2 * 368e-6 / L * 1e3, rel=1e-9)
+    assert check(book, "pfc_boost", "l_ap")["status"] == c.PENDING  # 磁芯数据录了、没逐页核对
+    assert check(book, "pfc_boost", "l_p_fe")["status"] == c.UNKNOWN  # 铁损要损耗曲线：未知
+    # 反激 RCD 钳位（按理论）：漏感 2 % L_p，P = ½·L_lk·I_p²·f·V_c/(V_c − V_OR)
+    vmin = math.sqrt(2) * 90 * 0.9
+    pin = (24 * 0.8 + 15 * 0.15 + 5 * 0.3) / 0.80
+    dmax = 100 / (100 + vmin)
+    ip = 2 * pin / (vmin * dmax)
+    lp = vmin * dmax / (ip * 66000)
+    p = 0.5 * 0.02 * lp * ip**2 * 66000 * 150 / (150 - 100)
+    assert item(book, "flyback_aux", "p_clamp") == pytest.approx(p, rel=1e-9)
+    assert item(book, "flyback_aux", "r_clamp") == pytest.approx(150**2 / p, rel=1e-9)
