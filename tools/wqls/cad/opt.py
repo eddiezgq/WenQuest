@@ -152,8 +152,9 @@ def build_T():
     # ---- 动刀轴座：钢板 z −14…−10，螺在机座顶板下两个凸台（x −28、+8，y 40）上；轴套往下到 z −30
     base = box(-34.0, 14.0, py - 7.0, py + 7.0, bs["z"][0], bs["z"][1]).fuse(cyl(7.0, (px, py, bs["bushing"][0]), (px, py, bs["z"][0])))
     base = base.cut(cyl(k["shaft_d"] / 2 + 0.05, (px, py, bs["bushing"][0] - 1), (px, py, bs["z"][1] + 1)))
-    for sx in (-28.0, 8.0):
-        base = base.cut(cyl(2.25, (sx, py, bs["z"][0] - 1), (sx, py, bs["z"][1] + 1)))
+    for sx in (-28.0, 8.0):                                         # 两根垫柱 Ø10 从 z −10 到机座顶板下凸台底面 −7.6
+        base = base.fuse(cyl(5.0, (sx, py, bs["z"][1]), (sx, py, -7.6)))
+        base = base.cut(cyl(2.25, (sx, py, bs["z"][0] - 1), (sx, py, -7.5)))
     P["trim_base"] = (base, "metal", "steel", None)
     # ---- 剪线摆轴：Ø10 沿 x（y 60、z −30），左端曲柄朝下 20，曲柄销在 x −18（和动刀曲柄销同一 x）
     Sy, Sz = rr["y"], rr["z"]
@@ -165,10 +166,10 @@ def build_T():
     # ---- 摆轴座两个（钢件，x −12…−4、94…104），各两颗 M5 螺在机座顶板下的凸台（z −10）上；右边的座往右伸一块托住剪线电磁铁
     brk = None
     for xa, xb in ((-12.0, -4.0), (94.0, 104.0)):
-        b_ = box(xa, xb, Sy - 8.0, Sy + 8.0, Sz - 8.0, -10.0).fuse(cyl(8.0, (xa, Sy, Sz), (xb, Sy, Sz)))
+        b_ = box(xa, xb, Sy - 8.0, Sy + 8.0, Sz - 8.0, -7.6).fuse(cyl(8.0, (xa, Sy, Sz), (xb, Sy, Sz)))
         b_ = b_.cut(cyl(rr["d"] / 2 + 0.05, (xa - 1, Sy, Sz), (xb + 1, Sy, Sz)))
         for yy in (Sy - 5.0, Sy + 5.0):
-            b_ = b_.cut(cyl(2.75, ((xa + xb) / 2, yy, -21.0), ((xa + xb) / 2, yy, -9.0)))
+            b_ = b_.cut(cyl(2.75, ((xa + xb) / 2, yy, -21.0), ((xa + xb) / 2, yy, -7.5)))
         brk = b_ if brk is None else brk.fuse(b_)
     st_ = GEO["solenoid_trim"]
     shelf = box(94.0, st_["x"][1], Sy - 6.0, Sy + 6.0, Sz - 18.0 - st_["d"] / 2 - 3.0, Sz - 18.0 - st_["d"] / 2).fuse(
@@ -273,8 +274,8 @@ def build_E():
     # 42 步进电机（48 mm 长，带磁编码器后盖 12）：机身 x 220…268；轴伸到 x 296；电机板 x 268…272 螺在机座顶板下的两个凸台上
     body = box(220.0, 268.0, my - 21.0, my + 21.0, mz - 21.0, mz + 21.0).fuse(cyl(14.0, (208.0, my, mz), (220.0, my, mz)))
     P["estep_motor"] = (body, "graphite", "copper", None)
-    plate = box(268.0, 272.0, my - 24.0, my + 24.0, mz - 24.0, -10.0).cut(cyl(11.5, (267.0, my, mz), (273.0, my, mz)))
-    plate = plate.fuse(box(268.0, 282.0, my - 24.0, my + 24.0, -14.0, -10.0))          # 顶上的翻边，两颗 M5 螺在机座顶板下的凸台上
+    plate = box(268.0, 272.0, my - 24.0, my + 24.0, mz - 24.0, -7.6).cut(cyl(11.5, (267.0, my, mz), (273.0, my, mz)))
+    plate = plate.fuse(box(268.0, 282.0, my - 24.0, my + 24.0, -11.6, -7.6))           # 顶上的翻边，两颗 M5 螺在机座顶板下的凸台上
     P["estep_bracket"] = (plate, "metal", "alu", None)
     P["estep_pulley_m"] = (cyl(5.0, (272.0, my, mz), (296.0, my, mz)).fuse(cyl(6.5, (284.0, my, mz), (294.0, my, mz))), "metal", "steel", None)
     # 调节器轴往左伸到 x 283，上面 24 齿带轮（节圆 Ø22.9）；带 HTD 3M、宽 9（只画外形）
