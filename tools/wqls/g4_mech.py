@@ -121,9 +121,11 @@ def frames(step=2):
         By, Bz = w(TK["B"])
         nb_bot = Bv + ZU - X["nb_below"]
         # G4.7：从夹线器开始——两片夹线盘之间（绕夹线柱下面）→ 挑线簧的钩 → 过线点 A
-        thread = TENSION_PATH + [[40.0, Ay, Az], [X["lever"][0] + X["lever"][1] / 2, Ey, Ez], [0.0, By, Bz], [0.0, -6.0, nb_bot + 0.3],
-                  [0.0, -0.3, tip + 2.8]]
-        out.append(dict(phi=phi, M={k: [round(v, 5) for v in m.flatten()] for k, m in M.items()}, thread=thread,
+        # 过线点 B 之后：机头前面下沿的过线环（z 44，cad/ctrl.py 的 thread_guide）→ 针夹上的线钩 → 顺着机针前面的长槽到针眼
+        thread = TENSION_PATH + [[40.0, Ay, Az], [X["lever"][0] + X["lever"][1] / 2, Ey, Ez], [0.0, By, Bz], [0.0, -51.0, 44.0],
+                                 [0.0, -6.0, nb_bot + 0.3], [0.0, -0.75, nb_bot - 3.0], [0.0, -0.3, tip + 2.8]]
+        own = (["tension", "tension", "check_spring"] if TENSION_PATH else []) + ["A", "lever", "B", "thread_guide", "needle_clamp", "needle", "needle"]
+        out.append(dict(phi=phi, M={k: [round(v, 5) for v in m.flatten()] for k, m in M.items()}, thread=thread, thread_own=own,
                         tip_z=round(tip, 3), eye=[round(Ey, 3), round(Ez, 3)]))
     return out
 

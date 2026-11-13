@@ -67,7 +67,7 @@ JOINT = {frozenset(p) for p in [
     ("tension_post", "tension_discs"), ("tension_discs", "release_pin"), ("tension_discs", "tension_spring"), ("tension_spring", "tension_nut"),
     ("tension_nut", "tension_post"), ("check_spring", "tension_post"), ("tension_spring", "tension_post"),
     ("stitch_dial", "casting"), ("stitch_dial", "pull_rod"), ("pull_rod", "regulator"), ("pull_rod", "reverse_lever"), ("reverse_lever", "casting"),
-    ("reverse_spring", "pull_rod"), ("reverse_spring", "casting")]}
+    ("reverse_spring", "pull_rod"), ("reverse_spring", "casting"), ("thread_guide", "casting")]}
 
 
 def mat(m):

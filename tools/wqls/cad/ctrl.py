@@ -192,6 +192,10 @@ def build():
     P["tension_nut"] = (cyl(9.0, (tx, yw - 18.0, tz), (tx, yw - 26.0, tz)).cut(cyl(t["post_d"] / 2, (tx, yw - 17, tz), (tx, yw - 27, tz))), "graphite", "plastic", None)
     cs = Part.makeTorus(9.0, 0.35, V(tx, yw - 3.5, tz), V(0, -1, 0)).fuse(cyl(0.35, (tx - 9.0, yw - 3.5, tz), (tx - 9.0 - 10.6, yw - 3.5, tz + 10.6)))
     P["check_spring"] = (cs, "chrome", "steel", None)
+    # 机头前面下沿的过线环（钢丝 Ø1，环内径 3，用 M3 螺钉装在机头前壁下沿 z 50 处）：面线从过线点 B 下来，经它拐到针杆线钩
+    gd = Part.makeTorus(2.0, 0.5, V(0.0, -51.0, 44.0), V(0, 0, 1)).fuse(cyl(0.5, (0.0, -49.0, 44.0), (0.0, -48.5, 44.0))).fuse(
+        box(-3.0, 3.0, -48.5, -46.5, 42.0, 50.0))
+    P["thread_guide"] = (gd, "chrome", "steel", None)
     # ---------------------------------------------------------------- ⑤ 针距旋钮、拉杆、倒缝扳手、拉簧（这一档的位置）
     s_, rev, alpha = setting()
     dl, ra, pr, rv = g["dial"], g["reg_arm"], g["pull_rod"], g["reverse"]

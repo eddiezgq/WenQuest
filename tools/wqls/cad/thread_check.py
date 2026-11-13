@@ -16,10 +16,9 @@ D = os.environ["WQ_MECH"]
 STEP = int(os.environ.get("WQ_STEP", "6"))
 FR = json.load(open(os.path.join(D, "frames.json")))["frames"]
 parts = {k: Part.read(os.path.join(D, k + ".step")) for k in json.load(open(os.path.join(D, "parts.json")))["parts"]}
-cast = Part.read(os.environ["WQ_HOUSING"])
+parts["casting_upper"] = Part.read(os.environ["WQ_HOUSING"])            # 两件分开算（合起来的布尔运算又慢又不稳）
 if os.environ.get("WQ_HOUSING_LOWER"):
-    cast = cast.fuse(Part.read(os.environ["WQ_HOUSING_LOWER"]))
-parts["casting"] = cast
+    parts["casting_lower"] = Part.read(os.environ["WQ_HOUSING_LOWER"])
 
 
 def mat(m):
@@ -29,6 +28,9 @@ def mat(m):
 worst = {}
 for f in FR[:: max(1, STEP // 2)]:
     pts = [V(*p) for p in f["thread"]]
+    own = f.get("thread_own", [""] * len(pts))
+    OWNER = dict(tension=("tension_post", "tension_discs"), lever=("lever",), needle_clamp=("needle_clamp",), needle=("needle",),
+                 check_spring=("check_spring",), thread_guide=("thread_guide",))
     segs = []
     for i in range(len(pts) - 1):
         a, b = pts[i], pts[i + 1]
@@ -37,14 +39,17 @@ for f in FR[:: max(1, STEP // 2)]:
             continue
         u = V(d)
         u.normalize()
-        segs.append((i, Part.makeCylinder(0.15, d.Length - 4.0, a + u * 2.0, u)))
+        ok_parts = set(OWNER.get(own[i], ())) | set(OWNER.get(own[i + 1], ()))     # 线本来就贴着的零件（两端的线眼、夹线盘、针的长槽）
+        segs.append((i, Part.makeCylinder(0.15, d.Length - 4.0, a + u * 2.0, u), ok_parts))
     for k, s0 in parts.items():
         s = s0.copy()
         m = f["M"].get(k)
         if m:
             s.transformShape(mat(m), True)
         bb = s.BoundBox
-        for i, seg in segs:
+        for i, seg, ok_parts in segs:
+            if k in ok_parts:
+                continue
             sb = App.BoundBox(seg.BoundBox)
             sb.enlarge(3.0)
             if not bb.intersect(sb):                     # 离得远的不算距离（只关心 3 mm 以内）
