@@ -440,17 +440,17 @@ def ctrl_seats(hollow, solid, info):
     if FEA_SIMPLE:
         return hollow
     holes = [
-        Part.makeCylinder(6.0, 160.0, V(bx, by, 30.0), V(0, 0, 1)).common(Part.makeBox(40, 40, 22, V(bx - 20, by - 20, 30.0))),   # 下导套孔 z 30…52
+        Part.makeCylinder(6.0, 160.0, V(bx, by, 30.0), V(0, 0, 1)).common(Part.makeBox(40, 40, 28, V(bx - 20, by - 20, 30.0))),   # 下导套孔 z 30…58（凸台顶上的圆角高出 52，孔要穿透）
         Part.makeCylinder(6.0, 20.0, V(bx, by, 166.0), V(0, 0, 1)),                                                   # 上导套孔
         Part.makeCylinder(8.25, 40.0, V(bx, by, 236.0), V(0, 0, 1)),                                                  # M18 × 1.5 底孔 Ø16.5
         Part.makeCylinder(4.05, 30.0, V(g["hand"]["x"], 50.0, hz), V(0, 1, 0)),
-        Part.makeCylinder(3.05, 20.0, V(kn["C2"]["x"], 45.0, kn["C2"]["z"]), V(0, 1, 0)),
+        Part.makeCylinder(3.05, 32.0, V(kn["C2"]["x"], 45.0, kn["C2"]["z"]), V(0, 1, 0)),                           # 从机头后壁外面钻进来，穿透后壁
         Part.makeCylinder(3.05, 60.0, V(rl["shaft"][0], -50.0, rl["shaft"][1]), V(0, 1, 0)).common(Part.makeBox(20, 13, 20, V(rl["shaft"][0] - 10, -8.0, rl["shaft"][1] - 10))),
         Part.makeCylinder(3.05, 51.0, V(rl["pivot"][0], rl["pivot"][1], 118.0), V(0, 0, 1)),                          # 从机臂底面钻上来；立轴销从下面压入（过盈，自封）
         Part.makeCylinder(2.5, 20.0, V(g["tension"]["x"], -30.0, g["tension"]["z"]), V(0, -1, 0)),                     # ⑦
         Part.makeCylinder(4.05, 20.0, V(dl["x"], -66.0, dl["z"]), V(0, 1, 0)),
         Part.makeCylinder(4.05, 20.0, V(rv["x"], -66.0, rv["z"]), V(0, 1, 0)),
-        Part.makeCylinder(3.05, 62.0, V(kn["C1"]["x"], 45.0, kn["C1"]["z"]), V(0, 1, 0)),
+        Part.makeCylinder(3.05, 76.0, V(kn["C1"]["x"], 45.0, kn["C1"]["z"]), V(0, 1, 0)),                           # 从立柱后壁外面钻进来，穿透后壁
         Part.makeBox(4.0, 4.0, 12.0, V(g["pull_rod"]["x"] - 2.0, g["spring_rev"]["anchor"][1] - 2.0, 52.0)),          # ⑪ 方孔 4 × 4 铸出（不加工）
         Part.makeCylinder(6.0, 16.0, V(g["pull_rod"]["x"], g["pull_rod"]["y"], 50.0), V(0, 0, 1)),                     # ⑪ 拉杆穿过下横隔板
         Part.makeBox(14.0, 14.0, 15.0, V(g["pull_rod"]["x"] - 4.0, g["pull_rod"]["y"] - 8.0, 108.0)),                 # ⑪ 上横隔板开缺口：拉杆和耳子（上下 ±6）

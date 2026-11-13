@@ -73,7 +73,21 @@ for f in part.Faces:
             for k_ in ("Fr", "Lr", "G"):
                 if abs(p0.y - feed_axes[k_][0]) < 0.5 and abs(p0.z - feed_axes[k_][1]) < 0.5:
                     feed_bore = k_
-        if hole and feed_bore:
+        ctrl_bore = None
+        if PART == "upper":
+            cg = json.load(open(os.path.join(ROOT, "docs/设计/WQ-LS/G4/操纵件.json"), encoding="utf-8"))
+            gb, hz_ = cg["geo"]["bar"], cg["hand"]["shaft_z"]
+            if abs(ax.z) > 0.99 and abs(p0.x - gb["x"]) < 0.5 and abs(p0.y - gb["y"]) < 0.5 and r > 5.5:
+                ctrl_bore = "presser"                    # 压脚杆两孔 Ø12、调压螺钉底孔 Ø16.5
+            if abs(ax.y) > 0.99 and abs(p0.x - cg["geo"]["hand"]["x"]) < 0.5 and abs(p0.z - hz_) < 0.5 and r > 3.5:
+                ctrl_bore = "hand"                       # 手抬扳手轴孔 Ø8
+        if hole and ctrl_bore:
+            # G4.7 压脚杆孔、调压螺钉孔、手抬扳手轴孔用砂芯铸出（不铸出时 Ø18–Ø26 的凸台成了实心热节，凝固仿真 9–18 cm³ 的孤立液相区）：
+            # 比成品小 3（Ø12 → Ø9，Ø16.5 → Ø13.5），手抬轴孔 Ø8 → Ø5
+            dc = 5.0 if ctrl_bore == "hand" else 2 * r - 3.0
+            adds.append(Part.makeCylinder(r + 0.4, L + 0.2, p0 - ax * 0.1, ax).cut(Part.makeCylinder(dc / 2, L + 2, p0 - ax, ax)))
+            log["bores"].append(dict(d=round(2 * r, 1), cast_d=dc, at=[round(x, 1) for x in p0], ctrl=ctrl_bore))
+        elif hole and feed_bore:
             # G4.6 送布摆轴、抬牙摆轴、调节器轴的孔和端壁工艺孔都用砂芯铸出（否则凸台成了实心热节）：
             # 抬牙摆轴前孔 Ø16 铸出 Ø15（后孔的 Ø14 镗刀要从这里穿过去），调节器孔 Ø10 铸出 Ø6，其余比成品小 3
             dc = 15.0 if (feed_bore == "Lr" and abs(r - 8.0) < 0.05 and p0.x > 0) else (6.0 if (feed_bore == "G" and abs(r - 5.0) < 0.05) else 2 * r - 3.0)

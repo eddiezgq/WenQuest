@@ -53,6 +53,9 @@ YL, ZL, ZH = 27.791774943072237, -35.36485983577417, -21.5
 FEED = json.loads((Path(__file__).resolve().parents[2] / "docs" / "设计" / "WQ-LS" / "G4" / "送布机构.json").read_text(encoding="utf-8"))["geo"]   # G4.6
 
 
+CLIP = {"ARMUP": 60.0}   # 帧坐标 z 大于此值（离刀具更近、在刀头后面）的材料不算：ARMUP 的刀头在机臂（z 120）和机座（z 0）之间，z 60 以下是机座
+
+
 def to_frame(frame, p):
     n, ex, ey, p0 = (np.asarray(v, float) for v in FRAMES[frame])
     d = np.asarray(p, float) - p0
@@ -64,6 +67,9 @@ def heightmap(tris, frame, xs, ys):
     n, ex, ey, p0 = (np.asarray(v, float) for v in FRAMES[frame])
     P = tris - p0
     U, V, W = P @ ex, P @ ey, P @ n
+    if frame in CLIP:                                   # 直角铣头伸进工件的空档里：只看空档这一侧的材料（ARMUP：机臂底面以上，机座不算）
+        keep = W.min(axis=1) <= CLIP[frame]
+        U, V, W = U[keep], V[keep], W[keep]
     H = np.full((len(xs), len(ys)), np.nan)
     h = xs[1] - xs[0]
     for u, v, w in zip(U, V, W):
@@ -238,8 +244,8 @@ def ctrl_holes():
             out.append(op(f"{frame} 铰 Ø{ream:g} H7（{tool}）", frame, tno + 1, f"铰刀 Ø{ream:g} H7", ream, 12,
                           cam.bore(P, -bottom_z, 0.25 * rpm(12, ream), r_plane=face_z + 2, safe=sf), kind="drill"))
         return out
-    # B 270°（前面）：夹线柱孔 Ø5（机臂前壁 y −45 → −38）；针距旋钮轴孔、倒缝扳手轴孔 Ø8 H9（立柱前壁 y −62 → −50）
-    ops += holes("B270", [(t["x"], -45.0, t["z"])], -3.0, -10.0, 4.8, "夹线柱孔", 41, 60, ream=5.0)
+    # B 270°（前面）：夹线柱孔 Ø5（机臂前壁 y −48 → −38）；针距旋钮轴孔、倒缝扳手轴孔 Ø8 H9（立柱前壁 y −62 → −50）
+    ops += holes("B270", [(t["x"], -48.0, t["z"])], 0.0, -10.0, 4.8, "夹线柱孔", 41, 60, ream=5.0)
     ops += holes("B270", [(dl["x"], -62.0, dl["z"]), (rv["x"], -62.0, rv["z"])], 14.0, 2.0, 7.8, "针距旋钮、倒缝扳手轴孔", 43, 60, ream=8.0)
     # B 270°：松线轴座孔 Ø6 H7（压脚杆上导套座伸出的耳子，y −7 → 4；加长钻头从机头前窗口伸进去，前盖板装之前加工）
     ops += holes("B270", [(rl["shaft"][0], -7.0, rl["shaft"][1])], -41.0, -52.0, 5.8, "松线轴座孔（加长，穿前窗口）", 45, 50, ream=6.0, f=0.06, safe=10.0)
@@ -251,17 +257,17 @@ def ctrl_holes():
     pb = g["bar"]
     P = [to_frame("TOPARM", (pb["x"], pb["y"], 256.0))[:2]]
     ops.append(op("TOPARM 钻调压螺钉底孔 Ø16.5", "TOPARM", 47, "钻头 Ø16.5（直角铣头）", 16.5, 70,
-                  cam.drill(P, 259 - 236, 0, 0.15 * rpm(70, 16.5), r_plane=-1, safe=8), kind="drill"))
+                  cam.drill(P, 259 - 236, 0, 0.15 * rpm(70, 16.5), r_plane=2, safe=8), kind="drill"))
     ops.append(op("TOPARM 攻 M18 × 1.5", "TOPARM", 48, "丝锥 M18 × 1.5（直角铣头，仿真按底孔 Ø16.5）", 16.5, 8,
-                  cam.tap(P, 259 - 244, 1.5, rpm(8, 18), r_plane=-1, safe=8), kind="drill"))
+                  cam.tap(P, 259 - 244, 1.5, rpm(8, 18), r_plane=2, safe=8), kind="drill"))
     # 直角铣头在机座底下向上：针距拉杆过孔 Ø12（穿机座顶板，再穿立柱下横隔板，到 z 66）、膝抬推杆过孔 Ø12（穿机座顶板）
     pr = g["pull_rod"]
     P = [to_frame("UNDER", (pr["x"], pr["y"], -16.0))[:2]]
     ops.append(op("UNDER 钻针距拉杆过孔 Ø12（机座顶板 + 立柱下横隔板）", "UNDER", 49, "钻头 Ø12（加长）", 12, 60,
-                  cam.drill(P, 66 + 16, 5, 0.12 * rpm(60, 12), r_plane=-8, safe=55), kind="drill"))
+                  cam.drill(P, 66 + 16, 5, 0.12 * rpm(60, 12), r_plane=-6, safe=55), kind="drill"))
     P = [to_frame("UNDER", (kn["push"]["x"] - 0.7, kn["y"], -16.0))[:2]]
     ops.append(op("UNDER 钻膝抬推杆过孔 Ø12（机座顶板）", "UNDER", 49, "钻头 Ø12（加长）", 12, 60,
-                  cam.drill(P, 2 + 16, 0, 0.12 * rpm(60, 12), r_plane=-8, safe=55), kind="drill"))
+                  cam.drill(P, 2 + 16, 0, 0.12 * rpm(60, 12), r_plane=-6, safe=55), kind="drill"))
     # 直角铣头伸进机臂下面的空档向上：松线拨杆座孔 Ø6 H7（机臂底面 z 120 穿过底板，进底板上的立柱到 z 170）；立轴销从下面压入，过盈自封
     P = [to_frame("ARMUP", (rl["pivot"][0], rl["pivot"][1], 120.0))[:2]]
     ops.append(op("ARMUP 钻 Ø5.8（松线拨杆座，加长）", "ARMUP", 45, "钻头 Ø5.8（直角铣头，加长）", 5.8, 50, cam.drill(P, 50, 4, 0.06 * rpm(50, 5.8), r_plane=2, safe=8), kind="drill"))
