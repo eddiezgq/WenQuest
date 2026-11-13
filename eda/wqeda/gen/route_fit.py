@@ -130,7 +130,7 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline, keepouts=())
     return len(made)
 
 
-def drop_dangling(board):
+def drop_dangling(board, keep=()):
     """布完以后，没有别的线、过孔接到（焊盘以外那一截）的引出线删掉：布线器从别处接通了这个焊盘，引出线用不上。返回删的段数"""
     from shapely.geometry import LineString, Point
 
@@ -144,7 +144,7 @@ def drop_dangling(board):
     tracks = list(board.GetTracks())
     drop = []
     for t in tracks:
-        if t.GetClass() == "PCB_VIA" or not t.IsLocked():
+        if t.GetClass() == "PCB_VIA" or not t.IsLocked() or t.m_Uuid.AsString() in keep:
             continue
         mm = pcbnew.ToMM
         a, b = (mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))
@@ -375,3 +375,167 @@ def _root(parent, k):
         parent[k] = parent[parent[k]]
         k = parent[k]
     return k
+
+
+def _pieces(board, net):
+    """一个网络的铜分成几块：[[(层号集合, 形状)], ...]（焊盘、过孔跨层，走线单层；同层相碰算连着）"""
+    from shapely.geometry import LineString, Point
+
+    mm = pcbnew.ToMM
+    its = []
+    for fp in board.GetFootprints():
+        for p in fp.Pads():
+            if p.GetNetname() == net:
+                its.append((set(p.GetLayerSet().CuStack()), _poly(p.GetEffectivePolygon())))
+    for t in board.GetTracks():
+        if t.GetNetname() != net:
+            continue
+        if t.GetClass() == "PCB_VIA":
+            c = (mm(t.GetPosition().x), mm(t.GetPosition().y))
+            its.append((set(t.GetLayerSet().CuStack()), Point(c).buffer(mm(t.GetWidth()) / 2)))
+        else:
+            a, b = (mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))
+            its.append(({t.GetLayer()}, LineString([a, b]).buffer(mm(t.GetWidth()) / 2)))
+    parent = {k: k for k in range(len(its))}
+    for i in range(len(its)):
+        for j in range(i + 1, len(its)):
+            if its[i][0] & its[j][0] and its[i][1].distance(its[j][1]) < 1e-3:
+                parent[_root(parent, i)] = _root(parent, j)
+    groups = {}
+    for k in range(len(its)):
+        groups.setdefault(_root(parent, k), []).append(its[k])
+    return list(groups.values())
+
+
+def maze(board, net, class_of, clearance, width, layers, outline, keepouts=(), step=0.25, edge_mm=0.5, lock=False):
+    """补线的最后一招（159d2c：交流零线一根从滤波电感到整流桥，两遍自动布线、直线和拐角都接不上）：
+    在一层上按网格找路（A*，八个方向），把网络还分开的两块接起来。障碍 = 这一层别的网络的铜各按要求间距外扩、
+    禁布区、板边。找到就按路径（合并同方向的格）加线，返回 (层名, 段数)；找不到返回 None。纯几何计算。"""
+    import heapq
+
+    import numpy as np
+    from shapely import contains_xy
+    from shapely.geometry import LineString, Point
+    from shapely.ops import unary_union
+
+    mm = pcbnew.ToMM
+    lid = {"F.Cu": pcbnew.F_Cu, "B.Cu": pcbnew.B_Cu, "In2.Cu": pcbnew.In2_Cu}
+    pieces = _pieces(board, net)
+    if len(pieces) < 2:
+        return None
+    x0, y0, x1, y1 = outline.bounds
+    xs = np.arange(x0, x1, step) + step / 2
+    ys = np.arange(y0, y1, step) + step / 2
+    gx, gy = np.meshgrid(xs, ys)
+    inner = outline.buffer(-(width / 2 + edge_mm))
+    for ln in layers:
+        if ln not in lid:
+            continue
+        L = lid[ln]
+        bufs = []
+        for fp in board.GetFootprints():
+            for p in fp.Pads():
+                if p.GetNetname() != net and p.IsOnLayer(L):
+                    g = _poly(p.GetEffectivePolygon())
+                    bufs.append(g.buffer(clearance(net, p.GetNetname()) + width / 2 + SLACK))
+        for t in board.GetTracks():
+            if t.GetNetname() == net or not t.IsOnLayer(L):
+                continue
+            if t.GetClass() == "PCB_VIA":
+                g = Point(mm(t.GetPosition().x), mm(t.GetPosition().y)).buffer(mm(t.GetWidth()) / 2)
+            else:
+                g = LineString([(mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))]).buffer(
+                    mm(t.GetWidth()) / 2)
+            bufs.append(g.buffer(clearance(net, t.GetNetname()) + width / 2 + SLACK))
+        for kp, lays in keepouts:
+            if L in lays:
+                bufs.append(kp.buffer(width / 2 + SLACK))
+        blocked = contains_xy(unary_union(bufs), gx, gy) | ~contains_xy(inner, gx, gy)
+        on = [unary_union([g for ls, g in pc if L in ls]) for pc in pieces]
+        if sum(1 for o in on if not o.is_empty) < 2:
+            continue
+        src = contains_xy(on[0], gx, gy) if not on[0].is_empty else np.zeros_like(blocked)
+        dst = np.zeros_like(blocked)
+        for o in on[1:]:
+            if not o.is_empty:
+                dst |= contains_xy(o, gx, gy)
+        if not src.any() or not dst.any():
+            continue
+        free = ~blocked | src | dst
+        ny, nx = free.shape
+        tgt = np.argwhere(dst)
+        ty, tx = tgt[:, 0].mean(), tgt[:, 1].mean()
+        start = [tuple(v) for v in np.argwhere(src)]
+        dist = {s: 0.0 for s in start}
+        prev = {}
+        heap = [(np.hypot(s[0] - ty, s[1] - tx), 0.0, s) for s in start]
+        heapq.heapify(heap)
+        moves = [(-1, 0, 1.0), (1, 0, 1.0), (0, -1, 1.0), (0, 1, 1.0),
+                 (-1, -1, 1.4142), (-1, 1, 1.4142), (1, -1, 1.4142), (1, 1, 1.4142)]
+        end = None
+        while heap:
+            _f, d, (i, j) = heapq.heappop(heap)
+            if d > dist.get((i, j), 1e18):
+                continue
+            if dst[i, j]:
+                end = (i, j)
+                break
+            for di, dj, c in moves:
+                a, b = i + di, j + dj
+                if 0 <= a < ny and 0 <= b < nx and free[a, b]:
+                    nd = d + c
+                    if nd < dist.get((a, b), 1e18):
+                        dist[(a, b)] = nd
+                        prev[(a, b)] = (i, j)
+                        heapq.heappush(heap, (nd + 0.5 * np.hypot(a - ty, b - tx), nd, (a, b)))
+        if end is None:
+            continue
+        path = [end]
+        while path[-1] in prev:
+            path.append(prev[path[-1]])
+        path.reverse()
+        # 合并同方向的格成一段
+        pts = [path[0]]
+        for k in range(1, len(path) - 1):
+            d1 = (path[k][0] - path[k - 1][0], path[k][1] - path[k - 1][1])
+            d2 = (path[k + 1][0] - path[k][0], path[k + 1][1] - path[k][1])
+            if d1 != d2:
+                pts.append(path[k])
+        pts.append(path[-1])
+        xy = [(float(xs[j]), float(ys[i])) for i, j in pts]
+        made = []
+        for u, v in zip(xy, xy[1:], strict=False):
+            if u == v:
+                continue
+            t = pcbnew.PCB_TRACK(board)
+            t.SetStart(pcbnew.VECTOR2I(pcbnew.FromMM(u[0]), pcbnew.FromMM(u[1])))
+            t.SetEnd(pcbnew.VECTOR2I(pcbnew.FromMM(v[0]), pcbnew.FromMM(v[1])))
+            t.SetWidth(pcbnew.FromMM(width))
+            t.SetLayer(L)
+            t.SetNet(board.FindNet(net))
+            board.Add(t)
+            made.append(t)
+        for t in made:
+            t.SetLocked(lock)
+        return ln, len(xy) - 1
+    return None
+
+
+def preroute(board, nets, class_of, clearance, width_of, layers_of, outline, keepouts=()):
+    """先布几根要紧的线（159d2c：交流相线、零线），再交给自动布线器：板上还空的时候按网格找路（maze），
+    每根网络把还分开的块一块块接起来，加的线锁定，自动布线器绕着它们走。
+    返回 ({网络: 段数}, 没布通的网络, 加的线的编号集合)"""
+    done, failed, ids = {}, [], set()
+    for net in nets:
+        n = 0
+        while len(_pieces(board, net)) > 1:
+            before = {t.m_Uuid.AsString() for t in board.GetTracks()}
+            r = maze(board, net, class_of, clearance, width_of(net), layers_of(net), outline, keepouts,
+                     lock=True)
+            if r is None:
+                failed.append(net)
+                break
+            ids |= {t.m_Uuid.AsString() for t in board.GetTracks()} - before
+            n += r[1]
+        done[net] = n
+    return done, failed, ids

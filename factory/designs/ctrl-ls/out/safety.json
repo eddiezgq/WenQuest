@@ -5,10 +5,10 @@
     314.15,
     216.0,
     "In1",
-    "zone GND_ISO zone:5e8d42f9-0e0c-4556-8cd5-2a7eda2852c9 ↔ zone GND zone:8f73c093-f7f2-4d17-aa9f-08367899a9a6"
+    "zone GND_ISO zone:c5eb150d-3222-4ab2-a1da-5716d305b08c ↔ zone GND zone:3f3a68b6-329a-40bd-a3d4-628068c5d3ae"
    ]
   ],
-  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:5e8d42f9-0e0c-4556-8cd5-2a7eda2852c9 ↔ zone GND zone:8f73c093-f7f2-4d17-aa9f-08367899a9a6）",
+  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:c5eb150d-3222-4ab2-a1da-5716d305b08c ↔ zone GND zone:3f3a68b6-329a-40bd-a3d4-628068c5d3ae）",
   "example": true,
   "groups": [
    [
@@ -178,13 +178,13 @@
  {
   "at": [
    [
-    115.91,
-    140.46,
+    121.63,
+    122.08,
     "In1",
-    "pth PE C103 ↔ zone GND zone:8f73c093-f7f2-4d17-aa9f-08367899a9a6"
+    "pth PE C102 ↔ zone GND zone:3f3a68b6-329a-40bd-a3d4-628068c5d3ae"
    ]
   ],
-  "detail": "最近 4.20 mm（In1 层，pth PE C103 ↔ zone GND zone:8f73c093-f7f2-4d17-aa9f-08367899a9a6）",
+  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:3f3a68b6-329a-40bd-a3d4-628068c5d3ae）",
   "example": true,
   "groups": [
    [
@@ -387,10 +387,10 @@
     218.56,
     106.14,
     "In1",
-    "pth VBUS D201 ↔ zone GND zone:8f73c093-f7f2-4d17-aa9f-08367899a9a6"
+    "pth VBUS D201 ↔ zone GND zone:3f3a68b6-329a-40bd-a3d4-628068c5d3ae"
    ]
   ],
-  "detail": "最近 2.20 mm（In1 层，pth VBUS D201 ↔ zone GND zone:8f73c093-f7f2-4d17-aa9f-08367899a9a6）",
+  "detail": "最近 2.20 mm（In1 层，pth VBUS D201 ↔ zone GND zone:3f3a68b6-329a-40bd-a3d4-628068c5d3ae）",
   "example": true,
   "groups": [
    [

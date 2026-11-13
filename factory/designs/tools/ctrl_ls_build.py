@@ -282,6 +282,12 @@ def board_build(route, jar):
         ox, oy = gb.ORIGIN
         kos = [(RF._poly(z.Outline()), set(z.GetLayerSet().CuStack())) for z in board.Zones()
                if z.GetIsRuleArea() and z.GetDoNotAllowTracks()]
+        # 交流相线、零线先布（159d2c：交给自动布线器时零线几次都没布通——它从滤波电感到整流桥要穿过整个交流区，
+        # 等别的线占了地方就过不去了）
+        pre, pre_fail, pre_ids = RF.preroute(board, ["N_C", "N_IN", "L_R", "L_C", "L_F", "L_IN"], class_of, clearance,
+                                             lambda n: width.get(n, 0.25), lambda n: lays.get(n, ["F.Cu", "B.Cu"]),
+                                             box(ox, oy, ox + w_, oy + h_), kos)
+        print("先布的交流线（段数）：", pre, "；没布通：", pre_fail)
         n_stub = RF.stubs(board, class_of, clearance, lambda n: width.get(n, 0.25),
                           lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"]), box(ox, oy, ox + w_, oy + h_),
                           kos)
@@ -299,7 +305,7 @@ def board_build(route, jar):
         print("补线（两遍都没接上的，直线或一个拐角）：", RF.finish(board, class_of, clearance, lambda n: width.get(n, 0.25),
                                                        lambda n: lays.get(n, ["F.Cu", "In2.Cu", "B.Cu"]), keepouts=kos))
         # 先补线再删用不上的引出线：引出线的线头正好是补线的好起点（第十七次：隔离电源 +5V 脚的引出线先被删了，补线找不到路）
-        print("用不上的引出线：", RF.drop_dangling(board))
+        print("用不上的引出线：", RF.drop_dangling(board, keep=pre_ids))
         targets = {n: c["track_mm"] for c in D.X["net_classes"] if c.get("route_mm") for n in c["nets"]}
         print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance, outline=box(ox, oy, ox + w_, oy + h_),
                                                              keepouts=kos))
