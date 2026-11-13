@@ -1,0 +1,446 @@
+{
+ "geo": {
+  "knife_plane": [
+   -5.9,
+   -4.9
+  ],
+  "plate_bottom": -2.5,
+  "knife": {
+   "pivot": [
+    -10.0,
+    40.0
+   ],
+   "tip_fwd": [
+    3.0,
+    1.0
+   ],
+   "tip_rest_x": -15.0,
+   "arm_z": [
+    -9.0,
+    -7.0
+   ],
+   "hub_r": 6.0,
+   "shaft_d": 8.0,
+   "shaft_z": [
+    -52.0,
+    -7.0
+   ],
+   "crank_z": -50.0,
+   "crank_r": 8.0,
+   "edge_back": 6.0
+  },
+  "fixed": {
+   "x_edge": -12.0,
+   "y": [
+    -5.0,
+    4.0
+   ],
+   "z": [
+    -4.9,
+    -2.5
+   ],
+   "x_back": -22.0,
+   "screw_x": -16.0
+  },
+  "base": {
+   "z": [
+    -14.0,
+    -10.0
+   ],
+   "bushing": [
+    -30.0,
+    -14.0
+   ]
+  },
+  "rock": {
+   "y": 60.0,
+   "z": -30.0,
+   "x": [
+    -25.0,
+    150.0
+   ],
+   "d": 10.0,
+   "crank_r": 20.0,
+   "crank_x": -18.0,
+   "boss_x": [
+    -12.0,
+    138.0
+   ]
+  },
+  "cam": {
+   "x": [
+    140.0,
+    150.0
+   ],
+   "rho0": 14.0,
+   "groove_w": 8.4,
+   "roller_d": 8.0,
+   "groove_depth": 4.0,
+   "lever_x": [
+    126.0,
+    136.0
+   ]
+  },
+  "link": {
+   "d": 6.0,
+   "ball_d": 8.0
+  },
+  "solenoid_trim": {
+   "x": [
+    108.0,
+    124.0
+   ],
+   "stroke": 5.0,
+   "d": 22.0
+  },
+  "sol_release": {
+   "arm": [
+    0.0,
+    10.0
+   ],
+   "x": [
+    40.0,
+    62.0
+   ],
+   "d": 16.0,
+   "stroke": 3.0
+  },
+  "wiper": {
+   "pivot": [
+    -36.0,
+    -22.0
+   ],
+   "z": [
+    4.0,
+    38.0
+   ],
+   "wire_d": 1.2,
+   "wire_z": 4.2,
+   "r": 34.0,
+   "rest_deg": 200.0,
+   "sweep_deg": 75.0,
+   "sol": {
+    "x": [
+     -58.0,
+     -40.0
+    ],
+    "z": 60.0,
+    "d": 16.0,
+    "stroke": 6.0
+   }
+  },
+  "estep": {
+   "motor_axis": [
+    -24.0,
+    -40.0
+   ],
+   "x_face": 270.0,
+   "pulley_x": [
+    286.0,
+    296.0
+   ]
+  }
+ },
+ "timing": {
+  "hook_catch": 206.1,
+  "needle_below_plate": 107.0,
+  "needle_above_plate": 253.0,
+  "needle_reaches_fabric": 96.3,
+  "takeup_top": 92.0,
+  "takeup_plateau": [
+   84.0,
+   104.0
+  ],
+  "dog_below": 99.7,
+  "dog_above": 304.2,
+  "idle_deg": 204.5,
+  "loop_round_bobbin": [
+   206.1,
+   293.6
+  ],
+  "knife_entry_window": [
+   300.0,
+   330.0
+  ]
+ },
+ "cam_segments": {
+  "rise": [
+   280.0,
+   340.0
+  ],
+  "hold": [
+   340.0,
+   380.0
+  ],
+  "ret": [
+   380.0,
+   435.0
+  ]
+ },
+ "knife": {
+  "R_tip": 41.10960958218893,
+  "a_fwd_deg": -71.56505117707799,
+  "a_rest_deg": -96.98595664093166,
+  "beta_deg": 25.42090546385367,
+  "gamma_deg": 10.168362185541469,
+  "lever_L": 29.495762407505257,
+  "cam_h": 5.2346542388817765,
+  "CS": 32.64965543462902,
+  "cut_deg": 58.6
+ },
+ "forces": {
+  "F_cut_N": 15.0,
+  "T_knife_Nmm": 526.6,
+  "F_link_N": 65.8,
+  "T_rock_Nmm": 1316.6,
+  "F_roller_N": 53.6,
+  "pressure_angle_max_deg": 33.5,
+  "sigma_H_MPa": 284.0,
+  "sigma_H_allow_MPa": 1500,
+  "T_main_extra_Nmm": 487.0,
+  "ok": true
+ },
+ "solenoids": {
+  "trim": {
+   "stroke_mm": 5.0,
+   "need_N": 11.0,
+   "pick": "24 V 推拉式电磁铁 Ø22（示例：行程 5 mm 时 22 N，通电 20%）",
+   "F_at_stroke_N": 22.0,
+   "SF": 2.0,
+   "t_pull_in_ms": [
+    5,
+    15
+   ]
+  },
+  "release": {
+   "need_N": 9.3,
+   "pick": "24 V 拉式电磁铁 Ø16（示例：行程 3 mm 时 15 N）",
+   "F_at_stroke_N": 15.0,
+   "SF": 1.61,
+   "opening_mm": 2.69,
+   "note": "行程 3 mm：先走完松线销 0.5 mm 的空程，再推开夹线盘"
+  },
+  "wiper": {
+   "pick": "24 V 推拉式电磁铁 Ø16（示例：行程 6 mm 时 12 N）",
+   "sweep_deg": 75.0,
+   "r_mm": 34.0,
+   "t_sweep_ms": 60,
+   "note": "电磁铁经机头里的小曲柄（半径 4.6）转拨线轴 75°；拨线钩是 Ø1.2 弹簧钢丝"
+  },
+  "ok": true
+ },
+ "trim_speed": {
+  "stop_window": [
+   75.0,
+   91.3
+  ],
+  "n_stop_max": 546,
+  "gate": [
+   100.0,
+   275.0
+  ],
+  "gate_deg": 175.0,
+  "n_gate_max": 2750,
+  "n_trim_max": 546,
+  "n_trim_default": 300.0,
+  "ok": true
+ },
+ "thread_tail": {
+  "cut_deg": 58.6,
+  "eye_above_plate": 15.1,
+  "tail_est_mm": 67.7,
+  "tail_min_mm": 35.0,
+  "bobbin_tail_est_mm": 9.4,
+  "ok": true,
+  "note": "估算；首件试缝量实际线头，偏短就把定刀刃往左挪"
+ },
+ "efeed": {
+  "full": {
+   "M_reg_Nm": 0.368,
+   "stitch_mm": 5.0,
+   "swing_deg": 35.2,
+   "idle_deg": 204.5,
+   "margin_deg": 10.0,
+   "window_deg": 184.5,
+   "table": [
+    {
+     "motor": "42 步进 48 mm（闭环，带磁编码器）",
+     "ratio": 1,
+     "hold_Nm": 0.44,
+     "ok_hold": false
+    },
+    {
+     "motor": "42 步进 48 mm（闭环，带磁编码器）",
+     "ratio": 2,
+     "hold_Nm": 0.88,
+     "ok_hold": true,
+     "n_reverse_max": 1639,
+     "t_switch_ms": 18.8,
+     "res_mm": 0.016
+    },
+    {
+     "motor": "42 步进 48 mm（闭环，带磁编码器）",
+     "ratio": 3,
+     "hold_Nm": 1.32,
+     "ok_hold": true,
+     "n_reverse_max": 1275,
+     "t_switch_ms": 24.1,
+     "res_mm": 0.0106
+    },
+    {
+     "motor": "42 步进 60 mm（闭环，带磁编码器）",
+     "ratio": 1,
+     "hold_Nm": 0.584,
+     "ok_hold": false
+    },
+    {
+     "motor": "42 步进 60 mm（闭环，带磁编码器）",
+     "ratio": 2,
+     "hold_Nm": 1.168,
+     "ok_hold": true,
+     "n_reverse_max": 1497,
+     "t_switch_ms": 20.5,
+     "res_mm": 0.016
+    },
+    {
+     "motor": "42 步进 60 mm（闭环，带磁编码器）",
+     "ratio": 3,
+     "hold_Nm": 1.752,
+     "ok_hold": true,
+     "n_reverse_max": 1158,
+     "t_switch_ms": 26.6,
+     "res_mm": 0.0106
+    },
+    {
+     "motor": "57 步进 56 mm（闭环）",
+     "ratio": 1,
+     "hold_Nm": 0.96,
+     "ok_hold": true,
+     "n_reverse_max": 1803,
+     "t_switch_ms": 17.1,
+     "res_mm": 0.0319
+    },
+    {
+     "motor": "57 步进 56 mm（闭环）",
+     "ratio": 2,
+     "hold_Nm": 1.92,
+     "ok_hold": true,
+     "n_reverse_max": 1163,
+     "t_switch_ms": 26.4,
+     "res_mm": 0.016
+    },
+    {
+     "motor": "57 步进 56 mm（闭环）",
+     "ratio": 3,
+     "hold_Nm": 2.88,
+     "ok_hold": true,
+     "n_reverse_max": 891,
+     "t_switch_ms": 34.5,
+     "res_mm": 0.0106
+    }
+   ]
+  },
+  "backtack_3mm": {
+   "M_reg_Nm": 0.368,
+   "stitch_mm": 3.0,
+   "swing_deg": 21.1,
+   "idle_deg": 204.5,
+   "margin_deg": 10.0,
+   "window_deg": 184.5,
+   "table": [
+    {
+     "motor": "42 步进 48 mm（闭环，带磁编码器）",
+     "ratio": 1,
+     "hold_Nm": 0.44,
+     "ok_hold": false
+    },
+    {
+     "motor": "42 步进 48 mm（闭环，带磁编码器）",
+     "ratio": 2,
+     "hold_Nm": 0.88,
+     "ok_hold": true,
+     "n_reverse_max": 2304,
+     "t_switch_ms": 13.3,
+     "res_mm": 0.016
+    },
+    {
+     "motor": "42 步进 48 mm（闭环，带磁编码器）",
+     "ratio": 3,
+     "hold_Nm": 1.32,
+     "ok_hold": true,
+     "n_reverse_max": 1792,
+     "t_switch_ms": 17.2,
+     "res_mm": 0.0106
+    },
+    {
+     "motor": "42 步进 60 mm（闭环，带磁编码器）",
+     "ratio": 1,
+     "hold_Nm": 0.584,
+     "ok_hold": false
+    },
+    {
+     "motor": "42 步进 60 mm（闭环，带磁编码器）",
+     "ratio": 2,
+     "hold_Nm": 1.168,
+     "ok_hold": true,
+     "n_reverse_max": 2105,
+     "t_switch_ms": 14.6,
+     "res_mm": 0.016
+    },
+    {
+     "motor": "42 步进 60 mm（闭环，带磁编码器）",
+     "ratio": 3,
+     "hold_Nm": 1.752,
+     "ok_hold": true,
+     "n_reverse_max": 1627,
+     "t_switch_ms": 18.9,
+     "res_mm": 0.0106
+    },
+    {
+     "motor": "57 步进 56 mm（闭环）",
+     "ratio": 1,
+     "hold_Nm": 0.96,
+     "ok_hold": true,
+     "n_reverse_max": 2534,
+     "t_switch_ms": 12.1,
+     "res_mm": 0.0319
+    },
+    {
+     "motor": "57 步进 56 mm（闭环）",
+     "ratio": 2,
+     "hold_Nm": 1.92,
+     "ok_hold": true,
+     "n_reverse_max": 1635,
+     "t_switch_ms": 18.8,
+     "res_mm": 0.016
+    },
+    {
+     "motor": "57 步进 56 mm（闭环）",
+     "ratio": 3,
+     "hold_Nm": 2.88,
+     "ok_hold": true,
+     "n_reverse_max": 1253,
+     "t_switch_ms": 24.5,
+     "res_mm": 0.0106
+    }
+   ]
+  },
+  "pick": {
+   "motor": "42 步进 48 mm（闭环，带磁编码器）",
+   "ratio": 2,
+   "hold_Nm": 0.88,
+   "n_full_max": 1639,
+   "n_3mm_max": 2304,
+   "res_mm": 0.016,
+   "SF_hold": 2.39
+  },
+  "targets": {
+   "n_full": 1600,
+   "n_3mm": 2200,
+   "res_mm": 0.05,
+   "SF_hold": 2.0
+  },
+  "ok": true
+ },
+ "all_ok": true
+}
