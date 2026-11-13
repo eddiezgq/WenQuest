@@ -282,9 +282,9 @@ def board_build(route, jar):
         ox, oy = gb.ORIGIN
         kos = [(RF._poly(z.Outline()), set(z.GetLayerSet().CuStack())) for z in board.Zones()
                if z.GetIsRuleArea() and z.GetDoNotAllowTracks()]
-        # 交流相线、零线、保护地先布（159d2c：交给自动布线器时零线几次都没布通——它从滤波电感到整流桥要穿过整个交流区，
+        # 保护地、交流相线、零线先布（保护地最先：它离谁都要 4.2 mm，排在交流线后面就挤不进去；159d2c：零线交给自动布线器几次都没布通——它从滤波电感到整流桥要穿过整个交流区，
         # 等别的线占了地方就过不去了）
-        pre, pre_fail, pre_ids = RF.preroute(board, ["N_C", "N_IN", "L_R", "L_C", "L_F", "L_IN", "PE"], class_of, clearance,
+        pre, pre_fail, pre_ids = RF.preroute(board, ["PE", "N_C", "N_IN", "L_R", "L_C", "L_F", "L_IN"], class_of, clearance,
                                              lambda n: width.get(n, 0.25), lambda n: lays.get(n, ["F.Cu", "B.Cu"]),
                                              box(ox, oy, ox + w_, oy + h_), kos)
         print("先布的交流线（段数）：", pre, "；没布通：", pre_fail)
