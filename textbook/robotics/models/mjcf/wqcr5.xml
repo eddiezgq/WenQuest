@@ -21,7 +21,7 @@
           <geom type="capsule" fromto="0 0 0 -0.4 0 0" size="0.045" rgba="0.80 0.82 0.84 1"/>
           <body name="link3" pos="-0.4 0 0" quat="1 0 0 0">
             <inertial pos="-0.284876 0 0" quat="0.707107 0.707107 -0 0" mass="2.05958" diaginertia="0.00207714 0.0247269 0.0249994"/>
-            <joint name="J3" axis="0 0 1" range="-3.05433 3.05433" armature="0.26" damping="1" frictionloss="0.8" actuatorfrcrange="-167.25 167.25"/>
+            <joint name="J3" axis="0 0 1" range="-3.05433 3.05433" armature="0.26" damping="1" frictionloss="0.8" actuatorfrcrange="-157 157"/>
             <geom type="cylinder" fromto="-0.36 0 -0.04 -0.36 0 0.04" size="0.035" rgba="0.20 0.45 0.70 1"/>
             <geom type="capsule" fromto="0 0 0 -0.36 0 0" size="0.0375" rgba="0.80 0.82 0.84 1"/>
             <body name="link4" pos="-0.36 0 0" quat="1 0 0 0">
@@ -53,7 +53,7 @@
   <actuator>
     <motor name="J1" joint="J1" ctrlrange="-333 333"/>
     <motor name="J2" joint="J2" ctrlrange="-333 333"/>
-    <motor name="J3" joint="J3" ctrlrange="-167.25 167.25"/>
+    <motor name="J3" joint="J3" ctrlrange="-157 157"/>
     <motor name="J4" joint="J4" ctrlrange="-54 54"/>
     <motor name="J5" joint="J5" ctrlrange="-54 54"/>
     <motor name="J6" joint="J6" ctrlrange="-54 54"/>

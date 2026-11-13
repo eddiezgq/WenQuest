@@ -118,6 +118,9 @@ for k, v in W.MODULES.items():
     mo = next(x for x in MO.MOTORS if x[0] == v["motor"][0])
     lib_cap[k] = {"peak": min(mo[3] * W.GEAR_RATIO * W.ETA, Tp), "rated": min(mo[2] * W.GEAR_RATIO * W.ETA, Tr)}
     lib_rows.append([v["code"], LIBH[k]["ref"], f"{v['gear'][1]:g} / {Tr:g}", f"{v['gear'][2]:g} / {Tp:g}", "一致" if (v["gear"][1], v["gear"][2]) == (Tr, Tp) else "**不一致**"])
+LIB_NOTE = ("三种模组都和零件库一致。（25 号的重复峰值原来写 178，和目录不符；这个案例对照零件库发现后，第 164 轮改成减速比 100 的 157，"
+            f"J3 的峰值能力 {min(next(x for x in MO.MOTORS if x[0] == W.MODULES['M']['motor'][0])[3] * W.GEAR_RATIO * W.ETA, 157):.0f} N·m。）"
+            if all(r[-1] == "一致" for r in lib_rows) else "**有不一致的**——以零件库为准，模型里的数据要改成零件库的。")
 lib_use = max(max(j["need_peak"] / lib_cap[W.JOINT_MODULE[i]]["peak"], j["need_rms"] / lib_cap[W.JOINT_MODULE[i]]["rated"]) for i, j in enumerate(J))
 calcmd += f"""
 ## 用零件库复核减速器参数
@@ -126,8 +129,8 @@ calcmd += f"""
 
 {L.md_table(["模组", "零件库编号", "额定 N·m（模型 / 零件库）", "重复峰值 N·m（模型 / 零件库）", ""], lib_rows)}
 
-**25 号的重复峰值模型写 178，厂商目录是 157**——以零件库为准：J3 的峰值能力变成 {lib_cap['M']['peak']:.0f} N·m，需求 {J[2]['need_peak']:.0f}，仍然够。
-按零件库的值，六个关节最紧的一项利用率 {lib_use:.2f}。模型里的数据要改成零件库的（改了以后实验 9、24–28 的数字要一起核对）。
+{LIB_NOTE}
+按零件库的值，六个关节最紧的一项利用率 {lib_use:.2f}。
 """
 case.check("calc", "按零件库减速器参数的最大利用率", "Largest utilisation with library gear data", lib_use, "<=", 1.0, "", "零件库 D-RDC-HD-CSF")
 case.step("calc", f"J2 峰值需求 {J[1]['need_peak']:.0f} N·m（利用率 {J[1]['use_peak']:.2f}）；J3 连续利用率 {J[2]['use_rms']:.2f}，全机最紧。",
