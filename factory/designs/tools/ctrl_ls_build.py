@@ -293,7 +293,7 @@ def board_build(route, jar):
         board.BuildConnectivity()
         left = board.GetConnectivity().GetUnconnectedCount(False)
         if left:
-            stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=15, keepouts=keep, pairs=gb.pairs_of(D.X),
+            stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep, pairs=gb.pairs_of(D.X),
                                  timeout=1500, replace=True)
             print("第二遍（第一遍剩 {} 处）：".format(left), stats, "；去重：", RF.dedupe(board))
         print("补线（两遍都没接上的，直线或一个拐角）：", RF.finish(board, class_of, clearance, lambda n: width.get(n, 0.25),
@@ -427,12 +427,13 @@ def _pin_rules():
             continue
         seen.add((ref, na, nb))
         # 只放宽“这个器件自己的焊盘”和别的东西之间（焊盘对焊盘、引出线对邻脚）；铺铜不在内——它很大，
-        # 和器件外框沾边就会把整块铺铜都放宽（159d2c 第一次布线：母线铺铜离 N_U 线只剩 1.6 mm，规则检查没报）
-        s += ('(rule "pins_{r}_{a}_{b}"\n  (condition "((A.NetName == \'{a}\' && B.NetName == \'{b}\') || '
-              '(A.NetName == \'{b}\' && B.NetName == \'{a}\')) && A.Type != \'Zone\' && B.Type != \'Zone\' && '
-              '((A.Type == \'Pad\' && A.Parent.Reference == \'{r}\') || (B.Type == \'Pad\' && B.Parent.Reference == \'{r}\')) && '
-              'A.intersectsCourtyard(\'{r}\') && B.intersectsCourtyard(\'{r}\')")\n  (constraint clearance (min {c:g}mm)))\n').format(
-            r=ref, a=na, b=nb, c=max(0.15, int((g - 0.05) / 0.05) * 0.05))
+        # 和器件外框沾边就会把整块铺铜都放宽（159d2c 第一次布线：母线铺铜离 N_U 线只剩 1.6 mm，规则检查没报）。
+        # A 是这个器件的焊盘、两个网络各写一条（KiCad 7 不认 A.Parent.Reference，条件整条不生效；用“焊盘沾这个器件外框”代替，已逐条试过）
+        for pa, pb in ((na, nb), (nb, na)):
+            s += ('(rule "pins_{r}_{a}_{b}"\n  (condition "A.Type == \'Pad\' && A.intersectsCourtyard(\'{r}\') && '
+                  'A.NetName == \'{a}\' && B.NetName == \'{b}\' && B.Type != \'Zone\' && B.intersectsCourtyard(\'{r}\')")'
+                  '\n  (constraint clearance (min {c:g}mm)))\n').format(
+                r=ref, a=pa, b=pb, c=max(0.15, int((g - 0.05) / 0.05) * 0.05))
     return s
 
 

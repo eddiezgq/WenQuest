@@ -230,8 +230,8 @@ board:
   - {name: IpmIn, track_mm: 0.3, clearance_mm: 0.2, nets: [IN_UH, IN_UL, IN_VH, IN_VL, IN_WH, IN_WL], layers: [F.Cu, In2.Cu, B.Cu]}
   - {name: Vcc15, track_mm: 0.6, route_mm: 0.4, clearance_mm: 0.2, nets: [+15V, FLY_15], layers: [F.Cu, In2.Cu, B.Cu]}
   # 步进驱动 HTSSOP 脚距 0.65 mm（焊盘 0.4）：布线先用 0.3 mm 进脚，布完加宽
-  # 电磁铁回路与 24 V（3 A）：只走表层（内层 1 oz 要宽 2.3 mm 以上）；布线先用 0.45 mm（IPC-2221 3 A 外层 2 oz 温升 20 ℃ 要 0.45），能进步进驱动 0.65 mm 脚距
-  - {name: Load, track_mm: 1.0, route_mm: 0.45, clearance_mm: 0.2, nets: [+24V, SOL1_D, SOL2_D, SOL3_D, SOL4_D], layers: [F.Cu, B.Cu]}
+  # 电磁铁回路与 24 V（3 A）：只走表层（内层 1 oz 要宽 2.3 mm 以上）；布线先用 0.3 mm 进步进驱动 0.65 mm 脚距，布完加宽（IPC-2221 3 A 外层 2 oz 温升 20 ℃ 要 0.45）
+  - {name: Load, track_mm: 1.0, route_mm: 0.3, clearance_mm: 0.2, nets: [+24V, SOL1_D, SOL2_D, SOL3_D, SOL4_D], layers: [F.Cu, B.Cu]}
   - {name: Power, track_mm: 1.0, route_mm: 0.3, clearance_mm: 0.2, nets: [SOL1_K, SOL2_K,
                                                        SOL3_K, SOL4_K, STP_OA1, STP_OA2, STP_OB1, STP_OB2, FLY_24, FLY_5, +5V],
      layers: [F.Cu, In2.Cu, B.Cu]}
