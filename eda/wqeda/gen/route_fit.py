@@ -19,6 +19,7 @@ import itertools
 import pcbnew
 
 STEP = 0.05
+SAME_NET_GAP = 0.2  # 同网络、不相连的两块铜加宽后至少隔这么多（比工艺能力表最小线距 0.127 mm 宽）
 SLACK = 0.01  # 焊盘圆弧在这里按多边形算，比 KiCad 精确算的近一点点：加宽时多留 0.01 mm（159d2c：2.595 对 2.6）
 
 
@@ -238,6 +239,10 @@ def widen(board, targets, clearance, passes=2, outline=None, edge_mm=0.5, keepou
             near = [items[int(i)] for i in tree.query(win)] if tree is not None else []
             for onet, g, ref in near:
                 if onet == net:
+                    # 同一网络、原来没碰上的铜：要么碰上、要么隔开，不能加宽到只剩一条细缝
+                    # （159d2c：工艺检查 F2 量到 0.12 mm 的缝）
+                    if g.distance(line.buffer(w0 / 2)) > 1e-3:
+                        half = min(half, line.distance(g) - SAME_NET_GAP)
                     continue
                 c = clearance(net, onet)
                 if ref is not None:
