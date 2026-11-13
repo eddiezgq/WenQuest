@@ -41,7 +41,8 @@ parts, total = bom_rollup("WQ-CR5")
 lab = {"WQJ-L": T("大关节模组 ×2", "large joint modules ×2"), "WQJ-M": T("中关节模组", "medium joint module"),
        "WQJ-S": T("小关节模组 ×3", "small joint modules ×3"), "CTRL-CAB": T("控制柜", "controller cabinet"),
        "ARM-UP": T("大臂", "upper arm"), "ARM-FO": T("小臂", "forearm"), "BASE-CR5": T("底座", "base"),
-       "CABLE-ARM": T("线束", "cable harness"), "SCR-M5x16": T("螺钉", "screws")}
+       "CABLE-ARM": T("线束", "cable harness"), "SCR-M5x16": T("螺钉", "screws"),
+       "IPC": T("工控机", "industrial PC")}  # 第 166 轮起工控机从控制柜里拿出来单列（向工业园的计算机厂买）
 items = sorted(parts.items(), key=lambda kv: kv[1])
 ax.barh(range(len(items)), [v for _, v in items], color=C["z"], alpha=0.8)
 for i, (k, v) in enumerate(items):
