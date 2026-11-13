@@ -189,7 +189,7 @@ def build_T():
     armL = Part.makeBox(lx1 - lx0, L, 8.0, V(lx0, 0.0, -4.0))
     armL.rotate(V(0, 0, 0), V(1, 0, 0), ang)                 # 沿 +y 画的臂转到朝滚子
     armL.translate(V(0, Sy, Sz))
-    stud = cyl(2.0, (lx1 - 1.0, Ry, Rz), (lx1 + 4.5, Ry, Rz))
+    stud = cyl(2.0, (lx1 - 1.0, Ry, Rz), (lx1 + 3.8, Ry, Rz))                     # 销不伸出滚子（剪线时滚子离槽底 0.2）
     roll = cyl(cm["roller_d"] / 2, (lx1 + 0.8, Ry, Rz), (lx1 + 4.8, Ry, Rz))           # 静止时 x 134.8…138.8，剪线时推进 5 到 139.8…143.8（槽深 4，离槽底 0.2）
     P["trim_lever"] = (hubl.fuse(armL).fuse(stud).fuse(cyl(4.5, (lx0, Ry, Rz), (lx1, Ry, Rz))), "metal", "steel", "tlever")
     P["trim_roller"] = (roll, "chrome", "steel", "tlever")

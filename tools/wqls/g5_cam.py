@@ -43,17 +43,18 @@ FRAMES = {   # 名称: (n, X 方向, Y 方向, 原点 p0（整机坐标，成品
     "LB0": ((-1, 0, 0), (0, -1, 0), (0, 0, 1), (-105.0, 0.0, 0.0)),       # G5.2 下件 / 合件：机座左端壁外面（x −105），B 0°
     "B90": ((0, 1, 0), (-1, 0, 0), (0, 0, 1), (0.0, 70.0, ZU)),           # G4.7 合件：后面（机头后壁 y 70），B 90°
     "ARMUP": ((0, 0, -1), (1, 0, 0), (0, -1, 0), (74.0, -28.0, 120.0)),   # G4.7 合件：直角铣头伸进机臂下面的空档向上（机臂底面 z 120）
+    "HEADUP": ((0, 0, -1), (1, 0, 0), (0, -1, 0), (-30.0, -10.0, 46.0)),   # G4.8 合件：直角铣头伸进机头和机座之间向上（机头底板 z 46）
 }
 WCS = {"B0": "G54", "B180": "G55", "B270": "G56", "UP": "G57", "DOWN_HEAD": "G58", "C_UP": "G54", "A_UP": "G54", "TOP": "G54",
-       "TOPARM": "G57", "UNDER": "G58", "LB0": "G59", "B90": "G54.1 P1", "ARMUP": "G54.1 P2"}
-BVAL = {"B0": 0, "B180": 180, "B270": 270, "UP": 0, "DOWN_HEAD": 0, "TOPARM": 0, "UNDER": 0, "LB0": 0, "B90": 90, "ARMUP": 0}
+       "TOPARM": "G57", "UNDER": "G58", "LB0": "G59", "B90": "G54.1 P1", "ARMUP": "G54.1 P2", "HEADUP": "G54.1 P3"}
+BVAL = {"B0": 0, "B180": 180, "B270": 270, "UP": 0, "DOWN_HEAD": 0, "TOPARM": 0, "UNDER": 0, "LB0": 0, "B90": 90, "ARMUP": 0, "HEADUP": 0}
 CTRL = json.loads((Path(__file__).resolve().parents[2] / "docs" / "设计" / "WQ-LS" / "G4" / "操纵件.json").read_text(encoding="utf-8"))   # G4.7
 PINS = ((315.8, 7.0), (380.2, 66.0))          # 工艺孔 / 锥销孔（G5.2 第二个由 y 47 移到 66）
 YL, ZL, ZH = 27.791774943072237, -35.36485983577417, -21.5
 FEED = json.loads((Path(__file__).resolve().parents[2] / "docs" / "设计" / "WQ-LS" / "G4" / "送布机构.json").read_text(encoding="utf-8"))["geo"]   # G4.6
 
 
-CLIP = {"ARMUP": 60.0}   # 帧坐标 z 大于此值（离刀具更近、在刀头后面）的材料不算：ARMUP 的刀头在机臂（z 120）和机座（z 0）之间，z 60 以下是机座
+CLIP = {"ARMUP": 60.0, "HEADUP": 30.0}   # 帧坐标 z 大于此值（离刀具更近、在刀头后面）的材料不算：ARMUP 的刀头在机臂（z 120）和机座（z 0）之间，z 60 以下是机座
 
 
 def to_frame(frame, p):
@@ -224,6 +225,7 @@ def pair_hmc():
     ops.append(op("直角铣头（从上面）钻顶盖 M4 底孔", "TOPARM", 31, "钻头 Ø3.3（直角铣头）", 3.3, 60, cam.drill(th, 5, 0, 0.08 * rpm(60, 3.3)), kind="drill"))
     ops.append(op("直角铣头 攻顶盖 M4", "TOPARM", 32, "丝锥 M4（直角铣头，仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(th, 3.5, 0.7, rpm(8, 4)), kind="drill"))
     ops += ctrl_holes()
+    ops += opt_holes()
     return ops
 
 
@@ -272,6 +274,34 @@ def ctrl_holes():
     P = [to_frame("ARMUP", (rl["pivot"][0], rl["pivot"][1], 120.0))[:2]]
     ops.append(op("ARMUP 钻 Ø5.8（松线拨杆座，加长）", "ARMUP", 45, "钻头 Ø5.8（直角铣头，加长）", 5.8, 50, cam.drill(P, 50, 4, 0.06 * rpm(50, 5.8), r_plane=2, safe=8), kind="drill"))
     ops.append(op("ARMUP 铰 Ø6 H7", "ARMUP", 46, "铰刀 Ø6 H7（直角铣头）", 6, 12, cam.bore(P, 50, 0.2 * rpm(12, 6), r_plane=2, safe=8), kind="drill"))
+    return ops
+
+
+def opt_holes():
+    """G4.8 选配件的孔（housing.py 的 opt_seats；凸台所有机器都铸出，这些孔只给带选项的机器加工：工序卡上单列“选 T”“选 E”）"""
+    O = json.loads((ROOT / "docs/设计/WQ-LS/G4/选配件.json").read_text())["geo"]
+    ops = []
+    my = O["estep"]["motor_axis"][0]
+    wx, wy = O["wiper"]["pivot"]
+    # 机座顶板下的凸台（z −10.5），盲螺孔到 z −2.5：选 T 2 × M4 + 4 × M5，选 E 2 × M5
+    m4 = [to_frame("UNDER", (x_, y_, -10.5))[:2] for x_, y_ in ((-28.0, 40.0), (8.0, 40.0))]
+    m5 = [to_frame("UNDER", (x_, y_, -10.5))[:2] for x_, y_ in ((-8.0, 55.0), (-8.0, 65.0), (99.0, 55.0), (99.0, 65.0), (275.0, my - 18.0), (275.0, my + 18.0))]
+    ops.append(op("UNDER 钻 Ø3.3（选 T：动刀轴座 M4 底孔）", "UNDER", 47, "钻头 Ø3.3（直角铣头）", 3.3, 50, cam.drill(m4, 16 - 2.5, 0, 0.06 * rpm(50, 3.3), r_plane=-3.5, safe=55), kind="drill"))
+    ops.append(op("UNDER 攻 M4（选 T）", "UNDER", 48, "丝锥 M4（直角铣头，仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(m4, 16 - 3.5, 0.7, rpm(8, 4), r_plane=-3.5, safe=55), kind="drill"))
+    ops.append(op("UNDER 钻 Ø4.2（选 T：剪线摆轴座；选 E：电机板 M5 底孔）", "UNDER", 49, "钻头 Ø4.2（直角铣头）", 4.2, 50, cam.drill(m5, 16 - 2.5, 0, 0.06 * rpm(50, 4.2), r_plane=-3.5, safe=55), kind="drill"))
+    ops.append(op("UNDER 攻 M5（选 T、E）", "UNDER", 50, "丝锥 M5（直角铣头，仿真按底孔 Ø4.2）", 4.2, 8, cam.tap(m5, 16 - 3.5, 0.8, rpm(8, 5), r_plane=-3.5, safe=55), kind="drill"))
+    # 直角铣头伸进机头和机座之间向上：选 T 拨线轴孔 Ø4 H7（凸台 z 42 → 54），拨线电磁铁托板 M4（底板 z 46 → 53，钻通攻丝）
+    P = [to_frame("HEADUP", (wx, wy, 42.0))[:2]]
+    ops.append(op("HEADUP 钻 Ø3.8（选 T：拨线轴孔）", "HEADUP", 51, "钻头 Ø3.8（直角铣头）", 3.8, 50, cam.drill(P, 8, 0, 0.06 * rpm(50, 3.8), r_plane=6, safe=14), kind="drill"))
+    ops.append(op("HEADUP 铰 Ø4 H7", "HEADUP", 52, "铰刀 Ø4 H7（直角铣头）", 4, 10, cam.bore(P, 8, 0.15 * rpm(10, 4), r_plane=6, safe=14), kind="drill"))
+    P = [to_frame("HEADUP", (-19.0, wy - 5.0, 46.0))[:2]]
+    ops.append(op("HEADUP 钻 Ø3.3（选 T：拨线电磁铁托板 M4）", "HEADUP", 47, "钻头 Ø3.3（直角铣头）", 3.3, 50, cam.drill(P, 7, 0, 0.06 * rpm(50, 3.3), r_plane=2, safe=14), kind="drill"))
+    ops.append(op("HEADUP 攻 M4", "HEADUP", 48, "丝锥 M4（直角铣头，仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(P, 7, 0.7, rpm(8, 4), r_plane=2, safe=14), kind="drill"))
+    # B 270°：选 E 倒缝按钮孔 Ø12（机头前壁 y −48 → −43.5）；选 T 松线电磁铁支架 2 × Ø4.5（机臂前壁 y −48 → −38）
+    P = [to_frame("B270", (-30.0, -48.0, 80.0))[:2]]
+    ops.append(op("B270 钻 Ø12（选 E：倒缝按钮孔）", "B270", 44, "钻头 Ø12", 12, 60, cam.drill(P, 6, 0, 0.12 * rpm(60, 12), r_plane=2, safe=8), kind="drill"))
+    P = [to_frame("B270", (x_, -48.0, 188.0))[:2] for x_ in (50.0, 58.0)]
+    ops.append(op("B270 钻 Ø4.5（选 T：松线电磁铁支架）", "B270", 49, "钻头 Ø4.5", 4.5, 60, cam.drill(P, 11, 0, 0.08 * rpm(60, 4.5), r_plane=2, safe=8), kind="drill"))
     return ops
 
 
