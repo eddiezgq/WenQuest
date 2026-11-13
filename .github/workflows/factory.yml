@@ -330,10 +330,11 @@ jobs:
           if [ "$st" = 0 ] && [ -n "$pcbhubp" ]; then
             for i in $(seq 1 40); do curl -fsS localhost:$pcbhubp/api/health && break; sleep 5; done
             buyb=""; [ -z "$chiphubp" ] || buyb="--item DRV-JOINT-B:2 --park-buy IC-ENCIF=http://localhost:$chiphubp=芯片厂"     # 第 106 轮
+            # 第 159 轮 159e：多接一张平缝机控制器 CTRL-LS 的单（两段线做完到发货；结果只作参考）
             cd factory/digital
             python tests/plant_loop.py --hub http://localhost:$pcbhubp --erp http://localhost:$pcberpp --erp-kind real \
               --erp-key "$(val WQ_C_${pup}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${pup}_ERP_API_SECRET)" --speed 300 --timeout 900 \
-              --item DRV-JOINT:3 --item ENC-RD:2 $buyb --reliability 0 --staffing 0 --domains --expect-products DRV-JOINT,CTRL-AGV,ENC-RD,DRV-JOINT-B \
+              --item DRV-JOINT:3 --item ENC-RD:2 --item CTRL-LS:2 $buyb --reliability 0 --staffing 0 --domains --expect-products DRV-JOINT,CTRL-AGV,ENC-RD,DRV-JOINT-B,CTRL-LS \
               2>&1 | tee /tmp/logs/pcb_loop.log
             st=${PIPESTATUS[0]}
             cd - >/dev/null
