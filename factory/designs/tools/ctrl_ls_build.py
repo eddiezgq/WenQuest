@@ -301,7 +301,8 @@ def board_build(route, jar):
         # 先补线再删用不上的引出线：引出线的线头正好是补线的好起点（第十七次：隔离电源 +5V 脚的引出线先被删了，补线找不到路）
         print("用不上的引出线：", RF.drop_dangling(board))
         targets = {n: c["track_mm"] for c in D.X["net_classes"] if c.get("route_mm") for n in c["nets"]}
-        print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance, outline=box(ox, oy, ox + w_, oy + h_)))
+        print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance, outline=box(ox, oy, ox + w_, oy + h_),
+                                                             keepouts=kos))
     # 功率铺铜（设计描述 board.pours）布完线再加：给布线器当平面时，别的网络从底层穿过去把它切成几块、块和块之间没连上
     # （第十二、十三次布线的“铺铜孤岛”）；现在母线全部按走线布通，铺铜只是加宽电流通路，连不上的碎块自动去掉
     for net, layer, pts in D.X["pours"]:
