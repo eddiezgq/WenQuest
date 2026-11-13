@@ -84,6 +84,21 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline, keepouts=())
             need.setdefault(k, (p, 0.6))
     lid = {"F.Cu": pcbnew.F_Cu, "B.Cu": pcbnew.B_Cu, "In2.Cu": pcbnew.In2_Cu}
     made = []  # 已经引出的线也算障碍：(网络, 层, 形状)
+    n_made = 0
+    # 板上已有的线（先布的交流线）也算障碍；已经有线接着的焊盘不用再引
+    # （159d2c：相线的引出线贴着先布的零线，只隔 0.68 mm）
+    mm = pcbnew.ToMM
+    for t in board.GetTracks():
+        if t.GetClass() == "PCB_VIA":
+            continue
+        g = LineString([(mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))]).buffer(
+            mm(t.GetWidth()) / 2)
+        made.append((t.GetNetname(), {v: k for k, v in lid.items()}.get(t.GetLayer()), g))
+        for key in list(need):
+            pa = need[key][0]
+            if pa.GetNetname() == t.GetNetname() and pa.IsOnLayer(t.GetLayer()) and \
+                    _poly(pa.GetEffectivePolygon()).distance(g) < 1e-3:
+                del need[key]
     for (_ref, _num), (p, c) in sorted(need.items(), key=lambda kv: (kv[0][0], kv[0][1])):
         net = p.GetNetname()
         w = width_of(net)
@@ -127,7 +142,8 @@ def stubs(board, class_of, clearance, width_of, layers_of, outline, keepouts=())
         t.SetLocked(True)
         board.Add(t)
         made.append((net, best[1], LineString([(x0, y0), best[2]]).buffer(w / 2)))
-    return len(made)
+        n_made += 1
+    return n_made
 
 
 def drop_dangling(board, keep=()):
@@ -555,3 +571,39 @@ def preroute(board, nets, class_of, clearance, width_of, layers_of, outline, kee
             n += r[1]
         done[net] = n
     return done, failed, ids
+
+
+def shrink_close(board, clearance, min_w=0.15, most=0.06):
+    """走线离别的网络的焊盘差一点点（≤ most mm）不够时，把这段线收细一点补上（不细于 min_w）。
+    焊盘要求的间距取网络要求和器件、焊盘自己写的间距里大的（159d2c：反激芯片没接网络的散热焊盘，器件要求 0.2 mm，
+    布线器给的 0.164）。返回收细的段数"""
+    from shapely import STRtree
+    from shapely.geometry import LineString
+
+    mm = pcbnew.ToMM
+    pads = []
+    for fp in board.GetFootprints():
+        fc = mm(fp.GetLocalClearance()) if hasattr(fp, "GetLocalClearance") else 0.0
+        for p in fp.Pads():
+            pc = mm(p.GetLocalClearance()) if hasattr(p, "GetLocalClearance") else 0.0
+            pads.append((p.GetNetname(), _poly(p.GetEffectivePolygon()), max(fc, pc), p))
+    tree = STRtree([g for _, g, _, _ in pads])
+    n = 0
+    for t in board.GetTracks():
+        if t.GetClass() == "PCB_VIA":
+            continue
+        net, w = t.GetNetname(), mm(t.GetWidth())
+        line = LineString([(mm(t.GetStart().x), mm(t.GetStart().y)), (mm(t.GetEnd().x), mm(t.GetEnd().y))])
+        short = 0.0
+        for i in tree.query(line.buffer(w / 2 + 1.0)):
+            pn, g, lc, p = pads[int(i)]
+            if pn == net or not p.IsOnLayer(t.GetLayer()):
+                continue
+            need = max(clearance(net, pn) if pn else 0.0, lc)
+            d = line.distance(g) - w / 2
+            if d < need:
+                short = max(short, need - d)
+        if 0 < short <= most and w - 2 * (short + 0.005) >= min_w:
+            t.SetWidth(pcbnew.FromMM(round(w - 2 * (short + 0.005), 3)))
+            n += 1
+    return n

@@ -282,9 +282,9 @@ def board_build(route, jar):
         ox, oy = gb.ORIGIN
         kos = [(RF._poly(z.Outline()), set(z.GetLayerSet().CuStack())) for z in board.Zones()
                if z.GetIsRuleArea() and z.GetDoNotAllowTracks()]
-        # 交流相线、零线先布（159d2c：交给自动布线器时零线几次都没布通——它从滤波电感到整流桥要穿过整个交流区，
+        # 交流相线、零线、保护地先布（159d2c：交给自动布线器时零线几次都没布通——它从滤波电感到整流桥要穿过整个交流区，
         # 等别的线占了地方就过不去了）
-        pre, pre_fail, pre_ids = RF.preroute(board, ["N_C", "N_IN", "L_R", "L_C", "L_F", "L_IN"], class_of, clearance,
+        pre, pre_fail, pre_ids = RF.preroute(board, ["N_C", "N_IN", "L_R", "L_C", "L_F", "L_IN", "PE"], class_of, clearance,
                                              lambda n: width.get(n, 0.25), lambda n: lays.get(n, ["F.Cu", "B.Cu"]),
                                              box(ox, oy, ox + w_, oy + h_), kos)
         print("先布的交流线（段数）：", pre, "；没布通：", pre_fail)
@@ -309,6 +309,7 @@ def board_build(route, jar):
         targets = {n: c["track_mm"] for c in D.X["net_classes"] if c.get("route_mm") for n in c["nets"]}
         print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance, outline=box(ox, oy, ox + w_, oy + h_),
                                                              keepouts=kos))
+        print("差一点点的线收细：", RF.shrink_close(board, clearance))
     # 功率铺铜（设计描述 board.pours）布完线再加：给布线器当平面时，别的网络从底层穿过去把它切成几块、块和块之间没连上
     # （第十二、十三次布线的“铺铜孤岛”）；现在母线全部按走线布通，铺铜只是加宽电流通路，连不上的碎块自动去掉
     for net, layer, pts in D.X["pours"]:
