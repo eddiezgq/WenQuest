@@ -609,7 +609,7 @@ def shrink_close(board, clearance, min_w=0.15, most=0.06):
     return n
 
 
-def close_slivers(board, gap=SAME_NET_GAP):
+def close_slivers(board, gap=SAME_NET_GAP, keep_mm=0.3):
     """同一网络、同一层上两块不相连的铜离得比 gap 还近（只剩一条细缝，板厂蚀刻难做，工艺检查 F2 报）：
     在两者最近的两点之间加一小段线把缝补上（159d2c：功率模块 N_W 脚旁的线在底层离自己的焊盘 0.086 mm）。返回补的处数"""
     from shapely.geometry import LineString, Point
@@ -633,6 +633,14 @@ def close_slivers(board, gap=SAME_NET_GAP):
                 mm(t.GetWidth()) / 2)
             its.append((t.GetNetname(), t.GetLayer(), g))
             tracks.append((t, g))
+    # 别的网络（含没接网络的焊盘）的铜：补的那一小段离它们至少 keep_mm（159d2c：补在反激芯片散热焊盘旁，差了 0.005 mm）
+    others = {}
+    for fp in board.GetFootprints():
+        for p in fp.Pads():
+            for lid in p.GetLayerSet().CuStack():
+                others.setdefault(lid, []).append((p.GetNetname(), _poly(p.GetEffectivePolygon())))
+    for net, lid, og in its:
+        others.setdefault(lid, []).append((net, og))
     n = 0
     for t, g in tracks:
         for net, lid, og in its:
@@ -642,6 +650,9 @@ def close_slivers(board, gap=SAME_NET_GAP):
             if 1e-3 < d < gap:
                 a, b = nearest_points(g, og)
                 w = min(mm(t.GetWidth()), 0.3)
+                bridge = LineString([a, b]).buffer(w / 2 + keep_mm)
+                if any(on != net and og2.intersects(bridge) for on, og2 in others.get(lid, [])):
+                    continue
                 s = pcbnew.PCB_TRACK(board)
                 # 两头各往里伸半个线宽，保证和两边都搭上
                 dx, dy = b.x - a.x, b.y - a.y
