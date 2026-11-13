@@ -33,10 +33,10 @@ body.shot .panel,body.shot .legend{display:none}
     <tr><td>针尖高出针板</td><td id="t_tip">—</td></tr>
     <tr><td>线眼（Y, Z）</td><td id="t_eye">—</td></tr>
   </table>
-  <div class="row"><button data-v="iso" class="on">斜视</button><button data-v="face">端面</button><button data-v="front">正面</button><button data-v="hook">旋梭</button><button data-v="train">传动</button><button data-v="feed">送布</button><button data-v="dog">送布牙</button><button data-v="press">压脚</button><button data-v="dial">旋钮</button></div>
+  <div class="row"><button data-v="iso" class="on">斜视</button><button data-v="face">端面</button><button data-v="front">正面</button><button data-v="hook">旋梭</button><button data-v="train">传动</button><button data-v="feed">送布</button><button data-v="dog">送布牙</button><button data-v="press">压脚</button><button data-v="dial">旋钮</button><button data-v="trim">剪线</button><button data-v="wipe">拨线</button></div>
   <div class="row"><button id="shell" class="on">机壳半透明</button><button id="thr" class="on">面线</button></div>
 </div>
-<div class="legend"><span style="background:#c8ccd1"></span>钢件<span style="background:#eef0f2"></span>镀铬件<span style="background:#d24a3a"></span>面线<span style="background:#6f9fd4"></span>送布组<span style="background:#b7bbc0;opacity:.6"></span>机壳</div>
+<div class="legend"><span style="background:#c8ccd1"></span>钢件<span style="background:#eef0f2"></span>镀铬件<span style="background:#d24a3a"></span>面线<span style="background:#6f9fd4"></span>送布组<span style="background:#d98a2b"></span>剪线、拨线<span style="background:#b7bbc0;opacity:.6"></span>机壳</div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
@@ -66,6 +66,7 @@ const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; root.scale.setSc
 const MAT = {
   metal: new THREE.MeshPhysicalMaterial({ color: 0xc8ccd1, metalness: 1, roughness: 0.3 }),
   chrome: new THREE.MeshPhysicalMaterial({ color: 0xeef0f2, metalness: 1, roughness: 0.1 }),
+  opt: new THREE.MeshPhysicalMaterial({ color: 0xd98a2b, metalness: 0.6, roughness: 0.35 }),
   black: new THREE.MeshPhysicalMaterial({ color: 0x2a2d31, metalness: 0.2, roughness: 0.6 }),
   brass: new THREE.MeshPhysicalMaterial({ color: 0xc9a25a, metalness: 1, roughness: 0.3 }),
   feed: new THREE.MeshPhysicalMaterial({ color: 0x6f9fd4, metalness: 0.7, roughness: 0.35 }),      // G4.6：送布组的运动件上蓝色，和机座里别的零件分开
@@ -89,11 +90,12 @@ async function geom(k) {
   }
   return loader.loadAsync(`${BASE}/${k}.stl`);
 }
+const OPTM = new Set(['moving_knife', 'knife_shaft', 'trim_link', 'trim_rock', 'trim_lever', 'trim_roller', 'trim_cam', 'wiper']);   // G4.8 剪线、拨线的运动件
 const FEED = new Set(['feed_ecc', 'feed_rod', 'regulator', 'reg_slider', 'feed_link', 'feed_rock', 'feed_bar', 'lift_ecc', 'lift_link', 'lift_rock', 'oil_ecc', 'oil_plunger']);
 const mesh = {};
 await Promise.all(Object.entries(info.parts).map(async ([k, p]) => {
   const g = prep(await geom(k));
-  const m = new THREE.Mesh(g, FEED.has(k) ? MAT.feed : (MAT[p.material] || MAT.metal));
+  const m = new THREE.Mesh(g, OPTM.has(k) ? MAT.opt : FEED.has(k) ? MAT.feed : (MAT[p.material] || MAT.metal));
   m.castShadow = m.receiveShadow = true; m.matrixAutoUpdate = false;
   root.add(m); mesh[k] = m;
 }));
@@ -123,7 +125,8 @@ const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true;
 const VIEWS = { iso: [[-0.32, 0.27, 0.40], [0.01, 0.15, 0.0]], face: [[-0.55, 0.15, 0.0], [0.0, 0.15, 0.0]], front: [[0.0, 0.15, 0.55], [0.0, 0.15, 0.0]],
                 hook: [[-0.16, -0.02, 0.17], [0.04, -0.03, -0.01]], train: [[0.15, 0.12, 0.62], [0.2, 0.08, 0.0]],
                 feed: [[0.06, 0.12, 0.38], [0.17, -0.03, 0.0]], dog: [[-0.085, -0.02, 0.08], [0.014, -0.006, 0.0]],
-                press: [[-0.25, 0.15, 0.26], [-0.02, 0.095, 0.0]], dial: [[0.21, 0.22, 0.38], [0.33, 0.10, 0.03]] };   // G4.7：压脚、手抬膝抬、松线；针距旋钮、倒缝扳手、拉杆   // G4.6：送布组全貌（机壳透明看机座里）；送布牙（从左往右看 y–z 平面）
+                press: [[-0.25, 0.15, 0.26], [-0.02, 0.095, 0.0]], dial: [[0.21, 0.22, 0.38], [0.33, 0.10, 0.03]],
+                trim: [[-0.085, -0.055, 0.095], [-0.004, -0.008, -0.010]], wipe: [[-0.11, 0.07, 0.10], [-0.012, 0.006, 0.008]] };   // G4.8：针板下面的动刀（从左前下方往上看）；拨线钩   // G4.7：压脚、手抬膝抬、松线；针距旋钮、倒缝扳手、拉杆   // G4.6：送布组全貌（机壳透明看机座里）；送布牙（从左往右看 y–z 平面）
 function view(v) { const [p, t] = VIEWS[v]; cam.position.set(...p); ctl.target.set(...t); ctl.update(); }
 view(q.get('view') || 'iso');
 

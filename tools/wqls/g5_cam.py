@@ -283,13 +283,13 @@ def opt_holes():
     ops = []
     my = O["estep"]["motor_axis"][0]
     wx, wy = O["wiper"]["pivot"]
-    # 机座顶板下的凸台（底面 z −7.6），盲螺孔到 z −1：选 T 2 × M4 + 4 × M5，选 E 2 × M5
-    m4 = [to_frame("UNDER", (x_, y_, -7.6))[:2] for x_, y_ in ((-28.0, 40.0), (8.0, 40.0))]
-    m5 = [to_frame("UNDER", (x_, y_, -7.6))[:2] for x_, y_ in ((-8.0, 55.0), (-8.0, 65.0), (99.0, 55.0), (99.0, 65.0), (275.0, my - 18.0), (275.0, my + 18.0))]
-    ops.append(op("UNDER 钻 Ø3.3（选 T：动刀轴座 M4 底孔）", "UNDER", 47, "钻头 Ø3.3（直角铣头）", 3.3, 50, cam.drill(m4, 16 - 1.0, 0, 0.06 * rpm(50, 3.3), r_plane=-6.4, safe=55), kind="drill"))
-    ops.append(op("UNDER 攻 M4（选 T）", "UNDER", 48, "丝锥 M4（直角铣头，仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(m4, 16 - 2.0, 0.7, rpm(8, 4), r_plane=-6.4, safe=55), kind="drill"))
-    ops.append(op("UNDER 钻 Ø4.2（选 T：剪线摆轴座；选 E：电机板 M5 底孔）", "UNDER", 49, "钻头 Ø4.2（直角铣头）", 4.2, 50, cam.drill(m5, 16 - 1.0, 0, 0.06 * rpm(50, 4.2), r_plane=-6.4, safe=55), kind="drill"))
-    ops.append(op("UNDER 攻 M5（选 T、E）", "UNDER", 50, "丝锥 M5（直角铣头，仿真按底孔 Ø4.2）", 4.2, 8, cam.tap(m5, 16 - 2.0, 0.8, rpm(8, 5), r_plane=-6.4, safe=55), kind="drill"))
+    # 机座顶板底面（z −5.6），盲螺孔到 z −1：选 T 2 × M4 + 4 × M5，选 E 2 × M5
+    m4 = [to_frame("UNDER", (x_, y_, -5.6))[:2] for x_, y_ in ((-28.0, 40.0), (8.0, 40.0))]
+    m5 = [to_frame("UNDER", (x_, y_, -5.6))[:2] for x_, y_ in ((-8.0, 55.0), (-8.0, 65.0), (99.0, 55.0), (99.0, 65.0), (275.0, my - 18.0), (275.0, my + 18.0))]
+    ops.append(op("UNDER 钻 Ø3.3（选 T：动刀轴座 M4 底孔）", "UNDER", 47, "钻头 Ø3.3（直角铣头）", 3.3, 50, cam.drill(m4, 16 - 1.0, 0, 0.06 * rpm(50, 3.3), r_plane=-8.4, safe=55), kind="drill"))
+    ops.append(op("UNDER 攻 M4（选 T）", "UNDER", 48, "丝锥 M4（直角铣头，仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(m4, 16 - 1.5, 0.7, rpm(8, 4), r_plane=-8.4, safe=55), kind="drill"))
+    ops.append(op("UNDER 钻 Ø4.2（选 T：剪线摆轴座；选 E：电机板 M5 底孔）", "UNDER", 49, "钻头 Ø4.2（直角铣头）", 4.2, 50, cam.drill(m5, 16 - 1.0, 0, 0.06 * rpm(50, 4.2), r_plane=-8.4, safe=55), kind="drill"))
+    ops.append(op("UNDER 攻 M5（选 T、E）", "UNDER", 50, "丝锥 M5（直角铣头，仿真按底孔 Ø4.2）", 4.2, 8, cam.tap(m5, 16 - 1.5, 0.8, rpm(8, 5), r_plane=-8.4, safe=55), kind="drill"))
     # 直角铣头伸进机头和机座之间向上：选 T 拨线轴孔 Ø4 H7（凸台 z 42 → 54），拨线电磁铁托板 M4（底板 z 46 → 53，钻通攻丝）
     P = [to_frame("HEADUP", (wx, wy, 42.0))[:2]]
     ops.append(op("HEADUP 钻 Ø3.8（选 T：拨线轴孔）", "HEADUP", 51, "钻头 Ø3.8（直角铣头）", 3.8, 50, cam.drill(P, 8, 0, 0.06 * rpm(50, 3.8), r_plane=6, safe=14), kind="drill"))

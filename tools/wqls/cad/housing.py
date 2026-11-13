@@ -469,7 +469,7 @@ def ctrl_seats(hollow, solid, info):
 
 def opt_seats(hollow, solid, info):
     """G4.8 选配件（T 自动剪线、E 电子针距，cad/opt.py）的支承。铸件所有变型共用：凸台都铸出来，孔只给带这个选项的机器加工。
-    机座顶板下（都是 Ø12 凸台，z −7.6…−5.6，盲螺孔从下面攻到 z −1，顶板上面不露孔）：
+    机座顶板下（不加凸台，盲螺孔从下面攻到 z −1、螺纹长 4.6，顶板上面不露孔；这几处只受几十牛的力）：
       ① 动刀轴座 2 × M4（x −28、8，y 40）；② 剪线摆轴座 4 × M5（x −8、99，y 55、65）；③ 电子针距电机板 2 × M5（x 275，y −42、−6）；
     机头：④ 拨线轴座（底板上 Ø12 凸台 z 42…54，孔 Ø4 H7，从下面钻铰）；⑤ 拨线电磁铁托板 M4（底板上 Ø12 凸台，从下面钻通攻丝）；
           ⑥ 倒缝按钮孔 Ø12（前壁 x −30、z 80）；
@@ -482,7 +482,7 @@ def opt_seats(hollow, solid, info):
     wx, wy = O["wiper"]["pivot"]
     pads_l = [(-28.0, 40.0, "M4"), (8.0, 40.0, "M4"), (-8.0, 55.0, "M5"), (-8.0, 65.0, "M5"), (99.0, 55.0, "M5"), (99.0, 65.0, "M5"),
               (275.0, my - 18.0, "M5"), (275.0, my + 18.0, "M5")]
-    feats = [Part.makeCylinder(6.0, 3.0, V(x_, y_, -7.6), V(0, 0, 1)) for x_, y_, _ in pads_l]        # 凸台只高 2（凝固：高 4.4 时机座顶板下出了 12.6 cm³ 的孤立液相区）
+    feats = []          # 机座顶板下不加凸台（凝固：凸台高 4.4 时出了 12.6 cm³、高 2 时 7.1 cm³ 的孤立液相区）；盲螺孔直接攻在顶板上，深 4.6
     feats += [Part.makeCylinder(6.0, 12.0, V(wx, wy, 42.0), V(0, 0, 1)),                                   # ④
               Part.makeCylinder(6.0, 3.0, V(-19.0, wy - 5.0, 50.0), V(0, 0, 1)),                            # ⑤
               Part.makeCylinder(6.0, 5.0, V(50.0, -43.0, 188.0), V(0, 1, 0)), Part.makeCylinder(6.0, 5.0, V(58.0, -43.0, 188.0), V(0, 1, 0))]   # ⑦
@@ -490,7 +490,7 @@ def opt_seats(hollow, solid, info):
         hollow = fuse_fillet(hollow, f_.common(solid))
     if FEA_SIMPLE:
         return hollow
-    holes = [Part.makeCylinder((1.65 if k == "M4" else 2.1), 6.7, V(x_, y_, -7.7), V(0, 0, 1)) for x_, y_, k in pads_l]   # 盲孔到 z −1.0
+    holes = [Part.makeCylinder((1.65 if k == "M4" else 2.1), 4.7, V(x_, y_, -5.7), V(0, 0, 1)) for x_, y_, k in pads_l]   # 盲孔到 z −1.0
     holes += [Part.makeCylinder(2.05, 16.0, V(wx, wy, 40.0), V(0, 0, 1)),
               Part.makeCylinder(1.65, 12.0, V(-19.0, wy - 5.0, 43.0), V(0, 0, 1)),
               Part.makeCylinder(6.0, 12.0, V(-30.0, -52.0, 80.0), V(0, 1, 0)),
