@@ -5,10 +5,10 @@
     314.15,
     216.0,
     "In1",
-    "zone GND_ISO zone:5004c9b8-6649-46cc-91e8-f843dce1f2a7 ↔ zone GND zone:a806e642-b6c2-4227-8222-413bfe444188"
+    "zone GND_ISO zone:5c20b0da-2437-4ab9-9702-1928145f84e9 ↔ zone GND zone:fa666b58-97a6-45b3-830b-6da3b59804ee"
    ]
   ],
-  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:5004c9b8-6649-46cc-91e8-f843dce1f2a7 ↔ zone GND zone:a806e642-b6c2-4227-8222-413bfe444188）",
+  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:5c20b0da-2437-4ab9-9702-1928145f84e9 ↔ zone GND zone:fa666b58-97a6-45b3-830b-6da3b59804ee）",
   "example": true,
   "groups": [
    [
@@ -181,10 +181,10 @@
     121.63,
     122.08,
     "In1",
-    "pth PE C102 ↔ zone GND zone:a806e642-b6c2-4227-8222-413bfe444188"
+    "pth PE C102 ↔ zone GND zone:fa666b58-97a6-45b3-830b-6da3b59804ee"
    ]
   ],
-  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:a806e642-b6c2-4227-8222-413bfe444188）",
+  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:fa666b58-97a6-45b3-830b-6da3b59804ee）",
   "example": true,
   "groups": [
    [
@@ -384,13 +384,13 @@
  {
   "at": [
    [
-    316.79,
-    135.13,
+    298.28,
+    119.6,
     "B",
-    "zone VBUS zone:0bf21ae6-7769-4b66-b625-363d2f9acf10 ↔ track IN_UH"
+    "zone VBUS zone:c5c87846-36e4-453d-8c9b-46dd3a48289d ↔ track N_U"
    ]
   ],
-  "detail": "最近 2.20 mm（B 层，zone VBUS zone:0bf21ae6-7769-4b66-b625-363d2f9acf10 ↔ track IN_UH）",
+  "detail": "最近 1.60 mm（B 层，zone VBUS zone:c5c87846-36e4-453d-8c9b-46dd3a48289d ↔ track N_U）",
   "example": true,
   "groups": [
    [
@@ -540,8 +540,8 @@
   "name": "安全距离：390 V 母线与电机相线 ↔ 弱电",
   "rule": "电气间隙 ≥ 2 mm、爬电距离 ≥ 2 mm（直线距离量，偏保守）",
   "source": "示例值",
-  "status": "pass",
+  "status": "fail",
   "unit": "mm",
-  "value": 2.2
+  "value": 1.6
  }
 ]
