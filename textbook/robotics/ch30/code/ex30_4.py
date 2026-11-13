@@ -21,12 +21,12 @@ _, cL = bom_rollup("WQJ-L")
 _, cM = bom_rollup("WQJ-M")
 _, cS = bom_rollup("WQJ-S")
 mods = parts["WQJ-L"] + parts["WQJ-M"] + parts["WQJ-S"]
-ctrl = parts["CTRL-CAB"]
+ctrl = parts["CTRL-CAB"] + parts.get("IPC", 0.0)  # 控制柜连同工控机（第 166 轮起工控机单列，向计算机厂买）
 rt = {r["name"]: r["steps"] for r in P["routings"]}
 t_robot = sum(m for _, m in rt["RT-协作机器人 Cobot"])
 t_joint = sum(m for _, m in rt["RT-关节模组 Joint module"])
 t_total = t_robot + 6 * t_joint
-assert abs(mods + ctrl + sum(v for k, v in parts.items() if k not in ("WQJ-L", "WQJ-M", "WQJ-S", "CTRL-CAB")) - mat) < 1e-6
+assert abs(mods + ctrl + sum(v for k, v in parts.items() if k not in ("WQJ-L", "WQJ-M", "WQJ-S", "CTRL-CAB", "IPC")) - mat) < 1e-6
 out(mat=mat, price=price, mat_share=mat / price * 100, cL=cL, cM=cM, cS=cS, mods=mods, mod_share=mods / mat * 100, ctrl=ctrl,
     ctrl_share=ctrl / mat * 100, save_j1=cL - cM, save_share=(cL - cM) / mat * 100, t_robot=t_robot, t_joint=t_joint,
     t_total_h=t_total / 60, t_run=dict(rt["RT-协作机器人 Cobot"])["负载跑合 Load run-in"],
