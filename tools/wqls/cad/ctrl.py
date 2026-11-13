@@ -161,7 +161,7 @@ def build():
     rth = CT["release"]["theta_deg"][{0.0: "0.0", 5.5: "5.5", 13.0: "13.0"}[L]] * DEG     # g4_ctrl.release_angle（到顶后空行程）
     tab_tip = rot_y(tuple(r["tip"]), (rx, rz), rth)
     rod_tip = rot_y((rx, rz - r["a_rod"]), (rx, rz), rth)
-    rs = cyl(3.0, (rx, ry0, rz), (rx, 66.0, rz))                        # 轴从机头后壁的座（y 58…72）伸过来
+    rs = cyl(3.0, (rx, ry0, rz), (rx, 4.0, rz))                         # 轴装在压脚杆上导套座伸出的耳子里（y −7…4）；不能伸到后壁：膝抬 C2 的臂扫过这里
     rs = rs.fuse(bar_xz((rx, rz), tab_tip, 5.0, -13.0, -9.0)).fuse(bar_xz((rx, rz), rod_tip, 5.0, ry0, ry0 + 4.0))   # 长臂在 y −13…−9（让开针杆连接块 y ≥ −7）
     P["release_shaft"] = (rs, "metal", "steel", None)
     s_rod = rod_tip[0] - rx

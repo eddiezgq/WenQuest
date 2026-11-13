@@ -42,7 +42,7 @@ FRAMES = {   # 名称: (n, X 方向, Y 方向, 原点 p0（整机坐标，成品
     "UNDER": ((0, 0, -1), (1, 0, 0), (0, -1, 0), (348.0, 36.5, -16.0)),   # G5.2 合件：直角铣头在机座底下向上（销孔凸台下端 z −16）
     "LB0": ((-1, 0, 0), (0, -1, 0), (0, 0, 1), (-105.0, 0.0, 0.0)),       # G5.2 下件 / 合件：机座左端壁外面（x −105），B 0°
     "B90": ((0, 1, 0), (-1, 0, 0), (0, 0, 1), (0.0, 70.0, ZU)),           # G4.7 合件：后面（机头后壁 y 70），B 90°
-    "ARMUP": ((0, 0, -1), (1, 0, 0), (0, -1, 0), (74.0, -28.0, 160.0)),   # G4.7 合件：直角铣头伸进机臂下面的空档向上（机臂底面 z 160）
+    "ARMUP": ((0, 0, -1), (1, 0, 0), (0, -1, 0), (74.0, -28.0, 120.0)),   # G4.7 合件：直角铣头伸进机臂下面的空档向上（机臂底面 z 120）
 }
 WCS = {"B0": "G54", "B180": "G55", "B270": "G56", "UP": "G57", "DOWN_HEAD": "G58", "C_UP": "G54", "A_UP": "G54", "TOP": "G54",
        "TOPARM": "G57", "UNDER": "G58", "LB0": "G59", "B90": "G54.1 P1", "ARMUP": "G54.1 P2"}
@@ -228,21 +228,24 @@ def ctrl_holes():
     kn, rl, dl, rv, t = g["knee"], g["release"], g["dial"], g["reverse"], g["tension"]
     ops = []
 
-    def holes(frame, pts, face_z, bottom_z, d, tool, tno, vc, ream=None, f=0.1):
+    def holes(frame, pts, face_z, bottom_z, d, tool, tno, vc, ream=None, f=0.1, safe=None):
         P = [to_frame(frame, p)[:2] for p in pts]
         r = rpm(vc, d)
+        sf = face_z + 8 if safe is None else safe
         out = [op(f"{frame} 钻 Ø{d:g}（{tool}）", frame, tno, f"钻头 Ø{d:g}", d, vc,
-                  cam.drill(P, -bottom_z, 3 if (face_z - bottom_z) > 4 * d else 0, f * r, r_plane=face_z + 2, safe=face_z + 8), kind="drill")]
+                  cam.drill(P, -bottom_z, 3 if (face_z - bottom_z) > 4 * d else 0, f * r, r_plane=face_z + 2, safe=sf), kind="drill")]
         if ream:
             out.append(op(f"{frame} 铰 Ø{ream:g} H7（{tool}）", frame, tno + 1, f"铰刀 Ø{ream:g} H7", ream, 12,
-                          cam.bore(P, -bottom_z, 0.25 * rpm(12, ream), r_plane=face_z + 2, safe=face_z + 8), kind="drill"))
+                          cam.bore(P, -bottom_z, 0.25 * rpm(12, ream), r_plane=face_z + 2, safe=sf), kind="drill"))
         return out
     # B 270°（前面）：夹线柱孔 Ø5（机臂前壁 y −45 → −38）；针距旋钮轴孔、倒缝扳手轴孔 Ø8 H9（立柱前壁 y −62 → −50）
     ops += holes("B270", [(t["x"], -45.0, t["z"])], -3.0, -10.0, 4.8, "夹线柱孔", 41, 60, ream=5.0)
     ops += holes("B270", [(dl["x"], -62.0, dl["z"]), (rv["x"], -62.0, rv["z"])], 14.0, 2.0, 7.8, "针距旋钮、倒缝扳手轴孔", 43, 60, ream=8.0)
-    # B 90°（后面）：手抬扳手轴孔 Ø8、松线轴孔 Ø6、C2 销孔 Ø6（机头后壁 y 72 → 50/45）；C1 销孔 Ø6（立柱后壁 y 116 → 45，深 71）
+    # B 270°：松线轴座孔 Ø6 H7（压脚杆上导套座伸出的耳子，y −7 → 4；加长钻头从机头前窗口伸进去，前盖板装之前加工）
+    ops += holes("B270", [(rl["shaft"][0], -7.0, rl["shaft"][1])], -41.0, -52.0, 5.8, "松线轴座孔（加长，穿前窗口）", 45, 50, ream=6.0, f=0.06, safe=10.0)
+    # B 90°（后面）：手抬扳手轴孔 Ø8、C2 销孔 Ø6（机头后壁 y 72 → 50/45）；C1 销孔 Ø6（立柱后壁 y 116 → 45，深 71）
     ops += holes("B90", [(g["hand"]["x"], 72.0, hz)], 2.0, -20.0, 7.8, "手抬扳手轴孔", 43, 60, ream=8.0)
-    ops += holes("B90", [(rl["shaft"][0], 72.0, rl["shaft"][1]), (kn["C2"]["x"], 72.0, kn["C2"]["z"])], 2.0, -25.0, 5.8, "松线轴孔、C2 销孔", 45, 60, ream=6.0)
+    ops += holes("B90", [(kn["C2"]["x"], 72.0, kn["C2"]["z"])], 2.0, -25.0, 5.8, "C2 销孔", 45, 60, ream=6.0)
     ops += holes("B90", [(kn["C1"]["x"], 116.0, kn["C1"]["z"])], 46.0, -25.0, 5.8, "C1 销孔（加长钻、铰）", 45, 50, ream=6.0, f=0.06)
     # 直角铣头从上面：调压螺钉孔 M18 × 1.5（机头顶 z 256，底孔 Ø16.5 钻通到 z 236）
     pb = g["bar"]
@@ -259,10 +262,10 @@ def ctrl_holes():
     P = [to_frame("UNDER", (kn["push"]["x"] - 0.7, kn["y"], -16.0))[:2]]
     ops.append(op("UNDER 钻膝抬推杆过孔 Ø12（机座顶板）", "UNDER", 49, "钻头 Ø12（加长）", 12, 60,
                   cam.drill(P, 2 + 16, 0, 0.12 * rpm(60, 12), r_plane=-8, safe=55), kind="drill"))
-    # 直角铣头伸进机臂下面的空档向上：松线拨杆座孔 Ø6 H7（机臂底面 z 160 → 170）
-    P = [to_frame("ARMUP", (rl["pivot"][0], rl["pivot"][1], 160.0))[:2]]
-    ops.append(op("ARMUP 钻 Ø5.8（松线拨杆座）", "ARMUP", 45, "钻头 Ø5.8（直角铣头）", 5.8, 60, cam.drill(P, 10, 0, 0.08 * rpm(60, 5.8), r_plane=2, safe=8), kind="drill"))
-    ops.append(op("ARMUP 铰 Ø6 H7", "ARMUP", 46, "铰刀 Ø6 H7（直角铣头）", 6, 12, cam.bore(P, 10, 0.2 * rpm(12, 6), r_plane=2, safe=8), kind="drill"))
+    # 直角铣头伸进机臂下面的空档向上：松线拨杆座孔 Ø6 H7（机臂底面 z 120 穿过底板，进底板上的立柱到 z 170）；立轴销从下面压入，过盈自封
+    P = [to_frame("ARMUP", (rl["pivot"][0], rl["pivot"][1], 120.0))[:2]]
+    ops.append(op("ARMUP 钻 Ø5.8（松线拨杆座，加长）", "ARMUP", 45, "钻头 Ø5.8（直角铣头，加长）", 5.8, 50, cam.drill(P, 50, 4, 0.06 * rpm(50, 5.8), r_plane=2, safe=8), kind="drill"))
+    ops.append(op("ARMUP 铰 Ø6 H7", "ARMUP", 46, "铰刀 Ø6 H7（直角铣头）", 6, 12, cam.bore(P, 50, 0.2 * rpm(12, 6), r_plane=2, safe=8), kind="drill"))
     return ops
 
 

@@ -409,8 +409,8 @@ def ctrl_seats(hollow, solid, info):
     """G4.7 压脚与操纵件的支承（cad/ctrl.py 的零件装在这里；位置来自 G4/操纵件.json 的 geo）：
     机头：① 压脚杆上导套座（Ø18，z 170…182，和针杆上导套座连成一块），下导套座（G3 已有的凸台）镗 Ø12；
           ② 机头顶上调压螺钉座（Ø26），攻 M18 × 1.5；③ 手抬扳手轴座（后壁，Ø18，孔 Ø8）；
-          ④ 膝抬角杠杆 C2 的轴座（从后壁伸出的 Ø14 凸台，销孔 Ø6）；⑤ 松线轴座（后壁，Ø14，孔 Ø6）；
-    机臂：⑥ 松线拨杆座（机臂底板上的 Ø12 凸台，孔 Ø6）；⑦ 夹线柱孔（前壁，Ø5）；
+          ④ 膝抬角杠杆 C2 的轴座（从后壁伸出的 Ø14 凸台，销孔 Ø6）；⑤ 松线轴座（压脚杆上导套座往左伸出的耳子，Ø14 × 11，孔 Ø6，从前窗口钻）；
+    机臂：⑥ 松线拨杆座（机臂底板上 Ø12 的立柱，z 126…168；孔 Ø6 从机臂底面钻上来）；⑦ 夹线柱孔（前壁，Ø5）；
     立柱：⑧ 针距旋钮轴座（前壁，Ø20，孔 Ø8）；⑨ 倒缝扳手轴座（前壁，Ø18，孔 Ø8）；⑩ 膝抬角杠杆 C1 的轴座（后壁伸出，Ø16，孔 Ø6）；
           ⑪ 下横隔板上挂拉簧的方孔 4 × 4（铸出）、拉杆过孔 Ø12，上横隔板开缺口 14 × 14（拉杆和耳子上下走 ±6）；
     机座顶板：⑫ 针距拉杆过孔 Ø10、膝抬推杆过孔 Ø12。"""
@@ -427,8 +427,10 @@ def ctrl_seats(hollow, solid, info):
         Part.makeCylinder(13.0, 22.0, V(bx, by, 240.0), V(0, 0, 1)),                                                  # ②
         Part.makeCylinder(9.0, 14.0, V(g["hand"]["x"], 58.0, hz), V(0, 1, 0)),                                         # ③
         Part.makeCylinder(7.0, 20.0, V(kn["C2"]["x"], 47.0, kn["C2"]["z"]), V(0, 1, 0)),                               # ④
-        Part.makeCylinder(7.0, 14.0, V(rl["shaft"][0], 58.0, rl["shaft"][1]), V(0, 1, 0)),                             # ⑤
-        Part.makeCylinder(6.0, 12.0, V(rl["pivot"][0], rl["pivot"][1], 156.0), V(0, 0, 1)),                            # ⑥
+        Part.makeCylinder(7.0, 11.0, V(rl["shaft"][0], -7.0, rl["shaft"][1]), V(0, 1, 0)).fuse(                        # ⑤ 松线轴座：从压脚杆
+            Part.makeBox(bx - rl["shaft"][0], 11.0, 12.0, V(rl["shaft"][0], -7.0, g["guide_up"]["z"][0]))),              #    上导套座伸出的耳子
+        Part.makeCylinder(6.0, 50.0, V(rl["pivot"][0], rl["pivot"][1], 120.0), V(0, 0, 1)).common(                     # ⑥ 立柱从机臂底板
+            Part.makeBox(20, 20, 48.0, V(rl["pivot"][0] - 10, rl["pivot"][1] - 10, 120.0))),                          #    （z 126）长到 168
         Part.makeCylinder(10.0, 10.0, V(dl["x"], -62.0, dl["z"]), V(0, 1, 0)),                                         # ⑧
         Part.makeCylinder(9.0, 12.0, V(rv["x"], -62.0, rv["z"]), V(0, 1, 0)),                                          # ⑨
         Part.makeCylinder(8.0, 66.0, V(kn["C1"]["x"], 47.0, kn["C1"]["z"]), V(0, 1, 0)),                               # ⑩
@@ -443,8 +445,8 @@ def ctrl_seats(hollow, solid, info):
         Part.makeCylinder(8.25, 40.0, V(bx, by, 236.0), V(0, 0, 1)),                                                  # M18 × 1.5 底孔 Ø16.5
         Part.makeCylinder(4.05, 30.0, V(g["hand"]["x"], 50.0, hz), V(0, 1, 0)),
         Part.makeCylinder(3.05, 20.0, V(kn["C2"]["x"], 45.0, kn["C2"]["z"]), V(0, 1, 0)),
-        Part.makeCylinder(3.05, 30.0, V(rl["shaft"][0], 50.0, rl["shaft"][1]), V(0, 1, 0)),
-        Part.makeCylinder(3.05, 14.0, V(rl["pivot"][0], rl["pivot"][1], 156.0), V(0, 0, 1)),
+        Part.makeCylinder(3.05, 60.0, V(rl["shaft"][0], -50.0, rl["shaft"][1]), V(0, 1, 0)).common(Part.makeBox(20, 13, 20, V(rl["shaft"][0] - 10, -8.0, rl["shaft"][1] - 10))),
+        Part.makeCylinder(3.05, 51.0, V(rl["pivot"][0], rl["pivot"][1], 118.0), V(0, 0, 1)),                          # 从机臂底面钻上来；立轴销从下面压入（过盈，自封）
         Part.makeCylinder(2.5, 20.0, V(g["tension"]["x"], -30.0, g["tension"]["z"]), V(0, -1, 0)),                     # ⑦
         Part.makeCylinder(4.05, 20.0, V(dl["x"], -66.0, dl["z"]), V(0, 1, 0)),
         Part.makeCylinder(4.05, 20.0, V(rv["x"], -66.0, rv["z"]), V(0, 1, 0)),
