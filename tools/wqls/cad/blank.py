@@ -116,11 +116,42 @@ for a_ in adds:
     if nb.Volume < v0 - 1.0:
         print("合并后体积减少，跳过这一块", round(v0 - nb.Volume, 1))
         continue
+    if not nb.isValid():                             # 合并出坏实体（面朝向不一致）：换模糊布尔，还坏就跳过这一块并记下来
+        nb2 = blank.fuse(a_, 0.01)
+        if nb2.isValid() and nb2.Volume >= v0 - 1.0:
+            nb = nb2
+        else:
+            bb_ = a_.BoundBox
+            print("合并出坏实体，跳过这一块", [round(x, 1) for x in (bb_.XMin, bb_.YMin, bb_.ZMin, bb_.XMax, bb_.YMax, bb_.ZMax)])
+            log.setdefault("skipped_bad", []).append([round(x, 1) for x in (bb_.XMin, bb_.YMin, bb_.ZMin, bb_.XMax, bb_.YMax, bb_.ZMax)])
+            continue
     blank = nb
-blank = blank.removeSplitter()
+b_rs = blank.removeSplitter()
+if b_rs.isValid():                                   # 合并共面有时把面朝向弄乱（Unorientable）：那就不合并共面
+    blank = b_rs
+else:
+    log["remove_splitter_skipped"] = True
 if len(blank.Solids) == 1:
     blank = blank.Solids[0]
-lost = part.cut(blank).Volume                        # 零件上有、毛坯上没有的材料，必须接近 0
+try:
+    lost = part.cut(blank).Volume                    # 零件上有、毛坯上没有的材料，必须接近 0
+except Exception as e:                               # noqa: BLE001  个别合并后的面朝向不一致（OCC 报 Unorientable）：修复后再算
+    print("核对毛坯：修复后重试", e)
+    blank = blank.copy()
+    blank.fix(1e-4, 1e-5, 1e-3)
+    lost = None
+    for tol in (0.0, 0.01, 0.05):                    # 精确、模糊布尔
+        try:
+            lost = part.cut(blank, tol).Volume if tol else part.cut(blank).Volume
+            break
+        except Exception:                            # noqa: BLE001
+            continue
+    if lost is None:                                 # 布尔运算都不行（零件本身有自相交的小面，BOP 检查不过）：改用零件表面的网格点逐个查是否在毛坯里
+        pts_ = part.tessellate(0.5)[0]
+        out_ = [p_ for p_ in pts_ if not blank.isInside(p_, 0.05, True)]
+        log["check_method"] = f"零件表面 {len(pts_)} 个网格点逐个查（布尔运算失败）"
+        log["part_points_outside_blank"] = len(out_)
+        lost = 0.0 if not out_ else 1e9
 log["part_outside_blank_mm3"] = round(lost, 1)
 if lost > 50:
     raise SystemExit(f"毛坯没有包住零件：差 {lost:.0f} mm³")

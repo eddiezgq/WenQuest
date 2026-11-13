@@ -43,7 +43,7 @@ for ax, c in CUTS:
     if ax == "x":
         plane = Part.makePlane(500, 500, V(c, -250, -150), V(1, 0, 0), V(0, 1, 0))
     else:
-        plane = Part.makePlane(800, 500, V(-200, c, -150), V(0, 1, 0), V(1, 0, 0))
+        plane = Part.makePlane(800, 500, V(-200, c, 350), V(0, 1, 0), V(1, 0, 0))   # 宽度方向 = 法向 × 长度方向 = −z
     lo, hi = ("XMin", "XMax") if ax == "x" else ("YMin", "YMax")
     sec = {}
     for k, s in [("casting_upper", up), ("casting_lower", low)] + list(parts.items()):

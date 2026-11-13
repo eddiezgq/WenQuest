@@ -27,16 +27,16 @@ STYLE = {
     "shaft": (STEEL, None), "lower_shaft": (STEEL, None), "feed_bar": (MOVE, None),
 }
 # 剖面键, 标题, u 范围, v 范围, u 轴名
-PANELS = [("x-16", "x −16：压脚杆、压脚弹簧、调压螺钉（从机头一侧往右看）", (-45, 70), (-8, 275), "y（mm，往后为正）"),
-          ("y18", "y 18：手抬偏心凸轮、抬压脚块凸轮臂（从前往后看）", (-75, 15), (60, 200), "x（mm，往右为正）"),
+PANELS = [("x-16", "x −16：压脚杆、弹簧、调压螺钉（从左往右看）", (-45, 70), (-8, 275), "y（mm，往后为正）"),
+          ("y18", "y 18：手抬偏心凸轮（从前往后看）", (-75, 15), (60, 200), "x（mm，往右为正）"),
           ("y-47", "y −47：针距旋钮槽轮、拉杆上端的销", (292, 388), (128, 212), "x（mm）"),
           ("y-20", "y −20：针距拉杆、调节器臂", (290, 370), (-70, 160), "x（mm）")]
 LABELS = {
     "x-16": [("presser_screw", (6, 262), (40, 262), "调压螺钉 M18×1.5"), ("presser_spring", (6, 215), (40, 225), "压脚弹簧"),
-             ("presser_bar", (6, 100), (40, 100), "压脚杆 Ø8（空心）"), ("lift_bracket", (30, 144), (45, 165), "抬压脚块"),
+             ("presser_bar", (6, 100), (40, 100), "压脚杆 Ø8（空心）"), ("lift_bracket", (5, 149), (40, 160), "抬压脚块"),
              ("presser_bushes", (2, 44), (40, 55), "下导套"), ("presser_foot", (0, 3), (35, 18), "压脚"),
-             ("release_shaft", (-20, 176), (-30, 200), "松线轴")],
-    "y18": [("hand_lifter", (-40, 128), (-62, 100), "手抬偏心凸轮"), ("lift_bracket", (-34, 144), (-55, 175), "抬压脚块凸轮臂")],
+             ("release_shaft", (-11, 153), (-28, 128), "松线轴长臂")],
+    "y18": [("hand_lifter", (-40, 128), (-62, 100), "手抬偏心凸轮"), ("lift_bracket", (-34, 144), (-55, 175), "抬压脚块凸轮臂"), ("casting", (-6, 175), (-8, 190), "压脚杆上导套座")],
     "y-47": [("stitch_dial", (340, 192), (372, 206), "槽轮"), ("pull_rod", (325, 150), (305, 140), "拉杆上端的销")],
     "y-20": [("pull_rod", (324, 60), (348, 70), "针距拉杆"), ("regulator", (312, -50), (345, -40), "调节器（臂端销）")],
 }
@@ -53,7 +53,11 @@ for ax, (key, title, xl, yl, ulab) in zip(axs, PANELS):
         if not rings:
             continue
         verts, codes = [], []
-        for r in rings:
+        for i, r in enumerate(rings):           # 孔（被同一零件的奇数个环包住）顺时针、外环逆时针，按非零环绕规则填充才对
+            depth = sum(1 for j, o in enumerate(rings) if j != i and MPath(o).contains_point(r[0]))
+            area = sum(r[k][0] * r[k - 1][1] - r[k - 1][0] * r[k][1] for k in range(len(r)))
+            if (area < 0) != (depth % 2 == 1):
+                r = r[::-1]
             verts += r + [r[0]]
             codes += [MPath.MOVETO] + [MPath.LINETO] * (len(r) - 1) + [MPath.CLOSEPOLY]
         fc, hatch = STYLE[k]
