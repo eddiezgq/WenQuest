@@ -74,7 +74,7 @@ jobs:
       - name: 工业园各厂网址（第 125 轮：新厂打不开时查证书与转发）
         if: always() && inputs.server == 'us'
         run: |
-          ssh "deploy@$HOST" 'for h in chip sensor motor sewing; do
+          ssh "deploy@$HOST" 'for h in chip sensor motor computer sewing; do
               d=$h.factory.wenquestrobotics.com
               echo "$d local=$(curl -sk -o /dev/null -m 20 -w "%{http_code}" --resolve $d:443:127.0.0.1 https://$d/api/health 2>&1)"
               curl -sv -o /dev/null -m 20 --resolve $d:443:127.0.0.1 https://$d/api/health 2>&1 | grep -iE "subject:|issuer:|expire|SSL|alert|HTTP/" | head -6

@@ -46,6 +46,13 @@ classes:
     teachers: []
     plant: wenquest-motor
     park: true             # 接入工业园：机器人厂的四种电机向这里买
+  # 问渠数字工业园第八座厂（第 166 轮）：计算机厂（台式机、笔记本、服务器、整机柜、工控机）→ https://computer.factory.wenquestrobotics.com
+  - id: computer
+    name: 问渠数字工业园 · 计算机厂
+    course: ""
+    teachers: []
+    plant: wenquest-computer
+    park: true             # 接入工业园：机器人厂控制柜里的工控机向这里买
   # 第 133 轮：缝纫机厂上线 → https://sewing.factory.wenquestrobotics.com；不接入工业园
   # 第 134 轮：换成按《缝纫机厂工艺方案》建的问渠缝纫机厂（五个车间）；旧清单 example-sewing-products 留作企业版接入样板
   - id: sewing
