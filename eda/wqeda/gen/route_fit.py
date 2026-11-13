@@ -414,6 +414,7 @@ def maze(board, net, class_of, clearance, width, layers, outline, keepouts=(), s
     import heapq
 
     import numpy as np
+    import shapely
     from shapely import contains_xy
     from shapely.geometry import LineString, Point
     from shapely.ops import unary_union
@@ -450,7 +451,8 @@ def maze(board, net, class_of, clearance, width, layers, outline, keepouts=(), s
         for kp, lays in keepouts:
             if L in lays:
                 bufs.append(kp.buffer(width / 2 + SLACK))
-        blocked = contains_xy(unary_union(bufs), gx, gy) | ~contains_xy(inner, gx, gy)
+        obst = unary_union(bufs)
+        blocked = contains_xy(obst, gx, gy) | ~contains_xy(inner, gx, gy)
         on = [unary_union([g for ls, g in pc if L in ls]) for pc in pieces]
         if sum(1 for o in on if not o.is_empty) < 2:
             continue
@@ -503,6 +505,20 @@ def maze(board, net, class_of, clearance, width, layers, outline, keepouts=(), s
                 pts.append(path[k])
         pts.append(path[-1])
         xy = [(float(xs[j]), float(ys[i])) for i, j in pts]
+        # 拉直：从当前点往后找最远、直线过去不碰障碍的点（网格路径是锯齿，段数多）
+        ok_area = inner.difference(obst).union(unary_union([o for o in on if not o.is_empty]))
+        shapely.prepare(ok_area)
+        out = [xy[0]]
+        k = 0
+        while k < len(xy) - 1:
+            far = k + 1
+            for m in range(len(xy) - 1, k + 1, -1):
+                if ok_area.contains(LineString([xy[k], xy[m]])):
+                    far = m
+                    break
+            out.append(xy[far])
+            k = far
+        xy = out
         made = []
         for u, v in zip(xy, xy[1:], strict=False):
             if u == v:
