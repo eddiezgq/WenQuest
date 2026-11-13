@@ -12,6 +12,9 @@
 !factory/designs/drv-joint/report/board-model.json.gz
 !eda/examples/factories
 !factory/designs/drv-joint/out/gerber.zip
+!factory/designs/ctrl-ls/out/gerber.zip
+!factory/designs/ctrl-ls/out/bom.csv
+!factory/designs/ctrl-ls/out/pos.csv
 !eda/examples/pcba-demo/bom.csv
 !eda/examples/pcba-demo/pos.csv
 !factory/designs/drv-joint/kicad

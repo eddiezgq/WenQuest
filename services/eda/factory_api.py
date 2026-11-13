@@ -112,8 +112,11 @@ def bom_rows(board):
 
 
 def register(app, *, factory_dir, gateway, headers_of, gw_errors, client, demo=None):
-    """demo = {gerber, bom, cpl}：演示资料包（第 112 轮，故意带错，标明）的路径；页面上“用演示资料包”用"""
+    """demo = {名字: {gerber, bom, cpl}}：资料包的路径。"1" 是演示资料包（第 112 轮，故意带错，标明）；
+    "ctrl-ls" 是平缝机控制器 CTRL-LS 生成的真文件（第 159 轮 159d3），检查结果照实显示。
+    只给一组 {gerber, bom, cpl} 时当作 "1"。"""
     caps = factories(factory_dir)
+    packs = {"1": demo} if demo and "gerber" in demo else dict(demo or {})
 
     @app.get("/api/factory/factories")
     def list_factories():
@@ -129,9 +132,10 @@ def register(app, *, factory_dir, gateway, headers_of, gw_errors, client, demo=N
             raise _err(400, "choose a factory capability table", "请选一家工厂的工艺能力表")
         uploads = [v for k, v in form.multi_items() if k == "gerber" and isinstance(v, UploadFile)]
         bom_up, cpl_up = form.get("bom"), form.get("cpl")
-        if form.get("demo") == "1" and demo:
-            uploads = [_Local(demo["gerber"])]
-            bom_up, cpl_up = _Local(demo["bom"]), _Local(demo["cpl"])
+        pack = packs.get(str(form.get("demo") or ""))
+        if pack:
+            uploads = [_Local(pack["gerber"])]
+            bom_up, cpl_up = _Local(pack["bom"]), _Local(pack["cpl"])
         if not uploads:
             raise _err(400, "upload the Gerber and drill files (a zip or several files)",
                        "请上传光绘和钻孔文件（一个 zip 或多个文件）")
