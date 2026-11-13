@@ -19,6 +19,7 @@ import itertools
 import pcbnew
 
 STEP = 0.05
+SLACK = 0.01  # 焊盘圆弧在这里按多边形算，比 KiCad 精确算的近一点点：加宽时多留 0.01 mm（159d2c：2.595 对 2.6）
 
 
 def _poly(ps):
@@ -243,11 +244,11 @@ def widen(board, targets, clearance, passes=2, outline=None, edge_mm=0.5, keepou
                     for oref, pg in own[k]:
                         if oref == ref:
                             c = min(c, pg.distance(g))
-                half = min(half, line.distance(g) - c)
+                half = min(half, line.distance(g) - c - SLACK)
             for m, (t2, line2, _w, lid2) in enumerate(segs):
                 if m == k or lid2 != lid or t2.GetNetname() == net or line2.distance(line) > goal + 6.0:
                     continue
-                half = min(half, line.distance(line2) - width[m] / 2 - clearance(net, t2.GetNetname()))
+                half = min(half, line.distance(line2) - width[m] / 2 - clearance(net, t2.GetNetname()) - SLACK)
             width[k] = max(w0, min(goal, int(2 * half / STEP + 1e-9) * STEP), width[k] if npass else w0)
     full = part = none = 0
     for k, (t, _line, w0, _l) in enumerate(segs):
