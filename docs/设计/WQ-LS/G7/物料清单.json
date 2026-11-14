@@ -1,0 +1,6789 @@
+{
+ "note": "WQ-LS 8 种变型的物料清单，由 tools/wqls/g7_bom.py 从设计生成；单价、选项加价是示例值",
+ "variants": {
+  "WQ-LS": {
+   "options": {
+    "T": false,
+    "E": false,
+    "D": false
+   },
+   "price": 520,
+   "lines": [
+    {
+     "code": "BUY-BELT-LS",
+     "qty": 1,
+     "parts": [
+      "belt"
+     ],
+     "kind": "buy",
+     "name": "同步带 Timing belt",
+     "mass_g": 21.0
+    },
+    {
+     "code": "BUY-BOBCASE",
+     "qty": 1,
+     "parts": [
+      "bobbin_case"
+     ],
+     "kind": "buy",
+     "name": "梭壳与梭芯 Bobbin case & bobbin",
+     "mass_g": 31.2
+    },
+    {
+     "code": "BUY-BOX-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "包装箱与附件包",
+     "extra": "包装箱与附件包",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6201",
+     "qty": 3,
+     "parts": [
+      "bearings_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴轴承 6201 Lower shaft bearings 6201",
+     "mass_g": 57.6,
+     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+    },
+    {
+     "code": "BUY-BRG-6202",
+     "qty": 1,
+     "parts": [
+      "bearing_front"
+     ],
+     "kind": "buy",
+     "name": "上轴前轴承 6202 Front bearing 6202",
+     "mass_g": 66.2
+    },
+    {
+     "code": "BUY-COVERS-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "extra": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-CTRL-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "电控箱（GC 设计，外购）",
+     "extra": "电控箱（GC 设计，外购）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-MOTOR-LS",
+     "qty": 1,
+     "parts": [
+      "encoder_disc",
+      "motor_bolts",
+      "motor_cap",
+      "motor_housing",
+      "motor_rods",
+      "rotor",
+      "rotor_magnets",
+      "stator_core",
+      "stator_winding"
+     ],
+     "kind": "buy",
+     "name": "直驱电机 Direct-drive motor",
+     "mass_g": 2422.6
+    },
+    {
+     "code": "BUY-NEEDLE-DB",
+     "qty": 1,
+     "parts": [
+      "needle"
+     ],
+     "kind": "buy",
+     "name": "机针 DB×1 Needle DB×1",
+     "mass_g": 0.3
+    },
+    {
+     "code": "BUY-OILPAN-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "油盘",
+     "extra": "油盘",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLATE-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "针板与推板（三维没有画）",
+     "extra": "针板与推板（三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M4",
+     "qty": 20,
+     "parts": [],
+     "kind": "buy",
+     "name": "螺钉 M4（数量为示例）",
+     "extra": "螺钉 M4（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M5",
+     "qty": 40,
+     "parts": [],
+     "kind": "buy",
+     "name": "内六角螺钉 M5（数量为示例）",
+     "extra": "内六角螺钉 M5（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "HSG-LS",
+     "qty": 1,
+     "parts": [
+      "housing_upper",
+      "housing_lower"
+     ],
+     "kind": "make",
+     "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
+     "mass_g": 24208.0
+    },
+    {
+     "code": "LS-101",
+     "qty": 1,
+     "parts": [
+      "shaft"
+     ],
+     "kind": "make",
+     "name": "上轴 Upper shaft",
+     "mass_g": 621.7
+    },
+    {
+     "code": "LS-102",
+     "qty": 1,
+     "parts": [
+      "lower_shaft"
+     ],
+     "kind": "make",
+     "name": "下轴 Lower shaft",
+     "mass_g": 278.8
+    },
+    {
+     "code": "LS-103",
+     "qty": 1,
+     "parts": [
+      "crank"
+     ],
+     "kind": "buy",
+     "name": "曲柄（带平衡块） Crank with counterweight",
+     "mass_g": 109.8
+    },
+    {
+     "code": "LS-104",
+     "qty": 1,
+     "parts": [
+      "crank_pin"
+     ],
+     "kind": "buy",
+     "name": "曲柄销 Crank pin",
+     "mass_g": 7.3
+    },
+    {
+     "code": "LS-105",
+     "qty": 1,
+     "parts": [
+      "pulley_upper"
+     ],
+     "kind": "buy",
+     "name": "上带轮 Upper timing pulley",
+     "mass_g": 73.6
+    },
+    {
+     "code": "LS-106",
+     "qty": 1,
+     "parts": [
+      "pulley_lower"
+     ],
+     "kind": "buy",
+     "name": "下带轮 Lower timing pulley",
+     "mass_g": 89.6
+    },
+    {
+     "code": "LS-107",
+     "qty": 1,
+     "parts": [
+      "handwheel"
+     ],
+     "kind": "buy",
+     "name": "手轮 Handwheel",
+     "mass_g": 125.2
+    },
+    {
+     "code": "LS-108",
+     "qty": 1,
+     "parts": [
+      "handwheel_ring"
+     ],
+     "kind": "buy",
+     "name": "手轮标记环 Handwheel marker ring",
+     "mass_g": 3.1
+    },
+    {
+     "code": "LS-201",
+     "qty": 1,
+     "parts": [
+      "needle_bar"
+     ],
+     "kind": "make",
+     "name": "针杆 Needle bar",
+     "mass_g": 71.0
+    },
+    {
+     "code": "LS-202",
+     "qty": 1,
+     "parts": [
+      "needle_clamp"
+     ],
+     "kind": "buy",
+     "name": "针夹 Needle clamp",
+     "mass_g": 3.2
+    },
+    {
+     "code": "LS-203",
+     "qty": 1,
+     "parts": [
+      "nb_link"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块 Needle-bar connecting block",
+     "mass_g": 17.2
+    },
+    {
+     "code": "LS-204",
+     "qty": 1,
+     "parts": [
+      "rod"
+     ],
+     "kind": "buy",
+     "name": "针杆连杆 Needle-bar connecting rod",
+     "mass_g": 46.2
+    },
+    {
+     "code": "LS-205",
+     "qty": 1,
+     "parts": [
+      "lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆 Take-up lever",
+     "mass_g": 24.2
+    },
+    {
+     "code": "LS-206",
+     "qty": 1,
+     "parts": [
+      "rocker"
+     ],
+     "kind": "buy",
+     "name": "挑线摇杆 Take-up rocker",
+     "mass_g": 10.9
+    },
+    {
+     "code": "LS-207",
+     "qty": 1,
+     "parts": [
+      "pin_M"
+     ],
+     "kind": "buy",
+     "name": "挑线杆销 M Take-up pin M",
+     "mass_g": 2.1
+    },
+    {
+     "code": "LS-208",
+     "qty": 1,
+     "parts": [
+      "stud_Q"
+     ],
+     "kind": "buy",
+     "name": "摇杆支点销 Q Rocker stud Q",
+     "mass_g": 4.5
+    },
+    {
+     "code": "LS-209",
+     "qty": 1,
+     "parts": [
+      "thread_guide"
+     ],
+     "kind": "buy",
+     "name": "过线环 Thread guide",
+     "mass_g": 0.8
+    },
+    {
+     "code": "LS-301",
+     "qty": 1,
+     "parts": [
+      "hook"
+     ],
+     "kind": "make",
+     "name": "旋梭 Rotary hook",
+     "mass_g": 46.6
+    },
+    {
+     "code": "LS-302",
+     "qty": 1,
+     "parts": [
+      "hook_shaft"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴 Hook shaft",
+     "mass_g": 42.6
+    },
+    {
+     "code": "LS-303",
+     "qty": 1,
+     "parts": [
+      "gear_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴齿轮 z20 Hook-shaft gear z20",
+     "mass_g": 21.6
+    },
+    {
+     "code": "LS-304",
+     "qty": 1,
+     "parts": [
+      "gear_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴齿轮 z40 Lower-shaft gear z40",
+     "mass_g": 86.3
+    },
+    {
+     "code": "LS-305",
+     "qty": 2,
+     "parts": [
+      "bushes_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴铜套 Hook-shaft bushings",
+     "mass_g": 18.6
+    },
+    {
+     "code": "LS-401",
+     "qty": 1,
+     "parts": [
+      "feed_ecc"
+     ],
+     "kind": "make",
+     "name": "送布偏心 Feed eccentric",
+     "mass_g": 20.7
+    },
+    {
+     "code": "LS-402",
+     "qty": 1,
+     "parts": [
+      "lift_ecc"
+     ],
+     "kind": "make",
+     "name": "抬牙偏心 Lift eccentric",
+     "mass_g": 12.6
+    },
+    {
+     "code": "LS-403",
+     "qty": 1,
+     "parts": [
+      "feed_rod"
+     ],
+     "kind": "buy",
+     "name": "送布连杆 Feed connecting rod",
+     "mass_g": 48.6
+    },
+    {
+     "code": "LS-404",
+     "qty": 1,
+     "parts": [
+      "regulator"
+     ],
+     "kind": "buy",
+     "name": "送布调节器 Feed regulator",
+     "mass_g": 28.6
+    },
+    {
+     "code": "LS-405",
+     "qty": 1,
+     "parts": [
+      "reg_slider"
+     ],
+     "kind": "buy",
+     "name": "调节器滑块 Regulator slider",
+     "mass_g": 7.2
+    },
+    {
+     "code": "LS-406",
+     "qty": 1,
+     "parts": [
+      "feed_link"
+     ],
+     "kind": "buy",
+     "name": "水平连杆 Feed link",
+     "mass_g": 28.3
+    },
+    {
+     "code": "LS-407",
+     "qty": 1,
+     "parts": [
+      "feed_rock"
+     ],
+     "kind": "buy",
+     "name": "送布摆轴 Feed rock shaft",
+     "mass_g": 196.3
+    },
+    {
+     "code": "LS-408",
+     "qty": 1,
+     "parts": [
+      "feed_bar"
+     ],
+     "kind": "buy",
+     "name": "牙架与送布牙 Feed bar & feed dog",
+     "mass_g": 29.2
+    },
+    {
+     "code": "LS-409",
+     "qty": 1,
+     "parts": [
+      "lift_link"
+     ],
+     "kind": "buy",
+     "name": "抬牙连杆 Lift link",
+     "mass_g": 15.8
+    },
+    {
+     "code": "LS-410",
+     "qty": 1,
+     "parts": [
+      "lift_rock"
+     ],
+     "kind": "buy",
+     "name": "抬牙摆轴 Lift rock shaft",
+     "mass_g": 76.2
+    },
+    {
+     "code": "LS-411",
+     "qty": 1,
+     "parts": [
+      "oil_ecc"
+     ],
+     "kind": "buy",
+     "name": "油泵偏心 Oil-pump eccentric",
+     "mass_g": 4.1
+    },
+    {
+     "code": "LS-412",
+     "qty": 1,
+     "parts": [
+      "oil_plunger"
+     ],
+     "kind": "buy",
+     "name": "油泵柱塞 Oil-pump plunger",
+     "mass_g": 1.2
+    },
+    {
+     "code": "LS-413",
+     "qty": 1,
+     "parts": [
+      "oil_pump"
+     ],
+     "kind": "buy",
+     "name": "油泵体 Oil-pump body",
+     "mass_g": 18.2
+    },
+    {
+     "code": "LS-501",
+     "qty": 1,
+     "parts": [
+      "presser_bar"
+     ],
+     "kind": "buy",
+     "name": "压脚杆 Presser bar",
+     "mass_g": 46.4
+    },
+    {
+     "code": "LS-502",
+     "qty": 1,
+     "parts": [
+      "presser_collar"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧座 Presser spring collar",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-503",
+     "qty": 1,
+     "parts": [
+      "presser_foot"
+     ],
+     "kind": "buy",
+     "name": "压脚 Presser foot",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-504",
+     "qty": 1,
+     "parts": [
+      "lift_bracket"
+     ],
+     "kind": "buy",
+     "name": "抬压脚板 Presser lifting bracket",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-505",
+     "qty": 1,
+     "parts": [
+      "presser_screw"
+     ],
+     "kind": "buy",
+     "name": "调压螺钉 Pressure adjusting screw",
+     "mass_g": 44.3
+    },
+    {
+     "code": "LS-506",
+     "qty": 1,
+     "parts": [
+      "presser_spring"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧 Presser spring",
+     "mass_g": 39.0
+    },
+    {
+     "code": "LS-507",
+     "qty": 2,
+     "parts": [
+      "presser_bushes"
+     ],
+     "kind": "buy",
+     "name": "压脚杆导套 Presser-bar bushings",
+     "mass_g": 11.7
+    },
+    {
+     "code": "LS-508",
+     "qty": 1,
+     "parts": [
+      "hand_lifter"
+     ],
+     "kind": "buy",
+     "name": "手抬扳手 Hand lifter",
+     "mass_g": 61.1
+    },
+    {
+     "code": "LS-509",
+     "qty": 1,
+     "parts": [
+      "knee_c1"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C1 Knee-lift crank C1",
+     "mass_g": 20.3
+    },
+    {
+     "code": "LS-510",
+     "qty": 1,
+     "parts": [
+      "knee_c2"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C2 Knee-lift crank C2",
+     "mass_g": 22.6
+    },
+    {
+     "code": "LS-511",
+     "qty": 1,
+     "parts": [
+      "knee_rod"
+     ],
+     "kind": "buy",
+     "name": "膝抬拉杆 Knee-lift rod",
+     "mass_g": 99.7
+    },
+    {
+     "code": "LS-512",
+     "qty": 1,
+     "parts": [
+      "knee_push"
+     ],
+     "kind": "buy",
+     "name": "膝抬推杆 Knee-lift push rod",
+     "mass_g": 98.0
+    },
+    {
+     "code": "LS-513",
+     "qty": 1,
+     "parts": [
+      "knee_link"
+     ],
+     "kind": "buy",
+     "name": "膝抬连杆 Knee-lift link",
+     "mass_g": 5.9
+    },
+    {
+     "code": "LS-514",
+     "qty": 1,
+     "parts": [
+      "release_shaft"
+     ],
+     "kind": "buy",
+     "name": "松线轴 Tension-release shaft",
+     "mass_g": 14.3
+    },
+    {
+     "code": "LS-515",
+     "qty": 1,
+     "parts": [
+      "release_rod"
+     ],
+     "kind": "buy",
+     "name": "松线拉杆 Tension-release rod",
+     "mass_g": 5.2
+    },
+    {
+     "code": "LS-516",
+     "qty": 1,
+     "parts": [
+      "release_lever"
+     ],
+     "kind": "buy",
+     "name": "松线杆 Tension-release lever",
+     "mass_g": 15.7
+    },
+    {
+     "code": "LS-517",
+     "qty": 1,
+     "parts": [
+      "release_pin"
+     ],
+     "kind": "buy",
+     "name": "松线顶针 Tension-release pin",
+     "mass_g": 0.4
+    },
+    {
+     "code": "LS-518",
+     "qty": 1,
+     "parts": [
+      "tension_post"
+     ],
+     "kind": "buy",
+     "name": "夹线柱 Tension post",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-519",
+     "qty": 1,
+     "parts": [
+      "tension_discs"
+     ],
+     "kind": "buy",
+     "name": "夹线盘 Tension discs",
+     "mass_g": 5.6
+    },
+    {
+     "code": "LS-520",
+     "qty": 1,
+     "parts": [
+      "tension_spring"
+     ],
+     "kind": "buy",
+     "name": "夹线簧 Tension spring",
+     "mass_g": 1.3
+    },
+    {
+     "code": "LS-521",
+     "qty": 1,
+     "parts": [
+      "tension_nut"
+     ],
+     "kind": "buy",
+     "name": "夹线螺母 Tension nut",
+     "mass_g": 2.2
+    },
+    {
+     "code": "LS-522",
+     "qty": 1,
+     "parts": [
+      "check_spring"
+     ],
+     "kind": "buy",
+     "name": "挑线簧 Check spring",
+     "mass_g": 0.2
+    },
+    {
+     "code": "LS-523",
+     "qty": 1,
+     "parts": [
+      "stitch_dial"
+     ],
+     "kind": "buy",
+     "name": "针距旋钮 Stitch-length dial",
+     "mass_g": 205.0
+    },
+    {
+     "code": "LS-524",
+     "qty": 1,
+     "parts": [
+      "pull_rod"
+     ],
+     "kind": "buy",
+     "name": "针距拉杆 Stitch-length pull rod",
+     "mass_g": 51.0
+    },
+    {
+     "code": "LS-525",
+     "qty": 1,
+     "parts": [
+      "reverse_lever"
+     ],
+     "kind": "buy",
+     "name": "倒缝扳手 Reverse lever",
+     "mass_g": 66.3
+    },
+    {
+     "code": "LS-526",
+     "qty": 1,
+     "parts": [
+      "reverse_spring"
+     ],
+     "kind": "buy",
+     "name": "倒缝拉簧 Reverse return spring",
+     "mass_g": 2.6
+    }
+   ]
+  },
+  "WQ-LS-D": {
+   "options": {
+    "T": false,
+    "E": false,
+    "D": true
+   },
+   "price": 535,
+   "lines": [
+    {
+     "code": "BUY-BELT-LS",
+     "qty": 1,
+     "parts": [
+      "belt"
+     ],
+     "kind": "buy",
+     "name": "同步带 Timing belt",
+     "mass_g": 21.0
+    },
+    {
+     "code": "BUY-BOBCASE",
+     "qty": 1,
+     "parts": [
+      "bobbin_case"
+     ],
+     "kind": "buy",
+     "name": "梭壳与梭芯 Bobbin case & bobbin",
+     "mass_g": 31.2
+    },
+    {
+     "code": "BUY-BOX-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "包装箱与附件包",
+     "extra": "包装箱与附件包",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6201",
+     "qty": 3,
+     "parts": [
+      "bearings_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴轴承 6201 Lower shaft bearings 6201",
+     "mass_g": 57.6,
+     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+    },
+    {
+     "code": "BUY-BRG-6202",
+     "qty": 1,
+     "parts": [
+      "bearing_front"
+     ],
+     "kind": "buy",
+     "name": "上轴前轴承 6202 Front bearing 6202",
+     "mass_g": 66.2
+    },
+    {
+     "code": "BUY-COVERS-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "extra": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-CTRL-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "电控箱（GC 设计，外购）",
+     "extra": "电控箱（GC 设计，外购）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-MOTOR-LS",
+     "qty": 1,
+     "parts": [
+      "encoder_disc",
+      "motor_bolts",
+      "motor_cap",
+      "motor_housing",
+      "motor_rods",
+      "rotor",
+      "rotor_magnets",
+      "stator_core",
+      "stator_winding"
+     ],
+     "kind": "buy",
+     "name": "直驱电机 Direct-drive motor",
+     "mass_g": 2422.6
+    },
+    {
+     "code": "BUY-NEEDLE-DB",
+     "qty": 1,
+     "parts": [
+      "needle"
+     ],
+     "kind": "buy",
+     "name": "机针 DB×1 Needle DB×1",
+     "mass_g": 0.3
+    },
+    {
+     "code": "BUY-OILPAN-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "油盘",
+     "extra": "油盘",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLATE-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "针板与推板（三维没有画）",
+     "extra": "针板与推板（三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M4",
+     "qty": 20,
+     "parts": [],
+     "kind": "buy",
+     "name": "螺钉 M4（数量为示例）",
+     "extra": "螺钉 M4（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M5",
+     "qty": 40,
+     "parts": [],
+     "kind": "buy",
+     "name": "内六角螺钉 M5（数量为示例）",
+     "extra": "内六角螺钉 M5（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "HSG-LS",
+     "qty": 1,
+     "parts": [
+      "housing_upper",
+      "housing_lower"
+     ],
+     "kind": "make",
+     "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
+     "mass_g": 24208.0
+    },
+    {
+     "code": "LS-101",
+     "qty": 1,
+     "parts": [
+      "shaft"
+     ],
+     "kind": "make",
+     "name": "上轴 Upper shaft",
+     "mass_g": 621.7
+    },
+    {
+     "code": "LS-102",
+     "qty": 1,
+     "parts": [
+      "lower_shaft"
+     ],
+     "kind": "make",
+     "name": "下轴 Lower shaft",
+     "mass_g": 278.8
+    },
+    {
+     "code": "LS-103",
+     "qty": 1,
+     "parts": [
+      "crank"
+     ],
+     "kind": "buy",
+     "name": "曲柄（带平衡块） Crank with counterweight",
+     "mass_g": 109.8
+    },
+    {
+     "code": "LS-104",
+     "qty": 1,
+     "parts": [
+      "crank_pin"
+     ],
+     "kind": "buy",
+     "name": "曲柄销 Crank pin",
+     "mass_g": 7.3
+    },
+    {
+     "code": "LS-105",
+     "qty": 1,
+     "parts": [
+      "pulley_upper"
+     ],
+     "kind": "buy",
+     "name": "上带轮 Upper timing pulley",
+     "mass_g": 73.6
+    },
+    {
+     "code": "LS-106",
+     "qty": 1,
+     "parts": [
+      "pulley_lower"
+     ],
+     "kind": "buy",
+     "name": "下带轮 Lower timing pulley",
+     "mass_g": 89.6
+    },
+    {
+     "code": "LS-107",
+     "qty": 1,
+     "parts": [
+      "handwheel"
+     ],
+     "kind": "buy",
+     "name": "手轮 Handwheel",
+     "mass_g": 125.2
+    },
+    {
+     "code": "LS-108",
+     "qty": 1,
+     "parts": [
+      "handwheel_ring"
+     ],
+     "kind": "buy",
+     "name": "手轮标记环 Handwheel marker ring",
+     "mass_g": 3.1
+    },
+    {
+     "code": "LS-201",
+     "qty": 1,
+     "parts": [
+      "needle_bar"
+     ],
+     "kind": "make",
+     "name": "针杆 Needle bar",
+     "mass_g": 71.0
+    },
+    {
+     "code": "LS-202",
+     "qty": 1,
+     "parts": [
+      "needle_clamp"
+     ],
+     "kind": "buy",
+     "name": "针夹 Needle clamp",
+     "mass_g": 3.2
+    },
+    {
+     "code": "LS-203",
+     "qty": 1,
+     "parts": [
+      "nb_link"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块 Needle-bar connecting block",
+     "mass_g": 17.2
+    },
+    {
+     "code": "LS-204",
+     "qty": 1,
+     "parts": [
+      "rod"
+     ],
+     "kind": "buy",
+     "name": "针杆连杆 Needle-bar connecting rod",
+     "mass_g": 46.2
+    },
+    {
+     "code": "LS-205",
+     "qty": 1,
+     "parts": [
+      "lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆 Take-up lever",
+     "mass_g": 24.2
+    },
+    {
+     "code": "LS-206",
+     "qty": 1,
+     "parts": [
+      "rocker"
+     ],
+     "kind": "buy",
+     "name": "挑线摇杆 Take-up rocker",
+     "mass_g": 10.9
+    },
+    {
+     "code": "LS-207",
+     "qty": 1,
+     "parts": [
+      "pin_M"
+     ],
+     "kind": "buy",
+     "name": "挑线杆销 M Take-up pin M",
+     "mass_g": 2.1
+    },
+    {
+     "code": "LS-208",
+     "qty": 1,
+     "parts": [
+      "stud_Q"
+     ],
+     "kind": "buy",
+     "name": "摇杆支点销 Q Rocker stud Q",
+     "mass_g": 4.5
+    },
+    {
+     "code": "LS-209",
+     "qty": 1,
+     "parts": [
+      "thread_guide"
+     ],
+     "kind": "buy",
+     "name": "过线环 Thread guide",
+     "mass_g": 0.8
+    },
+    {
+     "code": "LS-301D",
+     "qty": 1,
+     "parts": [
+      "hook"
+     ],
+     "kind": "make",
+     "name": "旋梭 Rotary hook",
+     "mass_g": 46.6
+    },
+    {
+     "code": "LS-302",
+     "qty": 1,
+     "parts": [
+      "hook_shaft"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴 Hook shaft",
+     "mass_g": 42.6
+    },
+    {
+     "code": "LS-303",
+     "qty": 1,
+     "parts": [
+      "gear_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴齿轮 z20 Hook-shaft gear z20",
+     "mass_g": 21.6
+    },
+    {
+     "code": "LS-304",
+     "qty": 1,
+     "parts": [
+      "gear_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴齿轮 z40 Lower-shaft gear z40",
+     "mass_g": 86.3
+    },
+    {
+     "code": "LS-305",
+     "qty": 2,
+     "parts": [
+      "bushes_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴铜套 Hook-shaft bushings",
+     "mass_g": 18.6
+    },
+    {
+     "code": "LS-401",
+     "qty": 1,
+     "parts": [
+      "feed_ecc"
+     ],
+     "kind": "make",
+     "name": "送布偏心 Feed eccentric",
+     "mass_g": 20.7
+    },
+    {
+     "code": "LS-402",
+     "qty": 1,
+     "parts": [
+      "lift_ecc"
+     ],
+     "kind": "make",
+     "name": "抬牙偏心 Lift eccentric",
+     "mass_g": 12.6
+    },
+    {
+     "code": "LS-403",
+     "qty": 1,
+     "parts": [
+      "feed_rod"
+     ],
+     "kind": "buy",
+     "name": "送布连杆 Feed connecting rod",
+     "mass_g": 48.6
+    },
+    {
+     "code": "LS-404",
+     "qty": 1,
+     "parts": [
+      "regulator"
+     ],
+     "kind": "buy",
+     "name": "送布调节器 Feed regulator",
+     "mass_g": 28.6
+    },
+    {
+     "code": "LS-405",
+     "qty": 1,
+     "parts": [
+      "reg_slider"
+     ],
+     "kind": "buy",
+     "name": "调节器滑块 Regulator slider",
+     "mass_g": 7.2
+    },
+    {
+     "code": "LS-406",
+     "qty": 1,
+     "parts": [
+      "feed_link"
+     ],
+     "kind": "buy",
+     "name": "水平连杆 Feed link",
+     "mass_g": 28.3
+    },
+    {
+     "code": "LS-407",
+     "qty": 1,
+     "parts": [
+      "feed_rock"
+     ],
+     "kind": "buy",
+     "name": "送布摆轴 Feed rock shaft",
+     "mass_g": 196.3
+    },
+    {
+     "code": "LS-408",
+     "qty": 1,
+     "parts": [
+      "feed_bar"
+     ],
+     "kind": "buy",
+     "name": "牙架与送布牙 Feed bar & feed dog",
+     "mass_g": 29.2
+    },
+    {
+     "code": "LS-409",
+     "qty": 1,
+     "parts": [
+      "lift_link"
+     ],
+     "kind": "buy",
+     "name": "抬牙连杆 Lift link",
+     "mass_g": 15.8
+    },
+    {
+     "code": "LS-410",
+     "qty": 1,
+     "parts": [
+      "lift_rock"
+     ],
+     "kind": "buy",
+     "name": "抬牙摆轴 Lift rock shaft",
+     "mass_g": 76.2
+    },
+    {
+     "code": "LS-411",
+     "qty": 1,
+     "parts": [
+      "oil_ecc"
+     ],
+     "kind": "buy",
+     "name": "油泵偏心 Oil-pump eccentric",
+     "mass_g": 4.1
+    },
+    {
+     "code": "LS-412",
+     "qty": 1,
+     "parts": [
+      "oil_plunger"
+     ],
+     "kind": "buy",
+     "name": "油泵柱塞 Oil-pump plunger",
+     "mass_g": 1.2
+    },
+    {
+     "code": "LS-413",
+     "qty": 1,
+     "parts": [
+      "oil_pump"
+     ],
+     "kind": "buy",
+     "name": "油泵体 Oil-pump body",
+     "mass_g": 18.2
+    },
+    {
+     "code": "LS-501",
+     "qty": 1,
+     "parts": [
+      "presser_bar"
+     ],
+     "kind": "buy",
+     "name": "压脚杆 Presser bar",
+     "mass_g": 46.4
+    },
+    {
+     "code": "LS-502",
+     "qty": 1,
+     "parts": [
+      "presser_collar"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧座 Presser spring collar",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-503",
+     "qty": 1,
+     "parts": [
+      "presser_foot"
+     ],
+     "kind": "buy",
+     "name": "压脚 Presser foot",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-504",
+     "qty": 1,
+     "parts": [
+      "lift_bracket"
+     ],
+     "kind": "buy",
+     "name": "抬压脚板 Presser lifting bracket",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-505",
+     "qty": 1,
+     "parts": [
+      "presser_screw"
+     ],
+     "kind": "buy",
+     "name": "调压螺钉 Pressure adjusting screw",
+     "mass_g": 44.3
+    },
+    {
+     "code": "LS-506",
+     "qty": 1,
+     "parts": [
+      "presser_spring"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧 Presser spring",
+     "mass_g": 39.0
+    },
+    {
+     "code": "LS-507",
+     "qty": 2,
+     "parts": [
+      "presser_bushes"
+     ],
+     "kind": "buy",
+     "name": "压脚杆导套 Presser-bar bushings",
+     "mass_g": 11.7
+    },
+    {
+     "code": "LS-508",
+     "qty": 1,
+     "parts": [
+      "hand_lifter"
+     ],
+     "kind": "buy",
+     "name": "手抬扳手 Hand lifter",
+     "mass_g": 61.1
+    },
+    {
+     "code": "LS-509",
+     "qty": 1,
+     "parts": [
+      "knee_c1"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C1 Knee-lift crank C1",
+     "mass_g": 20.3
+    },
+    {
+     "code": "LS-510",
+     "qty": 1,
+     "parts": [
+      "knee_c2"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C2 Knee-lift crank C2",
+     "mass_g": 22.6
+    },
+    {
+     "code": "LS-511",
+     "qty": 1,
+     "parts": [
+      "knee_rod"
+     ],
+     "kind": "buy",
+     "name": "膝抬拉杆 Knee-lift rod",
+     "mass_g": 99.7
+    },
+    {
+     "code": "LS-512",
+     "qty": 1,
+     "parts": [
+      "knee_push"
+     ],
+     "kind": "buy",
+     "name": "膝抬推杆 Knee-lift push rod",
+     "mass_g": 98.0
+    },
+    {
+     "code": "LS-513",
+     "qty": 1,
+     "parts": [
+      "knee_link"
+     ],
+     "kind": "buy",
+     "name": "膝抬连杆 Knee-lift link",
+     "mass_g": 5.9
+    },
+    {
+     "code": "LS-514",
+     "qty": 1,
+     "parts": [
+      "release_shaft"
+     ],
+     "kind": "buy",
+     "name": "松线轴 Tension-release shaft",
+     "mass_g": 14.3
+    },
+    {
+     "code": "LS-515",
+     "qty": 1,
+     "parts": [
+      "release_rod"
+     ],
+     "kind": "buy",
+     "name": "松线拉杆 Tension-release rod",
+     "mass_g": 5.2
+    },
+    {
+     "code": "LS-516",
+     "qty": 1,
+     "parts": [
+      "release_lever"
+     ],
+     "kind": "buy",
+     "name": "松线杆 Tension-release lever",
+     "mass_g": 15.7
+    },
+    {
+     "code": "LS-517",
+     "qty": 1,
+     "parts": [
+      "release_pin"
+     ],
+     "kind": "buy",
+     "name": "松线顶针 Tension-release pin",
+     "mass_g": 0.4
+    },
+    {
+     "code": "LS-518",
+     "qty": 1,
+     "parts": [
+      "tension_post"
+     ],
+     "kind": "buy",
+     "name": "夹线柱 Tension post",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-519",
+     "qty": 1,
+     "parts": [
+      "tension_discs"
+     ],
+     "kind": "buy",
+     "name": "夹线盘 Tension discs",
+     "mass_g": 5.6
+    },
+    {
+     "code": "LS-520",
+     "qty": 1,
+     "parts": [
+      "tension_spring"
+     ],
+     "kind": "buy",
+     "name": "夹线簧 Tension spring",
+     "mass_g": 1.3
+    },
+    {
+     "code": "LS-521",
+     "qty": 1,
+     "parts": [
+      "tension_nut"
+     ],
+     "kind": "buy",
+     "name": "夹线螺母 Tension nut",
+     "mass_g": 2.2
+    },
+    {
+     "code": "LS-522",
+     "qty": 1,
+     "parts": [
+      "check_spring"
+     ],
+     "kind": "buy",
+     "name": "挑线簧 Check spring",
+     "mass_g": 0.2
+    },
+    {
+     "code": "LS-523",
+     "qty": 1,
+     "parts": [
+      "stitch_dial"
+     ],
+     "kind": "buy",
+     "name": "针距旋钮 Stitch-length dial",
+     "mass_g": 205.0
+    },
+    {
+     "code": "LS-524",
+     "qty": 1,
+     "parts": [
+      "pull_rod"
+     ],
+     "kind": "buy",
+     "name": "针距拉杆 Stitch-length pull rod",
+     "mass_g": 51.0
+    },
+    {
+     "code": "LS-525",
+     "qty": 1,
+     "parts": [
+      "reverse_lever"
+     ],
+     "kind": "buy",
+     "name": "倒缝扳手 Reverse lever",
+     "mass_g": 66.3
+    },
+    {
+     "code": "LS-526",
+     "qty": 1,
+     "parts": [
+      "reverse_spring"
+     ],
+     "kind": "buy",
+     "name": "倒缝拉簧 Reverse return spring",
+     "mass_g": 2.6
+    }
+   ]
+  },
+  "WQ-LS-E": {
+   "options": {
+    "T": false,
+    "E": true,
+    "D": false
+   },
+   "price": 590,
+   "lines": [
+    {
+     "code": "BUY-BELT-E",
+     "qty": 1,
+     "parts": [
+      "estep_belt"
+     ],
+     "kind": "buy",
+     "name": "针距同步带 Stitch-drive belt",
+     "mass_g": 1.7
+    },
+    {
+     "code": "BUY-BELT-LS",
+     "qty": 1,
+     "parts": [
+      "belt"
+     ],
+     "kind": "buy",
+     "name": "同步带 Timing belt",
+     "mass_g": 21.0
+    },
+    {
+     "code": "BUY-BOBCASE",
+     "qty": 1,
+     "parts": [
+      "bobbin_case"
+     ],
+     "kind": "buy",
+     "name": "梭壳与梭芯 Bobbin case & bobbin",
+     "mass_g": 31.2
+    },
+    {
+     "code": "BUY-BOX-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "包装箱与附件包",
+     "extra": "包装箱与附件包",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6201",
+     "qty": 3,
+     "parts": [
+      "bearings_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴轴承 6201 Lower shaft bearings 6201",
+     "mass_g": 57.6,
+     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+    },
+    {
+     "code": "BUY-BRG-6202",
+     "qty": 1,
+     "parts": [
+      "bearing_front"
+     ],
+     "kind": "buy",
+     "name": "上轴前轴承 6202 Front bearing 6202",
+     "mass_g": 66.2
+    },
+    {
+     "code": "BUY-BTN-E",
+     "qty": 1,
+     "parts": [
+      "reverse_button"
+     ],
+     "kind": "buy",
+     "name": "倒缝按钮 Reverse button",
+     "mass_g": 3.1
+    },
+    {
+     "code": "BUY-COVERS-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "extra": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-CTRL-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "电控箱（GC 设计，外购）",
+     "extra": "电控箱（GC 设计，外购）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-MOTOR-LS",
+     "qty": 1,
+     "parts": [
+      "encoder_disc",
+      "motor_bolts",
+      "motor_cap",
+      "motor_housing",
+      "motor_rods",
+      "rotor",
+      "rotor_magnets",
+      "stator_core",
+      "stator_winding"
+     ],
+     "kind": "buy",
+     "name": "直驱电机 Direct-drive motor",
+     "mass_g": 2422.6
+    },
+    {
+     "code": "BUY-NEEDLE-DB",
+     "qty": 1,
+     "parts": [
+      "needle"
+     ],
+     "kind": "buy",
+     "name": "机针 DB×1 Needle DB×1",
+     "mass_g": 0.3
+    },
+    {
+     "code": "BUY-OILPAN-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "油盘",
+     "extra": "油盘",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLATE-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "针板与推板（三维没有画）",
+     "extra": "针板与推板（三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M4",
+     "qty": 20,
+     "parts": [],
+     "kind": "buy",
+     "name": "螺钉 M4（数量为示例）",
+     "extra": "螺钉 M4（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M5",
+     "qty": 40,
+     "parts": [],
+     "kind": "buy",
+     "name": "内六角螺钉 M5（数量为示例）",
+     "extra": "内六角螺钉 M5（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-STEP-42",
+     "qty": 1,
+     "parts": [
+      "estep_motor"
+     ],
+     "kind": "buy",
+     "name": "步进电机 42 型（48 mm） Stepper motor NEMA 17 (48 mm)",
+     "mass_g": 819.3
+    },
+    {
+     "code": "HSG-LS",
+     "qty": 1,
+     "parts": [
+      "housing_upper",
+      "housing_lower"
+     ],
+     "kind": "make",
+     "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
+     "mass_g": 24208.0
+    },
+    {
+     "code": "LS-101",
+     "qty": 1,
+     "parts": [
+      "shaft"
+     ],
+     "kind": "make",
+     "name": "上轴 Upper shaft",
+     "mass_g": 621.7
+    },
+    {
+     "code": "LS-102",
+     "qty": 1,
+     "parts": [
+      "lower_shaft"
+     ],
+     "kind": "make",
+     "name": "下轴 Lower shaft",
+     "mass_g": 278.8
+    },
+    {
+     "code": "LS-103",
+     "qty": 1,
+     "parts": [
+      "crank"
+     ],
+     "kind": "buy",
+     "name": "曲柄（带平衡块） Crank with counterweight",
+     "mass_g": 109.8
+    },
+    {
+     "code": "LS-104",
+     "qty": 1,
+     "parts": [
+      "crank_pin"
+     ],
+     "kind": "buy",
+     "name": "曲柄销 Crank pin",
+     "mass_g": 7.3
+    },
+    {
+     "code": "LS-105",
+     "qty": 1,
+     "parts": [
+      "pulley_upper"
+     ],
+     "kind": "buy",
+     "name": "上带轮 Upper timing pulley",
+     "mass_g": 73.6
+    },
+    {
+     "code": "LS-106",
+     "qty": 1,
+     "parts": [
+      "pulley_lower"
+     ],
+     "kind": "buy",
+     "name": "下带轮 Lower timing pulley",
+     "mass_g": 89.6
+    },
+    {
+     "code": "LS-107",
+     "qty": 1,
+     "parts": [
+      "handwheel"
+     ],
+     "kind": "buy",
+     "name": "手轮 Handwheel",
+     "mass_g": 125.2
+    },
+    {
+     "code": "LS-108",
+     "qty": 1,
+     "parts": [
+      "handwheel_ring"
+     ],
+     "kind": "buy",
+     "name": "手轮标记环 Handwheel marker ring",
+     "mass_g": 3.1
+    },
+    {
+     "code": "LS-201",
+     "qty": 1,
+     "parts": [
+      "needle_bar"
+     ],
+     "kind": "make",
+     "name": "针杆 Needle bar",
+     "mass_g": 71.0
+    },
+    {
+     "code": "LS-202",
+     "qty": 1,
+     "parts": [
+      "needle_clamp"
+     ],
+     "kind": "buy",
+     "name": "针夹 Needle clamp",
+     "mass_g": 3.2
+    },
+    {
+     "code": "LS-203",
+     "qty": 1,
+     "parts": [
+      "nb_link"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块 Needle-bar connecting block",
+     "mass_g": 17.2
+    },
+    {
+     "code": "LS-204",
+     "qty": 1,
+     "parts": [
+      "rod"
+     ],
+     "kind": "buy",
+     "name": "针杆连杆 Needle-bar connecting rod",
+     "mass_g": 46.2
+    },
+    {
+     "code": "LS-205",
+     "qty": 1,
+     "parts": [
+      "lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆 Take-up lever",
+     "mass_g": 24.2
+    },
+    {
+     "code": "LS-206",
+     "qty": 1,
+     "parts": [
+      "rocker"
+     ],
+     "kind": "buy",
+     "name": "挑线摇杆 Take-up rocker",
+     "mass_g": 10.9
+    },
+    {
+     "code": "LS-207",
+     "qty": 1,
+     "parts": [
+      "pin_M"
+     ],
+     "kind": "buy",
+     "name": "挑线杆销 M Take-up pin M",
+     "mass_g": 2.1
+    },
+    {
+     "code": "LS-208",
+     "qty": 1,
+     "parts": [
+      "stud_Q"
+     ],
+     "kind": "buy",
+     "name": "摇杆支点销 Q Rocker stud Q",
+     "mass_g": 4.5
+    },
+    {
+     "code": "LS-209",
+     "qty": 1,
+     "parts": [
+      "thread_guide"
+     ],
+     "kind": "buy",
+     "name": "过线环 Thread guide",
+     "mass_g": 0.8
+    },
+    {
+     "code": "LS-301",
+     "qty": 1,
+     "parts": [
+      "hook"
+     ],
+     "kind": "make",
+     "name": "旋梭 Rotary hook",
+     "mass_g": 46.6
+    },
+    {
+     "code": "LS-302",
+     "qty": 1,
+     "parts": [
+      "hook_shaft"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴 Hook shaft",
+     "mass_g": 42.6
+    },
+    {
+     "code": "LS-303",
+     "qty": 1,
+     "parts": [
+      "gear_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴齿轮 z20 Hook-shaft gear z20",
+     "mass_g": 21.6
+    },
+    {
+     "code": "LS-304",
+     "qty": 1,
+     "parts": [
+      "gear_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴齿轮 z40 Lower-shaft gear z40",
+     "mass_g": 86.3
+    },
+    {
+     "code": "LS-305",
+     "qty": 2,
+     "parts": [
+      "bushes_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴铜套 Hook-shaft bushings",
+     "mass_g": 18.6
+    },
+    {
+     "code": "LS-401",
+     "qty": 1,
+     "parts": [
+      "feed_ecc"
+     ],
+     "kind": "make",
+     "name": "送布偏心 Feed eccentric",
+     "mass_g": 20.7
+    },
+    {
+     "code": "LS-402",
+     "qty": 1,
+     "parts": [
+      "lift_ecc"
+     ],
+     "kind": "make",
+     "name": "抬牙偏心 Lift eccentric",
+     "mass_g": 12.6
+    },
+    {
+     "code": "LS-403",
+     "qty": 1,
+     "parts": [
+      "feed_rod"
+     ],
+     "kind": "buy",
+     "name": "送布连杆 Feed connecting rod",
+     "mass_g": 48.6
+    },
+    {
+     "code": "LS-404",
+     "qty": 1,
+     "parts": [
+      "regulator"
+     ],
+     "kind": "buy",
+     "name": "送布调节器 Feed regulator",
+     "mass_g": 28.6
+    },
+    {
+     "code": "LS-405",
+     "qty": 1,
+     "parts": [
+      "reg_slider"
+     ],
+     "kind": "buy",
+     "name": "调节器滑块 Regulator slider",
+     "mass_g": 7.2
+    },
+    {
+     "code": "LS-406",
+     "qty": 1,
+     "parts": [
+      "feed_link"
+     ],
+     "kind": "buy",
+     "name": "水平连杆 Feed link",
+     "mass_g": 28.3
+    },
+    {
+     "code": "LS-407",
+     "qty": 1,
+     "parts": [
+      "feed_rock"
+     ],
+     "kind": "buy",
+     "name": "送布摆轴 Feed rock shaft",
+     "mass_g": 196.3
+    },
+    {
+     "code": "LS-408",
+     "qty": 1,
+     "parts": [
+      "feed_bar"
+     ],
+     "kind": "buy",
+     "name": "牙架与送布牙 Feed bar & feed dog",
+     "mass_g": 29.2
+    },
+    {
+     "code": "LS-409",
+     "qty": 1,
+     "parts": [
+      "lift_link"
+     ],
+     "kind": "buy",
+     "name": "抬牙连杆 Lift link",
+     "mass_g": 15.8
+    },
+    {
+     "code": "LS-410",
+     "qty": 1,
+     "parts": [
+      "lift_rock"
+     ],
+     "kind": "buy",
+     "name": "抬牙摆轴 Lift rock shaft",
+     "mass_g": 76.2
+    },
+    {
+     "code": "LS-411",
+     "qty": 1,
+     "parts": [
+      "oil_ecc"
+     ],
+     "kind": "buy",
+     "name": "油泵偏心 Oil-pump eccentric",
+     "mass_g": 4.1
+    },
+    {
+     "code": "LS-412",
+     "qty": 1,
+     "parts": [
+      "oil_plunger"
+     ],
+     "kind": "buy",
+     "name": "油泵柱塞 Oil-pump plunger",
+     "mass_g": 1.2
+    },
+    {
+     "code": "LS-413",
+     "qty": 1,
+     "parts": [
+      "oil_pump"
+     ],
+     "kind": "buy",
+     "name": "油泵体 Oil-pump body",
+     "mass_g": 18.2
+    },
+    {
+     "code": "LS-501",
+     "qty": 1,
+     "parts": [
+      "presser_bar"
+     ],
+     "kind": "buy",
+     "name": "压脚杆 Presser bar",
+     "mass_g": 46.4
+    },
+    {
+     "code": "LS-502",
+     "qty": 1,
+     "parts": [
+      "presser_collar"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧座 Presser spring collar",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-503",
+     "qty": 1,
+     "parts": [
+      "presser_foot"
+     ],
+     "kind": "buy",
+     "name": "压脚 Presser foot",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-504",
+     "qty": 1,
+     "parts": [
+      "lift_bracket"
+     ],
+     "kind": "buy",
+     "name": "抬压脚板 Presser lifting bracket",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-505",
+     "qty": 1,
+     "parts": [
+      "presser_screw"
+     ],
+     "kind": "buy",
+     "name": "调压螺钉 Pressure adjusting screw",
+     "mass_g": 44.3
+    },
+    {
+     "code": "LS-506",
+     "qty": 1,
+     "parts": [
+      "presser_spring"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧 Presser spring",
+     "mass_g": 39.0
+    },
+    {
+     "code": "LS-507",
+     "qty": 2,
+     "parts": [
+      "presser_bushes"
+     ],
+     "kind": "buy",
+     "name": "压脚杆导套 Presser-bar bushings",
+     "mass_g": 11.7
+    },
+    {
+     "code": "LS-508",
+     "qty": 1,
+     "parts": [
+      "hand_lifter"
+     ],
+     "kind": "buy",
+     "name": "手抬扳手 Hand lifter",
+     "mass_g": 61.1
+    },
+    {
+     "code": "LS-509",
+     "qty": 1,
+     "parts": [
+      "knee_c1"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C1 Knee-lift crank C1",
+     "mass_g": 20.3
+    },
+    {
+     "code": "LS-510",
+     "qty": 1,
+     "parts": [
+      "knee_c2"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C2 Knee-lift crank C2",
+     "mass_g": 22.6
+    },
+    {
+     "code": "LS-511",
+     "qty": 1,
+     "parts": [
+      "knee_rod"
+     ],
+     "kind": "buy",
+     "name": "膝抬拉杆 Knee-lift rod",
+     "mass_g": 99.7
+    },
+    {
+     "code": "LS-512",
+     "qty": 1,
+     "parts": [
+      "knee_push"
+     ],
+     "kind": "buy",
+     "name": "膝抬推杆 Knee-lift push rod",
+     "mass_g": 98.0
+    },
+    {
+     "code": "LS-513",
+     "qty": 1,
+     "parts": [
+      "knee_link"
+     ],
+     "kind": "buy",
+     "name": "膝抬连杆 Knee-lift link",
+     "mass_g": 5.9
+    },
+    {
+     "code": "LS-514",
+     "qty": 1,
+     "parts": [
+      "release_shaft"
+     ],
+     "kind": "buy",
+     "name": "松线轴 Tension-release shaft",
+     "mass_g": 14.3
+    },
+    {
+     "code": "LS-515",
+     "qty": 1,
+     "parts": [
+      "release_rod"
+     ],
+     "kind": "buy",
+     "name": "松线拉杆 Tension-release rod",
+     "mass_g": 5.2
+    },
+    {
+     "code": "LS-516",
+     "qty": 1,
+     "parts": [
+      "release_lever"
+     ],
+     "kind": "buy",
+     "name": "松线杆 Tension-release lever",
+     "mass_g": 15.7
+    },
+    {
+     "code": "LS-517",
+     "qty": 1,
+     "parts": [
+      "release_pin"
+     ],
+     "kind": "buy",
+     "name": "松线顶针 Tension-release pin",
+     "mass_g": 0.4
+    },
+    {
+     "code": "LS-518",
+     "qty": 1,
+     "parts": [
+      "tension_post"
+     ],
+     "kind": "buy",
+     "name": "夹线柱 Tension post",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-519",
+     "qty": 1,
+     "parts": [
+      "tension_discs"
+     ],
+     "kind": "buy",
+     "name": "夹线盘 Tension discs",
+     "mass_g": 5.6
+    },
+    {
+     "code": "LS-520",
+     "qty": 1,
+     "parts": [
+      "tension_spring"
+     ],
+     "kind": "buy",
+     "name": "夹线簧 Tension spring",
+     "mass_g": 1.3
+    },
+    {
+     "code": "LS-521",
+     "qty": 1,
+     "parts": [
+      "tension_nut"
+     ],
+     "kind": "buy",
+     "name": "夹线螺母 Tension nut",
+     "mass_g": 2.2
+    },
+    {
+     "code": "LS-522",
+     "qty": 1,
+     "parts": [
+      "check_spring"
+     ],
+     "kind": "buy",
+     "name": "挑线簧 Check spring",
+     "mass_g": 0.2
+    },
+    {
+     "code": "LS-801",
+     "qty": 1,
+     "parts": [
+      "estep_bracket"
+     ],
+     "kind": "buy",
+     "name": "步进电机支架 Stepper bracket",
+     "mass_g": 28.9
+    },
+    {
+     "code": "LS-802",
+     "qty": 1,
+     "parts": [
+      "estep_pulley_m"
+     ],
+     "kind": "buy",
+     "name": "电机带轮 Motor pulley",
+     "mass_g": 19.1
+    },
+    {
+     "code": "LS-803",
+     "qty": 1,
+     "parts": [
+      "estep_pulley_r"
+     ],
+     "kind": "buy",
+     "name": "调节器带轮 Regulator pulley",
+     "mass_g": 35.7
+    }
+   ]
+  },
+  "WQ-LS-ED": {
+   "options": {
+    "T": false,
+    "E": true,
+    "D": true
+   },
+   "price": 605,
+   "lines": [
+    {
+     "code": "BUY-BELT-E",
+     "qty": 1,
+     "parts": [
+      "estep_belt"
+     ],
+     "kind": "buy",
+     "name": "针距同步带 Stitch-drive belt",
+     "mass_g": 1.7
+    },
+    {
+     "code": "BUY-BELT-LS",
+     "qty": 1,
+     "parts": [
+      "belt"
+     ],
+     "kind": "buy",
+     "name": "同步带 Timing belt",
+     "mass_g": 21.0
+    },
+    {
+     "code": "BUY-BOBCASE",
+     "qty": 1,
+     "parts": [
+      "bobbin_case"
+     ],
+     "kind": "buy",
+     "name": "梭壳与梭芯 Bobbin case & bobbin",
+     "mass_g": 31.2
+    },
+    {
+     "code": "BUY-BOX-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "包装箱与附件包",
+     "extra": "包装箱与附件包",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6201",
+     "qty": 3,
+     "parts": [
+      "bearings_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴轴承 6201 Lower shaft bearings 6201",
+     "mass_g": 57.6,
+     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+    },
+    {
+     "code": "BUY-BRG-6202",
+     "qty": 1,
+     "parts": [
+      "bearing_front"
+     ],
+     "kind": "buy",
+     "name": "上轴前轴承 6202 Front bearing 6202",
+     "mass_g": 66.2
+    },
+    {
+     "code": "BUY-BTN-E",
+     "qty": 1,
+     "parts": [
+      "reverse_button"
+     ],
+     "kind": "buy",
+     "name": "倒缝按钮 Reverse button",
+     "mass_g": 3.1
+    },
+    {
+     "code": "BUY-COVERS-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "extra": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-CTRL-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "电控箱（GC 设计，外购）",
+     "extra": "电控箱（GC 设计，外购）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-MOTOR-LS",
+     "qty": 1,
+     "parts": [
+      "encoder_disc",
+      "motor_bolts",
+      "motor_cap",
+      "motor_housing",
+      "motor_rods",
+      "rotor",
+      "rotor_magnets",
+      "stator_core",
+      "stator_winding"
+     ],
+     "kind": "buy",
+     "name": "直驱电机 Direct-drive motor",
+     "mass_g": 2422.6
+    },
+    {
+     "code": "BUY-NEEDLE-DB",
+     "qty": 1,
+     "parts": [
+      "needle"
+     ],
+     "kind": "buy",
+     "name": "机针 DB×1 Needle DB×1",
+     "mass_g": 0.3
+    },
+    {
+     "code": "BUY-OILPAN-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "油盘",
+     "extra": "油盘",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLATE-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "针板与推板（三维没有画）",
+     "extra": "针板与推板（三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M4",
+     "qty": 20,
+     "parts": [],
+     "kind": "buy",
+     "name": "螺钉 M4（数量为示例）",
+     "extra": "螺钉 M4（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M5",
+     "qty": 40,
+     "parts": [],
+     "kind": "buy",
+     "name": "内六角螺钉 M5（数量为示例）",
+     "extra": "内六角螺钉 M5（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-STEP-42",
+     "qty": 1,
+     "parts": [
+      "estep_motor"
+     ],
+     "kind": "buy",
+     "name": "步进电机 42 型（48 mm） Stepper motor NEMA 17 (48 mm)",
+     "mass_g": 819.3
+    },
+    {
+     "code": "HSG-LS",
+     "qty": 1,
+     "parts": [
+      "housing_upper",
+      "housing_lower"
+     ],
+     "kind": "make",
+     "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
+     "mass_g": 24208.0
+    },
+    {
+     "code": "LS-101",
+     "qty": 1,
+     "parts": [
+      "shaft"
+     ],
+     "kind": "make",
+     "name": "上轴 Upper shaft",
+     "mass_g": 621.7
+    },
+    {
+     "code": "LS-102",
+     "qty": 1,
+     "parts": [
+      "lower_shaft"
+     ],
+     "kind": "make",
+     "name": "下轴 Lower shaft",
+     "mass_g": 278.8
+    },
+    {
+     "code": "LS-103",
+     "qty": 1,
+     "parts": [
+      "crank"
+     ],
+     "kind": "buy",
+     "name": "曲柄（带平衡块） Crank with counterweight",
+     "mass_g": 109.8
+    },
+    {
+     "code": "LS-104",
+     "qty": 1,
+     "parts": [
+      "crank_pin"
+     ],
+     "kind": "buy",
+     "name": "曲柄销 Crank pin",
+     "mass_g": 7.3
+    },
+    {
+     "code": "LS-105",
+     "qty": 1,
+     "parts": [
+      "pulley_upper"
+     ],
+     "kind": "buy",
+     "name": "上带轮 Upper timing pulley",
+     "mass_g": 73.6
+    },
+    {
+     "code": "LS-106",
+     "qty": 1,
+     "parts": [
+      "pulley_lower"
+     ],
+     "kind": "buy",
+     "name": "下带轮 Lower timing pulley",
+     "mass_g": 89.6
+    },
+    {
+     "code": "LS-107",
+     "qty": 1,
+     "parts": [
+      "handwheel"
+     ],
+     "kind": "buy",
+     "name": "手轮 Handwheel",
+     "mass_g": 125.2
+    },
+    {
+     "code": "LS-108",
+     "qty": 1,
+     "parts": [
+      "handwheel_ring"
+     ],
+     "kind": "buy",
+     "name": "手轮标记环 Handwheel marker ring",
+     "mass_g": 3.1
+    },
+    {
+     "code": "LS-201",
+     "qty": 1,
+     "parts": [
+      "needle_bar"
+     ],
+     "kind": "make",
+     "name": "针杆 Needle bar",
+     "mass_g": 71.0
+    },
+    {
+     "code": "LS-202",
+     "qty": 1,
+     "parts": [
+      "needle_clamp"
+     ],
+     "kind": "buy",
+     "name": "针夹 Needle clamp",
+     "mass_g": 3.2
+    },
+    {
+     "code": "LS-203",
+     "qty": 1,
+     "parts": [
+      "nb_link"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块 Needle-bar connecting block",
+     "mass_g": 17.2
+    },
+    {
+     "code": "LS-204",
+     "qty": 1,
+     "parts": [
+      "rod"
+     ],
+     "kind": "buy",
+     "name": "针杆连杆 Needle-bar connecting rod",
+     "mass_g": 46.2
+    },
+    {
+     "code": "LS-205",
+     "qty": 1,
+     "parts": [
+      "lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆 Take-up lever",
+     "mass_g": 24.2
+    },
+    {
+     "code": "LS-206",
+     "qty": 1,
+     "parts": [
+      "rocker"
+     ],
+     "kind": "buy",
+     "name": "挑线摇杆 Take-up rocker",
+     "mass_g": 10.9
+    },
+    {
+     "code": "LS-207",
+     "qty": 1,
+     "parts": [
+      "pin_M"
+     ],
+     "kind": "buy",
+     "name": "挑线杆销 M Take-up pin M",
+     "mass_g": 2.1
+    },
+    {
+     "code": "LS-208",
+     "qty": 1,
+     "parts": [
+      "stud_Q"
+     ],
+     "kind": "buy",
+     "name": "摇杆支点销 Q Rocker stud Q",
+     "mass_g": 4.5
+    },
+    {
+     "code": "LS-209",
+     "qty": 1,
+     "parts": [
+      "thread_guide"
+     ],
+     "kind": "buy",
+     "name": "过线环 Thread guide",
+     "mass_g": 0.8
+    },
+    {
+     "code": "LS-301D",
+     "qty": 1,
+     "parts": [
+      "hook"
+     ],
+     "kind": "make",
+     "name": "旋梭 Rotary hook",
+     "mass_g": 46.6
+    },
+    {
+     "code": "LS-302",
+     "qty": 1,
+     "parts": [
+      "hook_shaft"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴 Hook shaft",
+     "mass_g": 42.6
+    },
+    {
+     "code": "LS-303",
+     "qty": 1,
+     "parts": [
+      "gear_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴齿轮 z20 Hook-shaft gear z20",
+     "mass_g": 21.6
+    },
+    {
+     "code": "LS-304",
+     "qty": 1,
+     "parts": [
+      "gear_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴齿轮 z40 Lower-shaft gear z40",
+     "mass_g": 86.3
+    },
+    {
+     "code": "LS-305",
+     "qty": 2,
+     "parts": [
+      "bushes_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴铜套 Hook-shaft bushings",
+     "mass_g": 18.6
+    },
+    {
+     "code": "LS-401",
+     "qty": 1,
+     "parts": [
+      "feed_ecc"
+     ],
+     "kind": "make",
+     "name": "送布偏心 Feed eccentric",
+     "mass_g": 20.7
+    },
+    {
+     "code": "LS-402",
+     "qty": 1,
+     "parts": [
+      "lift_ecc"
+     ],
+     "kind": "make",
+     "name": "抬牙偏心 Lift eccentric",
+     "mass_g": 12.6
+    },
+    {
+     "code": "LS-403",
+     "qty": 1,
+     "parts": [
+      "feed_rod"
+     ],
+     "kind": "buy",
+     "name": "送布连杆 Feed connecting rod",
+     "mass_g": 48.6
+    },
+    {
+     "code": "LS-404",
+     "qty": 1,
+     "parts": [
+      "regulator"
+     ],
+     "kind": "buy",
+     "name": "送布调节器 Feed regulator",
+     "mass_g": 28.6
+    },
+    {
+     "code": "LS-405",
+     "qty": 1,
+     "parts": [
+      "reg_slider"
+     ],
+     "kind": "buy",
+     "name": "调节器滑块 Regulator slider",
+     "mass_g": 7.2
+    },
+    {
+     "code": "LS-406",
+     "qty": 1,
+     "parts": [
+      "feed_link"
+     ],
+     "kind": "buy",
+     "name": "水平连杆 Feed link",
+     "mass_g": 28.3
+    },
+    {
+     "code": "LS-407",
+     "qty": 1,
+     "parts": [
+      "feed_rock"
+     ],
+     "kind": "buy",
+     "name": "送布摆轴 Feed rock shaft",
+     "mass_g": 196.3
+    },
+    {
+     "code": "LS-408",
+     "qty": 1,
+     "parts": [
+      "feed_bar"
+     ],
+     "kind": "buy",
+     "name": "牙架与送布牙 Feed bar & feed dog",
+     "mass_g": 29.2
+    },
+    {
+     "code": "LS-409",
+     "qty": 1,
+     "parts": [
+      "lift_link"
+     ],
+     "kind": "buy",
+     "name": "抬牙连杆 Lift link",
+     "mass_g": 15.8
+    },
+    {
+     "code": "LS-410",
+     "qty": 1,
+     "parts": [
+      "lift_rock"
+     ],
+     "kind": "buy",
+     "name": "抬牙摆轴 Lift rock shaft",
+     "mass_g": 76.2
+    },
+    {
+     "code": "LS-411",
+     "qty": 1,
+     "parts": [
+      "oil_ecc"
+     ],
+     "kind": "buy",
+     "name": "油泵偏心 Oil-pump eccentric",
+     "mass_g": 4.1
+    },
+    {
+     "code": "LS-412",
+     "qty": 1,
+     "parts": [
+      "oil_plunger"
+     ],
+     "kind": "buy",
+     "name": "油泵柱塞 Oil-pump plunger",
+     "mass_g": 1.2
+    },
+    {
+     "code": "LS-413",
+     "qty": 1,
+     "parts": [
+      "oil_pump"
+     ],
+     "kind": "buy",
+     "name": "油泵体 Oil-pump body",
+     "mass_g": 18.2
+    },
+    {
+     "code": "LS-501",
+     "qty": 1,
+     "parts": [
+      "presser_bar"
+     ],
+     "kind": "buy",
+     "name": "压脚杆 Presser bar",
+     "mass_g": 46.4
+    },
+    {
+     "code": "LS-502",
+     "qty": 1,
+     "parts": [
+      "presser_collar"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧座 Presser spring collar",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-503",
+     "qty": 1,
+     "parts": [
+      "presser_foot"
+     ],
+     "kind": "buy",
+     "name": "压脚 Presser foot",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-504",
+     "qty": 1,
+     "parts": [
+      "lift_bracket"
+     ],
+     "kind": "buy",
+     "name": "抬压脚板 Presser lifting bracket",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-505",
+     "qty": 1,
+     "parts": [
+      "presser_screw"
+     ],
+     "kind": "buy",
+     "name": "调压螺钉 Pressure adjusting screw",
+     "mass_g": 44.3
+    },
+    {
+     "code": "LS-506",
+     "qty": 1,
+     "parts": [
+      "presser_spring"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧 Presser spring",
+     "mass_g": 39.0
+    },
+    {
+     "code": "LS-507",
+     "qty": 2,
+     "parts": [
+      "presser_bushes"
+     ],
+     "kind": "buy",
+     "name": "压脚杆导套 Presser-bar bushings",
+     "mass_g": 11.7
+    },
+    {
+     "code": "LS-508",
+     "qty": 1,
+     "parts": [
+      "hand_lifter"
+     ],
+     "kind": "buy",
+     "name": "手抬扳手 Hand lifter",
+     "mass_g": 61.1
+    },
+    {
+     "code": "LS-509",
+     "qty": 1,
+     "parts": [
+      "knee_c1"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C1 Knee-lift crank C1",
+     "mass_g": 20.3
+    },
+    {
+     "code": "LS-510",
+     "qty": 1,
+     "parts": [
+      "knee_c2"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C2 Knee-lift crank C2",
+     "mass_g": 22.6
+    },
+    {
+     "code": "LS-511",
+     "qty": 1,
+     "parts": [
+      "knee_rod"
+     ],
+     "kind": "buy",
+     "name": "膝抬拉杆 Knee-lift rod",
+     "mass_g": 99.7
+    },
+    {
+     "code": "LS-512",
+     "qty": 1,
+     "parts": [
+      "knee_push"
+     ],
+     "kind": "buy",
+     "name": "膝抬推杆 Knee-lift push rod",
+     "mass_g": 98.0
+    },
+    {
+     "code": "LS-513",
+     "qty": 1,
+     "parts": [
+      "knee_link"
+     ],
+     "kind": "buy",
+     "name": "膝抬连杆 Knee-lift link",
+     "mass_g": 5.9
+    },
+    {
+     "code": "LS-514",
+     "qty": 1,
+     "parts": [
+      "release_shaft"
+     ],
+     "kind": "buy",
+     "name": "松线轴 Tension-release shaft",
+     "mass_g": 14.3
+    },
+    {
+     "code": "LS-515",
+     "qty": 1,
+     "parts": [
+      "release_rod"
+     ],
+     "kind": "buy",
+     "name": "松线拉杆 Tension-release rod",
+     "mass_g": 5.2
+    },
+    {
+     "code": "LS-516",
+     "qty": 1,
+     "parts": [
+      "release_lever"
+     ],
+     "kind": "buy",
+     "name": "松线杆 Tension-release lever",
+     "mass_g": 15.7
+    },
+    {
+     "code": "LS-517",
+     "qty": 1,
+     "parts": [
+      "release_pin"
+     ],
+     "kind": "buy",
+     "name": "松线顶针 Tension-release pin",
+     "mass_g": 0.4
+    },
+    {
+     "code": "LS-518",
+     "qty": 1,
+     "parts": [
+      "tension_post"
+     ],
+     "kind": "buy",
+     "name": "夹线柱 Tension post",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-519",
+     "qty": 1,
+     "parts": [
+      "tension_discs"
+     ],
+     "kind": "buy",
+     "name": "夹线盘 Tension discs",
+     "mass_g": 5.6
+    },
+    {
+     "code": "LS-520",
+     "qty": 1,
+     "parts": [
+      "tension_spring"
+     ],
+     "kind": "buy",
+     "name": "夹线簧 Tension spring",
+     "mass_g": 1.3
+    },
+    {
+     "code": "LS-521",
+     "qty": 1,
+     "parts": [
+      "tension_nut"
+     ],
+     "kind": "buy",
+     "name": "夹线螺母 Tension nut",
+     "mass_g": 2.2
+    },
+    {
+     "code": "LS-522",
+     "qty": 1,
+     "parts": [
+      "check_spring"
+     ],
+     "kind": "buy",
+     "name": "挑线簧 Check spring",
+     "mass_g": 0.2
+    },
+    {
+     "code": "LS-801",
+     "qty": 1,
+     "parts": [
+      "estep_bracket"
+     ],
+     "kind": "buy",
+     "name": "步进电机支架 Stepper bracket",
+     "mass_g": 28.9
+    },
+    {
+     "code": "LS-802",
+     "qty": 1,
+     "parts": [
+      "estep_pulley_m"
+     ],
+     "kind": "buy",
+     "name": "电机带轮 Motor pulley",
+     "mass_g": 19.1
+    },
+    {
+     "code": "LS-803",
+     "qty": 1,
+     "parts": [
+      "estep_pulley_r"
+     ],
+     "kind": "buy",
+     "name": "调节器带轮 Regulator pulley",
+     "mass_g": 35.7
+    }
+   ]
+  },
+  "WQ-LS-T": {
+   "options": {
+    "T": true,
+    "E": false,
+    "D": false
+   },
+   "price": 610,
+   "lines": [
+    {
+     "code": "BUY-BELT-LS",
+     "qty": 1,
+     "parts": [
+      "belt"
+     ],
+     "kind": "buy",
+     "name": "同步带 Timing belt",
+     "mass_g": 21.0
+    },
+    {
+     "code": "BUY-BOBCASE",
+     "qty": 1,
+     "parts": [
+      "bobbin_case"
+     ],
+     "kind": "buy",
+     "name": "梭壳与梭芯 Bobbin case & bobbin",
+     "mass_g": 31.2
+    },
+    {
+     "code": "BUY-BOX-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "包装箱与附件包",
+     "extra": "包装箱与附件包",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6201",
+     "qty": 3,
+     "parts": [
+      "bearings_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴轴承 6201 Lower shaft bearings 6201",
+     "mass_g": 57.6,
+     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+    },
+    {
+     "code": "BUY-BRG-6202",
+     "qty": 1,
+     "parts": [
+      "bearing_front"
+     ],
+     "kind": "buy",
+     "name": "上轴前轴承 6202 Front bearing 6202",
+     "mass_g": 66.2
+    },
+    {
+     "code": "BUY-COVERS-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "extra": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-CTRL-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "电控箱（GC 设计，外购）",
+     "extra": "电控箱（GC 设计，外购）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-MOTOR-LS",
+     "qty": 1,
+     "parts": [
+      "encoder_disc",
+      "motor_bolts",
+      "motor_cap",
+      "motor_housing",
+      "motor_rods",
+      "rotor",
+      "rotor_magnets",
+      "stator_core",
+      "stator_winding"
+     ],
+     "kind": "buy",
+     "name": "直驱电机 Direct-drive motor",
+     "mass_g": 2422.6
+    },
+    {
+     "code": "BUY-NEEDLE-DB",
+     "qty": 1,
+     "parts": [
+      "needle"
+     ],
+     "kind": "buy",
+     "name": "机针 DB×1 Needle DB×1",
+     "mass_g": 0.3
+    },
+    {
+     "code": "BUY-OILPAN-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "油盘",
+     "extra": "油盘",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLATE-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "针板与推板（三维没有画）",
+     "extra": "针板与推板（三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M4",
+     "qty": 20,
+     "parts": [],
+     "kind": "buy",
+     "name": "螺钉 M4（数量为示例）",
+     "extra": "螺钉 M4（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M5",
+     "qty": 40,
+     "parts": [],
+     "kind": "buy",
+     "name": "内六角螺钉 M5（数量为示例）",
+     "extra": "内六角螺钉 M5（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SOL-REL",
+     "qty": 1,
+     "parts": [
+      "release_solenoid"
+     ],
+     "kind": "buy",
+     "name": "松线电磁铁 Release solenoid",
+     "mass_g": 42.4
+    },
+    {
+     "code": "BUY-SOL-TRIM",
+     "qty": 1,
+     "parts": [
+      "trim_solenoid"
+     ],
+     "kind": "buy",
+     "name": "剪线电磁铁 Trimmer solenoid",
+     "mass_g": 55.4
+    },
+    {
+     "code": "BUY-SOL-WIPE",
+     "qty": 1,
+     "parts": [
+      "wiper_solenoid"
+     ],
+     "kind": "buy",
+     "name": "拨线电磁铁 Wiper solenoid",
+     "mass_g": 25.4
+    },
+    {
+     "code": "HSG-LS",
+     "qty": 1,
+     "parts": [
+      "housing_upper",
+      "housing_lower"
+     ],
+     "kind": "make",
+     "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
+     "mass_g": 24208.0
+    },
+    {
+     "code": "LS-101",
+     "qty": 1,
+     "parts": [
+      "shaft"
+     ],
+     "kind": "make",
+     "name": "上轴 Upper shaft",
+     "mass_g": 621.7
+    },
+    {
+     "code": "LS-102",
+     "qty": 1,
+     "parts": [
+      "lower_shaft"
+     ],
+     "kind": "make",
+     "name": "下轴 Lower shaft",
+     "mass_g": 278.8
+    },
+    {
+     "code": "LS-103",
+     "qty": 1,
+     "parts": [
+      "crank"
+     ],
+     "kind": "buy",
+     "name": "曲柄（带平衡块） Crank with counterweight",
+     "mass_g": 109.8
+    },
+    {
+     "code": "LS-104",
+     "qty": 1,
+     "parts": [
+      "crank_pin"
+     ],
+     "kind": "buy",
+     "name": "曲柄销 Crank pin",
+     "mass_g": 7.3
+    },
+    {
+     "code": "LS-105",
+     "qty": 1,
+     "parts": [
+      "pulley_upper"
+     ],
+     "kind": "buy",
+     "name": "上带轮 Upper timing pulley",
+     "mass_g": 73.6
+    },
+    {
+     "code": "LS-106",
+     "qty": 1,
+     "parts": [
+      "pulley_lower"
+     ],
+     "kind": "buy",
+     "name": "下带轮 Lower timing pulley",
+     "mass_g": 89.6
+    },
+    {
+     "code": "LS-107",
+     "qty": 1,
+     "parts": [
+      "handwheel"
+     ],
+     "kind": "buy",
+     "name": "手轮 Handwheel",
+     "mass_g": 125.2
+    },
+    {
+     "code": "LS-108",
+     "qty": 1,
+     "parts": [
+      "handwheel_ring"
+     ],
+     "kind": "buy",
+     "name": "手轮标记环 Handwheel marker ring",
+     "mass_g": 3.1
+    },
+    {
+     "code": "LS-201",
+     "qty": 1,
+     "parts": [
+      "needle_bar"
+     ],
+     "kind": "make",
+     "name": "针杆 Needle bar",
+     "mass_g": 71.0
+    },
+    {
+     "code": "LS-202",
+     "qty": 1,
+     "parts": [
+      "needle_clamp"
+     ],
+     "kind": "buy",
+     "name": "针夹 Needle clamp",
+     "mass_g": 3.2
+    },
+    {
+     "code": "LS-203",
+     "qty": 1,
+     "parts": [
+      "nb_link"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块 Needle-bar connecting block",
+     "mass_g": 17.2
+    },
+    {
+     "code": "LS-204",
+     "qty": 1,
+     "parts": [
+      "rod"
+     ],
+     "kind": "buy",
+     "name": "针杆连杆 Needle-bar connecting rod",
+     "mass_g": 46.2
+    },
+    {
+     "code": "LS-205",
+     "qty": 1,
+     "parts": [
+      "lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆 Take-up lever",
+     "mass_g": 24.2
+    },
+    {
+     "code": "LS-206",
+     "qty": 1,
+     "parts": [
+      "rocker"
+     ],
+     "kind": "buy",
+     "name": "挑线摇杆 Take-up rocker",
+     "mass_g": 10.9
+    },
+    {
+     "code": "LS-207",
+     "qty": 1,
+     "parts": [
+      "pin_M"
+     ],
+     "kind": "buy",
+     "name": "挑线杆销 M Take-up pin M",
+     "mass_g": 2.1
+    },
+    {
+     "code": "LS-208",
+     "qty": 1,
+     "parts": [
+      "stud_Q"
+     ],
+     "kind": "buy",
+     "name": "摇杆支点销 Q Rocker stud Q",
+     "mass_g": 4.5
+    },
+    {
+     "code": "LS-209",
+     "qty": 1,
+     "parts": [
+      "thread_guide"
+     ],
+     "kind": "buy",
+     "name": "过线环 Thread guide",
+     "mass_g": 0.8
+    },
+    {
+     "code": "LS-301",
+     "qty": 1,
+     "parts": [
+      "hook"
+     ],
+     "kind": "make",
+     "name": "旋梭 Rotary hook",
+     "mass_g": 46.6
+    },
+    {
+     "code": "LS-302",
+     "qty": 1,
+     "parts": [
+      "hook_shaft"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴 Hook shaft",
+     "mass_g": 42.6
+    },
+    {
+     "code": "LS-303",
+     "qty": 1,
+     "parts": [
+      "gear_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴齿轮 z20 Hook-shaft gear z20",
+     "mass_g": 21.6
+    },
+    {
+     "code": "LS-304",
+     "qty": 1,
+     "parts": [
+      "gear_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴齿轮 z40 Lower-shaft gear z40",
+     "mass_g": 86.3
+    },
+    {
+     "code": "LS-305",
+     "qty": 2,
+     "parts": [
+      "bushes_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴铜套 Hook-shaft bushings",
+     "mass_g": 18.6
+    },
+    {
+     "code": "LS-401",
+     "qty": 1,
+     "parts": [
+      "feed_ecc"
+     ],
+     "kind": "make",
+     "name": "送布偏心 Feed eccentric",
+     "mass_g": 20.7
+    },
+    {
+     "code": "LS-402",
+     "qty": 1,
+     "parts": [
+      "lift_ecc"
+     ],
+     "kind": "make",
+     "name": "抬牙偏心 Lift eccentric",
+     "mass_g": 12.6
+    },
+    {
+     "code": "LS-403",
+     "qty": 1,
+     "parts": [
+      "feed_rod"
+     ],
+     "kind": "buy",
+     "name": "送布连杆 Feed connecting rod",
+     "mass_g": 48.6
+    },
+    {
+     "code": "LS-404",
+     "qty": 1,
+     "parts": [
+      "regulator"
+     ],
+     "kind": "buy",
+     "name": "送布调节器 Feed regulator",
+     "mass_g": 28.6
+    },
+    {
+     "code": "LS-405",
+     "qty": 1,
+     "parts": [
+      "reg_slider"
+     ],
+     "kind": "buy",
+     "name": "调节器滑块 Regulator slider",
+     "mass_g": 7.2
+    },
+    {
+     "code": "LS-406",
+     "qty": 1,
+     "parts": [
+      "feed_link"
+     ],
+     "kind": "buy",
+     "name": "水平连杆 Feed link",
+     "mass_g": 28.3
+    },
+    {
+     "code": "LS-407",
+     "qty": 1,
+     "parts": [
+      "feed_rock"
+     ],
+     "kind": "buy",
+     "name": "送布摆轴 Feed rock shaft",
+     "mass_g": 196.3
+    },
+    {
+     "code": "LS-408",
+     "qty": 1,
+     "parts": [
+      "feed_bar"
+     ],
+     "kind": "buy",
+     "name": "牙架与送布牙 Feed bar & feed dog",
+     "mass_g": 29.2
+    },
+    {
+     "code": "LS-409",
+     "qty": 1,
+     "parts": [
+      "lift_link"
+     ],
+     "kind": "buy",
+     "name": "抬牙连杆 Lift link",
+     "mass_g": 15.8
+    },
+    {
+     "code": "LS-410",
+     "qty": 1,
+     "parts": [
+      "lift_rock"
+     ],
+     "kind": "buy",
+     "name": "抬牙摆轴 Lift rock shaft",
+     "mass_g": 76.2
+    },
+    {
+     "code": "LS-411",
+     "qty": 1,
+     "parts": [
+      "oil_ecc"
+     ],
+     "kind": "buy",
+     "name": "油泵偏心 Oil-pump eccentric",
+     "mass_g": 4.1
+    },
+    {
+     "code": "LS-412",
+     "qty": 1,
+     "parts": [
+      "oil_plunger"
+     ],
+     "kind": "buy",
+     "name": "油泵柱塞 Oil-pump plunger",
+     "mass_g": 1.2
+    },
+    {
+     "code": "LS-413",
+     "qty": 1,
+     "parts": [
+      "oil_pump"
+     ],
+     "kind": "buy",
+     "name": "油泵体 Oil-pump body",
+     "mass_g": 18.2
+    },
+    {
+     "code": "LS-501",
+     "qty": 1,
+     "parts": [
+      "presser_bar"
+     ],
+     "kind": "buy",
+     "name": "压脚杆 Presser bar",
+     "mass_g": 46.4
+    },
+    {
+     "code": "LS-502",
+     "qty": 1,
+     "parts": [
+      "presser_collar"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧座 Presser spring collar",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-503",
+     "qty": 1,
+     "parts": [
+      "presser_foot"
+     ],
+     "kind": "buy",
+     "name": "压脚 Presser foot",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-504",
+     "qty": 1,
+     "parts": [
+      "lift_bracket"
+     ],
+     "kind": "buy",
+     "name": "抬压脚板 Presser lifting bracket",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-505",
+     "qty": 1,
+     "parts": [
+      "presser_screw"
+     ],
+     "kind": "buy",
+     "name": "调压螺钉 Pressure adjusting screw",
+     "mass_g": 44.3
+    },
+    {
+     "code": "LS-506",
+     "qty": 1,
+     "parts": [
+      "presser_spring"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧 Presser spring",
+     "mass_g": 39.0
+    },
+    {
+     "code": "LS-507",
+     "qty": 2,
+     "parts": [
+      "presser_bushes"
+     ],
+     "kind": "buy",
+     "name": "压脚杆导套 Presser-bar bushings",
+     "mass_g": 11.7
+    },
+    {
+     "code": "LS-508",
+     "qty": 1,
+     "parts": [
+      "hand_lifter"
+     ],
+     "kind": "buy",
+     "name": "手抬扳手 Hand lifter",
+     "mass_g": 61.1
+    },
+    {
+     "code": "LS-509",
+     "qty": 1,
+     "parts": [
+      "knee_c1"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C1 Knee-lift crank C1",
+     "mass_g": 20.3
+    },
+    {
+     "code": "LS-510",
+     "qty": 1,
+     "parts": [
+      "knee_c2"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C2 Knee-lift crank C2",
+     "mass_g": 22.6
+    },
+    {
+     "code": "LS-511",
+     "qty": 1,
+     "parts": [
+      "knee_rod"
+     ],
+     "kind": "buy",
+     "name": "膝抬拉杆 Knee-lift rod",
+     "mass_g": 99.7
+    },
+    {
+     "code": "LS-512",
+     "qty": 1,
+     "parts": [
+      "knee_push"
+     ],
+     "kind": "buy",
+     "name": "膝抬推杆 Knee-lift push rod",
+     "mass_g": 98.0
+    },
+    {
+     "code": "LS-513",
+     "qty": 1,
+     "parts": [
+      "knee_link"
+     ],
+     "kind": "buy",
+     "name": "膝抬连杆 Knee-lift link",
+     "mass_g": 5.9
+    },
+    {
+     "code": "LS-514",
+     "qty": 1,
+     "parts": [
+      "release_shaft"
+     ],
+     "kind": "buy",
+     "name": "松线轴 Tension-release shaft",
+     "mass_g": 14.3
+    },
+    {
+     "code": "LS-515",
+     "qty": 1,
+     "parts": [
+      "release_rod"
+     ],
+     "kind": "buy",
+     "name": "松线拉杆 Tension-release rod",
+     "mass_g": 5.2
+    },
+    {
+     "code": "LS-516",
+     "qty": 1,
+     "parts": [
+      "release_lever"
+     ],
+     "kind": "buy",
+     "name": "松线杆 Tension-release lever",
+     "mass_g": 15.7
+    },
+    {
+     "code": "LS-517",
+     "qty": 1,
+     "parts": [
+      "release_pin"
+     ],
+     "kind": "buy",
+     "name": "松线顶针 Tension-release pin",
+     "mass_g": 0.4
+    },
+    {
+     "code": "LS-518",
+     "qty": 1,
+     "parts": [
+      "tension_post"
+     ],
+     "kind": "buy",
+     "name": "夹线柱 Tension post",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-519",
+     "qty": 1,
+     "parts": [
+      "tension_discs"
+     ],
+     "kind": "buy",
+     "name": "夹线盘 Tension discs",
+     "mass_g": 5.6
+    },
+    {
+     "code": "LS-520",
+     "qty": 1,
+     "parts": [
+      "tension_spring"
+     ],
+     "kind": "buy",
+     "name": "夹线簧 Tension spring",
+     "mass_g": 1.3
+    },
+    {
+     "code": "LS-521",
+     "qty": 1,
+     "parts": [
+      "tension_nut"
+     ],
+     "kind": "buy",
+     "name": "夹线螺母 Tension nut",
+     "mass_g": 2.2
+    },
+    {
+     "code": "LS-522",
+     "qty": 1,
+     "parts": [
+      "check_spring"
+     ],
+     "kind": "buy",
+     "name": "挑线簧 Check spring",
+     "mass_g": 0.2
+    },
+    {
+     "code": "LS-523",
+     "qty": 1,
+     "parts": [
+      "stitch_dial"
+     ],
+     "kind": "buy",
+     "name": "针距旋钮 Stitch-length dial",
+     "mass_g": 205.0
+    },
+    {
+     "code": "LS-524",
+     "qty": 1,
+     "parts": [
+      "pull_rod"
+     ],
+     "kind": "buy",
+     "name": "针距拉杆 Stitch-length pull rod",
+     "mass_g": 51.0
+    },
+    {
+     "code": "LS-525",
+     "qty": 1,
+     "parts": [
+      "reverse_lever"
+     ],
+     "kind": "buy",
+     "name": "倒缝扳手 Reverse lever",
+     "mass_g": 66.3
+    },
+    {
+     "code": "LS-526",
+     "qty": 1,
+     "parts": [
+      "reverse_spring"
+     ],
+     "kind": "buy",
+     "name": "倒缝拉簧 Reverse return spring",
+     "mass_g": 2.6
+    },
+    {
+     "code": "LS-701",
+     "qty": 1,
+     "parts": [
+      "moving_knife"
+     ],
+     "kind": "buy",
+     "name": "动刀 Moving knife",
+     "mass_g": 5.1
+    },
+    {
+     "code": "LS-702",
+     "qty": 1,
+     "parts": [
+      "knife_shaft"
+     ],
+     "kind": "buy",
+     "name": "动刀轴 Moving-knife shaft",
+     "mass_g": 20.2
+    },
+    {
+     "code": "LS-703",
+     "qty": 1,
+     "parts": [
+      "fixed_knife"
+     ],
+     "kind": "buy",
+     "name": "定刀 Fixed knife",
+     "mass_g": 2.0
+    },
+    {
+     "code": "LS-704",
+     "qty": 1,
+     "parts": [
+      "trim_base"
+     ],
+     "kind": "buy",
+     "name": "动刀轴座 Knife-shaft base",
+     "mass_g": 35.7
+    },
+    {
+     "code": "LS-705",
+     "qty": 1,
+     "parts": [
+      "trim_rock"
+     ],
+     "kind": "buy",
+     "name": "剪线摆轴 Trimmer rock shaft",
+     "mass_g": 106.8
+    },
+    {
+     "code": "LS-706",
+     "qty": 1,
+     "parts": [
+      "trim_brackets"
+     ],
+     "kind": "buy",
+     "name": "摆轴座 Rock-shaft brackets",
+     "mass_g": 78.7
+    },
+    {
+     "code": "LS-707",
+     "qty": 1,
+     "parts": [
+      "trim_link"
+     ],
+     "kind": "buy",
+     "name": "剪线拉杆 Trimmer link",
+     "mass_g": 5.8
+    },
+    {
+     "code": "LS-708",
+     "qty": 1,
+     "parts": [
+      "trim_lever"
+     ],
+     "kind": "buy",
+     "name": "剪线摆杆 Trimmer cam lever",
+     "mass_g": 25.5
+    },
+    {
+     "code": "LS-709",
+     "qty": 1,
+     "parts": [
+      "trim_roller"
+     ],
+     "kind": "buy",
+     "name": "凸轮滚子 Cam roller",
+     "mass_g": 1.6
+    },
+    {
+     "code": "LS-710",
+     "qty": 1,
+     "parts": [
+      "trim_cam"
+     ],
+     "kind": "make",
+     "name": "剪线凸轮 Trimmer cam",
+     "mass_g": 140.9
+    },
+    {
+     "code": "LS-711",
+     "qty": 1,
+     "parts": [
+      "wiper"
+     ],
+     "kind": "buy",
+     "name": "拨线钩 Thread wiper",
+     "mass_g": 6.7
+    },
+    {
+     "code": "LS-712",
+     "qty": 1,
+     "parts": [
+      "release_arm_t"
+     ],
+     "kind": "buy",
+     "name": "松线臂 Release arm",
+     "mass_g": 2.1
+    }
+   ]
+  },
+  "WQ-LS-TD": {
+   "options": {
+    "T": true,
+    "E": false,
+    "D": true
+   },
+   "price": 625,
+   "lines": [
+    {
+     "code": "BUY-BELT-LS",
+     "qty": 1,
+     "parts": [
+      "belt"
+     ],
+     "kind": "buy",
+     "name": "同步带 Timing belt",
+     "mass_g": 21.0
+    },
+    {
+     "code": "BUY-BOBCASE",
+     "qty": 1,
+     "parts": [
+      "bobbin_case"
+     ],
+     "kind": "buy",
+     "name": "梭壳与梭芯 Bobbin case & bobbin",
+     "mass_g": 31.2
+    },
+    {
+     "code": "BUY-BOX-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "包装箱与附件包",
+     "extra": "包装箱与附件包",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6201",
+     "qty": 3,
+     "parts": [
+      "bearings_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴轴承 6201 Lower shaft bearings 6201",
+     "mass_g": 57.6,
+     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+    },
+    {
+     "code": "BUY-BRG-6202",
+     "qty": 1,
+     "parts": [
+      "bearing_front"
+     ],
+     "kind": "buy",
+     "name": "上轴前轴承 6202 Front bearing 6202",
+     "mass_g": 66.2
+    },
+    {
+     "code": "BUY-COVERS-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "extra": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-CTRL-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "电控箱（GC 设计，外购）",
+     "extra": "电控箱（GC 设计，外购）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-MOTOR-LS",
+     "qty": 1,
+     "parts": [
+      "encoder_disc",
+      "motor_bolts",
+      "motor_cap",
+      "motor_housing",
+      "motor_rods",
+      "rotor",
+      "rotor_magnets",
+      "stator_core",
+      "stator_winding"
+     ],
+     "kind": "buy",
+     "name": "直驱电机 Direct-drive motor",
+     "mass_g": 2422.6
+    },
+    {
+     "code": "BUY-NEEDLE-DB",
+     "qty": 1,
+     "parts": [
+      "needle"
+     ],
+     "kind": "buy",
+     "name": "机针 DB×1 Needle DB×1",
+     "mass_g": 0.3
+    },
+    {
+     "code": "BUY-OILPAN-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "油盘",
+     "extra": "油盘",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLATE-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "针板与推板（三维没有画）",
+     "extra": "针板与推板（三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M4",
+     "qty": 20,
+     "parts": [],
+     "kind": "buy",
+     "name": "螺钉 M4（数量为示例）",
+     "extra": "螺钉 M4（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M5",
+     "qty": 40,
+     "parts": [],
+     "kind": "buy",
+     "name": "内六角螺钉 M5（数量为示例）",
+     "extra": "内六角螺钉 M5（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SOL-REL",
+     "qty": 1,
+     "parts": [
+      "release_solenoid"
+     ],
+     "kind": "buy",
+     "name": "松线电磁铁 Release solenoid",
+     "mass_g": 42.4
+    },
+    {
+     "code": "BUY-SOL-TRIM",
+     "qty": 1,
+     "parts": [
+      "trim_solenoid"
+     ],
+     "kind": "buy",
+     "name": "剪线电磁铁 Trimmer solenoid",
+     "mass_g": 55.4
+    },
+    {
+     "code": "BUY-SOL-WIPE",
+     "qty": 1,
+     "parts": [
+      "wiper_solenoid"
+     ],
+     "kind": "buy",
+     "name": "拨线电磁铁 Wiper solenoid",
+     "mass_g": 25.4
+    },
+    {
+     "code": "HSG-LS",
+     "qty": 1,
+     "parts": [
+      "housing_upper",
+      "housing_lower"
+     ],
+     "kind": "make",
+     "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
+     "mass_g": 24208.0
+    },
+    {
+     "code": "LS-101",
+     "qty": 1,
+     "parts": [
+      "shaft"
+     ],
+     "kind": "make",
+     "name": "上轴 Upper shaft",
+     "mass_g": 621.7
+    },
+    {
+     "code": "LS-102",
+     "qty": 1,
+     "parts": [
+      "lower_shaft"
+     ],
+     "kind": "make",
+     "name": "下轴 Lower shaft",
+     "mass_g": 278.8
+    },
+    {
+     "code": "LS-103",
+     "qty": 1,
+     "parts": [
+      "crank"
+     ],
+     "kind": "buy",
+     "name": "曲柄（带平衡块） Crank with counterweight",
+     "mass_g": 109.8
+    },
+    {
+     "code": "LS-104",
+     "qty": 1,
+     "parts": [
+      "crank_pin"
+     ],
+     "kind": "buy",
+     "name": "曲柄销 Crank pin",
+     "mass_g": 7.3
+    },
+    {
+     "code": "LS-105",
+     "qty": 1,
+     "parts": [
+      "pulley_upper"
+     ],
+     "kind": "buy",
+     "name": "上带轮 Upper timing pulley",
+     "mass_g": 73.6
+    },
+    {
+     "code": "LS-106",
+     "qty": 1,
+     "parts": [
+      "pulley_lower"
+     ],
+     "kind": "buy",
+     "name": "下带轮 Lower timing pulley",
+     "mass_g": 89.6
+    },
+    {
+     "code": "LS-107",
+     "qty": 1,
+     "parts": [
+      "handwheel"
+     ],
+     "kind": "buy",
+     "name": "手轮 Handwheel",
+     "mass_g": 125.2
+    },
+    {
+     "code": "LS-108",
+     "qty": 1,
+     "parts": [
+      "handwheel_ring"
+     ],
+     "kind": "buy",
+     "name": "手轮标记环 Handwheel marker ring",
+     "mass_g": 3.1
+    },
+    {
+     "code": "LS-201",
+     "qty": 1,
+     "parts": [
+      "needle_bar"
+     ],
+     "kind": "make",
+     "name": "针杆 Needle bar",
+     "mass_g": 71.0
+    },
+    {
+     "code": "LS-202",
+     "qty": 1,
+     "parts": [
+      "needle_clamp"
+     ],
+     "kind": "buy",
+     "name": "针夹 Needle clamp",
+     "mass_g": 3.2
+    },
+    {
+     "code": "LS-203",
+     "qty": 1,
+     "parts": [
+      "nb_link"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块 Needle-bar connecting block",
+     "mass_g": 17.2
+    },
+    {
+     "code": "LS-204",
+     "qty": 1,
+     "parts": [
+      "rod"
+     ],
+     "kind": "buy",
+     "name": "针杆连杆 Needle-bar connecting rod",
+     "mass_g": 46.2
+    },
+    {
+     "code": "LS-205",
+     "qty": 1,
+     "parts": [
+      "lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆 Take-up lever",
+     "mass_g": 24.2
+    },
+    {
+     "code": "LS-206",
+     "qty": 1,
+     "parts": [
+      "rocker"
+     ],
+     "kind": "buy",
+     "name": "挑线摇杆 Take-up rocker",
+     "mass_g": 10.9
+    },
+    {
+     "code": "LS-207",
+     "qty": 1,
+     "parts": [
+      "pin_M"
+     ],
+     "kind": "buy",
+     "name": "挑线杆销 M Take-up pin M",
+     "mass_g": 2.1
+    },
+    {
+     "code": "LS-208",
+     "qty": 1,
+     "parts": [
+      "stud_Q"
+     ],
+     "kind": "buy",
+     "name": "摇杆支点销 Q Rocker stud Q",
+     "mass_g": 4.5
+    },
+    {
+     "code": "LS-209",
+     "qty": 1,
+     "parts": [
+      "thread_guide"
+     ],
+     "kind": "buy",
+     "name": "过线环 Thread guide",
+     "mass_g": 0.8
+    },
+    {
+     "code": "LS-301D",
+     "qty": 1,
+     "parts": [
+      "hook"
+     ],
+     "kind": "make",
+     "name": "旋梭 Rotary hook",
+     "mass_g": 46.6
+    },
+    {
+     "code": "LS-302",
+     "qty": 1,
+     "parts": [
+      "hook_shaft"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴 Hook shaft",
+     "mass_g": 42.6
+    },
+    {
+     "code": "LS-303",
+     "qty": 1,
+     "parts": [
+      "gear_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴齿轮 z20 Hook-shaft gear z20",
+     "mass_g": 21.6
+    },
+    {
+     "code": "LS-304",
+     "qty": 1,
+     "parts": [
+      "gear_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴齿轮 z40 Lower-shaft gear z40",
+     "mass_g": 86.3
+    },
+    {
+     "code": "LS-305",
+     "qty": 2,
+     "parts": [
+      "bushes_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴铜套 Hook-shaft bushings",
+     "mass_g": 18.6
+    },
+    {
+     "code": "LS-401",
+     "qty": 1,
+     "parts": [
+      "feed_ecc"
+     ],
+     "kind": "make",
+     "name": "送布偏心 Feed eccentric",
+     "mass_g": 20.7
+    },
+    {
+     "code": "LS-402",
+     "qty": 1,
+     "parts": [
+      "lift_ecc"
+     ],
+     "kind": "make",
+     "name": "抬牙偏心 Lift eccentric",
+     "mass_g": 12.6
+    },
+    {
+     "code": "LS-403",
+     "qty": 1,
+     "parts": [
+      "feed_rod"
+     ],
+     "kind": "buy",
+     "name": "送布连杆 Feed connecting rod",
+     "mass_g": 48.6
+    },
+    {
+     "code": "LS-404",
+     "qty": 1,
+     "parts": [
+      "regulator"
+     ],
+     "kind": "buy",
+     "name": "送布调节器 Feed regulator",
+     "mass_g": 28.6
+    },
+    {
+     "code": "LS-405",
+     "qty": 1,
+     "parts": [
+      "reg_slider"
+     ],
+     "kind": "buy",
+     "name": "调节器滑块 Regulator slider",
+     "mass_g": 7.2
+    },
+    {
+     "code": "LS-406",
+     "qty": 1,
+     "parts": [
+      "feed_link"
+     ],
+     "kind": "buy",
+     "name": "水平连杆 Feed link",
+     "mass_g": 28.3
+    },
+    {
+     "code": "LS-407",
+     "qty": 1,
+     "parts": [
+      "feed_rock"
+     ],
+     "kind": "buy",
+     "name": "送布摆轴 Feed rock shaft",
+     "mass_g": 196.3
+    },
+    {
+     "code": "LS-408",
+     "qty": 1,
+     "parts": [
+      "feed_bar"
+     ],
+     "kind": "buy",
+     "name": "牙架与送布牙 Feed bar & feed dog",
+     "mass_g": 29.2
+    },
+    {
+     "code": "LS-409",
+     "qty": 1,
+     "parts": [
+      "lift_link"
+     ],
+     "kind": "buy",
+     "name": "抬牙连杆 Lift link",
+     "mass_g": 15.8
+    },
+    {
+     "code": "LS-410",
+     "qty": 1,
+     "parts": [
+      "lift_rock"
+     ],
+     "kind": "buy",
+     "name": "抬牙摆轴 Lift rock shaft",
+     "mass_g": 76.2
+    },
+    {
+     "code": "LS-411",
+     "qty": 1,
+     "parts": [
+      "oil_ecc"
+     ],
+     "kind": "buy",
+     "name": "油泵偏心 Oil-pump eccentric",
+     "mass_g": 4.1
+    },
+    {
+     "code": "LS-412",
+     "qty": 1,
+     "parts": [
+      "oil_plunger"
+     ],
+     "kind": "buy",
+     "name": "油泵柱塞 Oil-pump plunger",
+     "mass_g": 1.2
+    },
+    {
+     "code": "LS-413",
+     "qty": 1,
+     "parts": [
+      "oil_pump"
+     ],
+     "kind": "buy",
+     "name": "油泵体 Oil-pump body",
+     "mass_g": 18.2
+    },
+    {
+     "code": "LS-501",
+     "qty": 1,
+     "parts": [
+      "presser_bar"
+     ],
+     "kind": "buy",
+     "name": "压脚杆 Presser bar",
+     "mass_g": 46.4
+    },
+    {
+     "code": "LS-502",
+     "qty": 1,
+     "parts": [
+      "presser_collar"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧座 Presser spring collar",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-503",
+     "qty": 1,
+     "parts": [
+      "presser_foot"
+     ],
+     "kind": "buy",
+     "name": "压脚 Presser foot",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-504",
+     "qty": 1,
+     "parts": [
+      "lift_bracket"
+     ],
+     "kind": "buy",
+     "name": "抬压脚板 Presser lifting bracket",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-505",
+     "qty": 1,
+     "parts": [
+      "presser_screw"
+     ],
+     "kind": "buy",
+     "name": "调压螺钉 Pressure adjusting screw",
+     "mass_g": 44.3
+    },
+    {
+     "code": "LS-506",
+     "qty": 1,
+     "parts": [
+      "presser_spring"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧 Presser spring",
+     "mass_g": 39.0
+    },
+    {
+     "code": "LS-507",
+     "qty": 2,
+     "parts": [
+      "presser_bushes"
+     ],
+     "kind": "buy",
+     "name": "压脚杆导套 Presser-bar bushings",
+     "mass_g": 11.7
+    },
+    {
+     "code": "LS-508",
+     "qty": 1,
+     "parts": [
+      "hand_lifter"
+     ],
+     "kind": "buy",
+     "name": "手抬扳手 Hand lifter",
+     "mass_g": 61.1
+    },
+    {
+     "code": "LS-509",
+     "qty": 1,
+     "parts": [
+      "knee_c1"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C1 Knee-lift crank C1",
+     "mass_g": 20.3
+    },
+    {
+     "code": "LS-510",
+     "qty": 1,
+     "parts": [
+      "knee_c2"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C2 Knee-lift crank C2",
+     "mass_g": 22.6
+    },
+    {
+     "code": "LS-511",
+     "qty": 1,
+     "parts": [
+      "knee_rod"
+     ],
+     "kind": "buy",
+     "name": "膝抬拉杆 Knee-lift rod",
+     "mass_g": 99.7
+    },
+    {
+     "code": "LS-512",
+     "qty": 1,
+     "parts": [
+      "knee_push"
+     ],
+     "kind": "buy",
+     "name": "膝抬推杆 Knee-lift push rod",
+     "mass_g": 98.0
+    },
+    {
+     "code": "LS-513",
+     "qty": 1,
+     "parts": [
+      "knee_link"
+     ],
+     "kind": "buy",
+     "name": "膝抬连杆 Knee-lift link",
+     "mass_g": 5.9
+    },
+    {
+     "code": "LS-514",
+     "qty": 1,
+     "parts": [
+      "release_shaft"
+     ],
+     "kind": "buy",
+     "name": "松线轴 Tension-release shaft",
+     "mass_g": 14.3
+    },
+    {
+     "code": "LS-515",
+     "qty": 1,
+     "parts": [
+      "release_rod"
+     ],
+     "kind": "buy",
+     "name": "松线拉杆 Tension-release rod",
+     "mass_g": 5.2
+    },
+    {
+     "code": "LS-516",
+     "qty": 1,
+     "parts": [
+      "release_lever"
+     ],
+     "kind": "buy",
+     "name": "松线杆 Tension-release lever",
+     "mass_g": 15.7
+    },
+    {
+     "code": "LS-517",
+     "qty": 1,
+     "parts": [
+      "release_pin"
+     ],
+     "kind": "buy",
+     "name": "松线顶针 Tension-release pin",
+     "mass_g": 0.4
+    },
+    {
+     "code": "LS-518",
+     "qty": 1,
+     "parts": [
+      "tension_post"
+     ],
+     "kind": "buy",
+     "name": "夹线柱 Tension post",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-519",
+     "qty": 1,
+     "parts": [
+      "tension_discs"
+     ],
+     "kind": "buy",
+     "name": "夹线盘 Tension discs",
+     "mass_g": 5.6
+    },
+    {
+     "code": "LS-520",
+     "qty": 1,
+     "parts": [
+      "tension_spring"
+     ],
+     "kind": "buy",
+     "name": "夹线簧 Tension spring",
+     "mass_g": 1.3
+    },
+    {
+     "code": "LS-521",
+     "qty": 1,
+     "parts": [
+      "tension_nut"
+     ],
+     "kind": "buy",
+     "name": "夹线螺母 Tension nut",
+     "mass_g": 2.2
+    },
+    {
+     "code": "LS-522",
+     "qty": 1,
+     "parts": [
+      "check_spring"
+     ],
+     "kind": "buy",
+     "name": "挑线簧 Check spring",
+     "mass_g": 0.2
+    },
+    {
+     "code": "LS-523",
+     "qty": 1,
+     "parts": [
+      "stitch_dial"
+     ],
+     "kind": "buy",
+     "name": "针距旋钮 Stitch-length dial",
+     "mass_g": 205.0
+    },
+    {
+     "code": "LS-524",
+     "qty": 1,
+     "parts": [
+      "pull_rod"
+     ],
+     "kind": "buy",
+     "name": "针距拉杆 Stitch-length pull rod",
+     "mass_g": 51.0
+    },
+    {
+     "code": "LS-525",
+     "qty": 1,
+     "parts": [
+      "reverse_lever"
+     ],
+     "kind": "buy",
+     "name": "倒缝扳手 Reverse lever",
+     "mass_g": 66.3
+    },
+    {
+     "code": "LS-526",
+     "qty": 1,
+     "parts": [
+      "reverse_spring"
+     ],
+     "kind": "buy",
+     "name": "倒缝拉簧 Reverse return spring",
+     "mass_g": 2.6
+    },
+    {
+     "code": "LS-701",
+     "qty": 1,
+     "parts": [
+      "moving_knife"
+     ],
+     "kind": "buy",
+     "name": "动刀 Moving knife",
+     "mass_g": 5.1
+    },
+    {
+     "code": "LS-702",
+     "qty": 1,
+     "parts": [
+      "knife_shaft"
+     ],
+     "kind": "buy",
+     "name": "动刀轴 Moving-knife shaft",
+     "mass_g": 20.2
+    },
+    {
+     "code": "LS-703",
+     "qty": 1,
+     "parts": [
+      "fixed_knife"
+     ],
+     "kind": "buy",
+     "name": "定刀 Fixed knife",
+     "mass_g": 2.0
+    },
+    {
+     "code": "LS-704",
+     "qty": 1,
+     "parts": [
+      "trim_base"
+     ],
+     "kind": "buy",
+     "name": "动刀轴座 Knife-shaft base",
+     "mass_g": 35.7
+    },
+    {
+     "code": "LS-705",
+     "qty": 1,
+     "parts": [
+      "trim_rock"
+     ],
+     "kind": "buy",
+     "name": "剪线摆轴 Trimmer rock shaft",
+     "mass_g": 106.8
+    },
+    {
+     "code": "LS-706",
+     "qty": 1,
+     "parts": [
+      "trim_brackets"
+     ],
+     "kind": "buy",
+     "name": "摆轴座 Rock-shaft brackets",
+     "mass_g": 78.7
+    },
+    {
+     "code": "LS-707",
+     "qty": 1,
+     "parts": [
+      "trim_link"
+     ],
+     "kind": "buy",
+     "name": "剪线拉杆 Trimmer link",
+     "mass_g": 5.8
+    },
+    {
+     "code": "LS-708",
+     "qty": 1,
+     "parts": [
+      "trim_lever"
+     ],
+     "kind": "buy",
+     "name": "剪线摆杆 Trimmer cam lever",
+     "mass_g": 25.5
+    },
+    {
+     "code": "LS-709",
+     "qty": 1,
+     "parts": [
+      "trim_roller"
+     ],
+     "kind": "buy",
+     "name": "凸轮滚子 Cam roller",
+     "mass_g": 1.6
+    },
+    {
+     "code": "LS-710",
+     "qty": 1,
+     "parts": [
+      "trim_cam"
+     ],
+     "kind": "make",
+     "name": "剪线凸轮 Trimmer cam",
+     "mass_g": 140.9
+    },
+    {
+     "code": "LS-711",
+     "qty": 1,
+     "parts": [
+      "wiper"
+     ],
+     "kind": "buy",
+     "name": "拨线钩 Thread wiper",
+     "mass_g": 6.7
+    },
+    {
+     "code": "LS-712",
+     "qty": 1,
+     "parts": [
+      "release_arm_t"
+     ],
+     "kind": "buy",
+     "name": "松线臂 Release arm",
+     "mass_g": 2.1
+    }
+   ]
+  },
+  "WQ-LS-TE": {
+   "options": {
+    "T": true,
+    "E": true,
+    "D": false
+   },
+   "price": 680,
+   "lines": [
+    {
+     "code": "BUY-BELT-E",
+     "qty": 1,
+     "parts": [
+      "estep_belt"
+     ],
+     "kind": "buy",
+     "name": "针距同步带 Stitch-drive belt",
+     "mass_g": 1.7
+    },
+    {
+     "code": "BUY-BELT-LS",
+     "qty": 1,
+     "parts": [
+      "belt"
+     ],
+     "kind": "buy",
+     "name": "同步带 Timing belt",
+     "mass_g": 21.0
+    },
+    {
+     "code": "BUY-BOBCASE",
+     "qty": 1,
+     "parts": [
+      "bobbin_case"
+     ],
+     "kind": "buy",
+     "name": "梭壳与梭芯 Bobbin case & bobbin",
+     "mass_g": 31.2
+    },
+    {
+     "code": "BUY-BOX-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "包装箱与附件包",
+     "extra": "包装箱与附件包",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6201",
+     "qty": 3,
+     "parts": [
+      "bearings_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴轴承 6201 Lower shaft bearings 6201",
+     "mass_g": 57.6,
+     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+    },
+    {
+     "code": "BUY-BRG-6202",
+     "qty": 1,
+     "parts": [
+      "bearing_front"
+     ],
+     "kind": "buy",
+     "name": "上轴前轴承 6202 Front bearing 6202",
+     "mass_g": 66.2
+    },
+    {
+     "code": "BUY-BTN-E",
+     "qty": 1,
+     "parts": [
+      "reverse_button"
+     ],
+     "kind": "buy",
+     "name": "倒缝按钮 Reverse button",
+     "mass_g": 3.1
+    },
+    {
+     "code": "BUY-COVERS-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "extra": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-CTRL-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "电控箱（GC 设计，外购）",
+     "extra": "电控箱（GC 设计，外购）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-MOTOR-LS",
+     "qty": 1,
+     "parts": [
+      "encoder_disc",
+      "motor_bolts",
+      "motor_cap",
+      "motor_housing",
+      "motor_rods",
+      "rotor",
+      "rotor_magnets",
+      "stator_core",
+      "stator_winding"
+     ],
+     "kind": "buy",
+     "name": "直驱电机 Direct-drive motor",
+     "mass_g": 2422.6
+    },
+    {
+     "code": "BUY-NEEDLE-DB",
+     "qty": 1,
+     "parts": [
+      "needle"
+     ],
+     "kind": "buy",
+     "name": "机针 DB×1 Needle DB×1",
+     "mass_g": 0.3
+    },
+    {
+     "code": "BUY-OILPAN-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "油盘",
+     "extra": "油盘",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLATE-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "针板与推板（三维没有画）",
+     "extra": "针板与推板（三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M4",
+     "qty": 20,
+     "parts": [],
+     "kind": "buy",
+     "name": "螺钉 M4（数量为示例）",
+     "extra": "螺钉 M4（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M5",
+     "qty": 40,
+     "parts": [],
+     "kind": "buy",
+     "name": "内六角螺钉 M5（数量为示例）",
+     "extra": "内六角螺钉 M5（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SOL-REL",
+     "qty": 1,
+     "parts": [
+      "release_solenoid"
+     ],
+     "kind": "buy",
+     "name": "松线电磁铁 Release solenoid",
+     "mass_g": 42.4
+    },
+    {
+     "code": "BUY-SOL-TRIM",
+     "qty": 1,
+     "parts": [
+      "trim_solenoid"
+     ],
+     "kind": "buy",
+     "name": "剪线电磁铁 Trimmer solenoid",
+     "mass_g": 55.4
+    },
+    {
+     "code": "BUY-SOL-WIPE",
+     "qty": 1,
+     "parts": [
+      "wiper_solenoid"
+     ],
+     "kind": "buy",
+     "name": "拨线电磁铁 Wiper solenoid",
+     "mass_g": 25.4
+    },
+    {
+     "code": "BUY-STEP-42",
+     "qty": 1,
+     "parts": [
+      "estep_motor"
+     ],
+     "kind": "buy",
+     "name": "步进电机 42 型（48 mm） Stepper motor NEMA 17 (48 mm)",
+     "mass_g": 819.3
+    },
+    {
+     "code": "HSG-LS",
+     "qty": 1,
+     "parts": [
+      "housing_upper",
+      "housing_lower"
+     ],
+     "kind": "make",
+     "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
+     "mass_g": 24208.0
+    },
+    {
+     "code": "LS-101",
+     "qty": 1,
+     "parts": [
+      "shaft"
+     ],
+     "kind": "make",
+     "name": "上轴 Upper shaft",
+     "mass_g": 621.7
+    },
+    {
+     "code": "LS-102",
+     "qty": 1,
+     "parts": [
+      "lower_shaft"
+     ],
+     "kind": "make",
+     "name": "下轴 Lower shaft",
+     "mass_g": 278.8
+    },
+    {
+     "code": "LS-103",
+     "qty": 1,
+     "parts": [
+      "crank"
+     ],
+     "kind": "buy",
+     "name": "曲柄（带平衡块） Crank with counterweight",
+     "mass_g": 109.8
+    },
+    {
+     "code": "LS-104",
+     "qty": 1,
+     "parts": [
+      "crank_pin"
+     ],
+     "kind": "buy",
+     "name": "曲柄销 Crank pin",
+     "mass_g": 7.3
+    },
+    {
+     "code": "LS-105",
+     "qty": 1,
+     "parts": [
+      "pulley_upper"
+     ],
+     "kind": "buy",
+     "name": "上带轮 Upper timing pulley",
+     "mass_g": 73.6
+    },
+    {
+     "code": "LS-106",
+     "qty": 1,
+     "parts": [
+      "pulley_lower"
+     ],
+     "kind": "buy",
+     "name": "下带轮 Lower timing pulley",
+     "mass_g": 89.6
+    },
+    {
+     "code": "LS-107",
+     "qty": 1,
+     "parts": [
+      "handwheel"
+     ],
+     "kind": "buy",
+     "name": "手轮 Handwheel",
+     "mass_g": 125.2
+    },
+    {
+     "code": "LS-108",
+     "qty": 1,
+     "parts": [
+      "handwheel_ring"
+     ],
+     "kind": "buy",
+     "name": "手轮标记环 Handwheel marker ring",
+     "mass_g": 3.1
+    },
+    {
+     "code": "LS-201",
+     "qty": 1,
+     "parts": [
+      "needle_bar"
+     ],
+     "kind": "make",
+     "name": "针杆 Needle bar",
+     "mass_g": 71.0
+    },
+    {
+     "code": "LS-202",
+     "qty": 1,
+     "parts": [
+      "needle_clamp"
+     ],
+     "kind": "buy",
+     "name": "针夹 Needle clamp",
+     "mass_g": 3.2
+    },
+    {
+     "code": "LS-203",
+     "qty": 1,
+     "parts": [
+      "nb_link"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块 Needle-bar connecting block",
+     "mass_g": 17.2
+    },
+    {
+     "code": "LS-204",
+     "qty": 1,
+     "parts": [
+      "rod"
+     ],
+     "kind": "buy",
+     "name": "针杆连杆 Needle-bar connecting rod",
+     "mass_g": 46.2
+    },
+    {
+     "code": "LS-205",
+     "qty": 1,
+     "parts": [
+      "lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆 Take-up lever",
+     "mass_g": 24.2
+    },
+    {
+     "code": "LS-206",
+     "qty": 1,
+     "parts": [
+      "rocker"
+     ],
+     "kind": "buy",
+     "name": "挑线摇杆 Take-up rocker",
+     "mass_g": 10.9
+    },
+    {
+     "code": "LS-207",
+     "qty": 1,
+     "parts": [
+      "pin_M"
+     ],
+     "kind": "buy",
+     "name": "挑线杆销 M Take-up pin M",
+     "mass_g": 2.1
+    },
+    {
+     "code": "LS-208",
+     "qty": 1,
+     "parts": [
+      "stud_Q"
+     ],
+     "kind": "buy",
+     "name": "摇杆支点销 Q Rocker stud Q",
+     "mass_g": 4.5
+    },
+    {
+     "code": "LS-209",
+     "qty": 1,
+     "parts": [
+      "thread_guide"
+     ],
+     "kind": "buy",
+     "name": "过线环 Thread guide",
+     "mass_g": 0.8
+    },
+    {
+     "code": "LS-301",
+     "qty": 1,
+     "parts": [
+      "hook"
+     ],
+     "kind": "make",
+     "name": "旋梭 Rotary hook",
+     "mass_g": 46.6
+    },
+    {
+     "code": "LS-302",
+     "qty": 1,
+     "parts": [
+      "hook_shaft"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴 Hook shaft",
+     "mass_g": 42.6
+    },
+    {
+     "code": "LS-303",
+     "qty": 1,
+     "parts": [
+      "gear_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴齿轮 z20 Hook-shaft gear z20",
+     "mass_g": 21.6
+    },
+    {
+     "code": "LS-304",
+     "qty": 1,
+     "parts": [
+      "gear_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴齿轮 z40 Lower-shaft gear z40",
+     "mass_g": 86.3
+    },
+    {
+     "code": "LS-305",
+     "qty": 2,
+     "parts": [
+      "bushes_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴铜套 Hook-shaft bushings",
+     "mass_g": 18.6
+    },
+    {
+     "code": "LS-401",
+     "qty": 1,
+     "parts": [
+      "feed_ecc"
+     ],
+     "kind": "make",
+     "name": "送布偏心 Feed eccentric",
+     "mass_g": 20.7
+    },
+    {
+     "code": "LS-402",
+     "qty": 1,
+     "parts": [
+      "lift_ecc"
+     ],
+     "kind": "make",
+     "name": "抬牙偏心 Lift eccentric",
+     "mass_g": 12.6
+    },
+    {
+     "code": "LS-403",
+     "qty": 1,
+     "parts": [
+      "feed_rod"
+     ],
+     "kind": "buy",
+     "name": "送布连杆 Feed connecting rod",
+     "mass_g": 48.6
+    },
+    {
+     "code": "LS-404",
+     "qty": 1,
+     "parts": [
+      "regulator"
+     ],
+     "kind": "buy",
+     "name": "送布调节器 Feed regulator",
+     "mass_g": 28.6
+    },
+    {
+     "code": "LS-405",
+     "qty": 1,
+     "parts": [
+      "reg_slider"
+     ],
+     "kind": "buy",
+     "name": "调节器滑块 Regulator slider",
+     "mass_g": 7.2
+    },
+    {
+     "code": "LS-406",
+     "qty": 1,
+     "parts": [
+      "feed_link"
+     ],
+     "kind": "buy",
+     "name": "水平连杆 Feed link",
+     "mass_g": 28.3
+    },
+    {
+     "code": "LS-407",
+     "qty": 1,
+     "parts": [
+      "feed_rock"
+     ],
+     "kind": "buy",
+     "name": "送布摆轴 Feed rock shaft",
+     "mass_g": 196.3
+    },
+    {
+     "code": "LS-408",
+     "qty": 1,
+     "parts": [
+      "feed_bar"
+     ],
+     "kind": "buy",
+     "name": "牙架与送布牙 Feed bar & feed dog",
+     "mass_g": 29.2
+    },
+    {
+     "code": "LS-409",
+     "qty": 1,
+     "parts": [
+      "lift_link"
+     ],
+     "kind": "buy",
+     "name": "抬牙连杆 Lift link",
+     "mass_g": 15.8
+    },
+    {
+     "code": "LS-410",
+     "qty": 1,
+     "parts": [
+      "lift_rock"
+     ],
+     "kind": "buy",
+     "name": "抬牙摆轴 Lift rock shaft",
+     "mass_g": 76.2
+    },
+    {
+     "code": "LS-411",
+     "qty": 1,
+     "parts": [
+      "oil_ecc"
+     ],
+     "kind": "buy",
+     "name": "油泵偏心 Oil-pump eccentric",
+     "mass_g": 4.1
+    },
+    {
+     "code": "LS-412",
+     "qty": 1,
+     "parts": [
+      "oil_plunger"
+     ],
+     "kind": "buy",
+     "name": "油泵柱塞 Oil-pump plunger",
+     "mass_g": 1.2
+    },
+    {
+     "code": "LS-413",
+     "qty": 1,
+     "parts": [
+      "oil_pump"
+     ],
+     "kind": "buy",
+     "name": "油泵体 Oil-pump body",
+     "mass_g": 18.2
+    },
+    {
+     "code": "LS-501",
+     "qty": 1,
+     "parts": [
+      "presser_bar"
+     ],
+     "kind": "buy",
+     "name": "压脚杆 Presser bar",
+     "mass_g": 46.4
+    },
+    {
+     "code": "LS-502",
+     "qty": 1,
+     "parts": [
+      "presser_collar"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧座 Presser spring collar",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-503",
+     "qty": 1,
+     "parts": [
+      "presser_foot"
+     ],
+     "kind": "buy",
+     "name": "压脚 Presser foot",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-504",
+     "qty": 1,
+     "parts": [
+      "lift_bracket"
+     ],
+     "kind": "buy",
+     "name": "抬压脚板 Presser lifting bracket",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-505",
+     "qty": 1,
+     "parts": [
+      "presser_screw"
+     ],
+     "kind": "buy",
+     "name": "调压螺钉 Pressure adjusting screw",
+     "mass_g": 44.3
+    },
+    {
+     "code": "LS-506",
+     "qty": 1,
+     "parts": [
+      "presser_spring"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧 Presser spring",
+     "mass_g": 39.0
+    },
+    {
+     "code": "LS-507",
+     "qty": 2,
+     "parts": [
+      "presser_bushes"
+     ],
+     "kind": "buy",
+     "name": "压脚杆导套 Presser-bar bushings",
+     "mass_g": 11.7
+    },
+    {
+     "code": "LS-508",
+     "qty": 1,
+     "parts": [
+      "hand_lifter"
+     ],
+     "kind": "buy",
+     "name": "手抬扳手 Hand lifter",
+     "mass_g": 61.1
+    },
+    {
+     "code": "LS-509",
+     "qty": 1,
+     "parts": [
+      "knee_c1"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C1 Knee-lift crank C1",
+     "mass_g": 20.3
+    },
+    {
+     "code": "LS-510",
+     "qty": 1,
+     "parts": [
+      "knee_c2"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C2 Knee-lift crank C2",
+     "mass_g": 22.6
+    },
+    {
+     "code": "LS-511",
+     "qty": 1,
+     "parts": [
+      "knee_rod"
+     ],
+     "kind": "buy",
+     "name": "膝抬拉杆 Knee-lift rod",
+     "mass_g": 99.7
+    },
+    {
+     "code": "LS-512",
+     "qty": 1,
+     "parts": [
+      "knee_push"
+     ],
+     "kind": "buy",
+     "name": "膝抬推杆 Knee-lift push rod",
+     "mass_g": 98.0
+    },
+    {
+     "code": "LS-513",
+     "qty": 1,
+     "parts": [
+      "knee_link"
+     ],
+     "kind": "buy",
+     "name": "膝抬连杆 Knee-lift link",
+     "mass_g": 5.9
+    },
+    {
+     "code": "LS-514",
+     "qty": 1,
+     "parts": [
+      "release_shaft"
+     ],
+     "kind": "buy",
+     "name": "松线轴 Tension-release shaft",
+     "mass_g": 14.3
+    },
+    {
+     "code": "LS-515",
+     "qty": 1,
+     "parts": [
+      "release_rod"
+     ],
+     "kind": "buy",
+     "name": "松线拉杆 Tension-release rod",
+     "mass_g": 5.2
+    },
+    {
+     "code": "LS-516",
+     "qty": 1,
+     "parts": [
+      "release_lever"
+     ],
+     "kind": "buy",
+     "name": "松线杆 Tension-release lever",
+     "mass_g": 15.7
+    },
+    {
+     "code": "LS-517",
+     "qty": 1,
+     "parts": [
+      "release_pin"
+     ],
+     "kind": "buy",
+     "name": "松线顶针 Tension-release pin",
+     "mass_g": 0.4
+    },
+    {
+     "code": "LS-518",
+     "qty": 1,
+     "parts": [
+      "tension_post"
+     ],
+     "kind": "buy",
+     "name": "夹线柱 Tension post",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-519",
+     "qty": 1,
+     "parts": [
+      "tension_discs"
+     ],
+     "kind": "buy",
+     "name": "夹线盘 Tension discs",
+     "mass_g": 5.6
+    },
+    {
+     "code": "LS-520",
+     "qty": 1,
+     "parts": [
+      "tension_spring"
+     ],
+     "kind": "buy",
+     "name": "夹线簧 Tension spring",
+     "mass_g": 1.3
+    },
+    {
+     "code": "LS-521",
+     "qty": 1,
+     "parts": [
+      "tension_nut"
+     ],
+     "kind": "buy",
+     "name": "夹线螺母 Tension nut",
+     "mass_g": 2.2
+    },
+    {
+     "code": "LS-522",
+     "qty": 1,
+     "parts": [
+      "check_spring"
+     ],
+     "kind": "buy",
+     "name": "挑线簧 Check spring",
+     "mass_g": 0.2
+    },
+    {
+     "code": "LS-701",
+     "qty": 1,
+     "parts": [
+      "moving_knife"
+     ],
+     "kind": "buy",
+     "name": "动刀 Moving knife",
+     "mass_g": 5.1
+    },
+    {
+     "code": "LS-702",
+     "qty": 1,
+     "parts": [
+      "knife_shaft"
+     ],
+     "kind": "buy",
+     "name": "动刀轴 Moving-knife shaft",
+     "mass_g": 20.2
+    },
+    {
+     "code": "LS-703",
+     "qty": 1,
+     "parts": [
+      "fixed_knife"
+     ],
+     "kind": "buy",
+     "name": "定刀 Fixed knife",
+     "mass_g": 2.0
+    },
+    {
+     "code": "LS-704",
+     "qty": 1,
+     "parts": [
+      "trim_base"
+     ],
+     "kind": "buy",
+     "name": "动刀轴座 Knife-shaft base",
+     "mass_g": 35.7
+    },
+    {
+     "code": "LS-705",
+     "qty": 1,
+     "parts": [
+      "trim_rock"
+     ],
+     "kind": "buy",
+     "name": "剪线摆轴 Trimmer rock shaft",
+     "mass_g": 106.8
+    },
+    {
+     "code": "LS-706",
+     "qty": 1,
+     "parts": [
+      "trim_brackets"
+     ],
+     "kind": "buy",
+     "name": "摆轴座 Rock-shaft brackets",
+     "mass_g": 78.7
+    },
+    {
+     "code": "LS-707",
+     "qty": 1,
+     "parts": [
+      "trim_link"
+     ],
+     "kind": "buy",
+     "name": "剪线拉杆 Trimmer link",
+     "mass_g": 5.8
+    },
+    {
+     "code": "LS-708",
+     "qty": 1,
+     "parts": [
+      "trim_lever"
+     ],
+     "kind": "buy",
+     "name": "剪线摆杆 Trimmer cam lever",
+     "mass_g": 25.5
+    },
+    {
+     "code": "LS-709",
+     "qty": 1,
+     "parts": [
+      "trim_roller"
+     ],
+     "kind": "buy",
+     "name": "凸轮滚子 Cam roller",
+     "mass_g": 1.6
+    },
+    {
+     "code": "LS-710",
+     "qty": 1,
+     "parts": [
+      "trim_cam"
+     ],
+     "kind": "make",
+     "name": "剪线凸轮 Trimmer cam",
+     "mass_g": 140.9
+    },
+    {
+     "code": "LS-711",
+     "qty": 1,
+     "parts": [
+      "wiper"
+     ],
+     "kind": "buy",
+     "name": "拨线钩 Thread wiper",
+     "mass_g": 6.7
+    },
+    {
+     "code": "LS-712",
+     "qty": 1,
+     "parts": [
+      "release_arm_t"
+     ],
+     "kind": "buy",
+     "name": "松线臂 Release arm",
+     "mass_g": 2.1
+    },
+    {
+     "code": "LS-801",
+     "qty": 1,
+     "parts": [
+      "estep_bracket"
+     ],
+     "kind": "buy",
+     "name": "步进电机支架 Stepper bracket",
+     "mass_g": 28.9
+    },
+    {
+     "code": "LS-802",
+     "qty": 1,
+     "parts": [
+      "estep_pulley_m"
+     ],
+     "kind": "buy",
+     "name": "电机带轮 Motor pulley",
+     "mass_g": 19.1
+    },
+    {
+     "code": "LS-803",
+     "qty": 1,
+     "parts": [
+      "estep_pulley_r"
+     ],
+     "kind": "buy",
+     "name": "调节器带轮 Regulator pulley",
+     "mass_g": 35.7
+    }
+   ]
+  },
+  "WQ-LS-TED": {
+   "options": {
+    "T": true,
+    "E": true,
+    "D": true
+   },
+   "price": 695,
+   "lines": [
+    {
+     "code": "BUY-BELT-E",
+     "qty": 1,
+     "parts": [
+      "estep_belt"
+     ],
+     "kind": "buy",
+     "name": "针距同步带 Stitch-drive belt",
+     "mass_g": 1.7
+    },
+    {
+     "code": "BUY-BELT-LS",
+     "qty": 1,
+     "parts": [
+      "belt"
+     ],
+     "kind": "buy",
+     "name": "同步带 Timing belt",
+     "mass_g": 21.0
+    },
+    {
+     "code": "BUY-BOBCASE",
+     "qty": 1,
+     "parts": [
+      "bobbin_case"
+     ],
+     "kind": "buy",
+     "name": "梭壳与梭芯 Bobbin case & bobbin",
+     "mass_g": 31.2
+    },
+    {
+     "code": "BUY-BOX-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "包装箱与附件包",
+     "extra": "包装箱与附件包",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6201",
+     "qty": 3,
+     "parts": [
+      "bearings_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴轴承 6201 Lower shaft bearings 6201",
+     "mass_g": 57.6,
+     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+    },
+    {
+     "code": "BUY-BRG-6202",
+     "qty": 1,
+     "parts": [
+      "bearing_front"
+     ],
+     "kind": "buy",
+     "name": "上轴前轴承 6202 Front bearing 6202",
+     "mass_g": 66.2
+    },
+    {
+     "code": "BUY-BTN-E",
+     "qty": 1,
+     "parts": [
+      "reverse_button"
+     ],
+     "kind": "buy",
+     "name": "倒缝按钮 Reverse button",
+     "mass_g": 3.1
+    },
+    {
+     "code": "BUY-COVERS-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "extra": "面板、后盖、顶盖（G3 定了做法，三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-CTRL-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "电控箱（GC 设计，外购）",
+     "extra": "电控箱（GC 设计，外购）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-MOTOR-LS",
+     "qty": 1,
+     "parts": [
+      "encoder_disc",
+      "motor_bolts",
+      "motor_cap",
+      "motor_housing",
+      "motor_rods",
+      "rotor",
+      "rotor_magnets",
+      "stator_core",
+      "stator_winding"
+     ],
+     "kind": "buy",
+     "name": "直驱电机 Direct-drive motor",
+     "mass_g": 2422.6
+    },
+    {
+     "code": "BUY-NEEDLE-DB",
+     "qty": 1,
+     "parts": [
+      "needle"
+     ],
+     "kind": "buy",
+     "name": "机针 DB×1 Needle DB×1",
+     "mass_g": 0.3
+    },
+    {
+     "code": "BUY-OILPAN-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "油盘",
+     "extra": "油盘",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLATE-LS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "针板与推板（三维没有画）",
+     "extra": "针板与推板（三维没有画）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M4",
+     "qty": 20,
+     "parts": [],
+     "kind": "buy",
+     "name": "螺钉 M4（数量为示例）",
+     "extra": "螺钉 M4（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SCREW-M5",
+     "qty": 40,
+     "parts": [],
+     "kind": "buy",
+     "name": "内六角螺钉 M5（数量为示例）",
+     "extra": "内六角螺钉 M5（数量为示例）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-SOL-REL",
+     "qty": 1,
+     "parts": [
+      "release_solenoid"
+     ],
+     "kind": "buy",
+     "name": "松线电磁铁 Release solenoid",
+     "mass_g": 42.4
+    },
+    {
+     "code": "BUY-SOL-TRIM",
+     "qty": 1,
+     "parts": [
+      "trim_solenoid"
+     ],
+     "kind": "buy",
+     "name": "剪线电磁铁 Trimmer solenoid",
+     "mass_g": 55.4
+    },
+    {
+     "code": "BUY-SOL-WIPE",
+     "qty": 1,
+     "parts": [
+      "wiper_solenoid"
+     ],
+     "kind": "buy",
+     "name": "拨线电磁铁 Wiper solenoid",
+     "mass_g": 25.4
+    },
+    {
+     "code": "BUY-STEP-42",
+     "qty": 1,
+     "parts": [
+      "estep_motor"
+     ],
+     "kind": "buy",
+     "name": "步进电机 42 型（48 mm） Stepper motor NEMA 17 (48 mm)",
+     "mass_g": 819.3
+    },
+    {
+     "code": "HSG-LS",
+     "qty": 1,
+     "parts": [
+      "housing_upper",
+      "housing_lower"
+     ],
+     "kind": "make",
+     "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
+     "mass_g": 24208.0
+    },
+    {
+     "code": "LS-101",
+     "qty": 1,
+     "parts": [
+      "shaft"
+     ],
+     "kind": "make",
+     "name": "上轴 Upper shaft",
+     "mass_g": 621.7
+    },
+    {
+     "code": "LS-102",
+     "qty": 1,
+     "parts": [
+      "lower_shaft"
+     ],
+     "kind": "make",
+     "name": "下轴 Lower shaft",
+     "mass_g": 278.8
+    },
+    {
+     "code": "LS-103",
+     "qty": 1,
+     "parts": [
+      "crank"
+     ],
+     "kind": "buy",
+     "name": "曲柄（带平衡块） Crank with counterweight",
+     "mass_g": 109.8
+    },
+    {
+     "code": "LS-104",
+     "qty": 1,
+     "parts": [
+      "crank_pin"
+     ],
+     "kind": "buy",
+     "name": "曲柄销 Crank pin",
+     "mass_g": 7.3
+    },
+    {
+     "code": "LS-105",
+     "qty": 1,
+     "parts": [
+      "pulley_upper"
+     ],
+     "kind": "buy",
+     "name": "上带轮 Upper timing pulley",
+     "mass_g": 73.6
+    },
+    {
+     "code": "LS-106",
+     "qty": 1,
+     "parts": [
+      "pulley_lower"
+     ],
+     "kind": "buy",
+     "name": "下带轮 Lower timing pulley",
+     "mass_g": 89.6
+    },
+    {
+     "code": "LS-107",
+     "qty": 1,
+     "parts": [
+      "handwheel"
+     ],
+     "kind": "buy",
+     "name": "手轮 Handwheel",
+     "mass_g": 125.2
+    },
+    {
+     "code": "LS-108",
+     "qty": 1,
+     "parts": [
+      "handwheel_ring"
+     ],
+     "kind": "buy",
+     "name": "手轮标记环 Handwheel marker ring",
+     "mass_g": 3.1
+    },
+    {
+     "code": "LS-201",
+     "qty": 1,
+     "parts": [
+      "needle_bar"
+     ],
+     "kind": "make",
+     "name": "针杆 Needle bar",
+     "mass_g": 71.0
+    },
+    {
+     "code": "LS-202",
+     "qty": 1,
+     "parts": [
+      "needle_clamp"
+     ],
+     "kind": "buy",
+     "name": "针夹 Needle clamp",
+     "mass_g": 3.2
+    },
+    {
+     "code": "LS-203",
+     "qty": 1,
+     "parts": [
+      "nb_link"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块 Needle-bar connecting block",
+     "mass_g": 17.2
+    },
+    {
+     "code": "LS-204",
+     "qty": 1,
+     "parts": [
+      "rod"
+     ],
+     "kind": "buy",
+     "name": "针杆连杆 Needle-bar connecting rod",
+     "mass_g": 46.2
+    },
+    {
+     "code": "LS-205",
+     "qty": 1,
+     "parts": [
+      "lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆 Take-up lever",
+     "mass_g": 24.2
+    },
+    {
+     "code": "LS-206",
+     "qty": 1,
+     "parts": [
+      "rocker"
+     ],
+     "kind": "buy",
+     "name": "挑线摇杆 Take-up rocker",
+     "mass_g": 10.9
+    },
+    {
+     "code": "LS-207",
+     "qty": 1,
+     "parts": [
+      "pin_M"
+     ],
+     "kind": "buy",
+     "name": "挑线杆销 M Take-up pin M",
+     "mass_g": 2.1
+    },
+    {
+     "code": "LS-208",
+     "qty": 1,
+     "parts": [
+      "stud_Q"
+     ],
+     "kind": "buy",
+     "name": "摇杆支点销 Q Rocker stud Q",
+     "mass_g": 4.5
+    },
+    {
+     "code": "LS-209",
+     "qty": 1,
+     "parts": [
+      "thread_guide"
+     ],
+     "kind": "buy",
+     "name": "过线环 Thread guide",
+     "mass_g": 0.8
+    },
+    {
+     "code": "LS-301D",
+     "qty": 1,
+     "parts": [
+      "hook"
+     ],
+     "kind": "make",
+     "name": "旋梭 Rotary hook",
+     "mass_g": 46.6
+    },
+    {
+     "code": "LS-302",
+     "qty": 1,
+     "parts": [
+      "hook_shaft"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴 Hook shaft",
+     "mass_g": 42.6
+    },
+    {
+     "code": "LS-303",
+     "qty": 1,
+     "parts": [
+      "gear_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴齿轮 z20 Hook-shaft gear z20",
+     "mass_g": 21.6
+    },
+    {
+     "code": "LS-304",
+     "qty": 1,
+     "parts": [
+      "gear_lower"
+     ],
+     "kind": "buy",
+     "name": "下轴齿轮 z40 Lower-shaft gear z40",
+     "mass_g": 86.3
+    },
+    {
+     "code": "LS-305",
+     "qty": 2,
+     "parts": [
+      "bushes_hook"
+     ],
+     "kind": "buy",
+     "name": "旋梭轴铜套 Hook-shaft bushings",
+     "mass_g": 18.6
+    },
+    {
+     "code": "LS-401",
+     "qty": 1,
+     "parts": [
+      "feed_ecc"
+     ],
+     "kind": "make",
+     "name": "送布偏心 Feed eccentric",
+     "mass_g": 20.7
+    },
+    {
+     "code": "LS-402",
+     "qty": 1,
+     "parts": [
+      "lift_ecc"
+     ],
+     "kind": "make",
+     "name": "抬牙偏心 Lift eccentric",
+     "mass_g": 12.6
+    },
+    {
+     "code": "LS-403",
+     "qty": 1,
+     "parts": [
+      "feed_rod"
+     ],
+     "kind": "buy",
+     "name": "送布连杆 Feed connecting rod",
+     "mass_g": 48.6
+    },
+    {
+     "code": "LS-404",
+     "qty": 1,
+     "parts": [
+      "regulator"
+     ],
+     "kind": "buy",
+     "name": "送布调节器 Feed regulator",
+     "mass_g": 28.6
+    },
+    {
+     "code": "LS-405",
+     "qty": 1,
+     "parts": [
+      "reg_slider"
+     ],
+     "kind": "buy",
+     "name": "调节器滑块 Regulator slider",
+     "mass_g": 7.2
+    },
+    {
+     "code": "LS-406",
+     "qty": 1,
+     "parts": [
+      "feed_link"
+     ],
+     "kind": "buy",
+     "name": "水平连杆 Feed link",
+     "mass_g": 28.3
+    },
+    {
+     "code": "LS-407",
+     "qty": 1,
+     "parts": [
+      "feed_rock"
+     ],
+     "kind": "buy",
+     "name": "送布摆轴 Feed rock shaft",
+     "mass_g": 196.3
+    },
+    {
+     "code": "LS-408",
+     "qty": 1,
+     "parts": [
+      "feed_bar"
+     ],
+     "kind": "buy",
+     "name": "牙架与送布牙 Feed bar & feed dog",
+     "mass_g": 29.2
+    },
+    {
+     "code": "LS-409",
+     "qty": 1,
+     "parts": [
+      "lift_link"
+     ],
+     "kind": "buy",
+     "name": "抬牙连杆 Lift link",
+     "mass_g": 15.8
+    },
+    {
+     "code": "LS-410",
+     "qty": 1,
+     "parts": [
+      "lift_rock"
+     ],
+     "kind": "buy",
+     "name": "抬牙摆轴 Lift rock shaft",
+     "mass_g": 76.2
+    },
+    {
+     "code": "LS-411",
+     "qty": 1,
+     "parts": [
+      "oil_ecc"
+     ],
+     "kind": "buy",
+     "name": "油泵偏心 Oil-pump eccentric",
+     "mass_g": 4.1
+    },
+    {
+     "code": "LS-412",
+     "qty": 1,
+     "parts": [
+      "oil_plunger"
+     ],
+     "kind": "buy",
+     "name": "油泵柱塞 Oil-pump plunger",
+     "mass_g": 1.2
+    },
+    {
+     "code": "LS-413",
+     "qty": 1,
+     "parts": [
+      "oil_pump"
+     ],
+     "kind": "buy",
+     "name": "油泵体 Oil-pump body",
+     "mass_g": 18.2
+    },
+    {
+     "code": "LS-501",
+     "qty": 1,
+     "parts": [
+      "presser_bar"
+     ],
+     "kind": "buy",
+     "name": "压脚杆 Presser bar",
+     "mass_g": 46.4
+    },
+    {
+     "code": "LS-502",
+     "qty": 1,
+     "parts": [
+      "presser_collar"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧座 Presser spring collar",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-503",
+     "qty": 1,
+     "parts": [
+      "presser_foot"
+     ],
+     "kind": "buy",
+     "name": "压脚 Presser foot",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-504",
+     "qty": 1,
+     "parts": [
+      "lift_bracket"
+     ],
+     "kind": "buy",
+     "name": "抬压脚板 Presser lifting bracket",
+     "mass_g": 25.2
+    },
+    {
+     "code": "LS-505",
+     "qty": 1,
+     "parts": [
+      "presser_screw"
+     ],
+     "kind": "buy",
+     "name": "调压螺钉 Pressure adjusting screw",
+     "mass_g": 44.3
+    },
+    {
+     "code": "LS-506",
+     "qty": 1,
+     "parts": [
+      "presser_spring"
+     ],
+     "kind": "buy",
+     "name": "压脚弹簧 Presser spring",
+     "mass_g": 39.0
+    },
+    {
+     "code": "LS-507",
+     "qty": 2,
+     "parts": [
+      "presser_bushes"
+     ],
+     "kind": "buy",
+     "name": "压脚杆导套 Presser-bar bushings",
+     "mass_g": 11.7
+    },
+    {
+     "code": "LS-508",
+     "qty": 1,
+     "parts": [
+      "hand_lifter"
+     ],
+     "kind": "buy",
+     "name": "手抬扳手 Hand lifter",
+     "mass_g": 61.1
+    },
+    {
+     "code": "LS-509",
+     "qty": 1,
+     "parts": [
+      "knee_c1"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C1 Knee-lift crank C1",
+     "mass_g": 20.3
+    },
+    {
+     "code": "LS-510",
+     "qty": 1,
+     "parts": [
+      "knee_c2"
+     ],
+     "kind": "buy",
+     "name": "膝抬曲柄 C2 Knee-lift crank C2",
+     "mass_g": 22.6
+    },
+    {
+     "code": "LS-511",
+     "qty": 1,
+     "parts": [
+      "knee_rod"
+     ],
+     "kind": "buy",
+     "name": "膝抬拉杆 Knee-lift rod",
+     "mass_g": 99.7
+    },
+    {
+     "code": "LS-512",
+     "qty": 1,
+     "parts": [
+      "knee_push"
+     ],
+     "kind": "buy",
+     "name": "膝抬推杆 Knee-lift push rod",
+     "mass_g": 98.0
+    },
+    {
+     "code": "LS-513",
+     "qty": 1,
+     "parts": [
+      "knee_link"
+     ],
+     "kind": "buy",
+     "name": "膝抬连杆 Knee-lift link",
+     "mass_g": 5.9
+    },
+    {
+     "code": "LS-514",
+     "qty": 1,
+     "parts": [
+      "release_shaft"
+     ],
+     "kind": "buy",
+     "name": "松线轴 Tension-release shaft",
+     "mass_g": 14.3
+    },
+    {
+     "code": "LS-515",
+     "qty": 1,
+     "parts": [
+      "release_rod"
+     ],
+     "kind": "buy",
+     "name": "松线拉杆 Tension-release rod",
+     "mass_g": 5.2
+    },
+    {
+     "code": "LS-516",
+     "qty": 1,
+     "parts": [
+      "release_lever"
+     ],
+     "kind": "buy",
+     "name": "松线杆 Tension-release lever",
+     "mass_g": 15.7
+    },
+    {
+     "code": "LS-517",
+     "qty": 1,
+     "parts": [
+      "release_pin"
+     ],
+     "kind": "buy",
+     "name": "松线顶针 Tension-release pin",
+     "mass_g": 0.4
+    },
+    {
+     "code": "LS-518",
+     "qty": 1,
+     "parts": [
+      "tension_post"
+     ],
+     "kind": "buy",
+     "name": "夹线柱 Tension post",
+     "mass_g": 3.6
+    },
+    {
+     "code": "LS-519",
+     "qty": 1,
+     "parts": [
+      "tension_discs"
+     ],
+     "kind": "buy",
+     "name": "夹线盘 Tension discs",
+     "mass_g": 5.6
+    },
+    {
+     "code": "LS-520",
+     "qty": 1,
+     "parts": [
+      "tension_spring"
+     ],
+     "kind": "buy",
+     "name": "夹线簧 Tension spring",
+     "mass_g": 1.3
+    },
+    {
+     "code": "LS-521",
+     "qty": 1,
+     "parts": [
+      "tension_nut"
+     ],
+     "kind": "buy",
+     "name": "夹线螺母 Tension nut",
+     "mass_g": 2.2
+    },
+    {
+     "code": "LS-522",
+     "qty": 1,
+     "parts": [
+      "check_spring"
+     ],
+     "kind": "buy",
+     "name": "挑线簧 Check spring",
+     "mass_g": 0.2
+    },
+    {
+     "code": "LS-701",
+     "qty": 1,
+     "parts": [
+      "moving_knife"
+     ],
+     "kind": "buy",
+     "name": "动刀 Moving knife",
+     "mass_g": 5.1
+    },
+    {
+     "code": "LS-702",
+     "qty": 1,
+     "parts": [
+      "knife_shaft"
+     ],
+     "kind": "buy",
+     "name": "动刀轴 Moving-knife shaft",
+     "mass_g": 20.2
+    },
+    {
+     "code": "LS-703",
+     "qty": 1,
+     "parts": [
+      "fixed_knife"
+     ],
+     "kind": "buy",
+     "name": "定刀 Fixed knife",
+     "mass_g": 2.0
+    },
+    {
+     "code": "LS-704",
+     "qty": 1,
+     "parts": [
+      "trim_base"
+     ],
+     "kind": "buy",
+     "name": "动刀轴座 Knife-shaft base",
+     "mass_g": 35.7
+    },
+    {
+     "code": "LS-705",
+     "qty": 1,
+     "parts": [
+      "trim_rock"
+     ],
+     "kind": "buy",
+     "name": "剪线摆轴 Trimmer rock shaft",
+     "mass_g": 106.8
+    },
+    {
+     "code": "LS-706",
+     "qty": 1,
+     "parts": [
+      "trim_brackets"
+     ],
+     "kind": "buy",
+     "name": "摆轴座 Rock-shaft brackets",
+     "mass_g": 78.7
+    },
+    {
+     "code": "LS-707",
+     "qty": 1,
+     "parts": [
+      "trim_link"
+     ],
+     "kind": "buy",
+     "name": "剪线拉杆 Trimmer link",
+     "mass_g": 5.8
+    },
+    {
+     "code": "LS-708",
+     "qty": 1,
+     "parts": [
+      "trim_lever"
+     ],
+     "kind": "buy",
+     "name": "剪线摆杆 Trimmer cam lever",
+     "mass_g": 25.5
+    },
+    {
+     "code": "LS-709",
+     "qty": 1,
+     "parts": [
+      "trim_roller"
+     ],
+     "kind": "buy",
+     "name": "凸轮滚子 Cam roller",
+     "mass_g": 1.6
+    },
+    {
+     "code": "LS-710",
+     "qty": 1,
+     "parts": [
+      "trim_cam"
+     ],
+     "kind": "make",
+     "name": "剪线凸轮 Trimmer cam",
+     "mass_g": 140.9
+    },
+    {
+     "code": "LS-711",
+     "qty": 1,
+     "parts": [
+      "wiper"
+     ],
+     "kind": "buy",
+     "name": "拨线钩 Thread wiper",
+     "mass_g": 6.7
+    },
+    {
+     "code": "LS-712",
+     "qty": 1,
+     "parts": [
+      "release_arm_t"
+     ],
+     "kind": "buy",
+     "name": "松线臂 Release arm",
+     "mass_g": 2.1
+    },
+    {
+     "code": "LS-801",
+     "qty": 1,
+     "parts": [
+      "estep_bracket"
+     ],
+     "kind": "buy",
+     "name": "步进电机支架 Stepper bracket",
+     "mass_g": 28.9
+    },
+    {
+     "code": "LS-802",
+     "qty": 1,
+     "parts": [
+      "estep_pulley_m"
+     ],
+     "kind": "buy",
+     "name": "电机带轮 Motor pulley",
+     "mass_g": 19.1
+    },
+    {
+     "code": "LS-803",
+     "qty": 1,
+     "parts": [
+      "estep_pulley_r"
+     ],
+     "kind": "buy",
+     "name": "调节器带轮 Regulator pulley",
+     "mass_g": 35.7
+    }
+   ]
+  }
+ }
+}

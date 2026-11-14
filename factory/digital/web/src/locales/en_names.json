@@ -52,6 +52,10 @@
 "Sewing controller bare PCB"
 ],
 [
+"问渠工业直驱平缝机 WQ-LS-TED（示例）Direct-drive lockstitch machine WQ-LS-TED",
+"lockstitch machine WQ-LS-TED"
+],
+[
 "伺服电机 100 W（带失电制动抱闸，问渠电机厂 WQ-SM100） Servo motor 100 W with brake",
 "Servo motor 100 W with brake"
 ],
@@ -76,12 +80,36 @@
 "PFC MOSFET"
 ],
 [
+"问渠工业直驱平缝机 WQ-LS-ED（示例）Direct-drive lockstitch machine WQ-LS-ED",
+"lockstitch machine WQ-LS-ED"
+],
+[
+"问渠工业直驱平缝机 WQ-LS-TD（示例）Direct-drive lockstitch machine WQ-LS-TD",
+"lockstitch machine WQ-LS-TD"
+],
+[
+"问渠工业直驱平缝机 WQ-LS-TE（示例）Direct-drive lockstitch machine WQ-LS-TE",
+"lockstitch machine WQ-LS-TE"
+],
+[
 "X2 安规电容 0.47 µF（示例选型 Vishay BFC233920474，未经硬件验证） X2 capacitor",
 "X2 capacitor"
 ],
 [
 "实时内核与驱动的开源组件包（BSD / Apache，审查入库） RTOS open-source components",
 "RTOS open-source components"
+],
+[
+"问渠工业直驱平缝机 WQ-LS-D（示例）Direct-drive lockstitch machine WQ-LS-D",
+"lockstitch machine WQ-LS-D"
+],
+[
+"问渠工业直驱平缝机 WQ-LS-E（示例）Direct-drive lockstitch machine WQ-LS-E",
+"lockstitch machine WQ-LS-E"
+],
+[
+"问渠工业直驱平缝机 WQ-LS-T（示例）Direct-drive lockstitch machine WQ-LS-T",
+"lockstitch machine WQ-LS-T"
 ],
 [
 "旁路继电器 12 V 线圈（示例选型 Omron G5LE-1-E DC12，未经硬件验证） Bypass relay",
@@ -150,6 +178,10 @@
 [
 "轮式人形 WQ-H1（示例：双臂 + 腰 + 头 16 个关节，AGV 底盘） Wheeled humanoid",
 "Wheeled humanoid"
+],
+[
+"42 步进电机 48 mm 带磁编码器（型号待确认） NEMA 17 stepper with encoder",
+"NEMA 17 stepper with encoder"
 ],
 [
 "关节扭矩传感器 WQ-TS（应变片全桥，量程 ±200 N·m，示例） Joint torque sensor",
@@ -368,6 +400,10 @@
 "Shunt reference"
 ],
 [
+"旋梭（少油型，镀 DLC） Rotary hook, low-oil (DLC-coated)",
+"Rotary hook, low-oil (DLC-coated)"
+],
+[
 "示例·谐波减速器代理商 Strain-wave Gear Distributor (Demo)",
 "Strain-wave Gear Distributor (Demo)"
 ],
@@ -394,6 +430,10 @@
 [
 "机器人软件授权（问渠软件公司 WQ-Robot，每台一份） WQ-Robot license",
 "WQ-Robot license"
+],
+[
+"松线电磁铁 24 V Ø16（型号待确认） Tension-release solenoid",
+"Tension-release solenoid"
 ],
 [
 "电机动力线与抱闸线（带插头，型号待确认） Motor power & brake leads",
@@ -426,6 +466,10 @@
 [
 "WQ-Cloud 订阅（100 vCPU·月） WQ-Cloud subscription",
 "WQ-Cloud subscription"
+],
+[
+"同步带 HTD 3M 宽 9（型号待确认） Timing belt HTD 3M 9 mm",
+"Timing belt HTD 3M 9 mm"
 ],
 [
 "机壳与端盖 60 机座（铝，外协） Housing & end caps frame 60",
@@ -542,6 +586,10 @@
 [
 "台式机主板光板 8 层（外协） Desktop mainboard bare PCB",
 "Desktop mainboard bare PCB"
+],
+[
+"平缝机针板与推板（型号待确认） Throat plate & slide plate",
+"Throat plate & slide plate"
 ],
 [
 "有源晶振 50 MHz 3.3 V（型号待确认） Oscillator 50 MHz",
@@ -760,6 +808,10 @@
 "Sub-assembly looper drive"
 ],
 [
+"剪线电磁铁 24 V Ø22（型号待确认） Trimmer solenoid",
+"Trimmer solenoid"
+],
+[
 "夹线器与挑线簧（型号待确认） Thread tension assembly",
 "Thread tension assembly"
 ],
@@ -906,6 +958,10 @@
 [
 "台式机电源 500 W（型号待确认） Desktop PSU 500 W",
 "Desktop PSU 500 W"
+],
+[
+"拨线电磁铁 24 V Ø16（型号待确认） Wiper solenoid",
+"Wiper solenoid"
 ],
 [
 "服务器线缆套件（电源线、网线、管理线） Server cable kit",
@@ -1296,6 +1352,14 @@
 "6010 Ball bearing 50×80×16"
 ],
 [
+"深沟球轴承 6201 Ball bearing 12×32×10",
+"6201 Ball bearing 12×32×10"
+],
+[
+"深沟球轴承 6202 Ball bearing 15×35×11",
+"6202 Ball bearing 15×35×11"
+],
+[
 "环氧塑封料（型号待确认） Epoxy mold compound",
 "Epoxy mold compound"
 ],
@@ -1358,6 +1422,10 @@
 [
 "P60 铣扁、钻孔 Milling flats & holes",
 "Milling flats & holes"
+],
+[
+"倒缝按钮（型号待确认） Reverse push-button",
+"Reverse push-button"
 ],
 [
 "应变胶（热固化环氧，型号待确认） Gauge adhesive",
@@ -1944,10 +2012,6 @@
 "Encoder final test"
 ],
 [
-"送布 / 抬牙偏心 Feed eccentric",
-"Feed eccentric"
-],
-[
 "钻攻螺纹孔 Drilling & tapping",
 "Drilling & tapping"
 ],
@@ -2472,6 +2536,10 @@
 "Gauge bonding"
 ],
 [
+"抬牙偏心 Lift eccentric",
+"Lift eccentric"
+],
+[
 "整机装配 Robot assembly",
 "Robot assembly"
 ],
@@ -2530,6 +2598,10 @@
 [
 "补偿电阻套件（零点、温漂，型号待确认）",
 "Compensation resistor kit"
+],
+[
+"送布偏心 Feed eccentric",
+"Feed eccentric"
 ],
 [
 "高速贴片 Chip placement",
@@ -2888,6 +2960,10 @@
 "Trim & form"
 ],
 [
+"剪线凸轮 Trimmer cam",
+"Trimmer cam"
+],
+[
 "包缝机主轴 Main shaft",
 "Main shaft"
 ],
@@ -3114,6 +3190,10 @@
 [
 "导电银浆（装片胶，型号待确认）",
 "Die-attach epoxy"
+],
+[
+"平缝机针板与推板（型号待确认）",
+"Throat plate & slide plate"
 ],
 [
 "总装线 A02：压装轴承、轴套",
@@ -3606,6 +3686,10 @@
 [
 "人形主控（型号待确认）",
 "Humanoid main controller"
+],
+[
+"倒缝按钮（型号待确认）",
+"Reverse push-button"
 ],
 [
 "出厂测试台 EOL-L",
@@ -4478,10 +4562,6 @@
 [
 "跑合台 RUN-O",
 "LS run-in stand 1 RUN-O"
-],
-[
-"送布 / 抬牙偏心",
-"Feed eccentric"
 ],
 [
 "铁芯叠压机 STK",
@@ -6100,6 +6180,10 @@
 "Trim & form"
 ],
 [
+"剪线凸轮",
+"Trimmer cam"
+],
+[
 "功能测试",
 "FCT"
 ],
@@ -6258,6 +6342,10 @@
 [
 "扭矩终检",
 "Torque final test"
+],
+[
+"抬牙偏心",
+"Lift eccentric"
 ],
 [
 "抱闸测试",
@@ -6518,6 +6606,10 @@
 [
 "躯干壳体",
 "Torso shell"
+],
+[
+"送布偏心",
+"Feed eccentric"
 ],
 [
 "部件装配",

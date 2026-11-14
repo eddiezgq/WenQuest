@@ -3256,7 +3256,7 @@ items:
   uom: Nos
   note: 少油型另外协镀 DLC
 - code: LS-401
-  name: 送布 / 抬牙偏心 Feed eccentric
+  name: 送布偏心 Feed eccentric
   kind: make
   uom: Nos
 - code: OL-401
@@ -3271,6 +3271,96 @@ items:
   name: 问渠工业直驱四线包缝机 WQ-OL（示例）Direct-drive 4-thread overlock
   kind: fg
   uom: Nos
+# >>> g7_bom：tools/wqls/g7_bom.py 生成（第 138 轮 G7.1），别手改（物料）
+- {code: WQ-LS-D, name: 问渠工业直驱平缝机 WQ-LS-D（示例）Direct-drive lockstitch machine WQ-LS-D, kind: fg, uom: Nos}
+- {code: WQ-LS-E, name: 问渠工业直驱平缝机 WQ-LS-E（示例）Direct-drive lockstitch machine WQ-LS-E, kind: fg, uom: Nos}
+- {code: WQ-LS-ED, name: 问渠工业直驱平缝机 WQ-LS-ED（示例）Direct-drive lockstitch machine WQ-LS-ED, kind: fg, uom: Nos}
+- {code: WQ-LS-T, name: 问渠工业直驱平缝机 WQ-LS-T（示例）Direct-drive lockstitch machine WQ-LS-T, kind: fg, uom: Nos}
+- {code: WQ-LS-TD, name: 问渠工业直驱平缝机 WQ-LS-TD（示例）Direct-drive lockstitch machine WQ-LS-TD, kind: fg, uom: Nos}
+- {code: WQ-LS-TE, name: 问渠工业直驱平缝机 WQ-LS-TE（示例）Direct-drive lockstitch machine WQ-LS-TE, kind: fg, uom: Nos}
+- {code: WQ-LS-TED, name: 问渠工业直驱平缝机 WQ-LS-TED（示例）Direct-drive lockstitch machine WQ-LS-TED, kind: fg, uom: Nos}
+- {code: BUY-BELT-E, name: 同步带 HTD 3M 宽 9（型号待确认） Timing belt HTD 3M 9 mm, kind: buy, uom: Nos, price: 1.5, supplier: sewparts}
+- {code: BUY-BRG-6201, name: 深沟球轴承 6201 Ball bearing 12×32×10, kind: buy, uom: Nos, price: 1.2, supplier: hardware}
+- {code: BUY-BRG-6202, name: 深沟球轴承 6202 Ball bearing 15×35×11, kind: buy, uom: Nos, price: 1.5, supplier: hardware}
+- {code: BUY-BTN-E, name: 倒缝按钮（型号待确认） Reverse push-button, kind: buy, uom: Nos, price: 1.0, supplier: drive}
+- {code: BUY-PLATE-LS, name: 平缝机针板与推板（型号待确认） Throat plate & slide plate, kind: buy, uom: Nos, price: 3.0, supplier: sewparts}
+- {code: BUY-SOL-REL, name: 松线电磁铁 24 V Ø16（型号待确认） Tension-release solenoid, kind: buy, uom: Nos, price: 4.5, supplier: drive}
+- {code: BUY-SOL-TRIM, name: 剪线电磁铁 24 V Ø22（型号待确认） Trimmer solenoid, kind: buy, uom: Nos, price: 6.0, supplier: drive}
+- {code: BUY-SOL-WIPE, name: 拨线电磁铁 24 V Ø16（型号待确认） Wiper solenoid, kind: buy, uom: Nos, price: 4.5, supplier: drive}
+- {code: BUY-STEP-42, name: 42 步进电机 48 mm 带磁编码器（型号待确认） NEMA 17 stepper with encoder, kind: buy, uom: Nos, price: 15.0, supplier: drive}
+- {code: LS-103, name: 曲柄（带平衡块） Crank with counterweight（按图外协）, kind: buy, uom: Nos, price: 4.29, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-104, name: 曲柄销 Crank pin（按图外协）, kind: buy, uom: Nos, price: 1.22, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-105, name: 上带轮 Upper timing pulley（按图外协）, kind: buy, uom: Nos, price: 3.21, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-106, name: 下带轮 Lower timing pulley（按图外协）, kind: buy, uom: Nos, price: 3.69, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-107, name: 手轮 Handwheel（按图外协）, kind: buy, uom: Nos, price: 4.76, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-108, name: 手轮标记环 Handwheel marker ring（按图外协）, kind: buy, uom: Nos, price: 1.09, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-202, name: 针夹 Needle clamp（按图外协）, kind: buy, uom: Nos, price: 1.1, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-203, name: 针杆连接块 Needle-bar connecting block（按图外协）, kind: buy, uom: Nos, price: 1.52, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-204, name: 针杆连杆 Needle-bar connecting rod（按图外协）, kind: buy, uom: Nos, price: 2.39, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-205, name: 挑线杆 Take-up lever（按图外协）, kind: buy, uom: Nos, price: 1.73, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-206, name: 挑线摇杆 Take-up rocker（按图外协）, kind: buy, uom: Nos, price: 1.33, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-207, name: 挑线杆销 M Take-up pin M（按图外协）, kind: buy, uom: Nos, price: 1.06, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-208, name: 摇杆支点销 Q Rocker stud Q（按图外协）, kind: buy, uom: Nos, price: 1.14, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-209, name: 过线环 Thread guide（按图外协）, kind: buy, uom: Nos, price: 1.02, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-301D, name: '旋梭（少油型，镀 DLC） Rotary hook, low-oil (DLC-coated)', kind: make, uom: Nos}
+- {code: LS-302, name: 旋梭轴 Hook shaft（按图外协）, kind: buy, uom: Nos, price: 2.28, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-303, name: 旋梭轴齿轮 z20 Hook-shaft gear z20（按图外协）, kind: buy, uom: Nos, price: 1.65, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-304, name: 下轴齿轮 z40 Lower-shaft gear z40（按图外协）, kind: buy, uom: Nos, price: 3.59, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-305, name: 旋梭轴铜套 Hook-shaft bushings（按图外协）, kind: buy, uom: Nos, price: 1.28, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-402, name: 抬牙偏心 Lift eccentric, kind: make, uom: Nos}
+- {code: LS-403, name: 送布连杆 Feed connecting rod（按图外协）, kind: buy, uom: Nos, price: 2.46, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-404, name: 送布调节器 Feed regulator（按图外协）, kind: buy, uom: Nos, price: 1.86, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-405, name: 调节器滑块 Regulator slider（按图外协）, kind: buy, uom: Nos, price: 1.22, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-406, name: 水平连杆 Feed link（按图外协）, kind: buy, uom: Nos, price: 1.85, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-407, name: 送布摆轴 Feed rock shaft（按图外协）, kind: buy, uom: Nos, price: 6.89, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-408, name: 牙架与送布牙 Feed bar & feed dog（按图外协）, kind: buy, uom: Nos, price: 1.88, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-409, name: 抬牙连杆 Lift link（按图外协）, kind: buy, uom: Nos, price: 1.47, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-410, name: 抬牙摆轴 Lift rock shaft（按图外协）, kind: buy, uom: Nos, price: 3.29, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-411, name: 油泵偏心 Oil-pump eccentric（按图外协）, kind: buy, uom: Nos, price: 1.12, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-412, name: 油泵柱塞 Oil-pump plunger（按图外协）, kind: buy, uom: Nos, price: 1.04, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-413, name: 油泵体 Oil-pump body（按图外协）, kind: buy, uom: Nos, price: 1.55, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-501, name: 压脚杆 Presser bar（按图外协）, kind: buy, uom: Nos, price: 2.39, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-502, name: 压脚弹簧座 Presser spring collar（按图外协）, kind: buy, uom: Nos, price: 1.11, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-503, name: 压脚 Presser foot（按图外协）, kind: buy, uom: Nos, price: 1.76, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-504, name: 抬压脚板 Presser lifting bracket（按图外协）, kind: buy, uom: Nos, price: 1.76, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-505, name: 调压螺钉 Pressure adjusting screw（按图外协）, kind: buy, uom: Nos, price: 2.33, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-506, name: 压脚弹簧 Presser spring（按图外协）, kind: buy, uom: Nos, price: 2.17, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-507, name: 压脚杆导套 Presser-bar bushings（按图外协）, kind: buy, uom: Nos, price: 1.18, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-508, name: 手抬扳手 Hand lifter（按图外协）, kind: buy, uom: Nos, price: 2.83, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-509, name: 膝抬曲柄 C1 Knee-lift crank C1（按图外协）, kind: buy, uom: Nos, price: 1.61, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-510, name: 膝抬曲柄 C2 Knee-lift crank C2（按图外协）, kind: buy, uom: Nos, price: 1.68, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-511, name: 膝抬拉杆 Knee-lift rod（按图外协）, kind: buy, uom: Nos, price: 3.99, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-512, name: 膝抬推杆 Knee-lift push rod（按图外协）, kind: buy, uom: Nos, price: 3.94, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-513, name: 膝抬连杆 Knee-lift link（按图外协）, kind: buy, uom: Nos, price: 1.18, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-514, name: 松线轴 Tension-release shaft（按图外协）, kind: buy, uom: Nos, price: 1.43, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-515, name: 松线拉杆 Tension-release rod（按图外协）, kind: buy, uom: Nos, price: 1.16, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-516, name: 松线杆 Tension-release lever（按图外协）, kind: buy, uom: Nos, price: 1.47, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-517, name: 松线顶针 Tension-release pin（按图外协）, kind: buy, uom: Nos, price: 1.01, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-518, name: 夹线柱 Tension post（按图外协）, kind: buy, uom: Nos, price: 1.11, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-519, name: 夹线盘 Tension discs（按图外协）, kind: buy, uom: Nos, price: 1.17, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-520, name: 夹线簧 Tension spring（按图外协）, kind: buy, uom: Nos, price: 1.04, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-521, name: 夹线螺母 Tension nut（按图外协）, kind: buy, uom: Nos, price: 1.07, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-522, name: 挑线簧 Check spring（按图外协）, kind: buy, uom: Nos, price: 1.01, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-523, name: 针距旋钮 Stitch-length dial（按图外协）, kind: buy, uom: Nos, price: 7.15, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-524, name: 针距拉杆 Stitch-length pull rod（按图外协）, kind: buy, uom: Nos, price: 2.53, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-525, name: 倒缝扳手 Reverse lever（按图外协）, kind: buy, uom: Nos, price: 2.99, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-526, name: 倒缝拉簧 Reverse return spring（按图外协）, kind: buy, uom: Nos, price: 1.08, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-701, name: 动刀 Moving knife（按图外协）, kind: buy, uom: Nos, price: 1.15, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-702, name: 动刀轴 Moving-knife shaft（按图外协）, kind: buy, uom: Nos, price: 1.61, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-703, name: 定刀 Fixed knife（按图外协）, kind: buy, uom: Nos, price: 1.06, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-704, name: 动刀轴座 Knife-shaft base（按图外协）, kind: buy, uom: Nos, price: 2.07, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-705, name: 剪线摆轴 Trimmer rock shaft（按图外协）, kind: buy, uom: Nos, price: 4.2, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-706, name: 摆轴座 Rock-shaft brackets（按图外协）, kind: buy, uom: Nos, price: 3.36, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-707, name: 剪线拉杆 Trimmer link（按图外协）, kind: buy, uom: Nos, price: 1.17, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-708, name: 剪线摆杆 Trimmer cam lever（按图外协）, kind: buy, uom: Nos, price: 1.77, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-709, name: 凸轮滚子 Cam roller（按图外协）, kind: buy, uom: Nos, price: 1.05, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-710, name: 剪线凸轮 Trimmer cam, kind: make, uom: Nos}
+- {code: LS-711, name: 拨线钩 Thread wiper（按图外协）, kind: buy, uom: Nos, price: 1.2, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-712, name: 松线臂 Release arm（按图外协）, kind: buy, uom: Nos, price: 1.06, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-801, name: 步进电机支架 Stepper bracket（按图外协）, kind: buy, uom: Nos, price: 1.87, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-802, name: 电机带轮 Motor pulley（按图外协）, kind: buy, uom: Nos, price: 1.57, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-803, name: 调节器带轮 Regulator pulley（按图外协）, kind: buy, uom: Nos, price: 2.07, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+# <<< g7_bom（物料）
 routings:
 - name: RT-铸件 平缝机壳 Casting LS
   steps:
@@ -3665,51 +3755,6 @@ boms:
   components:
   - - RM-20CRMNTI-D40
     - 0.2
-- item: WQ-LS
-  routing: RT-平缝机总装 LS assembly
-  components:
-  - - HSG-LS
-    - 1
-  - - LS-101
-    - 1
-  - - LS-102
-    - 1
-  - - LS-201
-    - 1
-  - - LS-301
-    - 1
-  - - LS-401
-    - 2
-  - - BUY-MOTOR-LS
-    - 1
-  - - BUY-CTRL-LS
-    - 1
-  - - BUY-BRG-6000
-    - 4
-  - - BUY-BUSH-20
-    - 2
-  - - BUY-BELT-LS
-    - 1
-  - - BUY-PULLEY
-    - 2
-  - - BUY-NEEDLE-DB
-    - 1
-  - - BUY-BOBCASE
-    - 1
-  - - BUY-FEED-LS
-    - 1
-  - - BUY-TENSION
-    - 1
-  - - BUY-OILPAN-LS
-    - 1
-  - - BUY-COVERS-LS
-    - 1
-  - - BUY-SCREW-M5
-    - 40
-  - - BUY-SCREW-M4
-    - 20
-  - - BUY-BOX-LS
-    - 1
 - item: WQ-OL
   routing: RT-包缝机总装 OL assembly
   components:
@@ -3751,11 +3796,726 @@ boms:
     - 16
   - - BUY-BOX-OL
     - 1
+# >>> g7_bom：tools/wqls/g7_bom.py 生成（第 138 轮 G7.1），别手改（BOM）
+- item: WQ-LS
+  routing: RT-平缝机总装 LS assembly
+  components:
+  - [BUY-BELT-LS, 1]
+  - [BUY-BOBCASE, 1]
+  - [BUY-BOX-LS, 1]
+  - [BUY-BRG-6201, 3]
+  - [BUY-BRG-6202, 1]
+  - [BUY-COVERS-LS, 1]
+  - [BUY-CTRL-LS, 1]
+  - [BUY-MOTOR-LS, 1]
+  - [BUY-NEEDLE-DB, 1]
+  - [BUY-OILPAN-LS, 1]
+  - [BUY-PLATE-LS, 1]
+  - [BUY-SCREW-M4, 20]
+  - [BUY-SCREW-M5, 40]
+  - [HSG-LS, 1]
+  - [LS-101, 1]
+  - [LS-102, 1]
+  - [LS-103, 1]
+  - [LS-104, 1]
+  - [LS-105, 1]
+  - [LS-106, 1]
+  - [LS-107, 1]
+  - [LS-108, 1]
+  - [LS-201, 1]
+  - [LS-202, 1]
+  - [LS-203, 1]
+  - [LS-204, 1]
+  - [LS-205, 1]
+  - [LS-206, 1]
+  - [LS-207, 1]
+  - [LS-208, 1]
+  - [LS-209, 1]
+  - [LS-301, 1]
+  - [LS-302, 1]
+  - [LS-303, 1]
+  - [LS-304, 1]
+  - [LS-305, 2]
+  - [LS-401, 1]
+  - [LS-402, 1]
+  - [LS-403, 1]
+  - [LS-404, 1]
+  - [LS-405, 1]
+  - [LS-406, 1]
+  - [LS-407, 1]
+  - [LS-408, 1]
+  - [LS-409, 1]
+  - [LS-410, 1]
+  - [LS-411, 1]
+  - [LS-412, 1]
+  - [LS-413, 1]
+  - [LS-501, 1]
+  - [LS-502, 1]
+  - [LS-503, 1]
+  - [LS-504, 1]
+  - [LS-505, 1]
+  - [LS-506, 1]
+  - [LS-507, 2]
+  - [LS-508, 1]
+  - [LS-509, 1]
+  - [LS-510, 1]
+  - [LS-511, 1]
+  - [LS-512, 1]
+  - [LS-513, 1]
+  - [LS-514, 1]
+  - [LS-515, 1]
+  - [LS-516, 1]
+  - [LS-517, 1]
+  - [LS-518, 1]
+  - [LS-519, 1]
+  - [LS-520, 1]
+  - [LS-521, 1]
+  - [LS-522, 1]
+  - [LS-523, 1]
+  - [LS-524, 1]
+  - [LS-525, 1]
+  - [LS-526, 1]
+- item: WQ-LS-D
+  routing: RT-平缝机总装 LS assembly
+  components:
+  - [BUY-BELT-LS, 1]
+  - [BUY-BOBCASE, 1]
+  - [BUY-BOX-LS, 1]
+  - [BUY-BRG-6201, 3]
+  - [BUY-BRG-6202, 1]
+  - [BUY-COVERS-LS, 1]
+  - [BUY-CTRL-LS, 1]
+  - [BUY-MOTOR-LS, 1]
+  - [BUY-NEEDLE-DB, 1]
+  - [BUY-OILPAN-LS, 1]
+  - [BUY-PLATE-LS, 1]
+  - [BUY-SCREW-M4, 20]
+  - [BUY-SCREW-M5, 40]
+  - [HSG-LS, 1]
+  - [LS-101, 1]
+  - [LS-102, 1]
+  - [LS-103, 1]
+  - [LS-104, 1]
+  - [LS-105, 1]
+  - [LS-106, 1]
+  - [LS-107, 1]
+  - [LS-108, 1]
+  - [LS-201, 1]
+  - [LS-202, 1]
+  - [LS-203, 1]
+  - [LS-204, 1]
+  - [LS-205, 1]
+  - [LS-206, 1]
+  - [LS-207, 1]
+  - [LS-208, 1]
+  - [LS-209, 1]
+  - [LS-301D, 1]
+  - [LS-302, 1]
+  - [LS-303, 1]
+  - [LS-304, 1]
+  - [LS-305, 2]
+  - [LS-401, 1]
+  - [LS-402, 1]
+  - [LS-403, 1]
+  - [LS-404, 1]
+  - [LS-405, 1]
+  - [LS-406, 1]
+  - [LS-407, 1]
+  - [LS-408, 1]
+  - [LS-409, 1]
+  - [LS-410, 1]
+  - [LS-411, 1]
+  - [LS-412, 1]
+  - [LS-413, 1]
+  - [LS-501, 1]
+  - [LS-502, 1]
+  - [LS-503, 1]
+  - [LS-504, 1]
+  - [LS-505, 1]
+  - [LS-506, 1]
+  - [LS-507, 2]
+  - [LS-508, 1]
+  - [LS-509, 1]
+  - [LS-510, 1]
+  - [LS-511, 1]
+  - [LS-512, 1]
+  - [LS-513, 1]
+  - [LS-514, 1]
+  - [LS-515, 1]
+  - [LS-516, 1]
+  - [LS-517, 1]
+  - [LS-518, 1]
+  - [LS-519, 1]
+  - [LS-520, 1]
+  - [LS-521, 1]
+  - [LS-522, 1]
+  - [LS-523, 1]
+  - [LS-524, 1]
+  - [LS-525, 1]
+  - [LS-526, 1]
+- item: WQ-LS-E
+  routing: RT-平缝机总装 LS assembly
+  components:
+  - [BUY-BELT-E, 1]
+  - [BUY-BELT-LS, 1]
+  - [BUY-BOBCASE, 1]
+  - [BUY-BOX-LS, 1]
+  - [BUY-BRG-6201, 3]
+  - [BUY-BRG-6202, 1]
+  - [BUY-BTN-E, 1]
+  - [BUY-COVERS-LS, 1]
+  - [BUY-CTRL-LS, 1]
+  - [BUY-MOTOR-LS, 1]
+  - [BUY-NEEDLE-DB, 1]
+  - [BUY-OILPAN-LS, 1]
+  - [BUY-PLATE-LS, 1]
+  - [BUY-SCREW-M4, 20]
+  - [BUY-SCREW-M5, 40]
+  - [BUY-STEP-42, 1]
+  - [HSG-LS, 1]
+  - [LS-101, 1]
+  - [LS-102, 1]
+  - [LS-103, 1]
+  - [LS-104, 1]
+  - [LS-105, 1]
+  - [LS-106, 1]
+  - [LS-107, 1]
+  - [LS-108, 1]
+  - [LS-201, 1]
+  - [LS-202, 1]
+  - [LS-203, 1]
+  - [LS-204, 1]
+  - [LS-205, 1]
+  - [LS-206, 1]
+  - [LS-207, 1]
+  - [LS-208, 1]
+  - [LS-209, 1]
+  - [LS-301, 1]
+  - [LS-302, 1]
+  - [LS-303, 1]
+  - [LS-304, 1]
+  - [LS-305, 2]
+  - [LS-401, 1]
+  - [LS-402, 1]
+  - [LS-403, 1]
+  - [LS-404, 1]
+  - [LS-405, 1]
+  - [LS-406, 1]
+  - [LS-407, 1]
+  - [LS-408, 1]
+  - [LS-409, 1]
+  - [LS-410, 1]
+  - [LS-411, 1]
+  - [LS-412, 1]
+  - [LS-413, 1]
+  - [LS-501, 1]
+  - [LS-502, 1]
+  - [LS-503, 1]
+  - [LS-504, 1]
+  - [LS-505, 1]
+  - [LS-506, 1]
+  - [LS-507, 2]
+  - [LS-508, 1]
+  - [LS-509, 1]
+  - [LS-510, 1]
+  - [LS-511, 1]
+  - [LS-512, 1]
+  - [LS-513, 1]
+  - [LS-514, 1]
+  - [LS-515, 1]
+  - [LS-516, 1]
+  - [LS-517, 1]
+  - [LS-518, 1]
+  - [LS-519, 1]
+  - [LS-520, 1]
+  - [LS-521, 1]
+  - [LS-522, 1]
+  - [LS-801, 1]
+  - [LS-802, 1]
+  - [LS-803, 1]
+- item: WQ-LS-ED
+  routing: RT-平缝机总装 LS assembly
+  components:
+  - [BUY-BELT-E, 1]
+  - [BUY-BELT-LS, 1]
+  - [BUY-BOBCASE, 1]
+  - [BUY-BOX-LS, 1]
+  - [BUY-BRG-6201, 3]
+  - [BUY-BRG-6202, 1]
+  - [BUY-BTN-E, 1]
+  - [BUY-COVERS-LS, 1]
+  - [BUY-CTRL-LS, 1]
+  - [BUY-MOTOR-LS, 1]
+  - [BUY-NEEDLE-DB, 1]
+  - [BUY-OILPAN-LS, 1]
+  - [BUY-PLATE-LS, 1]
+  - [BUY-SCREW-M4, 20]
+  - [BUY-SCREW-M5, 40]
+  - [BUY-STEP-42, 1]
+  - [HSG-LS, 1]
+  - [LS-101, 1]
+  - [LS-102, 1]
+  - [LS-103, 1]
+  - [LS-104, 1]
+  - [LS-105, 1]
+  - [LS-106, 1]
+  - [LS-107, 1]
+  - [LS-108, 1]
+  - [LS-201, 1]
+  - [LS-202, 1]
+  - [LS-203, 1]
+  - [LS-204, 1]
+  - [LS-205, 1]
+  - [LS-206, 1]
+  - [LS-207, 1]
+  - [LS-208, 1]
+  - [LS-209, 1]
+  - [LS-301D, 1]
+  - [LS-302, 1]
+  - [LS-303, 1]
+  - [LS-304, 1]
+  - [LS-305, 2]
+  - [LS-401, 1]
+  - [LS-402, 1]
+  - [LS-403, 1]
+  - [LS-404, 1]
+  - [LS-405, 1]
+  - [LS-406, 1]
+  - [LS-407, 1]
+  - [LS-408, 1]
+  - [LS-409, 1]
+  - [LS-410, 1]
+  - [LS-411, 1]
+  - [LS-412, 1]
+  - [LS-413, 1]
+  - [LS-501, 1]
+  - [LS-502, 1]
+  - [LS-503, 1]
+  - [LS-504, 1]
+  - [LS-505, 1]
+  - [LS-506, 1]
+  - [LS-507, 2]
+  - [LS-508, 1]
+  - [LS-509, 1]
+  - [LS-510, 1]
+  - [LS-511, 1]
+  - [LS-512, 1]
+  - [LS-513, 1]
+  - [LS-514, 1]
+  - [LS-515, 1]
+  - [LS-516, 1]
+  - [LS-517, 1]
+  - [LS-518, 1]
+  - [LS-519, 1]
+  - [LS-520, 1]
+  - [LS-521, 1]
+  - [LS-522, 1]
+  - [LS-801, 1]
+  - [LS-802, 1]
+  - [LS-803, 1]
+- item: WQ-LS-T
+  routing: RT-平缝机总装 LS assembly
+  components:
+  - [BUY-BELT-LS, 1]
+  - [BUY-BOBCASE, 1]
+  - [BUY-BOX-LS, 1]
+  - [BUY-BRG-6201, 3]
+  - [BUY-BRG-6202, 1]
+  - [BUY-COVERS-LS, 1]
+  - [BUY-CTRL-LS, 1]
+  - [BUY-MOTOR-LS, 1]
+  - [BUY-NEEDLE-DB, 1]
+  - [BUY-OILPAN-LS, 1]
+  - [BUY-PLATE-LS, 1]
+  - [BUY-SCREW-M4, 20]
+  - [BUY-SCREW-M5, 40]
+  - [BUY-SOL-REL, 1]
+  - [BUY-SOL-TRIM, 1]
+  - [BUY-SOL-WIPE, 1]
+  - [HSG-LS, 1]
+  - [LS-101, 1]
+  - [LS-102, 1]
+  - [LS-103, 1]
+  - [LS-104, 1]
+  - [LS-105, 1]
+  - [LS-106, 1]
+  - [LS-107, 1]
+  - [LS-108, 1]
+  - [LS-201, 1]
+  - [LS-202, 1]
+  - [LS-203, 1]
+  - [LS-204, 1]
+  - [LS-205, 1]
+  - [LS-206, 1]
+  - [LS-207, 1]
+  - [LS-208, 1]
+  - [LS-209, 1]
+  - [LS-301, 1]
+  - [LS-302, 1]
+  - [LS-303, 1]
+  - [LS-304, 1]
+  - [LS-305, 2]
+  - [LS-401, 1]
+  - [LS-402, 1]
+  - [LS-403, 1]
+  - [LS-404, 1]
+  - [LS-405, 1]
+  - [LS-406, 1]
+  - [LS-407, 1]
+  - [LS-408, 1]
+  - [LS-409, 1]
+  - [LS-410, 1]
+  - [LS-411, 1]
+  - [LS-412, 1]
+  - [LS-413, 1]
+  - [LS-501, 1]
+  - [LS-502, 1]
+  - [LS-503, 1]
+  - [LS-504, 1]
+  - [LS-505, 1]
+  - [LS-506, 1]
+  - [LS-507, 2]
+  - [LS-508, 1]
+  - [LS-509, 1]
+  - [LS-510, 1]
+  - [LS-511, 1]
+  - [LS-512, 1]
+  - [LS-513, 1]
+  - [LS-514, 1]
+  - [LS-515, 1]
+  - [LS-516, 1]
+  - [LS-517, 1]
+  - [LS-518, 1]
+  - [LS-519, 1]
+  - [LS-520, 1]
+  - [LS-521, 1]
+  - [LS-522, 1]
+  - [LS-523, 1]
+  - [LS-524, 1]
+  - [LS-525, 1]
+  - [LS-526, 1]
+  - [LS-701, 1]
+  - [LS-702, 1]
+  - [LS-703, 1]
+  - [LS-704, 1]
+  - [LS-705, 1]
+  - [LS-706, 1]
+  - [LS-707, 1]
+  - [LS-708, 1]
+  - [LS-709, 1]
+  - [LS-710, 1]
+  - [LS-711, 1]
+  - [LS-712, 1]
+- item: WQ-LS-TD
+  routing: RT-平缝机总装 LS assembly
+  components:
+  - [BUY-BELT-LS, 1]
+  - [BUY-BOBCASE, 1]
+  - [BUY-BOX-LS, 1]
+  - [BUY-BRG-6201, 3]
+  - [BUY-BRG-6202, 1]
+  - [BUY-COVERS-LS, 1]
+  - [BUY-CTRL-LS, 1]
+  - [BUY-MOTOR-LS, 1]
+  - [BUY-NEEDLE-DB, 1]
+  - [BUY-OILPAN-LS, 1]
+  - [BUY-PLATE-LS, 1]
+  - [BUY-SCREW-M4, 20]
+  - [BUY-SCREW-M5, 40]
+  - [BUY-SOL-REL, 1]
+  - [BUY-SOL-TRIM, 1]
+  - [BUY-SOL-WIPE, 1]
+  - [HSG-LS, 1]
+  - [LS-101, 1]
+  - [LS-102, 1]
+  - [LS-103, 1]
+  - [LS-104, 1]
+  - [LS-105, 1]
+  - [LS-106, 1]
+  - [LS-107, 1]
+  - [LS-108, 1]
+  - [LS-201, 1]
+  - [LS-202, 1]
+  - [LS-203, 1]
+  - [LS-204, 1]
+  - [LS-205, 1]
+  - [LS-206, 1]
+  - [LS-207, 1]
+  - [LS-208, 1]
+  - [LS-209, 1]
+  - [LS-301D, 1]
+  - [LS-302, 1]
+  - [LS-303, 1]
+  - [LS-304, 1]
+  - [LS-305, 2]
+  - [LS-401, 1]
+  - [LS-402, 1]
+  - [LS-403, 1]
+  - [LS-404, 1]
+  - [LS-405, 1]
+  - [LS-406, 1]
+  - [LS-407, 1]
+  - [LS-408, 1]
+  - [LS-409, 1]
+  - [LS-410, 1]
+  - [LS-411, 1]
+  - [LS-412, 1]
+  - [LS-413, 1]
+  - [LS-501, 1]
+  - [LS-502, 1]
+  - [LS-503, 1]
+  - [LS-504, 1]
+  - [LS-505, 1]
+  - [LS-506, 1]
+  - [LS-507, 2]
+  - [LS-508, 1]
+  - [LS-509, 1]
+  - [LS-510, 1]
+  - [LS-511, 1]
+  - [LS-512, 1]
+  - [LS-513, 1]
+  - [LS-514, 1]
+  - [LS-515, 1]
+  - [LS-516, 1]
+  - [LS-517, 1]
+  - [LS-518, 1]
+  - [LS-519, 1]
+  - [LS-520, 1]
+  - [LS-521, 1]
+  - [LS-522, 1]
+  - [LS-523, 1]
+  - [LS-524, 1]
+  - [LS-525, 1]
+  - [LS-526, 1]
+  - [LS-701, 1]
+  - [LS-702, 1]
+  - [LS-703, 1]
+  - [LS-704, 1]
+  - [LS-705, 1]
+  - [LS-706, 1]
+  - [LS-707, 1]
+  - [LS-708, 1]
+  - [LS-709, 1]
+  - [LS-710, 1]
+  - [LS-711, 1]
+  - [LS-712, 1]
+- item: WQ-LS-TE
+  routing: RT-平缝机总装 LS assembly
+  components:
+  - [BUY-BELT-E, 1]
+  - [BUY-BELT-LS, 1]
+  - [BUY-BOBCASE, 1]
+  - [BUY-BOX-LS, 1]
+  - [BUY-BRG-6201, 3]
+  - [BUY-BRG-6202, 1]
+  - [BUY-BTN-E, 1]
+  - [BUY-COVERS-LS, 1]
+  - [BUY-CTRL-LS, 1]
+  - [BUY-MOTOR-LS, 1]
+  - [BUY-NEEDLE-DB, 1]
+  - [BUY-OILPAN-LS, 1]
+  - [BUY-PLATE-LS, 1]
+  - [BUY-SCREW-M4, 20]
+  - [BUY-SCREW-M5, 40]
+  - [BUY-SOL-REL, 1]
+  - [BUY-SOL-TRIM, 1]
+  - [BUY-SOL-WIPE, 1]
+  - [BUY-STEP-42, 1]
+  - [HSG-LS, 1]
+  - [LS-101, 1]
+  - [LS-102, 1]
+  - [LS-103, 1]
+  - [LS-104, 1]
+  - [LS-105, 1]
+  - [LS-106, 1]
+  - [LS-107, 1]
+  - [LS-108, 1]
+  - [LS-201, 1]
+  - [LS-202, 1]
+  - [LS-203, 1]
+  - [LS-204, 1]
+  - [LS-205, 1]
+  - [LS-206, 1]
+  - [LS-207, 1]
+  - [LS-208, 1]
+  - [LS-209, 1]
+  - [LS-301, 1]
+  - [LS-302, 1]
+  - [LS-303, 1]
+  - [LS-304, 1]
+  - [LS-305, 2]
+  - [LS-401, 1]
+  - [LS-402, 1]
+  - [LS-403, 1]
+  - [LS-404, 1]
+  - [LS-405, 1]
+  - [LS-406, 1]
+  - [LS-407, 1]
+  - [LS-408, 1]
+  - [LS-409, 1]
+  - [LS-410, 1]
+  - [LS-411, 1]
+  - [LS-412, 1]
+  - [LS-413, 1]
+  - [LS-501, 1]
+  - [LS-502, 1]
+  - [LS-503, 1]
+  - [LS-504, 1]
+  - [LS-505, 1]
+  - [LS-506, 1]
+  - [LS-507, 2]
+  - [LS-508, 1]
+  - [LS-509, 1]
+  - [LS-510, 1]
+  - [LS-511, 1]
+  - [LS-512, 1]
+  - [LS-513, 1]
+  - [LS-514, 1]
+  - [LS-515, 1]
+  - [LS-516, 1]
+  - [LS-517, 1]
+  - [LS-518, 1]
+  - [LS-519, 1]
+  - [LS-520, 1]
+  - [LS-521, 1]
+  - [LS-522, 1]
+  - [LS-701, 1]
+  - [LS-702, 1]
+  - [LS-703, 1]
+  - [LS-704, 1]
+  - [LS-705, 1]
+  - [LS-706, 1]
+  - [LS-707, 1]
+  - [LS-708, 1]
+  - [LS-709, 1]
+  - [LS-710, 1]
+  - [LS-711, 1]
+  - [LS-712, 1]
+  - [LS-801, 1]
+  - [LS-802, 1]
+  - [LS-803, 1]
+- item: WQ-LS-TED
+  routing: RT-平缝机总装 LS assembly
+  components:
+  - [BUY-BELT-E, 1]
+  - [BUY-BELT-LS, 1]
+  - [BUY-BOBCASE, 1]
+  - [BUY-BOX-LS, 1]
+  - [BUY-BRG-6201, 3]
+  - [BUY-BRG-6202, 1]
+  - [BUY-BTN-E, 1]
+  - [BUY-COVERS-LS, 1]
+  - [BUY-CTRL-LS, 1]
+  - [BUY-MOTOR-LS, 1]
+  - [BUY-NEEDLE-DB, 1]
+  - [BUY-OILPAN-LS, 1]
+  - [BUY-PLATE-LS, 1]
+  - [BUY-SCREW-M4, 20]
+  - [BUY-SCREW-M5, 40]
+  - [BUY-SOL-REL, 1]
+  - [BUY-SOL-TRIM, 1]
+  - [BUY-SOL-WIPE, 1]
+  - [BUY-STEP-42, 1]
+  - [HSG-LS, 1]
+  - [LS-101, 1]
+  - [LS-102, 1]
+  - [LS-103, 1]
+  - [LS-104, 1]
+  - [LS-105, 1]
+  - [LS-106, 1]
+  - [LS-107, 1]
+  - [LS-108, 1]
+  - [LS-201, 1]
+  - [LS-202, 1]
+  - [LS-203, 1]
+  - [LS-204, 1]
+  - [LS-205, 1]
+  - [LS-206, 1]
+  - [LS-207, 1]
+  - [LS-208, 1]
+  - [LS-209, 1]
+  - [LS-301D, 1]
+  - [LS-302, 1]
+  - [LS-303, 1]
+  - [LS-304, 1]
+  - [LS-305, 2]
+  - [LS-401, 1]
+  - [LS-402, 1]
+  - [LS-403, 1]
+  - [LS-404, 1]
+  - [LS-405, 1]
+  - [LS-406, 1]
+  - [LS-407, 1]
+  - [LS-408, 1]
+  - [LS-409, 1]
+  - [LS-410, 1]
+  - [LS-411, 1]
+  - [LS-412, 1]
+  - [LS-413, 1]
+  - [LS-501, 1]
+  - [LS-502, 1]
+  - [LS-503, 1]
+  - [LS-504, 1]
+  - [LS-505, 1]
+  - [LS-506, 1]
+  - [LS-507, 2]
+  - [LS-508, 1]
+  - [LS-509, 1]
+  - [LS-510, 1]
+  - [LS-511, 1]
+  - [LS-512, 1]
+  - [LS-513, 1]
+  - [LS-514, 1]
+  - [LS-515, 1]
+  - [LS-516, 1]
+  - [LS-517, 1]
+  - [LS-518, 1]
+  - [LS-519, 1]
+  - [LS-520, 1]
+  - [LS-521, 1]
+  - [LS-522, 1]
+  - [LS-701, 1]
+  - [LS-702, 1]
+  - [LS-703, 1]
+  - [LS-704, 1]
+  - [LS-705, 1]
+  - [LS-706, 1]
+  - [LS-707, 1]
+  - [LS-708, 1]
+  - [LS-709, 1]
+  - [LS-710, 1]
+  - [LS-711, 1]
+  - [LS-712, 1]
+  - [LS-801, 1]
+  - [LS-802, 1]
+  - [LS-803, 1]
+- item: LS-402
+  routing: RT-偏心 Eccentric
+  components:
+  - [RM-20CRMNTI-D40, 0.2]
+- item: LS-710
+  routing: RT-偏心 Eccentric
+  components:
+  - [RM-20CRMNTI-D40, 0.3]
+- item: LS-301D
+  routing: RT-旋梭 Rotary hook
+  components:
+  - [RM-20CRMNTI-D40, 0.25]
+# <<< g7_bom（BOM）
 products:
 - item: WQ-LS
   price: 520
 - item: WQ-OL
   price: 640
+# >>> g7_bom：tools/wqls/g7_bom.py 生成（第 138 轮 G7.1），别手改（成品）
+- {item: WQ-LS-D, price: 535}
+- {item: WQ-LS-E, price: 590}
+- {item: WQ-LS-ED, price: 605}
+- {item: WQ-LS-T, price: 610}
+- {item: WQ-LS-TD, price: 625}
+- {item: WQ-LS-TE, price: 680}
+- {item: WQ-LS-TED, price: 695}
+# <<< g7_bom（成品）
 stock:
   opening:
     BUY-BELT-LS: 20
@@ -3800,6 +4560,86 @@ stock:
     RM-SCRAP: 210
     RM-SEALANT: 0.4
     RM-TOPCOAT: 9.0
+    # >>> g7_bom：tools/wqls/g7_bom.py 生成（第 138 轮 G7.1），别手改（期初库存）
+    BUY-BELT-E: 20
+    BUY-BRG-6201: 60
+    BUY-BRG-6202: 20
+    BUY-BTN-E: 20
+    BUY-PLATE-LS: 20
+    BUY-SOL-REL: 20
+    BUY-SOL-TRIM: 20
+    BUY-SOL-WIPE: 20
+    BUY-STEP-42: 20
+    LS-103: 20
+    LS-104: 20
+    LS-105: 20
+    LS-106: 20
+    LS-107: 20
+    LS-108: 20
+    LS-202: 20
+    LS-203: 20
+    LS-204: 20
+    LS-205: 20
+    LS-206: 20
+    LS-207: 20
+    LS-208: 20
+    LS-209: 20
+    LS-302: 20
+    LS-303: 20
+    LS-304: 20
+    LS-305: 40
+    LS-403: 20
+    LS-404: 20
+    LS-405: 20
+    LS-406: 20
+    LS-407: 20
+    LS-408: 20
+    LS-409: 20
+    LS-410: 20
+    LS-411: 20
+    LS-412: 20
+    LS-413: 20
+    LS-501: 20
+    LS-502: 20
+    LS-503: 20
+    LS-504: 20
+    LS-505: 20
+    LS-506: 20
+    LS-507: 40
+    LS-508: 20
+    LS-509: 20
+    LS-510: 20
+    LS-511: 20
+    LS-512: 20
+    LS-513: 20
+    LS-514: 20
+    LS-515: 20
+    LS-516: 20
+    LS-517: 20
+    LS-518: 20
+    LS-519: 20
+    LS-520: 20
+    LS-521: 20
+    LS-522: 20
+    LS-523: 20
+    LS-524: 20
+    LS-525: 20
+    LS-526: 20
+    LS-701: 20
+    LS-702: 20
+    LS-703: 20
+    LS-704: 20
+    LS-705: 20
+    LS-706: 20
+    LS-707: 20
+    LS-708: 20
+    LS-709: 20
+    LS-711: 20
+    LS-712: 20
+    LS-801: 20
+    LS-802: 20
+    LS-803: 20
+    # <<< g7_bom（期初库存）
   safety:
     BUY-BRG-6000: 40
     BUY-SCREW-M5: 400
