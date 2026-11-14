@@ -831,7 +831,7 @@ jobs:
     needs: [mirror-cn, textbook, webeditions]
     if: always() && !cancelled() && github.event_name != 'push' && needs.mirror-cn.result == 'success' && needs.webeditions.result == 'success' && (needs.textbook.result == 'success' || needs.textbook.result == 'skipped')
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 150   # 跨境慢的时候光传部署文件就要 40 分钟（11-14），60 分钟不够
     env:
       HOST: ${{ secrets.CN_DEPLOY_HOST }}
     steps:
@@ -877,7 +877,9 @@ jobs:
         if: env.SKIP != '1'  # 网页版教材每次都有；教材没改时只有网页版（第 34 轮修正）
         run: |
           books=$(ls textbook-build | tr "\n" " ")
-          tar czf - -C textbook-build . | ssh "deploy@$HOST" "set -e; mkdir -p /opt/wenquest/textbook; cd /opt/wenquest/textbook; for b in $books; do rm -rf \"\$b\"; done; tar xzf -"
+          # 先解到旁边的临时文件夹，整包收齐了才逐本换上：跨境慢、传到一半被中断时，服务器上的旧书不受影响
+          # （11-14 01:58 那次传到一半超时，旧书已删、新书没解完，国内教材页少了机械制造、数字工厂、缝纫机三本）
+          tar czf - -C textbook-build . | ssh "deploy@$HOST" "set -e; mkdir -p /opt/wenquest/textbook; cd /opt/wenquest; rm -rf textbook.incoming; mkdir textbook.incoming; tar xzf - -C textbook.incoming; for b in $books; do rm -rf \"textbook/\$b\"; mv \"textbook.incoming/\$b\" \"textbook/\$b\"; done; rm -rf textbook.incoming"
       - name: Update the China server
         if: env.SKIP != '1'
         env:
