@@ -1,0 +1,493 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WQ-LS 选配件：自动剪线 T、电子针距 E（G4.8，2026-11-13）</title><style>
+:root{--bg:#fbfbfa;--ink:#1d2329;--mut:#5b6670;--line:#d8dde2;--acc:#0b4fae;--hl:#fff3c4}
+@media (prefers-color-scheme: dark){:root{--bg:#15181b;--ink:#e6e9ec;--mut:#9aa5ae;--line:#39414a;--acc:#6aa7ff;--hl:#4a3f12}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 system-ui,"Noto Sans CJK SC","PingFang SC",sans-serif}
+main{max-width:860px;margin:0 auto;padding:16px 16px 64px}
+.note{color:var(--mut);font-size:13px;border-bottom:1px solid var(--line);padding-bottom:8px}
+h1{font-size:22px}h2{font-size:18px;margin-top:2em;scroll-margin-top:12px}h3{font-size:16px;scroll-margin-top:12px}
+h2:target,h3:target{background:var(--hl);border-radius:4px}
+table{border-collapse:collapse;display:block;overflow-x:auto;font-size:13.5px;margin:1em 0}
+td,th{border:1px solid var(--line);padding:4px 8px;vertical-align:top}th{background:rgba(127,127,127,.08)}
+code{font-size:.9em;background:rgba(127,127,127,.12);padding:0 3px;border-radius:3px}pre{overflow-x:auto}
+img{max-width:100%;height:auto}a{color:var(--acc)}blockquote{margin:1em 0;padding:0 12px;border-left:3px solid var(--line);color:var(--mut)}
+</style></head><body><main><p class="note">WQ-LS 设计文档 · G4/剪线与电子针距.md · 设计计算的原文（中文） · Design document (Chinese original)</p><h1 id="s1">WQ-LS 选配件：自动剪线 T、电子针距 E（G4.8，2026-11-13）</h1>
+<p><strong>一句话</strong>：剪线用下轴上的剪线凸轮带动动刀，电磁铁只管把滚子推进凸轮槽，所以进刀、剪断的时刻由凸轮定死，不受电磁铁快慢影响；剪线时另一个电磁铁拉开夹线器，停针后拨线钩把线头拨到压脚上面。电子针距用一台闭环 42 步进电机经 1 : 2 同步带转调节器，去掉 G4.7 的针距旋钮和倒缝扳手，回针靠电机换向。D（少油旋梭）只是旋梭镀 DLC 膜，不改形状，只进零件清单和工艺卡。</p>
+<p><strong>程序</strong>
+- 尺寸和计算：<code>tools/wqls/g4_opt.py &lt;零件目录&gt;</code> → <code>选配件.json</code>（零件按其中的 <code>geo</code> 画）。
+- 零件：<code>tools/wqls/cad/opt.py</code>（由 <code>cad/mech.py</code> 调用）。选项用环境变量 <code>WQ_OPT=T,E</code>（不给 = 基本型），8 种变型都能生成；带 E 的去掉针距拉杆、旋钮、倒缝扳手、拉簧。
+- 一转运动：<code>g4_mech.py</code>，<code>WQ_TRIM=sew</code>（平时缝纫）/ <code>trim</code>（剪线那一转）/ <code>wipe</code>（针停在 80°，拨线钩扫一下）。
+- 机壳上的凸台和孔：<code>cad/housing.py</code> 的 <code>opt_seats()</code>；加工：<code>g5_cam.py</code> 的 <code>opt_holes()</code>，工序 80 第 9 步（按选项跳段）。
+- 干涉检查：<code>cad/mech_check.py</code>；动刀和旋梭、梭壳、送布牙排按 0.5 mm 查（<code>TIGHT</code>）。</p>
+<h2 id="s2">一、时刻（我们这台机器的一转运动）</h2>
+<p>φ 为主轴转角，针杆上止点为 0。</p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>φ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>梭尖钩住线环</td>
+<td>206.1°</td>
+</tr>
+<tr>
+<td>线环绕过梭壳</td>
+<td>206°–294°</td>
+</tr>
+<tr>
+<td>动刀钻进线环的窗口（线环张得最大）</td>
+<td>300°–330°</td>
+</tr>
+<tr>
+<td>针尖穿过针板面往下 / 回到上面</td>
+<td>107° / 253°</td>
+</tr>
+<tr>
+<td>针尖碰 3 mm 布面</td>
+<td>96.3°</td>
+</tr>
+<tr>
+<td>挑线杆线眼平顶</td>
+<td>84°–104°（最高 92°）</td>
+</tr>
+<tr>
+<td>送布牙沉下 / 升上针板</td>
+<td>99.7° / 304.2°（空闲角 204.5°）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="s3">二、剪线机构</h2>
+<p><strong>布置</strong>（坐标同整机，mm）：</p>
+<table>
+<thead>
+<tr>
+<th>件</th>
+<th>位置</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>剪线凸轮</td>
+<td>下轴上 x 140…150</td>
+<td>端面槽凸轮，槽宽 8.4、深 4，在左端面</td>
+</tr>
+<tr>
+<td>摆杆和滚子</td>
+<td>套在剪线摆轴上 x 126…133.8，滚子 Ø8</td>
+<td>静止时滚子离凸轮端面 1.2；剪线时电磁铁把摆杆沿轴推 5，滚子进槽（离槽底 0.4），摆杆离凸轮端面 1.2</td>
+</tr>
+<tr>
+<td>剪线摆轴</td>
+<td>Ø10，沿 x，y 60、z −30，x −25…140</td>
+<td>两个钢座顶在机座顶板底面，M5 螺进顶板；左端曲柄朝下 20</td>
+</tr>
+<tr>
+<td>球头拉杆</td>
+<td>沿 y，(−18, 40…54, −50)</td>
+<td>两头球头</td>
+</tr>
+<tr>
+<td>动刀轴</td>
+<td>Ø8，竖直，在 (−10, 40)，z −52…−7</td>
+<td>轴座是一块钢板（z −14…−10），两根垫柱顶到机座顶板底面，M4 螺进顶板；下端曲柄朝 −x 8</td>
+</tr>
+<tr>
+<td>动刀</td>
+<td>刀尖半径 41.1，摆 22.6°</td>
+<td>低的一段（z −8.6…−6.6）从机座顶板下面过来，在 (−5, 4.9) 抬到刀片平面 z −5.9…−4.9</td>
+</tr>
+<tr>
+<td>定刀</td>
+<td>针板底面，x −20.5…−8（刃在 x −8，离送布牙排 1.5），y −5…4</td>
+<td>动刀回程时贴着定刀底面剪</td>
+</tr>
+<tr>
+<td>剪线电磁铁</td>
+<td>摆轴下面 x 108…124</td>
+<td>托在右边的摆轴座上</td>
+</tr>
+</tbody>
+</table>
+<p><strong>针板下面的空间</strong>：机座顶板在针板座处开口 x −22…29.5、y ±18；旋梭顶 z −6.5；送布牙排两排齿最低时底面 −3.9，侧梁在 |y| 11.3 以外、从 x −6.5 开始。</p>
+<ul>
+<li>刀片平面 z −5.9…−4.9：离齿排 1.0，离旋梭顶 0.6。</li>
+<li>刀片走侧梁中间的开口；动刀低的一段都在 x &lt; −6.5，侧梁那里还没有东西。</li>
+<li>所以<strong>送布牙排不用改</strong>。</li>
+</ul>
+<p><strong>凸轮</strong>（凸轮转角 = φ，下轴 1 : 1）：</p>
+<table>
+<thead>
+<tr>
+<th>段</th>
+<th>φ</th>
+<th>动刀</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>静止、入口段</td>
+<td>75°–280°</td>
+<td>在最后；滚子可以在 100°–275° 之间任何时候进槽</td>
+</tr>
+<tr>
+<td>往前</td>
+<td>280°–340°</td>
+<td>钻进线环（摆线运动规律）</td>
+</tr>
+<tr>
+<td>停</td>
+<td>340°–20°</td>
+<td>钩住连布的面线和底线；线环脱出梭壳，挑线杆开始收线</td>
+</tr>
+<tr>
+<td>回程</td>
+<td>20°–75°</td>
+<td>52.4° 时刀刃越过定刀刃，剪断</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>数</th>
+<th>要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>动刀摆角 / 剪线摆轴转角</td>
+<td>22.6° / 9.0°</td>
+<td></td>
+</tr>
+<tr>
+<td>滚子升程</td>
+<td>4.66 mm（槽按拉杆的真实运动算）</td>
+<td></td>
+</tr>
+<tr>
+<td>最大压力角</td>
+<td>30.9°</td>
+<td>≤ 35°</td>
+</tr>
+<tr>
+<td>剪线力（两根线按 15 N）→ 拉杆 / 滚子</td>
+<td>65.8 N / 52.0 N</td>
+<td></td>
+</tr>
+<tr>
+<td>滚子对凸轮槽接触应力</td>
+<td>279 MPa</td>
+<td>≤ 1500（渗碳淬火）</td>
+</tr>
+<tr>
+<td>剪线那一转多出的主轴力矩</td>
+<td>0.43 N·m</td>
+<td>电机峰值 ≥ 3 N·m（G2）；剪线转速只有 300 r/min，没有惯性力矩的起伏</td>
+</tr>
+</tbody>
+</table>
+<p><strong>电磁铁合上</strong>：入口段 100°–275°，宽 175°。电磁铁延迟从 5 ms 变到 15 ms，在剪线转速下转过的角度远小于 175°（到 2750 r/min 都装得下），所以电磁铁快慢不影响剪线。</p>
+<p><strong>停针和剪线转速</strong>：</p>
+<ul>
+<li>动刀 75° 回到最后，停针窗口从 75° 开始。</li>
+<li>上限取两者中较小的：针尖碰 3 mm 布面前留 5°，是 91.3°；拨线钩要从停住的针尖下面扫过（针尖离钢丝顶 ≥ 1.0），是 82°。</li>
+<li>窗口 75°–82°（拨线钢丝在 z 5.3，针尖要高 1.0）。按停车减速度 5745 rad/s²，剪线转速上限 358 r/min（要求 ≥ 300；默认 300）。</li>
+</ul>
+<p><strong>线头</strong>（估算，首件试缝核对）：</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>数</th>
+<th>要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>针眼外的面线</td>
+<td>约 65 mm（剪断时针眼高度 + 到刀片平面 5.4 + 到定刀刃 8 + 线环绕梭壳半圈 35；松线让挑线杆从线团抽线，线环不缩）</td>
+<td>≥ 35</td>
+</tr>
+<tr>
+<td>布底下的底线头</td>
+<td>13.4 mm（刀片平面深 5.4 + 针孔到定刀刃 8）</td>
+<td>≤ 15（细则写 5，做不到，见细则偏差 3）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="s4">三、松线电磁铁和拨线器</h2>
+<table>
+<thead>
+<tr>
+<th>件</th>
+<th>做法</th>
+<th>数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>松线电磁铁</td>
+<td>G4.7 的立轴拨杆上加一条朝 +y 10 的臂，电磁铁在机臂里拉它往 −x；支架用两颗螺钉从机臂前壁外面拧进去</td>
+<td>需要 9.3 N（夹线簧最大 8.4 N + 张开 0.5 mm 的增量，乘杠杆比）；选 Ø16、行程 3 mm 时 15 N，余量 1.61；夹线盘张开 2.7 mm（≥ 0.5）</td>
+</tr>
+<tr>
+<td>剪线电磁铁</td>
+<td>推摆杆沿摆轴 5 mm</td>
+<td>需要 11 N（回位弹簧 9 N + 摩擦 2 N）；选 Ø22、行程 5 mm 时 22 N，余量 2.0</td>
+</tr>
+<tr>
+<td>拨线器</td>
+<td>竖轴在 (−30, −10)，从机头底板的轴座（Ø4 H7）伸下来；钢丝 Ø0.8 在 z 5.3，长 31；收回时朝 −100°（压脚前外侧），一下扫 115°，钩尖过针前</td>
+<td>电磁铁在机头里经半径 5 的小曲柄转轴；扫一下约 60 ms。压脚前端翘起的一段减薄到 2 mm（G4.7 的零件，细则偏差 4），钢丝离压脚各处 ≥ 1.0</td>
+</tr>
+</tbody>
+</table>
+<p>控制器（GC）三路电磁铁驱动：剪线、拨线、松线。原来第三路留给自动抬压脚（AK），AK 不在 8 种变型里；以后要加 AK，GC 再加一路。</p>
+<h2 id="s5">四、电子针距</h2>
+<p>调节器每 1 mm 针距转 3.52°。从 +5 换到 −5 要转 35.2°，而且要在送布牙沉在针板下面的空闲角里（两头各留 10°，184.5°）转完。调节器受的送布力矩上界 368 N·mm（G4.6）。</p>
+<p>可用力矩按“转速 n_c 以下 80% 保持力矩，以上恒功率下降”估算（24 V 驱动的典型样本，选型时按实际样本复核）：</p>
+<table>
+<thead>
+<tr>
+<th>电机</th>
+<th>传动比</th>
+<th>保持力矩 / 送布力矩</th>
+<th>全程 ±5 换向最高转速</th>
+<th>±3 回针最高转速</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>42 步进 48 mm（带磁编码器）</strong></td>
+<td><strong>1 : 2</strong></td>
+<td><strong>2.39</strong></td>
+<td><strong>1640 r/min</strong></td>
+<td><strong>2300 r/min</strong></td>
+</tr>
+<tr>
+<td>42 步进 48 mm</td>
+<td>1 : 3</td>
+<td>3.59</td>
+<td>1280</td>
+<td></td>
+</tr>
+<tr>
+<td>42 步进 60 mm</td>
+<td>1 : 2</td>
+<td>3.17</td>
+<td>1500</td>
+<td></td>
+</tr>
+<tr>
+<td>57 步进 56 mm</td>
+<td>1 : 1</td>
+<td>2.61</td>
+<td>1800</td>
+<td>2530</td>
+</tr>
+</tbody>
+</table>
+<p>选 42 步进 48 mm + 1 : 2 同步带（HTD 3M，12 齿 / 24 齿）：GC 现有的 24 V、TMC2226 驱动带得动；针距分辨率 0.016 mm（16 细分）；编码器读电机转角，丢步能发现、能补。</p>
+<ul>
+<li>回针时控制器按回针针距限转速：±5 mm 1600 r/min、±3 mm 2200 r/min。工业平缝机回针转速一般也设 1600–1800。</li>
+<li>细则原写“换向 ≥ 2500 r/min，比倒缝电磁铁快得多”，按力矩算做不到（细则偏差 1）。电子针距的好处是针距能编程（起缝加密、转角加密、对条对格），不是回针更快。</li>
+</ul>
+<p>布置：电机在机座里 x 220…268，轴心 (y −24, z −35)；电机板 x 268…272 螺在机座顶板下两个凸台上。调节器轴往左伸到 x 283，上面装 24 齿带轮。倒缝按钮在机头前面（x −30、z 80）。立柱上旋钮和倒缝扳手的孔，带 E 的机器不加工，装盖板。</p>
+<h2 id="s6">五、一转干涉</h2>
+<p>每 2°（结果 <code>选配件干涉检查.json</code>）。合格条件：除设计的配合外 ≥ 1.0 mm；动刀和旋梭、梭壳、送布牙排 ≥ 0.5 mm。</p>
+<table>
+<thead>
+<tr>
+<th>变型和状态</th>
+<th>结果</th>
+<th>最近的几对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>旗舰 TED · 剪线那一转</td>
+<td>合格</td>
+<td>动刀—旋梭 0.60（φ 358°）、动刀—送布牙排 0.65、动刀—机座 1.0、摆杆—凸轮端面 1.2</td>
+</tr>
+<tr>
+<td>旗舰 TED · 停在 80° 拨线</td>
+<td>合格</td>
+<td>拨线钩—压脚 1.09、拨线钩—针 2.4</td>
+</tr>
+<tr>
+<td>旗舰 TED · 手抬 5.5 mm</td>
+<td>合格</td>
+<td>动刀—机座 1.0、电机—机座 1.4</td>
+</tr>
+<tr>
+<td>旗舰 TED · 倒缝 5 mm</td>
+<td>合格</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>只带 T · 剪线那一转（机械针距件还在）</td>
+<td>合格（第一遍的滚子销问题同上改掉）</td>
+<td>动刀—旋梭 0.60</td>
+</tr>
+<tr>
+<td>只带 E · 平时缝纫</td>
+<td>合格</td>
+<td>电机—机座 1.4、电机带轮—机座 4.0</td>
+</tr>
+</tbody>
+</table>
+<p>第一遍查出、改掉的：滚子的销伸出滚子，剪线时离凸轮槽底 0.5（销缩进滚子）；拨线钩扫到压脚前端翘起的地方（压脚前端减薄、钢丝改 Ø0.8 抬到 z 5.3）；剪线电磁铁碰剪线摆轴（下移 2）；摆杆推进以后碰凸轮端面（摆杆缩短）；松线电磁铁碰上轴前轴承（右移）；定刀碰针板座边（右移 1.5）；动刀退回时出了针板座开口（低的一段从机座顶板下面走，抬起点往前挪）。</p>
+<h2 id="s7">六、机壳的改动</h2>
+<p>铸件所有变型共用；孔只给带这个选项的机器加工（合件工序 80 第 9 步，按选项跳段）。</p>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>加的东西</th>
+<th>加工</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>机座顶板底面</td>
+<td>选 T：动刀轴座 2 × M4（x −28、8，y 40）、剪线摆轴座 4 × M5（x −8、99，y 55、65）；选 E：电机板 2 × M5（x 275）</td>
+<td>直角铣头在机座底下向上钻、攻盲孔，螺纹长 4.6，顶面不露孔</td>
+</tr>
+<tr>
+<td>机头底板</td>
+<td>拨线轴座 Ø12 凸台（z 42…54），孔 Ø4 H7；拨线电磁铁托板 Ø12 凸台，M4</td>
+<td>直角铣头伸进机头和机座之间向上钻铰、钻攻（新的加工面 HEADUP）</td>
+</tr>
+<tr>
+<td>机头前壁</td>
+<td>选 E：倒缝按钮孔 Ø12（x −30、z 80）</td>
+<td>B 270° 钻</td>
+</tr>
+<tr>
+<td>机臂前壁</td>
+<td>选 T：松线电磁铁支架 2 × Ø4.5（x 50、58，z 188），里面 Ø12 凸台</td>
+<td>B 270° 钻</td>
+</tr>
+<tr>
+<td>机座顶板</td>
+<td>膝抬推杆过孔由 Ø12 改 Ø10（G4.7 的孔）：钻头要从下轴右轴承座（x 378.2）和机座右壁（x 390）之间 11.8 宽的缝里上来</td>
+<td>直角铣头在机座底下向上钻</td>
+</tr>
+</tbody>
+</table>
+<p>机座顶板下面原来想加凸台，凝固仿真查出凸台高 4.4 时出了 12.6 cm³、高 2 时 7.1 cm³ 的孤立液相区，所以不加凸台，螺孔直接攻在顶板上（这几处只受几十牛的力）。改后两件的凝固和 G4.7 一样，没有新的孤立液相区。</p>
+<p><strong>模态</strong>（<code>选配件_模态.json</code>）：一阶、二阶 218.09 / 230.16 Hz（G4.7 是 217.97 / 230.39）。</p>
+<p><strong>数控程序</strong>：8 个程序仿真都是 0 问题。修了两处：选配孔的刀号和原有刀号重了（仿真按刀号取刀，取错了直径），改成 61–69；膝抬推杆过孔见上表。</p>
+<h2 id="s8">七、验收结果</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>合格条件</th>
+<th>结果</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>剪线：进刀</td>
+<td>动刀钻进线环在线环张开的窗口里</td>
+<td>往前 280°–340°，刀尖在 300°–330° 过针</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>剪线：电磁铁合上</td>
+<td>入口段 ≥ 延迟变化转过的角 + 10°</td>
+<td>入口段 175°，到 2750 r/min 都装得下</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>剪线：剪断和停针、剪线转速</td>
+<td>剪断在停针前完成；剪线转速上限 ≥ 300</td>
+<td>52.4° 剪断，停针窗口 75°–82°，上限 358 r/min</td>
+<td>合格（剪断时刻和细则不同，偏差 2）</td>
+</tr>
+<tr>
+<td>剪线：力</td>
+<td>压力角 ≤ 35°；电磁铁余量 ≥ 1.5；接触应力合格</td>
+<td>30.9°；剪线电磁铁 2.0；279 MPa</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>剪线：留线头</td>
+<td>面线 ≥ 35；底线 ≤ 5</td>
+<td>面线约 65；底线约 13.4</td>
+<td>面线合格；底线按改后的条件 ≤ 15 合格（偏差 3），首件试缝核对</td>
+</tr>
+<tr>
+<td>剪线：松线</td>
+<td>夹线盘张开 ≥ 0.5</td>
+<td>2.7 mm；松线电磁铁余量 1.61</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>拨线</td>
+<td>和针、压脚 ≥ 1.0；扫完 ≤ 100 ms</td>
+<td>压脚 1.09、针 2.4；约 60 ms</td>
+<td>合格（压脚前端减薄，偏差 4）</td>
+</tr>
+<tr>
+<td>电子针距：力矩</td>
+<td>≥ 2 倍送布力矩上界</td>
+<td>2.39 倍</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>电子针距：换向</td>
+<td>细则写 ≥ 2500 r/min（做不到，偏差 1）；改为全程 ±5 ≥ 1600、±3 ≥ 2200</td>
+<td>1640 / 2300 r/min</td>
+<td>合格（按改后的条件）</td>
+</tr>
+<tr>
+<td>电子针距：分辨率</td>
+<td>≤ 0.05 mm</td>
+<td>0.016 mm</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>控制器</td>
+<td>三路电磁铁、24 V 驱动带得动</td>
+<td>剪线、拨线、松线三路；42 步进电机用现有 TMC2226</td>
+<td>合格（以后加 AK 要加一路）</td>
+</tr>
+<tr>
+<td>一转干涉</td>
+<td>按第五节</td>
+<td>六种变型和状态都合格</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>机壳</td>
+<td>模态 ≥ G4.7 的 95%；凝固没有新的孤立液相区</td>
+<td>218.09 / 230.16 Hz；没有新的</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>机壳工艺</td>
+<td>新孔进工序；仿真 0 问题；图纸、检测计划更新</td>
+<td>工序 80 第 9 步；8 个程序 0 问题；图纸、检测计划已更新</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>8 种变型</td>
+<td>都能生成三维、零件清单</td>
+<td><code>WQ_OPT</code>；<code>选配件清单.json</code></td>
+<td>合格</td>
+</tr>
+<tr>
+<td>给 Eddie 看</td>
+<td>剪线动画、针板下剖视、计算书</td>
+<td><code>剪线与拨线_演示.mp4</code>、<code>剪线_针板下剖视.png</code>、本文；三维页面加“剪线”“拨线”两个视角</td>
+<td>合格</td>
+</tr>
+</tbody>
+</table></main></body></html>

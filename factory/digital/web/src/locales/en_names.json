@@ -28,6 +28,10 @@
 "Intelligent power module"
 ],
 [
+"Linux 内核与用户态组件包（GPL / LGPL / MIT，审查入库） Linux distribution components",
+"Linux distribution components"
+],
+[
 "隔离电源模块 5 V → 5 V 1 W（示例选型 B0505S-1WR2，未经硬件验证） Isolated DC-DC module",
 "Isolated DC-DC module"
 ],
@@ -76,6 +80,10 @@
 "X2 capacitor"
 ],
 [
+"实时内核与驱动的开源组件包（BSD / Apache，审查入库） RTOS open-source components",
+"RTOS open-source components"
+],
+[
 "旁路继电器 12 V 线圈（示例选型 Omron G5LE-1-E DC12，未经硬件验证） Bypass relay",
 "Bypass relay"
 ],
@@ -112,6 +120,10 @@
 "Desktop board component kit"
 ],
 [
+"云原生组件包（容器编排、分布式存储、网络，Apache-2.0） Cloud-native components",
+"Cloud-native components"
+],
+[
 "伺服电机 WQ-SM100（100 W，带抱闸，示例） Servo motor 100 W with brake",
 "Servo motor 100 W with brake"
 ],
@@ -126,6 +138,10 @@
 [
 "关节伺服驱动板（示例：48 V、三相、电流采样 + 编码器接口） Joint servo drive board",
 "Joint servo drive board"
+],
+[
+"商业数据库驱动与中间件授权（每个版本，型号待确认） Commercial database middleware",
+"Commercial database middleware"
 ],
 [
 "服务器主板元件套料（双路供电、管理芯片、插座，型号待确认） Server board component kit",
@@ -168,6 +184,10 @@
 "Joint absolute encoder"
 ],
 [
+"功能安全认证编译器授权（每次构建，型号待确认） Safety-certified compiler seat",
+"Safety-certified compiler seat"
+],
+[
 "电流采样放大器（示例选型 INA240A1D，未经硬件验证） Current-sense amplifier",
 "Current-sense amplifier"
 ],
@@ -176,8 +196,16 @@
 "AGV controller board"
 ],
 [
+"实时操作系统授权（问渠软件公司 WQ-RTOS，每块板一份） WQ-RTOS device license",
+"WQ-RTOS device license"
+],
+[
 "扭矩传感器弹性体（17-4PH 不锈钢，外协机加，型号待确认） Torque sensor flexure",
 "Torque sensor flexure"
+],
+[
+"机器人中间件与视觉库（Apache / BSD） Robotics middleware & vision",
+"Robotics middleware & vision"
 ],
 [
 "电机控制 MCU（示例选型 STM32G431CBT6，未经硬件验证） Motor-control MCU",
@@ -194,6 +222,10 @@
 [
 "WQ-ENCIF 工程样片（一片晶圆的批次，老化后全测、托盘装） Engineering samples",
 "Engineering samples"
+],
+[
+"前后端框架与数据库组件包（MIT / Apache） Web & database components",
+"Web & database components"
 ],
 [
 "压敏电阻 275 V（示例选型 TDK B72214S0271K101，未经硬件验证） Varistor",
@@ -360,6 +392,10 @@
 "Direct-drive servo motor (LS)"
 ],
 [
+"机器人软件授权（问渠软件公司 WQ-Robot，每台一份） WQ-Robot license",
+"WQ-Robot license"
+],
+[
 "电机动力线与抱闸线（带插头，型号待确认） Motor power & brake leads",
 "Motor power & brake leads"
 ],
@@ -386,6 +422,10 @@
 [
 "OA-B06 装油底壳、电机、外罩 Fit oil sump, motor, covers",
 "Fit oil sump, motor, covers"
+],
+[
+"WQ-Cloud 订阅（100 vCPU·月） WQ-Cloud subscription",
+"WQ-Cloud subscription"
 ],
 [
 "机壳与端盖 60 机座（铝，外协） Housing & end caps frame 60",
@@ -456,12 +496,20 @@
 "Housing loading, oil pump"
 ],
 [
+"云平台整机柜（问渠计算机厂 WQ-RACK42，16 台服务器） Cloud rack",
+"Cloud rack"
+],
+[
 "内存条电源管理与 SPD 芯片组（型号待确认） DIMM PMIC & SPD hub",
 "DIMM PMIC & SPD hub"
 ],
 [
 "平缝机电控箱（出厂测试时烧录本厂固件）（型号待确认） Control box (LS)",
 "Control box (LS)"
+],
+[
+"机器人软件 WQ-Robot 版本（运动控制、视觉） WQ-Robot release",
+"WQ-Robot release"
 ],
 [
 "示例·北方精密轴承 Northern Precision Bearing (Demo)",
@@ -536,6 +584,14 @@
 "Drill & tap, oil galleries"
 ],
 [
+"WQ-RTOS 设备授权（每台设备） WQ-RTOS device license",
+"WQ-RTOS device license"
+],
+[
+"实时操作系统 WQ-RTOS 版本（板级定制构建） WQ-RTOS release",
+"WQ-RTOS release"
+],
+[
 "已测晶圆 WQ-ENCIF（CP 完成、减薄，带晶圆图） Probed wafer",
 "Probed wafer"
 ],
@@ -546,6 +602,10 @@
 [
 "无铅锡膏 SAC305（型号待确认） Lead-free solder paste",
 "Lead-free solder paste"
+],
+[
+"示例·企业云客户 Enterprise Cloud Customer (Demo)",
+"Enterprise Cloud Customer (Demo)"
 ],
 [
 "示例·先锋工业品 Pioneer Industrial Supply (Demo)",
@@ -596,6 +656,10 @@
 "Magnet Wire Supplier (Demo)"
 ],
 [
+"示例·证书与签名服务商 Certificate Authority (Demo)",
+"Certificate Authority (Demo)"
+],
+[
 "编码器读头板（示例：正余弦输出） Encoder read-head board",
 "Encoder read-head board"
 ],
@@ -630,6 +694,10 @@
 [
 "平缝机壳铸件 HT250 Lockstitch housing casting",
 "HT250 Lockstitch housing casting"
+],
+[
+"操作系统授权（问渠软件公司 WQ-OS，每台一份） WQ-OS license",
+"WQ-OS license"
 ],
 [
 "服务器冗余电源 1600 W（型号待确认） Server PSU 1600 W",
@@ -776,6 +844,10 @@
 "Torque sensor cable"
 ],
 [
+"示例·开源社区上游 Open-source Upstream (Demo)",
+"Open-source Upstream (Demo)"
+],
+[
 "示例·海湾润滑油 Gulf Coast Lubricants (Demo)",
 "Gulf Coast Lubricants (Demo)"
 ],
@@ -860,6 +932,10 @@
 "AGV Parts Supplier (Demo)"
 ],
 [
+"示例·工具链与组件授权商 Toolchain Vendor (Demo)",
+"Toolchain Vendor (Demo)"
+],
+[
 "示例·应变片商 Strain Gauge Supplier (Demo)",
 "Strain Gauge Supplier (Demo)"
 ],
@@ -892,6 +968,14 @@
 "Centreless finish grinding"
 ],
 [
+"WQ-MES 订阅（每厂每月） WQ-MES subscription",
+"WQ-MES subscription"
+],
+[
+"WQ-Robot 授权（每台机器人） WQ-Robot license",
+"WQ-Robot license"
+],
+[
 "包缝机包装箱与附件包 Box & accessory kit (OL)",
 "Box & accessory kit (OL)"
 ],
@@ -902,6 +986,10 @@
 [
 "平缝机包装箱与附件包 Box & accessory kit (LS)",
 "Box & accessory kit (LS)"
+],
+[
+"服务器 / 桌面操作系统 WQ-OS 版本 WQ-OS release",
+"WQ-OS release"
 ],
 [
 "电磁铁插座 JST VH 8 位 Solenoid connector",
@@ -946,6 +1034,10 @@
 [
 "示例·钕铁硼磁钢厂 NdFeB Magnet Maker (Demo)",
 "NdFeB Magnet Maker (Demo)"
+],
+[
+"示例·问渠计算机厂 WenQuest Computers (Demo)",
+"WenQuest Computers (Demo)"
 ],
 [
 "笔记本电池组（型号待确认） Notebook battery pack",
@@ -1030,6 +1122,10 @@
 [
 "示例·编带与防潮包装商 Tape & Dry-pack (Demo)",
 "Tape & Dry-pack (Demo)"
+],
+[
+"示例·问渠机器人厂 WenQuest Robotics (Demo)",
+"WenQuest Robotics (Demo)"
 ],
 [
 "贴片电阻 1206（母线分压） Chip resistor 1206",
@@ -1144,6 +1240,10 @@
 "Conformal coating"
 ],
 [
+"云平台 WQ-Cloud 版本 WQ-Cloud release",
+"WQ-Cloud release"
+],
+[
 "台式机 WQ-PC1（示例） Desktop PC WQ-PC1",
 "Desktop PC WQ-PC1"
 ],
@@ -1222,6 +1322,10 @@
 [
 "示例·磁性元件厂 Magnetics Winder (Demo)",
 "Magnetics Winder (Demo)"
+],
+[
+"示例·设备制造商 OEM Device Maker (Demo)",
+"OEM Device Maker (Demo)"
 ],
 [
 "示例·钣金塑料件商 Covers Supplier (Demo)",
@@ -1320,6 +1424,10 @@
 "WenQuest Robotics (Demo)"
 ],
 [
+"问渠软件公司 WenQuest Software (Demo)",
+"WenQuest Software (Demo)"
+],
+[
 "驱动板贴片板 Drive board SMT assembly",
 "Drive board SMT assembly"
 ],
@@ -1378,6 +1486,10 @@
 [
 "快恢复二极管 US1M SMA Fast rectifier",
 "US1M SMA Fast rectifier"
+],
+[
+"授权密钥签发配额（每份） License key quota",
+"License key quota"
 ],
 [
 "磁钢胶（结构胶，型号待确认） Magnet adhesive",
@@ -1444,6 +1556,10 @@
 "Cleaning & packing"
 ],
 [
+"WQ-OS 授权（每台计算机） WQ-OS license",
+"WQ-OS license"
+],
+[
 "信号连接器（型号待确认） Signal connector",
 "Signal connector"
 ],
@@ -1458,6 +1574,10 @@
 [
 "开关二极管 1N4148W Switching diode",
 "1N4148W Switching diode"
+],
+[
+"数字工厂 WQ-MES 版本 WQ-MES release",
+"WQ-MES release"
 ],
 [
 "数字隔离器（型号待确认） Digital isolator",
@@ -1530,6 +1650,10 @@
 [
 "P90 磨外圆 Cylindrical grinding",
 "Cylindrical grinding"
+],
+[
+"代码签名（每次，硬件安全模块） Code signing",
+"Code signing"
 ],
 [
 "内六角螺钉 M3×8 Socket screw M3×8",
@@ -1728,6 +1852,10 @@
 "Timing pulley"
 ],
 [
+"商业数据库驱动与中间件授权（每个版本，型号待确认）",
+"Commercial database middleware"
+],
+[
 "平缝机油盘（型号待确认） Oil pan (LS)",
 "Oil pan (LS)"
 ],
@@ -1742,6 +1870,10 @@
 [
 "精度标定 Accuracy calibration",
 "Accuracy calibration"
+],
+[
+"编译与单元测试 Build & unit test",
+"Build & unit test"
 ],
 [
 "轴套 Ø20（型号待确认） Bushing Ø20",
@@ -1840,6 +1972,10 @@
 "Assembly & test"
 ],
 [
+"RT-机器人软件 Robot software",
+"Robot software"
+],
+[
 "三坐标测量机（计量室，恒温 20 ± 1 ℃）",
 "CMM (metrology room)"
 ],
@@ -1864,6 +2000,10 @@
 "Joint housing S"
 ],
 [
+"功能安全认证编译器授权（每次构建，型号待确认）",
+"Safety-certified compiler seat"
+],
+[
 "合箱钻铰销孔 Pin-hole reaming",
 "Pin-hole reaming"
 ],
@@ -1886,6 +2026,10 @@
 [
 "放油螺塞 M16×1.5 Drain plug",
 "M16×1.5 Drain plug"
+],
+[
+"服务验收 Service acceptance",
+"Service acceptance"
 ],
 [
 "清洗包装 Cleaning & packing",
@@ -2016,8 +2160,24 @@
 "Rack PDU"
 ],
 [
+"硬件在环测试台 1 号（关节驱动板、工控机）",
+"HIL bench 1"
+],
+[
+"硬件在环测试台 2 号（关节驱动板、工控机）",
+"HIL bench 2"
+],
+[
+"硬件在环测试台 3 号（关节驱动板、工控机）",
+"HIL bench 3"
+],
+[
 "臂内线束 Arm cable harness",
 "Arm cable harness"
+],
+[
+"长稳压测平台（12 小时满负荷、记内存曲线）",
+"Soak test platform"
 ],
 [
 "C110 抛丸 Shot blasting",
@@ -2072,6 +2232,10 @@
 "12 Spring washer"
 ],
 [
+"授权签发 License issuance",
+"License issuance"
+],
+[
 "晶圆来料检验 Wafer incoming",
 "Wafer incoming"
 ],
@@ -2086,6 +2250,10 @@
 [
 "电机终检 Motor final test",
 "Motor final test"
+],
+[
+"监控平台（延迟、错误率、可用性；运维值班）",
+"Monitoring platform"
 ],
 [
 "编带材料（一盘：载带、盖带、13 吋卷盘）",
@@ -2106,6 +2274,10 @@
 [
 "锡膏印刷 Stencil printing",
 "Stencil printing"
+],
+[
+"集成测试 Integration test",
+"Integration test"
 ],
 [
 "骨架油封 20×35×7 Oil seal",
@@ -2172,8 +2344,16 @@
 "Material store"
 ],
 [
+"合并与评审 Merge & review",
+"Merge & review"
+],
+[
 "回流焊 Reflow soldering",
 "Reflow soldering"
+],
+[
+"安全扫描服务器（漏洞、许可证、代码扫描）",
+"Security scanner"
 ],
 [
 "平面密封胶 Flange sealant",
@@ -2198,6 +2378,10 @@
 [
 "电机包装盒（带内衬） Motor box",
 "Motor box"
+],
+[
+"组件仓库（开源与第三方组件、证书与密钥）",
+"Component repository"
 ],
 [
 "编码器读头板（问渠电路板厂，正余弦输出）",
@@ -2308,6 +2492,10 @@
 "Robot controller cabinet (without IPC)"
 ],
 [
+"机房巡检与搬运机器人（换硬盘、送备件）",
+"Data-center patrol robot"
+],
+[
 "测试分选机 + 测试机（4 个测试位）",
 "Final test handler"
 ],
@@ -2326,6 +2514,10 @@
 [
 "笔记本包装盒 Notebook box",
 "Notebook box"
+],
+[
+"签名发布 Sign & publish",
+"Sign & publish"
 ],
 [
 "编码器线缆（屏蔽，带插头，型号待确认）",
@@ -2368,6 +2560,10 @@
 "AGV motor"
 ],
 [
+"RT-订阅 Subscription",
+"Subscription"
+],
+[
 "RT-驱动单元 Drive unit",
 "Drive unit"
 ],
@@ -2386,6 +2582,10 @@
 [
 "多功能贴片 IC placement",
 "IC placement"
+],
+[
+"安全扫描 Security scan",
+"Security scan"
 ],
 [
 "平缝机面板、后盖、顶盖（型号待确认）",
@@ -2472,6 +2672,10 @@
 "Parts inspection (gauges, runout tester)"
 ],
 [
+"RT-应用 Application",
+"Application"
+],
+[
 "RT-旋梭 Rotary hook",
 "Rotary hook"
 ],
@@ -2486,6 +2690,10 @@
 [
 "原材料库（炉料、型砂、钢材、油漆）",
 "Raw materials store"
+],
+[
+"发布门禁 Release gate",
+"Release gate"
 ],
 [
 "台式机处理器（插座式，型号待确认）",
@@ -2544,6 +2752,10 @@
 "Torque sensor cable"
 ],
 [
+"授权服务器（硬件安全模块签发授权）",
+"License server"
+],
+[
 "探针台 + 测试机（8 个测试位）",
 "Prober + tester (CP)"
 ],
@@ -2598,6 +2810,10 @@
 [
 "胶固化 Adhesive cure",
 "Adhesive cure"
+],
+[
+"资源开通 Provisioning",
+"Provisioning"
 ],
 [
 "部件装配 Sub-assembly",
@@ -2860,6 +3076,10 @@
 "Ø100 Caster"
 ],
 [
+"代码签名（每次，硬件安全模块）",
+"Code signing"
+],
+[
 "元器件库（防潮柜、温湿度受控）",
 "Component store"
 ],
@@ -2928,6 +3148,10 @@
 "Low-temperature curing oven"
 ],
 [
+"硬件在环测试 HIL test",
+"HIL test"
+],
+[
 "磁钢粘贴台（定位工装 + 胶）",
 "Magnet bonding bench"
 ],
@@ -2992,6 +3216,10 @@
 "Back end"
 ],
 [
+"RT-平台 Platform",
+"Platform"
+],
+[
 "RT-编码器 Encoder",
 "Encoder"
 ],
@@ -3018,6 +3246,10 @@
 [
 "划片膜与晶圆框（型号待确认）",
 "Dicing tape & frame"
+],
+[
+"制品库（已签名的版本、授权）",
+"Artifact repository"
 ],
 [
 "加工中心 1 号（笔记本壳）",
@@ -3084,6 +3316,10 @@
 "Hardening & tempering furnace"
 ],
 [
+"长稳压测 Soak test",
+"Soak test"
+],
+[
 "防静电包装盒 ESD box",
 "ESD box"
 ],
@@ -3094,6 +3330,10 @@
 [
 "P10 下料 Sawing",
 "Sawing"
+],
+[
+"RT-授权 License",
+"License"
 ],
 [
 "RT-服务器 Server",
@@ -3196,8 +3436,28 @@
 "Run-in test rig TEST-01"
 ],
 [
+"RT-实时OS RTOS",
+"RTOS"
+],
+[
 "上刀、下刀（型号待确认）",
 "Upper & lower knives"
+],
+[
+"云平台 A 区宿主机 1",
+"Cloud zone A host 1"
+],
+[
+"云平台 A 区宿主机 2",
+"Cloud zone A host 2"
+],
+[
+"云平台 B 区宿主机 1",
+"Cloud zone B host 1"
+],
+[
+"云平台 B 区宿主机 2",
+"Cloud zone B host 2"
 ],
 [
 "信号连接器（型号待确认）",
@@ -3214,6 +3474,10 @@
 [
 "压铆螺母柱（型号待确认）",
 "Self-clinching standoff"
+],
+[
+"发布与签名服务器 REL",
+"Release gate & signing REL"
 ],
 [
 "台式机机箱（钣金，自制）",
@@ -3250,6 +3514,10 @@
 [
 "总装线 A11：通电检查",
 "Line LS A11: Power-on check"
+],
+[
+"授权密钥签发配额（每份）",
+"License key quota"
 ],
 [
 "数字隔离器（型号待确认）",
@@ -3290,6 +3558,10 @@
 [
 "环氧塑封料（型号待确认）",
 "Epoxy mold compound"
+],
+[
+"示例·工具链与组件授权商",
+"Toolchain Vendor (Demo)"
 ],
 [
 "示例·漆包线与绝缘材料商",
@@ -3396,6 +3668,10 @@
 "Cylindrical grinder GRD-01"
 ],
 [
+"安全扫描服务器 SEC",
+"Security scanner SEC"
+],
+[
 "导热硅脂点胶机 1 号",
 "TIM dispenser 1"
 ],
@@ -3452,6 +3728,10 @@
 "LS run-in stand 15"
 ],
 [
+"应用与机器人软件组工位",
+"Applications & robotics team"
+],
+[
 "振动清砂机（内腔芯砂）",
 "Vibratory core knockout"
 ],
@@ -3484,6 +3764,10 @@
 "Dead-weight calibration rig"
 ],
 [
+"硬件在环测试台 HIL",
+"HIL bench 1 HIL"
+],
+[
 "示例·工业机器人集成商",
 "Robot Integrator (Demo)"
 ],
@@ -3498,6 +3782,10 @@
 [
 "示例·网络与机柜设备商",
 "Network & Rack Supplier (Demo)"
+],
+[
+"示例·证书与签名服务商",
+"Certificate Authority (Demo)"
 ],
 [
 "示例·谐波减速器代理商",
@@ -3538,6 +3826,10 @@
 [
 "RT-底座 Base",
 "Base"
+],
+[
+"RT-操作系统 OS",
+"OS"
 ],
 [
 "RT-轴 Shaft",
@@ -3622,6 +3914,10 @@
 [
 "卧式加工中心 HMC",
 "HMC 1 (LS housing) HMC"
+],
+[
+"发布门禁与签名服务器",
+"Release gate & signing"
 ],
 [
 "台式机与工控机包装箱",
@@ -3860,6 +4156,10 @@
 "Milling"
 ],
 [
+"集成测试机群 TST",
+"Integration test farm 1 TST"
+],
+[
 "零件检验站 QC-P",
 "Parts inspection (gauges, runout tester) QC-P"
 ],
@@ -3878,6 +4178,10 @@
 [
 "下料 Sawing",
 "Sawing"
+],
+[
+"云平台宿主机 CL",
+"Cloud zone A host 1 CL"
 ],
 [
 "人形总装工位 HA",
@@ -3940,6 +4244,10 @@
 "Insertion & lacing bench INS"
 ],
 [
+"工具链与组件授权商",
+"Toolchain Vendor (Demo)"
+],
+[
 "带锯床 SAW-R",
 "Band saw SAW-R"
 ],
@@ -3972,6 +4280,10 @@
 "Torque sensor final test TFT"
 ],
 [
+"授权服务器 LIC",
+"License server LIC"
+],
+[
 "数控车床 10 号",
 "CNC lathe 10"
 ],
@@ -3986,6 +4298,26 @@
 [
 "来料检验台 IQC",
 "Incoming inspection IQC"
+],
+[
+"构建服务器 1 号",
+"Build server 1"
+],
+[
+"构建服务器 2 号",
+"Build server 2"
+],
+[
+"构建服务器 3 号",
+"Build server 3"
+],
+[
+"构建服务器 4 号",
+"Build server 4"
+],
+[
+"构建服务器 BLD",
+"Build server 1 BLD"
 ],
 [
 "梭尖研磨机 1 号",
@@ -4060,6 +4392,10 @@
 "CPU Distributor (Demo)"
 ],
 [
+"示例·开源社区上游",
+"Open-source Upstream (Demo)"
+],
+[
 "示例·某云数据中心",
 "Cloud Data Center (Demo)"
 ],
@@ -4102,6 +4438,14 @@
 [
 "示例·钣金塑料件商",
 "Covers Supplier (Demo)"
+],
+[
+"示例·问渠机器人厂",
+"WenQuest Robotics (Demo)"
+],
+[
+"示例·问渠计算机厂",
+"WenQuest Computers (Demo)"
 ],
 [
 "等离子清洗机 PL",
@@ -4148,6 +4492,10 @@
 "Solder paste inspection SPI"
 ],
 [
+"长稳压测平台 SK",
+"Soak test platform SK"
+],
+[
 "高频淬火机 IHD",
 "Induction hardening machine IHD"
 ],
@@ -4178,6 +4526,10 @@
 [
 "内存测试机 MT",
 "Memory module tester MT"
+],
+[
+"内核与驱动组工位",
+"Kernel & drivers team"
 ],
 [
 "冷却线 COOL",
@@ -4234,6 +4586,10 @@
 [
 "原材料与外购件库",
 "Raw & purchased store"
+],
+[
+"发布与签名服务器",
+"Release gate & signing"
 ],
 [
 "在线测试 ICT",
@@ -4384,12 +4740,20 @@
 "AGV 2"
 ],
 [
+"监控平台 MON",
+"Monitoring platform MON"
+],
+[
 "砂处理 SAND",
 "Rotor sand mixer SAND"
 ],
 [
 "砂芯检验台 CQ",
 "Core finishing & check bench CQ"
+],
+[
+"研发工位 DEV",
+"Kernel & drivers team DEV"
 ],
 [
 "磁钢粘贴台 MG",
@@ -4402,6 +4766,10 @@
 [
 "示例·五大湖轴承",
 "Great Lakes Bearing (Demo)"
+],
+[
+"示例·企业云客户",
+"Enterprise Cloud Customer (Demo)"
 ],
 [
 "示例·伺服电机厂",
@@ -4488,6 +4856,10 @@
 "IC Distributor (Demo)"
 ],
 [
+"示例·设备制造商",
+"OEM Device Maker (Demo)"
+],
+[
 "示例·造型材料商",
 "Foundry Consumables (Demo)"
 ],
@@ -4524,6 +4896,10 @@
 "Network & Rack Supplier (Demo)"
 ],
 [
+"证书与签名服务商",
+"Certificate Authority (Demo)"
+],
+[
 "读头装调台 HM",
 "Read-head mounting & gap adjust HM"
 ],
@@ -4558,6 +4934,14 @@
 [
 "阳极氧化线 AN",
 "Anodizing line AN"
+],
+[
+"集成测试机群 1",
+"Integration test farm 1"
+],
+[
+"集成测试机群 2",
+"Integration test farm 2"
 ],
 [
 "事故 / 未遂",
@@ -4632,6 +5016,10 @@
 "DRAM Distributor (Demo)"
 ],
 [
+"安全扫描服务器",
+"Security scanner"
+],
+[
 "带锯床 1 号",
 "Band saw 1"
 ],
@@ -4642,6 +5030,10 @@
 [
 "带锯床 SAW",
 "Band saw 1 SAW"
+],
+[
+"平台与云组工位",
+"Platform & cloud team"
 ],
 [
 "开机自检与灌装",
@@ -4716,6 +5108,10 @@
 "Core finishing & check bench"
 ],
 [
+"硬件在环测试台",
+"HIL bench 1"
+],
+[
 "示例·东岳铸造",
 "Dongyue Castings (Demo)"
 ],
@@ -4784,6 +5180,10 @@
 "Notebook assembly"
 ],
 [
+"编译与单元测试",
+"Build & unit test"
+],
+[
 "缝纫设备经销商",
 "Sewing Equipment Dealer (Demo)"
 ],
@@ -4818,6 +5218,10 @@
 [
 "中频感应电炉",
 "Induction furnace 1 t no.1"
+],
+[
+"云平台宿主机",
+"Cloud zone A host 1"
 ],
 [
 "人形总装工位",
@@ -4904,6 +5308,10 @@
 "Adhesive cure oven"
 ],
 [
+"开源社区上游",
+"Open-source Upstream (Demo)"
+],
+[
 "数控凸轮磨床",
 "CNC cam grinder 1"
 ],
@@ -4974,6 +5382,10 @@
 [
 "码盘粘接对心",
 "Disk bonding & centering"
+],
+[
+"硬件在环测试",
+"HIL test"
 ],
 [
 "示例·家纺厂",
@@ -5092,6 +5504,10 @@
 "Covers Supplier (Demo)"
 ],
 [
+"长稳压测平台",
+"Soak test platform"
+],
+[
 "问渠传感器厂",
 "WenQuest Sensors (Demo)"
 ],
@@ -5116,8 +5532,16 @@
 "WenQuest Computers (Demo)"
 ],
 [
+"问渠软件公司",
+"WenQuest Software (Demo)"
+],
+[
 "防静电包装盒",
 "ESD box"
+],
+[
+"集成测试机群",
+"Integration test farm 1"
 ],
 [
 "驱动板贴片板",
@@ -5154,6 +5578,10 @@
 [
 "仓储与物流",
 "Warehouse & logistics"
+],
+[
+"企业云客户",
+"Enterprise Cloud Customer (Demo)"
 ],
 [
 "伺服电机厂",
@@ -5214,6 +5642,10 @@
 [
 "台式机装配",
 "Desktop assembly"
+],
+[
+"合并与评审",
+"Merge & review"
 ],
 [
 "后固化烘箱",
@@ -5304,6 +5736,10 @@
 "Authorized Distributor (Demo)"
 ],
 [
+"授权服务器",
+"License server"
+],
+[
 "数控折弯机",
 "CNC press brake"
 ],
@@ -5334,6 +5770,10 @@
 [
 "来料检验台",
 "Incoming inspection"
+],
+[
+"构建服务器",
+"Build server 1"
 ],
 [
 "某算力中心",
@@ -5494,6 +5934,10 @@
 [
 "计划与排产",
 "Planning & scheduling"
+],
+[
+"设备制造商",
+"OEM Device Maker (Demo)"
 ],
 [
 "读头装调台",
@@ -5708,6 +6152,10 @@
 "Degating station"
 ],
 [
+"发布门禁",
+"Release gate"
+],
+[
 "回流焊炉",
 "Reflow oven"
 ],
@@ -5734,6 +6182,10 @@
 [
 "安全培训",
 "Safety training"
+],
+[
+"安全扫描",
+"Security scan"
 ],
 [
 "安装记录",
@@ -5816,6 +6268,10 @@
 "Vibratory core knockout"
 ],
 [
+"授权签发",
+"License issuance"
+],
+[
 "排放指标",
 "Emission"
 ],
@@ -5858,6 +6314,10 @@
 [
 "服务工单",
 "Service order"
+],
+[
+"服务验收",
+"Service acceptance"
 ],
 [
 "来料检验",
@@ -5948,8 +6408,16 @@
 "Motor final test"
 ],
 [
+"监控平台",
+"Monitoring platform"
+],
+[
 "码盘清洗",
 "Disk cleaning"
+],
+[
+"研发工位",
+"Kernel & drivers team"
 ],
 [
 "砝码标定",
@@ -5962,6 +6430,10 @@
 [
 "程序烧录",
 "Programming"
+],
+[
+"签名发布",
+"Sign & publish"
 ],
 [
 "精密传动",
@@ -6036,6 +6508,10 @@
 "Load run-in"
 ],
 [
+"资源开通",
+"Provisioning"
+],
+[
 "跑合试验",
 "Run-in test"
 ],
@@ -6096,12 +6572,20 @@
 "Changhe Forging (Demo)"
 ],
 [
+"长稳压测",
+"Soak test"
+],
+[
 "防静电袋",
 "ESD bag"
 ],
 [
 "阳极氧化",
 "Anodizing"
+],
+[
+"集成测试",
+"Integration test"
 ],
 [
 "零件实物",

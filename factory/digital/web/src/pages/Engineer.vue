@@ -168,7 +168,8 @@
       </section>
       <section v-if="cur" class="card grow" data-help="eng-structure">
         <div class="card-head"><h2>{{ $t('{a} · {b}', { a: $td(cur.item), b: $td(cur.name) }) }}</h2>
-          <span class="muted small">{{ $t('工艺路线 {a}', { a: $td(cur.routing) }) }}</span></div>
+          <span class="muted small">{{ $t('工艺路线 {a}', { a: $td(cur.routing) }) }}</span>
+          <a v-if="model3d" class="btn ghost small" :href="model3d" target="_blank" rel="noopener">{{ $t('在三维整机里看 ↗') }}</a></div>
         <h3 class="sub">{{ $t('物料清单（每件）') }}</h3>
         <div class="tw"><table class="t">
           <thead><tr><th>{{ $t('物料') }}</th><th>{{ $t('名称') }}</th><th class="num">{{ $t('用量') }}</th><th>{{ $t('单位') }}</th><th>{{ $t('来源') }}</th></tr></thead>
@@ -253,6 +254,15 @@ const plantMode = computed(() => session.config?.plant?.demo === false);
 const ps = ref(null);
 const sel = ref('');
 const cur = computed(() => (ps.value?.items || []).find((x) => x.item === sel.value) || null);
+// 第 138 轮 G6.1：问渠缝纫机厂的物料在网页三维整机（/wqls/，tools/wqls/g6_web.py 生成）里有零件的，给一个“在三维整机里看”
+const codes3d = ref({});
+const model3d = computed(() => {
+  const it = cur.value?.item;
+  if (!it) return '';
+  if (it === 'WQ-LS') return '/wqls/index.html?opt=TED';
+  const code = { 'HSG-LS': 'HSG-LS-P' }[it] || it;        // 工厂里的机壳 HSG-LS 就是 G5 的合件 HSG-LS-P（G7.1 统一）
+  return codes3d.value[code] ? `/wqls/index.html?part=${encodeURIComponent(code)}` : '';
+});
 const groups = computed(() => {
   const it = ps.value?.items || [];
   return [{ title: $t('可接单的产品'), items: it.filter((x) => x.product) }, { title: $t('自制的半成品、部件'), items: it.filter((x) => !x.product) }]
@@ -348,6 +358,7 @@ async function loadDesign() {
 }
 
 onMounted(async () => {
+  fetch('/wqls/codes.json').then((r) => (r.ok ? r.json() : {})).then((j) => { codes3d.value = j || {}; }).catch(() => {});
   await loadConfig().catch(() => null);
   const loadStructure = get('/products/structure').then((r) => { ps.value = r; sel.value = route.query.item || r.items[0]?.item || ''; });
   pbLoadPending();

@@ -46,6 +46,14 @@ classes:
     teachers: []
     plant: wenquest-motor
     park: true             # 接入工业园：机器人厂的四种电机向这里买
+  # 问渠数字工业园第九家（第 167 轮）：软件公司（实时 OS、OS、云平台、数字工厂、机器人软件）→ https://software.factory.wenquestrobotics.com
+  # 排在计算机厂前面：CI 演练里计算机厂向它买 OS 授权，要先起来
+  - id: software
+    name: 问渠数字工业园 · 软件公司
+    course: ""
+    teachers: []
+    plant: wenquest-software
+    park: true             # 接入工业园：计算机厂、机器人厂、电路板厂向这里买授权；它向计算机厂买整机柜
   # 问渠数字工业园第八座厂（第 166 轮）：计算机厂（台式机、笔记本、服务器、整机柜、工控机）→ https://computer.factory.wenquestrobotics.com
   - id: computer
     name: 问渠数字工业园 · 计算机厂

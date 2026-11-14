@@ -287,6 +287,13 @@
 "desc": "Hook-clearance data on the bus in the WenQuest Digital Factory topic and envelope format, control charts and run rules that raise alarms and NCRs, serial-to-lot traceability and the cost of late detection, and a payback calculator for a three-phase roll-out."
 },
 {
+"ch": 27,
+"href": "../labs/wqls/index.html?lang=en",
+"kind": "3D model",
+"title": "The WQ-LS machine (real design)",
+"desc": "The real design of the WQ-LS direct-drive lockstitch machine: 98 parts, motion every 2°, all 8 variants, the trimmer and wiper, explode and section views; click a part for its item number, material, mass, drawings and calculations."
+},
+{
 "ch": 28,
 "href": "labs/line21.html",
 "kind": "Virtual lab",

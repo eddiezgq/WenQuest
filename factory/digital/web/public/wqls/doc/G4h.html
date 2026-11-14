@@ -1,0 +1,288 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WQ-LS 旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</title><style>
+:root{--bg:#fbfbfa;--ink:#1d2329;--mut:#5b6670;--line:#d8dde2;--acc:#0b4fae;--hl:#fff3c4}
+@media (prefers-color-scheme: dark){:root{--bg:#15181b;--ink:#e6e9ec;--mut:#9aa5ae;--line:#39414a;--acc:#6aa7ff;--hl:#4a3f12}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 system-ui,"Noto Sans CJK SC","PingFang SC",sans-serif}
+main{max-width:860px;margin:0 auto;padding:16px 16px 64px}
+.note{color:var(--mut);font-size:13px;border-bottom:1px solid var(--line);padding-bottom:8px}
+h1{font-size:22px}h2{font-size:18px;margin-top:2em;scroll-margin-top:12px}h3{font-size:16px;scroll-margin-top:12px}
+h2:target,h3:target{background:var(--hl);border-radius:4px}
+table{border-collapse:collapse;display:block;overflow-x:auto;font-size:13.5px;margin:1em 0}
+td,th{border:1px solid var(--line);padding:4px 8px;vertical-align:top}th{background:rgba(127,127,127,.08)}
+code{font-size:.9em;background:rgba(127,127,127,.12);padding:0 3px;border-radius:3px}pre{overflow-x:auto}
+img{max-width:100%;height:auto}a{color:var(--acc)}blockquote{margin:1em 0;padding:0 12px;border-left:3px solid var(--line);color:var(--mut)}
+</style></head><body><main><p class="note">WQ-LS 设计文档 · G4/旋梭组.md · 设计计算的原文（中文） · Design document (Chinese original)</p><h1 id="s1">WQ-LS 旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</h1>
+<p><strong>传动路线</strong>：上轴 → 同步带 1 : 1 → 下轴 → 一对斜齿轮 1 : 2 → 旋梭轴。旋梭的转速是上轴的 2 倍：5000 r/min 时为 10 000 r/min，梭尖线速度 14.1 m/s。</p>
+<p><strong>程序</strong>
+- 零件：<code>tools/wqls/cad/hook.py</code>，由 <code>cad/mech.py</code> 调用。
+- 计算：<code>tools/wqls/g4_hook.py</code>，结果在 <code>旋梭组计算.json</code>。
+- 齿轮校核工具：<code>factory/digital/cae/gears.py</code>，带测试 <code>tests/test_gears.py</code>。
+- 一转运动：<code>g4_mech.py</code>。
+- 干涉检查：<code>cad/mech_check.py</code>。
+- 机座的轴承座：<code>cad/housing.py</code> 的 <code>lower_seats()</code>。</p>
+<h2 id="s2">一、位置怎么定的</h2>
+<p>旋梭轴的位置在 G1 已经由钩线几何反推出来：针的正下方，z = −21.5。</p>
+<p>下轴的位置要同时满足两个条件：</p>
+<table>
+<thead>
+<tr>
+<th>条件</th>
+<th>数</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>齿轮中心距</td>
+<td>31.058</td>
+<td>斜齿 mn 1、z 20 / 40、β 15° 的标准中心距（不变位）</td>
+</tr>
+<tr>
+<td>同步带中心距</td>
+<td>237.000</td>
+<td>中心距固定、不加张紧轮时，带长 2C + 3z 必须正好是节距 3 的整数倍</td>
+</tr>
+</tbody>
+</table>
+<p>两个圆的交点，就是下轴的位置：<strong>z = −35.36，y = 27.79</strong>，在旋梭轴后面偏下。G1 的 −36 / 26 只是估计，现在 <code>spec.py</code> 由这两个条件算出。</p>
+<h2 id="s3">二、零件</h2>
+<table>
+<thead>
+<tr>
+<th>件</th>
+<th>规格</th>
+<th>质量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>旋梭 LS-301</td>
+<td>外购，“轴径 7.94 mm”一级（示例外形：梭尖回转半径 13.5，梭床外径 Ø30，梭芯 Ø21）。梭面在 x = 0.53，离机针表面 0.08</td>
+<td>47 g</td>
+</tr>
+<tr>
+<td>梭芯套和梭芯</td>
+<td>外购，不转（定位钩挡住）</td>
+<td>31 g</td>
+</tr>
+<tr>
+<td>旋梭轴 LS-302</td>
+<td>45 钢，x 17…92；左端 Ø7.94 × 6 装旋梭（不伸进梭芯套，离它 1.5），轴身 Ø10，轴心 Ø2.5 油孔</td>
+<td>43 g</td>
+</tr>
+<tr>
+<td>旋梭轴轴套 ×2</td>
+<td>ZCuSn10P1，Ø14 / Ø10 × 14，压进机座的旋梭轴座</td>
+<td>共 19 g</td>
+</tr>
+<tr>
+<td>齿轮 LS-303（旋梭轴）</td>
+<td>z 20，mn 1，β 15° 左旋，齿宽 8，20CrMnTi 渗碳淬火 58–62 HRC，磨齿 6 级</td>
+<td>22 g</td>
+</tr>
+<tr>
+<td>齿轮 LS-304（下轴）</td>
+<td>z 40，mn 1，β 15° 右旋，齿宽 8，材料同上</td>
+<td>86 g</td>
+</tr>
+<tr>
+<td>下轴 LS-102</td>
+<td>45 钢调质，Ø12，x 70…384，两个 6201（x 92…102、366…376）</td>
+<td>279 g</td>
+</tr>
+<tr>
+<td>同步带轮 ×2</td>
+<td>HTD 3M，32 齿，节径 30.56，带宽 15；上轴的孔 Ø16，下轴的孔 Ø12；轮毂在左边</td>
+<td>74 / 90 g</td>
+</tr>
+<tr>
+<td>同步带</td>
+<td>HTD 3M 570-3M-15（190 齿），中心距 237.000</td>
+<td>21 g</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>齿形</strong>：齿轮的齿形是真的渐开线（端面齿廓沿齿宽扭转）。两齿轮在中心连线上按“齿对齿槽”定相位，一转 180 个位置里实体都不重叠。</li>
+<li><strong>转向</strong>：下轴经同步带与上轴同向转；旋梭轴经外啮合齿轮反向转。在钩线角 206.1° 时，梭尖正好转到针的正上方，向后（+y）运动。旋梭要配这个转向的那一种（左旋梭或右旋梭），外购时按这个转向订。</li>
+</ul>
+<h2 id="s4">三、载荷</h2>
+<p>上轴的角加速度取两项相加（偏保守）：
+- <strong>急停</strong>：电机用峰值力矩 3 N·m 制动，总惯量 5.2×10⁻⁴ kg·m²，约 5 700 rad/s²，0.09 s 停下。
+- <strong>一转之内的转速波动</strong>：G2 算的 ±1.37%，每转两次，约 7 500 rad/s²。这一项在高速缝纫时一直都有。</p>
+<p>两项合计 13 200 rad/s²。旋梭组零件的转动惯量按实体算：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>转动惯量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>旋梭轴上（旋梭、轴、小齿轮）</td>
+<td>9.0×10⁻⁶ kg·m²</td>
+</tr>
+<tr>
+<td>下轴上（轴、大齿轮、带轮）</td>
+<td>3.5×10⁻⁵ kg·m²</td>
+</tr>
+<tr>
+<td>上轴带轮</td>
+<td>1.1×10⁻⁵ kg·m²</td>
+</tr>
+<tr>
+<td>折算到上轴（旋梭乘 4）</td>
+<td>8.1×10⁻⁵ kg·m²</td>
+</tr>
+</tbody>
+</table>
+<p>G2 选电机时，下轴、旋梭、带轮这部分估的是约 7.5×10⁻⁵，实体是 8.1×10⁻⁵，相差 8%，对电机选型没有影响。</p>
+<p><strong>峰值力矩</strong>：旋梭轴 0.26 N·m，下轴 1.03 N·m。稳态时只有 0.04 N·m 和 0.09 N·m。</p>
+<h2 id="s5">四、校核（全部合格）</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>结果</th>
+<th>合格条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>齿轮齿面接触（峰值，KA 1.5、Kv 1.2）</td>
+<td>σH 265 MPa，安全系数 4.8</td>
+<td>≥ 1.2</td>
+</tr>
+<tr>
+<td>齿轮齿根弯曲（峰值）</td>
+<td>σF 19 MPa，安全系数 46</td>
+<td>≥ 1.5</td>
+</tr>
+<tr>
+<td>齿轮几何</td>
+<td>端面重合度 1.56，轴向重合度 0.66，节圆线速度 10.8 m/s</td>
+<td>—</td>
+</tr>
+<tr>
+<td>下轴临界转速</td>
+<td>18 500 r/min，是最高转速的 3.7 倍</td>
+<td>≥ 2 倍</td>
+</tr>
+<tr>
+<td>下轴疲劳</td>
+<td>安全系数 24</td>
+<td>≥ 2</td>
+</tr>
+<tr>
+<td>6201 寿命</td>
+<td>右轴承（带轮旁）当量载荷 42 N，L10 远超 20 000 h</td>
+<td>≥ 20 000 h</td>
+</tr>
+<tr>
+<td>旋梭轴轴套</td>
+<td>p 0.37 MPa，v 5.2 m/s，pv 2.0 MPa·m/s</td>
+<td>锡青铜加油润滑：15 / 10 / 15</td>
+</tr>
+<tr>
+<td>同步带</td>
+<td>峰值有效拉力 67 N 加安装张力 20 N，许用 300 N，余量 3.4</td>
+<td>≥ 3</td>
+</tr>
+<tr>
+<td>钩线几何（设计软件复算）</td>
+<td>钩线角 206.1°，回升 2.00 mm，梭尖高于针眼 1.00 mm，梭尖间隙 0.08，线环余量 0.51 mm，结果“钩住线环”</td>
+<td>与 G1 一致</td>
+</tr>
+</tbody>
+</table>
+<p>齿轮的强度富余很大：尺寸是由空间、噪声和旋梭轴的轴径定的，不是由强度定的。模数 1 已经是这个速度下常用的最小值。</p>
+<h2 id="s6">五、机座里补的结构（下件）</h2>
+<ul>
+<li><strong>旋梭轴座</strong>：x 24…66，Ø24 凸台，孔 Ø14 H7 压进两个铜套，上面一道 5 mm 厚的筋（x 34…66，G5.2 改：原来从 x 24 起伸进了针板座下面的开口）连到机座顶板。孔铸出 Ø9（砂芯）。</li>
+<li><strong>下轴左轴承座</strong>：x 88…104，Ø42 凸台，孔 Ø32 H7，6 mm 厚的筋连到顶板。</li>
+<li><strong>下轴右轴承座</strong>：x 364…378，在同步带轮右边，筋在过带孔右边。</li>
+<li><strong>过带孔</strong>：立柱脚下的机座顶板上，改为 x 340…364、y 0…50。带在 z 0 处的两边是 y 8…39。</li>
+<li><strong>立柱下左横筋（x 300…307）上的 Ø34 铸孔</strong>：下轴从这里穿过；G5.2 镗下轴两孔时镗杆也从这里过。</li>
+<li><strong>立柱横隔板的带槽</strong>（上件，z 55、115 两道）：改为 y −30…50（原来 −30…30，下轴在后面，带的后边超出了原来的槽）。</li>
+<li><strong>两个端壁工艺孔</strong>：</li>
+<li>右端壁在下轴轴线上开 Ø34，镗下轴两孔时镗杆从这里进；</li>
+<li>左端壁在旋梭轴轴线上开 Ø20，镗旋梭轴孔用；</li>
+<li>装配后都用橡胶堵堵上。这些孔在 G5.2 合箱后精镗时加工。</li>
+<li><strong>重量和模态</strong>：下件 8.38 → 8.59 kg，上件 15.73 → 15.69 kg（开横筋孔、加宽带槽之前是 8.63 / 15.73）。机壳模态 222 / 230 Hz（原来 221 / 229 Hz），没变；这个模态是开横筋孔、加宽带槽之前算的，后来只去掉了约 80 g 筋材，没有重算。</li>
+</ul>
+<h2 id="s7">六、一转干涉检查</h2>
+<p>上轴一转每 2° 一帧（180 帧），旋梭组每个零件与其他零件、与机壳（上件立柱脚、下件机座）求实体最小距离。结果在 <code>旋梭组干涉检查.json</code>；机头部分（刺布、挑线）G4.1–4.3 查过，这次只查和旋梭组有关的组合。</p>
+<p><strong>第一次查出三处相碰，都改了模型：</strong></p>
+<table>
+<thead>
+<tr>
+<th>相碰</th>
+<th>原因</th>
+<th>改法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>旋梭轴 ↔ 梭芯套</td>
+<td>旋梭轴左端在 x 8，伸进了旋梭的梭芯套腔里</td>
+<td>旋梭轴从 x 17 开始，只伸进旋梭的轴孔</td>
+</tr>
+<tr>
+<td>同步带 ↔ 上件立柱</td>
+<td>立柱里两道横隔板的带槽是 G4.4 按下轴在 y 26 附近、带接近竖直开的（y −30…30）；下轴定在后面，带的后边在 z 55 处到 y 约 34</td>
+<td>带槽改为 y −30…50</td>
+</tr>
+<tr>
+<td>下轴 ↔ 机座横筋</td>
+<td>立柱下面机座里的左横筋（x 300…307）整块挡在下轴上</td>
+<td>横筋开 Ø34 铸孔</td>
+</tr>
+</tbody>
+</table>
+<p><strong>改后复查：没有小于 1.0 mm 的。</strong> 最近的几处：</p>
+<table>
+<thead>
+<tr>
+<th>两件</th>
+<th>一转中的最小间隙</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>机针 ↔ 梭芯套</td>
+<td>1.08 mm（在 166°）</td>
+</tr>
+<tr>
+<td>旋梭轴 ↔ 梭芯套</td>
+<td>1.47</td>
+</tr>
+<tr>
+<td>旋梭 ↔ 机座（旋梭轴座端面）</td>
+<td>1.47</td>
+</tr>
+<tr>
+<td>旋梭轴 ↔ 机座</td>
+<td>2.0</td>
+</tr>
+<tr>
+<td>小齿轮 ↔ 机座</td>
+<td>2.87</td>
+</tr>
+<tr>
+<td>下带轮 ↔ 机座</td>
+<td>2.90</td>
+</tr>
+<tr>
+<td>同步带 ↔ 机座</td>
+<td>4.5</td>
+</tr>
+<tr>
+<td>下轴 ↔ 机座（横筋孔）</td>
+<td>5.0</td>
+</tr>
+</tbody>
+</table>
+<p>本来就相连的不算：齿轮啮合（齿侧间隙按齿轮精度另算）、梭芯套装在旋梭里、轴与轴承和轴套。梭尖与机针之间是设计的 0.08 mm，在第四节钩线几何里核对。</p>
+<p><strong>图</strong>：剖视 <code>旋梭组_剖视.png</code>（剖面过旋梭轴、下轴两条轴线）；三维 <code>旋梭组_旋梭.png</code>、<code>旋梭组_传动.png</code>；一转视频 <code>旋梭组_一转.mp4</code>（旋梭视角，钩线角附近梭尖从针后掠过）。三维页面 <code>tools/wqls/render/mech.html</code> 加了“旋梭”“传动”两个视角，机座随机壳半透明 / 实体一起切换。</p>
+<h2 id="s8">七、下件铸造复算</h2>
+<p>（见 G5 <code>机壳铸造工艺.md</code> 第九节。）</p></main></body></html>

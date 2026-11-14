@@ -393,12 +393,34 @@ jobs:
                                  python3 factory/deploy/ci_annotate.py 电机厂闭环失败项 /tmp/logs/motor_fail.log 40; }
             fi
           fi
+          # 第 167 轮：工业园第九家（软件公司）起来，自己接单走通（实时 OS 版本走发布流水线、云平台订阅开通并验收 24 小时）；排在计算机厂前面，计算机厂向它买 OS 授权
+          software=$(awk -F'\t' '$2 ~ /wenquest-software\.yaml$/ {print $1; exit}' "$FACTORY_DIR/classes.plants")
+          softhubp=""
+          if [ "$st" = 0 ] && [ -n "$software" ]; then
+            m=0; for c in $(cat "$FACTORY_DIR/classes.ids"); do [ "$c" = "$software" ] && break; m=$((m + 1)); done
+            softhubp=$((8102 + m)); softerpp=$((8093 + m)); sup=$(echo "$software" | tr '[:lower:]' '[:upper:]')
+            bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$software'" 2>&1 | tee /tmp/logs/software_setup.log
+            st=${PIPESTATUS[0]}
+            if [ "$st" = 0 ]; then
+              for i in $(seq 1 40); do curl -fsS localhost:$softhubp/api/health && break; sleep 5; done
+              cd factory/digital
+              python tests/plant_loop.py --hub http://localhost:$softhubp --erp http://localhost:$softerpp --erp-kind real \
+                --erp-key "$(val WQ_C_${sup}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${sup}_ERP_API_SECRET)" --speed 600 --timeout 1200 \
+                --item REL-RTOS:1 --item SUB-CLOUD:1 --reliability 0 --staffing 0 --domains --expect-products REL-RTOS,SUB-CLOUD \
+                2>&1 | tee /tmp/logs/software_loop.log
+              st=${PIPESTATUS[0]}
+              cd - >/dev/null
+              [ "$st" = 0 ] || { grep -v "ERPNext 进度" /tmp/logs/software_loop.log | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/software_fail.log;
+                                 python3 factory/deploy/ci_annotate.py 软件公司闭环失败项 /tmp/logs/software_fail.log 40; }
+            fi
+          fi
           # 第 166 轮：工业园第八座厂（计算机厂）起来，自己接单走通（台式机、笔记本：主板、内存条、机箱、笔记本壳都要先做）
           computer=$(awk -F'\t' '$2 ~ /wenquest-computer\.yaml$/ {print $1; exit}' "$FACTORY_DIR/classes.plants")
           comphubp=""
           if [ "$st" = 0 ] && [ -n "$computer" ]; then
             m=0; for c in $(cat "$FACTORY_DIR/classes.ids"); do [ "$c" = "$computer" ] && break; m=$((m + 1)); done
             comphubp=$((8102 + m)); comperpp=$((8093 + m)); sup=$(echo "$computer" | tr '[:lower:]' '[:upper:]')
+            buyos=""; [ -z "$softhubp" ] || buyos="--park-buy LIC-OS=http://localhost:$softhubp=软件公司"     # 第 167 轮
             bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$computer'" 2>&1 | tee /tmp/logs/computer_setup.log
             st=${PIPESTATUS[0]}
             if [ "$st" = 0 ]; then
@@ -406,7 +428,7 @@ jobs:
               cd factory/digital
               python tests/plant_loop.py --hub http://localhost:$comphubp --erp http://localhost:$comperpp --erp-kind real \
                 --erp-key "$(val WQ_C_${sup}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${sup}_ERP_API_SECRET)" --speed 300 --timeout 1200 \
-                --item WQ-PC1:2 --item WQ-NB14:1 --reliability 0 --staffing 0 --domains --expect-products WQ-PC1,WQ-NB14 \
+                --item WQ-PC1:2 --item WQ-NB14:1 --reliability 0 --staffing 0 --domains --expect-products WQ-PC1,WQ-NB14 $buyos \
                 2>&1 | tee /tmp/logs/computer_loop.log
               st=${PIPESTATUS[0]}
               cd - >/dev/null
@@ -455,6 +477,7 @@ jobs:
               [ -z "$sensorhubp" ] || park="$park --park-buy ENC-ABS=http://localhost:$sensorhubp=传感器厂"     # 第 125 轮：关节编码器
               [ -z "$motorhubp" ] || park="$park --park-buy MTR-SV-400=http://localhost:$motorhubp=电机厂"     # 第 131 轮：伺服电机
               [ -z "$comphubp" ] || park="$park --park-buy IPC=http://localhost:$comphubp=计算机厂"     # 第 166 轮：工控机
+              [ -z "$softhubp" ] || park="$park --park-buy LIC-ROBOT=http://localhost:$softhubp=软件公司"     # 第 167 轮：机器人软件授权
             fi
             if [ -z "$changed" ] || echo "$changed" | grep -qE \
                 "sim/(calib|errors|engine|runin)\.py|hub/lab2[68]\.py|cae/wqcr5\.py|plants/wenquest-robot|tests/plant_loop\.py|workflows/factory\.yml"; then

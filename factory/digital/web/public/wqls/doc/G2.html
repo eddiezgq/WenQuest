@@ -1,0 +1,641 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WQ-LS 设计计算书 · 第 2 关：动力学、强度与仿真</title><style>
+:root{--bg:#fbfbfa;--ink:#1d2329;--mut:#5b6670;--line:#d8dde2;--acc:#0b4fae;--hl:#fff3c4}
+@media (prefers-color-scheme: dark){:root{--bg:#15181b;--ink:#e6e9ec;--mut:#9aa5ae;--line:#39414a;--acc:#6aa7ff;--hl:#4a3f12}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 system-ui,"Noto Sans CJK SC","PingFang SC",sans-serif}
+main{max-width:860px;margin:0 auto;padding:16px 16px 64px}
+.note{color:var(--mut);font-size:13px;border-bottom:1px solid var(--line);padding-bottom:8px}
+h1{font-size:22px}h2{font-size:18px;margin-top:2em;scroll-margin-top:12px}h3{font-size:16px;scroll-margin-top:12px}
+h2:target,h3:target{background:var(--hl);border-radius:4px}
+table{border-collapse:collapse;display:block;overflow-x:auto;font-size:13.5px;margin:1em 0}
+td,th{border:1px solid var(--line);padding:4px 8px;vertical-align:top}th{background:rgba(127,127,127,.08)}
+code{font-size:.9em;background:rgba(127,127,127,.12);padding:0 3px;border-radius:3px}pre{overflow-x:auto}
+img{max-width:100%;height:auto}a{color:var(--acc)}blockquote{margin:1em 0;padding:0 12px;border-left:3px solid var(--line);color:var(--mut)}
+</style></head><body><main><p class="note">WQ-LS 设计文档 · G2/设计计算书.md · 设计计算的原文（中文） · Design document (Chinese original)</p><h1 id="s1">WQ-LS 设计计算书 · 第 2 关：动力学、强度与仿真</h1>
+<h1 id="s2">WQ-LS Design Calculations · Gate 2: Dynamics, Strength and Simulation</h1>
+<p>问渠示例设计，第 138 轮　2026-11-10　版本 G2-1
+<em>WenQuest example design. Checked by calculation only, no prototype. All masses are estimates until G4 replaces them with values from the solid parts.</em></p>
+<p>本文的数和图全部由程序生成，可以重算：</p>
+<table>
+<thead>
+<tr>
+<th>程序</th>
+<th>做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tools/wqls/dyn.py</code></td>
+<td>一转之内的动力学</td>
+</tr>
+<tr>
+<td><code>tools/wqls/g2.py</code></td>
+<td>驱动力矩、平衡、上轴、电机，以及与 MuJoCo 的对照</td>
+</tr>
+<tr>
+<td><code>tools/wqls/g2_fea.py</code></td>
+<td>上轴三维有限元</td>
+</tr>
+</tbody>
+</table>
+<p>原始结果在 <code>结果.json</code> 和 <code>有限元.json</code>。</p>
+<p>用到的软件：</p>
+<ul>
+<li>问渠缝纫机设计软件（机构几何、校核）</li>
+<li>数字工厂 CAE：MuJoCo 多体动力学；Gmsh + CalculiX 有限元；应力集中系数用教材《机械设计》33.5 节的轴对称有限元程序</li>
+<li>FreeCAD（上轴三维模型）</li>
+<li>教材《机械设计》第 33 章的疲劳方法（<code>mdstd</code>）</li>
+</ul>
+<hr />
+<h2 id="s3">结论 · Summary</h2>
+<table>
+<thead>
+<tr>
+<th>项目 Item</th>
+<th>结果 Result</th>
+<th>判据 Criterion</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主轴平均力矩 / 缝纫功率</td>
+<td>0.122 N·m / 64 W（阻力 ×2 时 127 W）</td>
+<td>—</td>
+<td>电机选 550 W 有余量</td>
+</tr>
+<tr>
+<td>一转之内的力矩起伏</td>
+<td>−4.3 … +5.0 N·m（主要是针杆和挑线杆的惯性）</td>
+<td>—</td>
+<td>起伏是平均值的 40 倍，决定电机和控制器怎么设计（第六节）</td>
+</tr>
+<tr>
+<td>MuJoCo 对照（刺布机构）</td>
+<td>最大差 0.009 N·m，为峰值 4.70 的 0.2%</td>
+<td>两种方法一致</td>
+<td>动力学模型可信</td>
+</tr>
+<tr>
+<td>平衡率</td>
+<td><strong>0.45</strong>（整机振动力最小 330 N）</td>
+<td>扫 0–1</td>
+<td>与教材 33.11 的 0.45 一致；设计软件默认 0.30 改为 0.45</td>
+</tr>
+<tr>
+<td>上轴疲劳安全系数（最危险截面 I）</td>
+<td><strong>3.02</strong></td>
+<td>≥ 1.5</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>上轴三维有限元（截面 I 弯矩最大时）</td>
+<td>最大 73 MPa（圆角 R0.5），静强度安全系数约 4.9</td>
+<td>≥ 2</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>曲柄处挠度</td>
+<td>27 µm</td>
+<td>≤ 50 µm（本设计定）</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>一阶临界转速</td>
+<td>11 652 r/min，为最高转速的 2.3 倍</td>
+<td>≥ 1.43 倍（最高转速 ≤ 0.7 倍临界）</td>
+<td>刚性轴，合格</td>
+</tr>
+<tr>
+<td>前轴承 6201 寿命 L10h</td>
+<td>41 600 h</td>
+<td>≥ 30 000 h（两班、约 8 年）</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>后轴承 6201 寿命 L10h</td>
+<td>455 000 h</td>
+<td>同上</td>
+<td>合格</td>
+</tr>
+<tr>
+<td>电机</td>
+<td>额定 550 W / 5000 r/min（1.05 N·m），峰值 ≥ 3 N·m，转子 + 手轮惯量约 4×10⁻⁴ kg·m²</td>
+<td>第六节</td>
+<td>交 GC 控制器设计</td>
+</tr>
+</tbody>
+</table>
+<p><strong>改了设计的两处：</strong></p>
+<ol>
+<li><strong>平衡率从 0.30 改为 0.45。</strong> 平衡块折算到曲柄半径处为 132 g（G1 为 96 g）。</li>
+<li><strong>上轴 LS-101 出 B 版。</strong> 教材 33.11 的 LS-101 全长 297 mm，跨不过 300 mm 的机臂空间。B 版全长 421 mm，两个 6201 的跨距 319 mm，轴段做法照教材。</li>
+</ol>
+<p><strong>比较后不采用的方案：中间加含油轴套（三支承）。</strong> 加了以后曲柄处挠度从 27 µm 降到 12 µm，临界转速升到 15 275 r/min。但前轴承寿命从 41 600 h 降到 36 700 h，三个孔还要一次镗出同轴，两支承已经全部合格，所以不加。</p>
+<hr />
+<h2 id="s4">一、模型与输入 · Model and inputs</h2>
+<p><strong>机构几何</strong>：G1 定的参数（<code>tools/wqls/spec.py</code>）：</p>
+<ul>
+<li>刺布曲柄滑块：r = 15.5 mm，l = 55 mm。</li>
+<li>挑线四连杆：设计软件第 4 章参数。</li>
+<li>送布：偏心距 1.1 mm，送布定时提前 6°。</li>
+</ul>
+<p><strong>方法</strong>：主轴匀速 ω。每个运动构件质心的位置和转角都是主轴转角 φ 的函数，对 φ 数值求导，按虚功率求驱动力矩：</p>
+<p>$$T(\varphi) = \sum_i \left( m_i\,\mathbf{x}_i'\cdot\mathbf{x}_i'' + I_i\,\theta_i'\theta_i'' \right)\omega^2 + \sum_i m_i g\, y_i' + \sum_j F_j\,|s_j'| $$</p>
+<p>上轴受的力用牛顿—欧拉方程求：</p>
+<ul>
+<li>针杆—连杆一组、挑线杆一组，分别解出销上的力。连杆和挑线杆有质量；摇杆按二力杆。</li>
+<li>再加上曲柄销当量质量和平衡块的离心力。</li>
+</ul>
+<p><strong>质量与转动惯量（估计值，G4 用实体零件的计算值替换）：</strong></p>
+<table>
+<thead>
+<tr>
+<th>构件</th>
+<th>质量</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>针杆组件（针杆、针夹、机针、线钩）</td>
+<td>0.09 kg</td>
+<td>设计软件 mr = 0.12 kg 里扣掉连杆往复的那一部分</td>
+</tr>
+<tr>
+<td>连杆</td>
+<td>0.040 kg，质心距曲柄销 0.38 l，I_G = 1.3×10⁻⁵ kg·m²</td>
+<td>钢锻件估计</td>
+</tr>
+<tr>
+<td>曲柄销当量</td>
+<td>0.06 kg</td>
+<td>设计软件 mo</td>
+</tr>
+<tr>
+<td>挑线杆</td>
+<td>0.025 kg，质心在 P→线眼 0.45 处</td>
+<td>设计软件 mt、link_com</td>
+</tr>
+<tr>
+<td>送布当量</td>
+<td>0.05 kg</td>
+<td>设计软件 mf</td>
+</tr>
+</tbody>
+</table>
+<p><strong>缝纫阻力（示例估计）：</strong></p>
+<ul>
+<li>机针穿布 4 N、出布摩擦 1.5 N。文献里 Nm 80–120 的机针穿刺力为几牛量级，没有查到可以直接引用的数值。</li>
+<li>压脚压力 50 N，布与压脚摩擦系数 0.25（设计软件棉布值）。</li>
+<li>挑线收紧时，线张力从 1.0 N 升到 1.4 N（设计软件的收紧峰值）。</li>
+<li>旋梭摩擦 0.02 N·m；轴承、油封、油泵、同步带合计 0.05 N·m。</li>
+</ul>
+<p>阻力都是估计值，所以做了 0.5 倍和 2 倍的敏感性分析（第二节）。</p>
+<h2 id="s5">二、主轴驱动力矩 · Drive torque　（图 <code>1_驱动力矩.png</code>）</h2>
+<table>
+<thead>
+<tr>
+<th>分量</th>
+<th>平均 N·m</th>
+<th>最小 N·m</th>
+<th>最大 N·m</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>针杆惯性</td>
+<td>0</td>
+<td>−3.87</td>
+<td>+3.87</td>
+</tr>
+<tr>
+<td>连杆惯性</td>
+<td>0</td>
+<td>−0.81</td>
+<td>+0.81</td>
+</tr>
+<tr>
+<td>挑线杆惯性</td>
+<td>0</td>
+<td>−2.82</td>
+<td>+4.42</td>
+</tr>
+<tr>
+<td>送布惯性</td>
+<td>0</td>
+<td>−0.01</td>
+<td>+0.01</td>
+</tr>
+<tr>
+<td>机针穿布</td>
+<td>0.013</td>
+<td>0</td>
+<td>0.064</td>
+</tr>
+<tr>
+<td>挑线收紧</td>
+<td>0.014</td>
+<td>0</td>
+<td>0.075</td>
+</tr>
+<tr>
+<td>送布（压脚摩擦，含顶起压脚）</td>
+<td>0.006</td>
+<td>−0.053</td>
+<td>0.064</td>
+</tr>
+<tr>
+<td>摩擦</td>
+<td>0.090</td>
+<td>0.090</td>
+<td>0.090</td>
+</tr>
+<tr>
+<td><strong>合计</strong></td>
+<td><strong>0.122</strong></td>
+<td><strong>−4.32</strong></td>
+<td><strong>+5.02</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>惯性力矩一转积分为零，不耗功，但在一转里来回推拉电机。缝纫真正耗的功只有 64 W。</li>
+<li>阻力敏感性：阻力 ×0.5 时 35 W，×2 时 127 W。教材 33.11 按 150 W 示意，电机选型按 150 W 留余量。</li>
+<li>转速的影响（惯性力矩与转速平方成正比）：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>转速 r/min</th>
+<th>3000</th>
+<th>4000</th>
+<th>5000</th>
+<th>5500</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>力矩最大 / 最小 N·m</td>
+<td>1.88 / −1.49</td>
+<td>3.25 / −2.72</td>
+<td>5.02 / −4.32</td>
+<td>6.05 / −5.24</td>
+</tr>
+<tr>
+<td>整机振动力最大 N</td>
+<td>119</td>
+<td>211</td>
+<td>330</td>
+<td>399</td>
+</tr>
+</tbody>
+</table>
+<p><strong>挑线杆的惯性力矩和针杆一样大</strong>（峰值 4.4 N·m）：线眼在一转里走 80 mm 的线，最大加速度上万 m/s²。挑线杆只有 25 g，却是主要的力矩来源之一。G4 设计挑线杆时，减重是重点。</p>
+<h2 id="s6">三、用 MuJoCo 对照 · Cross-check with MuJoCo　（图 <code>2_MuJoCo对照.png</code>）</h2>
+<p>用数字工厂的多体动力学引擎 MuJoCo 搭同一个刺布机构：曲柄、连杆、针杆，质量和转动惯量都相同。曲柄用运动约束驱动，以 5000 r/min 匀速转两圈，取第二圈的约束力矩，和本计算逐点比较：</p>
+<ul>
+<li>599 个点里，最大差 0.009 N·m、均方根差 0.004 N·m，是峰值 4.70 N·m 的 0.2%。</li>
+<li>两种方法互相独立：一种是公式加数值求导，一种是约束多体动力学。结果一致，说明惯性力矩的算法没错。</li>
+</ul>
+<h2 id="s7">四、平衡 · Balancing　（图 <code>3_平衡率.png</code>）</h2>
+<p>平衡块随曲柄转动，产生离心力，抵消针杆一阶往复惯性力的 k 倍。代价是在水平方向引入同样大小的力。扫 k = 0…1，5000 r/min：</p>
+<table>
+<thead>
+<tr>
+<th>平衡率 k</th>
+<th>0</th>
+<th>0.30</th>
+<th><strong>0.45</strong></th>
+<th>0.60</th>
+<th>1.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>整机振动力最大值 N</td>
+<td>503</td>
+<td>372</td>
+<td><strong>330</strong></td>
+<td>377</td>
+<td>543</td>
+</tr>
+<tr>
+<td>铅垂一阶 N</td>
+<td>399</td>
+<td>267</td>
+<td>201</td>
+<td>137</td>
+<td>70</td>
+</tr>
+<tr>
+<td>水平一阶 N</td>
+<td>109</td>
+<td>242</td>
+<td>309</td>
+<td>376</td>
+<td>554</td>
+</tr>
+<tr>
+<td>铅垂二阶 N</td>
+<td>103</td>
+<td>103</td>
+<td>103</td>
+<td>103</td>
+<td>103</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>取 0.45</strong>：合力最小。与教材《机械设计》33.11 取的值相同，也在教材“工程师笔记”说的 0.4–0.6 之内。</li>
+<li>二阶惯性力（103 N，频率为转速的 2 倍，即 167 Hz）平衡块管不了。所以 G1 定的机壳一阶固有频率 ≥ 210 Hz 很要紧：这一条在 G3 用机壳实体做模态分析时验证。</li>
+<li>平衡块折算到曲柄半径处为 132 g，G4 设计曲柄时按这个值配重。</li>
+</ul>
+<blockquote>
+<p><strong>G4 修订（2026-11-10）：平衡率改 0.35。</strong> 机壳模态做出来后，最低一阶是机头前后摆（Y 向，约 129 Hz），对它起作用的是水平一阶力。k 从 0.45 降到 0.35：合力最大值 330 → 351 N（+6%），水平一阶 309 → 264 N，机头前后摆振动约降 10%。平衡块折算到曲柄半径处 132 g → <strong>103 g</strong>。G4 装上机构后用谐响应再定一次。</p>
+</blockquote>
+<h2 id="s8">五、上轴 LS-101 B 版 · Upper shaft　（图 <code>4_上轴.png</code>、<code>6_上轴有限元.png</code>）</h2>
+<p><strong>结构</strong>（x 为沿轴位置，机针 x = 0，单位 mm）：</p>
+<table>
+<thead>
+<tr>
+<th>轴段 x</th>
+<th>直径</th>
+<th>装什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>−11…11</td>
+<td>Ø10</td>
+<td>针杆曲柄（x = 0）</td>
+</tr>
+<tr>
+<td>11…21</td>
+<td>Ø12</td>
+<td>前轴承 6201（中心 16）</td>
+</tr>
+<tr>
+<td>21…330</td>
+<td>Ø16</td>
+<td>挑线曲柄（30）、送布偏心（139）</td>
+</tr>
+<tr>
+<td>330…340</td>
+<td>Ø12</td>
+<td>后轴承 6201（中心 335）</td>
+</tr>
+<tr>
+<td>340…410</td>
+<td>Ø10</td>
+<td>同步带轮（352）、电机转子（392）</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>材料 45 钢调质，轴颈磨削。台阶圆角 R0.5：6201 的内圈倒角限制了圆角大小（教材 33.2.5）。</li>
+<li><strong>载荷</strong>（每个转角都算）：</li>
+<li>曲柄：连杆力加曲柄销和平衡块的离心力，最大 375 N。</li>
+<li>挑线曲柄：挑线杆的销力。</li>
+<li>送布偏心：送布连杆的力。</li>
+<li>同步带：120 N，向下。</li>
+<li>电机转子重 9 N。</li>
+<li><strong>梁单元计算</strong>：沿轴按 2 mm 一段划分，阶梯直径，两个平面分别算。</li>
+</ul>
+<p><strong>疲劳</strong>（无限寿命，教材 33.11 的方法）：</p>
+<ul>
+<li>截面一周取 72 个点，每个点随轴转一圈，算出弯曲应力的循环和扭转切应力。</li>
+<li>理论应力集中系数用轴对称有限元算。</li>
+<li>按 DIN 743 流程，乘上尺寸系数、表面系数，求合成安全系数。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>截面</th>
+<th>α_σ / α_τ</th>
+<th>σ_a / σ_m MPa</th>
+<th>τ_a MPa</th>
+<th>安全系数 S</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I 曲柄座 Ø10 → 前轴颈 Ø12</td>
+<td>2.04 / 1.49</td>
+<td>33.5 / 8.5</td>
+<td>23.8</td>
+<td><strong>3.02</strong></td>
+</tr>
+<tr>
+<td>II 前轴颈 Ø12 → 轴身 Ø16</td>
+<td>2.30 / 1.61</td>
+<td>27.9 / 9.3</td>
+<td>13.8</td>
+<td>3.75</td>
+</tr>
+<tr>
+<td>III 轴身 Ø16 → 后轴颈 Ø12</td>
+<td>2.30 / 1.61</td>
+<td>14.9 / 0.6</td>
+<td>13.8</td>
+<td>5.43</td>
+</tr>
+<tr>
+<td>IV 后轴颈 Ø12 → 带轮座 Ø10</td>
+<td>2.04 / 1.49</td>
+<td>19.3 / 0.0</td>
+<td>23.8</td>
+<td>3.74</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>截面 I 和 IV 的扭转切应力幅都是 23.8 MPa：一转里 ±5 N·m 的惯性力矩全部要从细的轴段通过。所以这根轴的疲劳主要由“惯性力矩起伏”决定，不由缝纫功率决定。</li>
+<li><strong>三维有限元</strong>（FreeCAD 建模，数字工厂 CAE：Gmsh 二阶四面体 7 万单元，CalculiX）：</li>
+<li>取截面 I 弯矩最大的转角 φ = 180°，加全部力和力矩；两个轴承位只限中间 1 mm 宽一圈（铰支，教材 33.11.5 “校准过”的加法），电机转子处限转动。</li>
+<li>最大应力 73 MPa，在截面 I 的 R0.5 圆角处，和名义应力乘应力集中系数的估算（约 86 MPa）在同一量级。</li>
+<li>2.5 mm 的网格对 0.5 mm 的圆角偏粗，峰值会低估，所以疲劳校核用上面那张表（细网格算的 α），有限元只用来看应力分布和找最危险的位置。</li>
+<li><strong>刚度和临界转速</strong>：曲柄处最大挠度 27 µm；一阶临界转速 11 652 r/min（集中质量：曲柄与平衡块 0.15 kg、挑线 0.05、送布偏心 0.08、带轮 0.06、转子 0.45 kg），是最高转速的 2.3 倍，属刚性轴。</li>
+<li><strong>轴承</strong>：6201 的额定动载荷 C = 7.28 kN（SKF 6201 TN9/C3，RS Components 目录）。当量载荷取一转里径向力的立方平均：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>轴承</th>
+<th>当量载荷</th>
+<th>最大径向力</th>
+<th>L10h（5000 r/min）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>前 6201</td>
+<td>314 N</td>
+<td>426 N</td>
+<td>41 600 h</td>
+</tr>
+<tr>
+<td>后 6201</td>
+<td>141 N</td>
+<td>162 N</td>
+<td>455 000 h</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>G4 修订：上轴 C 版（2026-11-10）。</strong> 机壳优化后立柱加宽到 x 300–396，电机外移到 x ≈ 423，上轴改为：两个 6201 在 x = 16 / 380，同步带轮 x = 352 移进轴身，右端 Ø10 轴段到 x = 472 装转子和手轮。复算（<code>python3 tools/wqls/g2.py</code>，图 <code>4_上轴.png</code> 已更新，k = 0.35）：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>C 版两支承</th>
+<th>加中间含油轴套</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>前轴承寿命 L10h</td>
+<td>45 925 h</td>
+<td>40 143 h</td>
+</tr>
+<tr>
+<td>后轴承寿命 L10h</td>
+<td>660 274 h</td>
+<td>—</td>
+</tr>
+<tr>
+<td>曲柄处挠度</td>
+<td>28.5 µm</td>
+<td>14.7 µm</td>
+</tr>
+<tr>
+<td>临界转速</td>
+<td>11 506 / 22 844 r/min</td>
+<td>19 539 r/min</td>
+</tr>
+<tr>
+<td>疲劳安全系数 截面 I–IV</td>
+<td>2.97 / 3.69 / 6.83 / 4.24</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>全部够用（寿命要求 ≥ 20 000 h，临界转速 ≥ 1.5 × 5000，S ≥ 1.5）。两支承就够，中间轴套不加。</p>
+<p><strong>G4.1 修订（2026-11-10 晚）：挑线机构改为共用曲柄销，上轴 D 版，平衡率 0.40。</strong> 做实体时发现教材的挑线曲柄（在刺布曲柄对面、单独一根销）装不下，改为挑线杆与针杆连杆共用曲柄销并重新综合（<code>G4/刺布与挑线机构.md</code>）。本计算书的数都已按新机构和实体质量重算（<code>python3 tools/wqls/g2.py</code>，图已更新）：</p>
+<ul>
+<li>质量：针杆组件 91.7 g、连杆 46.2 g、挑线杆 41.2 g（实体），替换了上面第一节的估计值。</li>
+<li>平衡：重扫 k，水平一阶力在 0.40 最小（6 N），取 0.40，平衡块折合 89 g。整机振动力最大 536 N，比教材机构大，主要是铅垂一阶 340 N 和二阶 229 N；挑线杆减重后再定（G4 后续）。</li>
+<li>上轴 D 版：曲柄、挑线杆、连杆都在轴端外侧（连杆平面 x = 9，曲柄 x = 25），前轴承移到 x = 37.5，前端 Ø15、前轴承 6202（C = 8.06 kN），后轴承仍 6201。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>D 版两支承</th>
+<th>加中间轴套</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>前轴承寿命 L10h</td>
+<td>21 497 h</td>
+<td>12 992 h</td>
+</tr>
+<tr>
+<td>后轴承寿命 L10h</td>
+<td>541 775 h</td>
+<td>—</td>
+</tr>
+<tr>
+<td>曲柄处挠度</td>
+<td>103 µm</td>
+<td>46 µm</td>
+</tr>
+<tr>
+<td>临界转速</td>
+<td>12 597 / 23 920 r/min</td>
+<td>19 599 r/min</td>
+</tr>
+<tr>
+<td>疲劳安全系数 截面 I–IV</td>
+<td>3.40 / 4.24 / 6.88 / 4.29</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>仍然不加中间轴套。曲柄的离心力（销与平衡块）现在加在曲柄平面 x = 25，连杆力加在连杆平面 x = 9；轴端外侧按刚性短梁算。
+上面 C 版的表作废。</p>
+</blockquote>
+<h2 id="s9">六、电机、惯量与控制方式（交给 GC）· Motor, inertia and control strategy</h2>
+<p>上轴一转里需要 −4.3 … +5.0 N·m 的力矩，平均却只有 0.12 N·m。电机和控制器有两种做法：</p>
+<table>
+<thead>
+<tr>
+<th>做法</th>
+<th>电机要出的力矩</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(a) 速度环很硬，电机补齐每一转的起伏</td>
+<td>均方根 2.73 N·m，峰值 5.0 N·m + 加速</td>
+<td>550 W 电机的额定力矩只有 1.05 N·m，要大一号以上的电机，铜损大、发热大</td>
+</tr>
+<tr>
+<td><strong>(b) 速度环带宽低于两倍转频，起伏由转动惯量吸收</strong>（建议）</td>
+<td>只出平均力矩和加减速力矩</td>
+<td>转速有小的波动，见下表</td>
+</tr>
+</tbody>
+</table>
+<p>负载侧转动惯量合计 1.24×10⁻⁴ kg·m²，包括上轴、下轴、旋梭（转速 2 倍，折算乘 4）、带轮，以及机构的平均当量惯量 0.26×10⁻⁴。按做法 (b)，再加不同的转子（含手轮）惯量：</p>
+<table>
+<thead>
+<tr>
+<th>转子 + 手轮惯量 kg·m²</th>
+<th>转速波动（5000 r/min）</th>
+<th>0.10 s 加速到 5000 r/min 要的力矩</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1×10⁻⁴</td>
+<td>±3.3%</td>
+<td>1.2 N·m</td>
+</tr>
+<tr>
+<td>2×10⁻⁴</td>
+<td>±2.3%</td>
+<td>1.7 N·m</td>
+</tr>
+<tr>
+<td><strong>4×10⁻⁴</strong></td>
+<td><strong>±1.4%</strong></td>
+<td><strong>2.7 N·m</strong></td>
+</tr>
+<tr>
+<td>8×10⁻⁴</td>
+<td>±0.8%</td>
+<td>4.8 N·m</td>
+</tr>
+</tbody>
+</table>
+<p><strong>建议的电机规格（交给 GC 选型）：</strong></p>
+<ul>
+<li>额定 550 W / 5000 r/min（1.05 N·m），峰值力矩 ≥ 3 N·m。</li>
+<li>转子加手轮惯量约 4×10⁻⁴ kg·m²。</li>
+<li>按每 2 s 起停一次估算（加速、减速各 0.1 s，缝 1.3 s，停 0.5 s）：力矩均方根约 0.9 N·m，在额定力矩之内。</li>
+</ul>
+<p>GC 要仿真验证三件事：</p>
+<ol>
+<li>速度环怎么设：带宽要低于 167 Hz 的二倍频。</li>
+<li>能不能按转角查表，给已知的负载力矩加前馈：力矩起伏的形状是确定的，补一部分能进一步减小转速波动，但要权衡电机发热。</li>
+<li>0.1 s 起动、停针定位、剪线时序。</li>
+</ol>
+<h2 id="s10">七、还没算的 · Not yet done</h2>
+<ul>
+<li><strong>机壳模态和谐响应</strong>：要机壳实体，在 G3 做。目标是一阶固有频率 ≥ 210 Hz，并在本章的振动力作用下算响应。</li>
+<li><strong>下轴、旋梭轴、齿轮、同步带选型</strong>：在 G4 和零件一起做。</li>
+<li><strong>质量换成实体零件的值后重算一遍</strong>：G4。挑线杆的质量估计对力矩影响大，是重点。</li>
+<li><strong>电控箱热设计</strong>：在 GC 按本章的电流复核。</li>
+</ul></main></body></html>

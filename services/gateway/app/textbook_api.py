@@ -57,7 +57,8 @@ TASKDOCS = ("task", "rubric", "calc")
 # 网页版教材（第 15 轮）：整本网页书放在 <dir>/<book>/webed/（book.json + 页面、实验、插图），登录后经有时效的链接阅读
 WEB_TTL = 12 * 3600
 WEB_TYPES = {".html": "text/html; charset=utf-8", ".webp": "image/webp", ".png": "image/png", ".svg": "image/svg+xml",
-             ".js": "text/javascript", ".css": "text/css", ".json": "application/json"}
+             ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
+             ".bin": "application/octet-stream", ".pdf": "application/pdf"}   # 第 138 轮：三维整机的网格、图纸
 
 
 def media_dir(m, book: str) -> Path:
