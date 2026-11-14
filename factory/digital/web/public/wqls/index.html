@@ -3,7 +3,7 @@
      数据由 tools/wqls/g6_web.py 生成（machine.json、mesh.bin、frames.bin、doc/、dwg/），都在本目录。
      挂两处：数字工厂（/wqls/index.html，公开）和《缝纫机设计与制造》第 27 章（构建时复制到 labs/wqls/）。
      参数：?lang=en  ?part=<零件名或物料号>  ?opt=TED  ?view=iso|face|front|hook|feed|press|trim|whole  ?fps=1（显示帧率）
-     three.js r128：先用平台的 /vendor/，没有就用本目录的 three.min.js（数字工厂没有 /vendor/）。 -->
+     three.js r128 用本目录的 three.min.js（数字工厂没有 /vendor/，教材复制时一起带上；不连外部网站）。 -->
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>WQ-LS 整机</title>
 <style>
@@ -82,8 +82,7 @@ body.shot .panel,body.shot .top,body.shot .card{display:none!important}
 </div>
 <div class="card" id="card" hidden></div>
 <div class="fps" id="fps" hidden></div>
-<script src="/vendor/three/r128/three.min.js"></script>
-<script>window.THREE || document.write('<script src="three.min.js"><\/script>')</script>
+<script src="three.min.js"></script>
 <script>
 (async function () {
 'use strict';

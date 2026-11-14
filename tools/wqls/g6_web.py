@@ -3,7 +3,7 @@
     python3 tools/wqls/g6_web.py <整机目录根> <机壳目录> factory/digital/web/public/wqls
 
 输出目录就是网页所在的目录：数字工厂把它作为公开页面 /wqls/index.html 提供，《缝纫机设计与制造》网页版构建时整个复制到 labs/wqls/。
-页面 index.html 是手写的（不由本程序生成）；three.min.js（r128）是 site/cases/three.min.js 的副本，平台有 /vendor/ 时不用它。
+页面 index.html 是手写的（不由本程序生成）；three.min.js（r128）是 site/cases/three.min.js 的副本，页面只用它。
 
 <整机目录根> 里是 cad/mech.py 按各状态建出来的整机（b_<档位>_<压脚>_<选项>，选项 none / TE / T / E），
 每个目录先用 render/web_tess.py 划好网页用的网格（<目录>/web/*.stl）；<机壳目录> 里是 housing_upper.step、housing_lower.step
