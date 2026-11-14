@@ -13,6 +13,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 FW = os.path.join(os.path.dirname(HERE), "ctrl-ls", "fw")
 ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 SYM = "/usr/share/kicad/symbols/MCU_ST_STM32G4.kicad_sym"
+# 159c 的复算结果、第 138 轮的机构模型只在问渠仓库里（freecad-ai-parts 同步了 factory/，没有 docs/ 和 tools/wqls/）
+REF159C = os.path.join(ROOT, "docs", "设计", "WQ-LS", "GC", "控制器仿真", "仿真结果.json")
+WQLS = os.path.join(ROOT, "tools", "wqls")
 
 
 def _t(p):
@@ -36,13 +39,14 @@ def test_four_scenarios_pass():
     assert "示例" in s["disclaimer"] and "未选型" in s["disclaimer"]
 
 
+@pytest.mark.skipif(not os.path.exists(REF159C), reason="159c 的复算结果只在问渠仓库里")
 def test_cycle_compared_with_159c():
     """场景 ① 每一项和 159c 对照的都写了 159c 的数"""
     s = _sim()
     cyc = s["scenarios"][0]
     vs = [c for c in cyc["checks"] if c["vs"]]
     assert len(vs) >= 6 and all("159c" in c["vs"] for c in vs)
-    ref = json.load(open(os.path.join(ROOT, "docs", "设计", "WQ-LS", "GC", "控制器仿真", "仿真结果.json"), encoding="utf-8"))["servo"]
+    ref = json.load(open(REF159C, encoding="utf-8"))["servo"]
     assert any("{:.4f}".format(ref["t_reach_5000_s"]) in c["vs"] for c in vs)
     assert any("{:.4f}".format(ref["t_from_release_s"]) in c["vs"] for c in vs)
 
@@ -129,6 +133,7 @@ def test_controller_matches_model():
     assert abs((64 + (0x95 & 0x3F)) * 2 / 170e6 - un["ipm_inverter"]["t_dead"]) < 1e-9 and "#define DTG_1US 0x95u" in h
 
 
+@pytest.mark.skipif(not os.path.isdir(WQLS), reason="第 138 轮的机构模型只在问渠仓库里")
 def test_load_table_matches_g2():
     """一转负载表是第 138 轮 G2 的（dyn.py 重算一致）；要 numpy，没有就跳过"""
     pytest.importorskip("numpy")
@@ -142,11 +147,12 @@ def test_load_table_matches_g2():
         assert ln == "{:.1f} {:.6f} {:.6f}".format(*r)
 
 
+@pytest.mark.skipif(not os.path.isdir(WQLS), reason="第 138 轮的机构模型只在问渠仓库里")
 def test_ref_159c_matches_model():
     """out/ref_159c.json 是 159c 同一个模型算的（要 numpy、matplotlib，没有就跳过）"""
     pytest.importorskip("numpy")
     pytest.importorskip("matplotlib")
-    sys.path.insert(0, os.path.join(ROOT, "tools", "wqls"))
+    sys.path.insert(0, WQLS)
     import gc_sim
 
     old = gc_sim.T_PEAK
