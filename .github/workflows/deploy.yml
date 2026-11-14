@@ -616,6 +616,7 @@ jobs:
           echo "GPU 实验设置已写入服务器"
       - name: Update the server
         if: env.SKIP != '1'
+        timeout-minutes: 60   # 第 170 轮：11-14 这一步一声不吭挂了 2 小时 13 分（连接断了才退出），后面的部署全被堵住
         run: |
           if ! ssh "deploy@$HOST" 'test -f /opt/wenquest/.env'; then
             echo "::error::/opt/wenquest/.env is missing. On the server run: cd /opt/wenquest && deploy/init-env.sh  - then re-run this workflow."
@@ -624,8 +625,8 @@ jobs:
           # The digital factory deploys to the same server: login, pulls and image pruning take turns under one lock,
           # so pushes that trigger both deploys do not break each other. The update log is kept for annotations.
           set +e
-          echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "flock -w 1500 /tmp/wenquest-deploy.lock sh -c 'docker login ghcr.io -u ${{ github.actor }} --password-stdin && /opt/wenquest/deploy/update.sh ${{ needs.build.outputs.image }}'" 2>&1 | tee /tmp/update.log
-          st=${PIPESTATUS[0]}
+          echo "${{ secrets.GITHUB_TOKEN }}" | ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=6 "deploy@$HOST" "flock -w 1500 /tmp/wenquest-deploy.lock sh -c 'docker login ghcr.io -u ${{ github.actor }} --password-stdin && /opt/wenquest/deploy/update.sh ${{ needs.build.outputs.image }}'" 2>&1 | tee /tmp/update.log
+          st=${PIPESTATUS[1]}   # 第 170 轮：管道第一段是 echo，原来取 [0] 永远是 0，更新失败也算成功
           if [ "$st" != 0 ]; then
             python3 factory/deploy/ci_annotate.py "Server update" /tmp/update.log 180
             exit "$st"

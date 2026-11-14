@@ -783,7 +783,7 @@ jobs:
           # 学习平台与数字工厂部署在同一台服务器：登录、拉镜像、清理镜像排队做（同一把锁），避免同时推送时互相打断
           set +e
           echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "flock -w 1500 /tmp/wenquest-deploy.lock sh -c 'docker login ghcr.io -u ${{ github.actor }} --password-stdin && /opt/wenquest/factory/deploy/update.sh ${{ needs.build.outputs.app }} ${{ needs.build.outputs.bridge }} ${{ needs.build.outputs.openplc }}'" 2>&1 | tee /tmp/update.log
-          st=${PIPESTATUS[0]}
+          st=${PIPESTATUS[1]}   # 第 170 轮：第一段是 echo，原来取 [0] 永远是 0
           if [ "$st" != 0 ]; then
             python3 factory/deploy/ci_annotate.py 服务器更新 /tmp/update.log 180
             ssh "deploy@$HOST" "cd /opt/wenquest/factory && docker compose -p wq-factory ps -a && docker compose -p wq-factory logs --no-color --tail 60 hub bridge erp-backend" > /tmp/server.log 2>&1
