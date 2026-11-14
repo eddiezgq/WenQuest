@@ -137,3 +137,24 @@ clips:
     do:
       - {at: 0.3, ring: "a.ont-banner >> nth=0", for: 2.2, pad: 4}
       - {at: 2.4, ring: "section.brief", for: 2.5, pad: 6}
+  # 第 159 轮 159f：平缝机控制器 CTRL-LS 的固件在 Renode 里缝一段（电路板设计 → 平缝机控制器 → 固件）。159g 帮助里用。
+  # 本机起一座教学版数字工厂即可（这一页只读仓库里的固件产物，哪座厂都一样）；录的时候用的是 8100。
+  - name: ctrl-ls-fw
+    hub: 8100
+    role: planner          # 这一页不看岗位；学生岗位不用老师密码
+    url: /pcb-design?rev=C&tab=fw
+    viewport: [1440, 810]
+    wait: 6000
+    dur: 30
+    do:
+      - {at: 0.5, ring: ".chain", for: 3, pad: 6}
+      - {at: 4, ring: {zh: "button:has-text('① 与 159c')", en: "button:has-text('① Same work cycle')"}, for: 2, pad: 4}
+      - {at: 6, scroll: ".charts", dur: 1.5}
+      - {at: 8, ring: ".charts > div:nth-child(1)", for: 3, pad: 4}
+      - {at: 11.5, ring: ".charts > div:nth-child(4)", for: 3, pad: 4}
+      - {at: 15, scroll: ".card2 .tbl", dur: 1.5}
+      - {at: 17, ring: ".card2 .tbl", for: 4, pad: 4}
+      - {at: 22, click: {zh: "button:has-text('② 缝一段')", en: "button:has-text('② Sew a seam')"}, keep: true}
+      - {at: 22, ring: {zh: "button:has-text('② 缝一段')", en: "button:has-text('② Sew a seam')"}, for: 1.5, pad: 4}
+      - {at: 24, scroll: ".charts", dur: 1.5}
+      - {at: 26, ring: ".charts > div:nth-child(4)", for: 3.5, pad: 4}

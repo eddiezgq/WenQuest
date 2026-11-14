@@ -139,7 +139,7 @@ def act(page, a: dict, lang: str = "zh"):
 def record(b, c: dict, lang: str, site_port: int, out: Path):
     w, h = c.get("viewport") or (1920, 1080)          # 页面按多大的浏览器排版；输出总是 1920×1080（小视口 = 放大倍数 1920/w，文字照样清楚）
     ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=1920 / w, locale="zh-CN" if lang == "zh" else "en-US")
-    ctx.add_init_script(f"try{{for (const k of ['wq-site-lang','eda.lang']) localStorage.setItem(k,'{lang}')}}catch(e){{}}")
+    ctx.add_init_script(f"try{{for (const k of ['wq-site-lang','eda.lang','wq-factory-lang']) localStorage.setItem(k,'{lang}')}}catch(e){{}}")
     if c.get("hub"):
         tok = hub_token(c["hub"], c.get("role", "manager"))
         ctx.add_init_script("localStorage.setItem('wq-df-session', " + json.dumps(json.dumps(tok)) + ")")
