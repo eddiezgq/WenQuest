@@ -586,7 +586,8 @@ jobs:
         run: |
           books=$(ls textbook-build | tr "\n" " ")   # one line: the list goes into the remote command (several books since 第 10 轮)
           du -sh textbook-build/* || true
-          if ! tar czf - -C textbook-build . | ssh "deploy@$HOST" "set -e; mkdir -p /opt/wenquest/textbook; cd /opt/wenquest/textbook; for b in $books; do rm -rf \"\$b\" 2>>/tmp/textbook-copy.log; done; tar xzf - 2>>/tmp/textbook-copy.log"; then
+          # 先解到旁边、收齐再逐本换上（第 170 轮，同国内第 168 轮）：传到一半断了，旧书不受影响
+          if ! tar czf - -C textbook-build . | ssh "deploy@$HOST" "set -e; mkdir -p /opt/wenquest/textbook; cd /opt/wenquest; rm -rf textbook.incoming; mkdir textbook.incoming; tar xzf - -C textbook.incoming 2>>/tmp/textbook-copy.log; for b in $books; do rm -rf \"textbook/\$b\" 2>>/tmp/textbook-copy.log; mv \"textbook.incoming/\$b\" \"textbook/\$b\"; done; rm -rf textbook.incoming"; then
             ssh "deploy@$HOST" 'tail -n 15 /tmp/textbook-copy.log; find /opt/wenquest/textbook ! -user deploy 2>&1 | head -n 5; ls -la /opt/wenquest/textbook/robotics 2>&1 | head -n 8' | sed 's/^/::error::/' || true
             exit 1
           fi
@@ -911,6 +912,26 @@ jobs:
         run: |
           ssh "deploy@$HOST" '/opt/wenquest/deploy/check-docs.sh' 2>&1 | tee /tmp/docs.log || true
           if ! grep -q '^docs ok$' /tmp/docs.log; then echo "::warning title=Online documents (China)::$(tail -n 1 /tmp/docs.log)"; exit 1; fi
+      - name: Cam, bearing and electronics sites answer (第 170 轮：原来只查美国)
+        if: env.SKIP != '1'
+        continue-on-error: true
+        timeout-minutes: 8
+        run: |
+          ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for s in cam bearing eda; do for i in $(seq 1 12); do c=$(curl -s -o /dev/null -w "%{http_code}" --resolve "$D:443:127.0.0.1" "https://$D/$s/api/health"); [ "$c" = 200 ] && break; sleep 5; done; echo "$s $c"; if [ "$c" != 200 ]; then . deploy/lib.sh; dc ps -a $s; dc logs --tail 60 $s; fi; done' > /tmp/sites.log 2>&1 || true
+          cat /tmp/sites.log
+          bad=$(grep -E '^(cam|bearing|eda) ' /tmp/sites.log | grep -v ' 200$' || true)
+          n=$(grep -cE '^(cam|bearing|eda) 200$' /tmp/sites.log || true)
+          if [ -n "$bad" ] || [ "$n" != 3 ]; then python3 factory/deploy/ci_annotate.py "China cam/bearing/eda" /tmp/sites.log 120; exit 1; fi
+      - name: Disk space on the China server (第 170 轮：国内 11-08 磁盘满过)
+        if: env.SKIP != '1'
+        continue-on-error: true
+        run: |
+          used=$(ssh "deploy@$HOST" "df -P / | awk 'NR==2 {sub(\"%\", \"\", \$5); print \$5}'")
+          echo "China server disk used: ${used}%"
+          if [ "${used:-0}" -gt 90 ]; then
+            echo "::warning title=China server disk ${used}% full::国内服务器磁盘快满了（在服务器上运行 deploy/status.sh 看备份和镜像占用）。"
+            exit 1
+          fi
       - name: Pages get their fonts and libraries from this server (第 34 轮)
         if: env.SKIP != '1'
         continue-on-error: true

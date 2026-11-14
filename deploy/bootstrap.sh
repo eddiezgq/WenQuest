@@ -60,6 +60,11 @@ ufw allow 443/tcp
 ufw allow 443/udp
 ufw --force enable
 
+# 第 170 轮：容器多了以后，默认 128 个 inotify 实例会用完，systemd 满屏“Too many open files”（国内服务器 2026-11-14）
+echo "== inotify limits"
+printf 'fs.inotify.max_user_instances=8192\nfs.inotify.max_user_watches=524288\n' > /etc/sysctl.d/99-wenquest-inotify.conf
+sysctl --system > /dev/null
+
 echo "== Install directory and daily backup"
 install -d -o deploy -g deploy "$WQ_DIR" "$WQ_DIR/backups"
 cat > /etc/cron.d/wenquest-backup <<EOF

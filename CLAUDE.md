@@ -14,7 +14,7 @@
 2. **每轮改动先写进《实施细则 · 第 N 轮》**（放 `docs/实施细则/`，格式参照前几轮：决定、规则、交付物、施工顺序与验收），Eddie 确认后才动手。
 3. **施工严格按细则**；有偏差先写回细则并告诉 Eddie。
 4. **收尾对照细则逐条验收**，把结果写进细则；同步写帮助文件（`docs/帮助/`）；影响总方案的，更新 `docs/方案/`。
-5. **推送到 main = 自动上线**（GitHub Actions 测试 → 构建 → 部署到服务器）。推送前本地跑通测试；推送后跟踪部署结果，告诉 Eddie 成功与否。
+5. **推送到 main 后上线**（GitHub Actions 测试 → 构建 → 部署到服务器；推送只跑检查，上线靠定时或手动启动，见下面技术速查）。推送前本地跑通测试；要尽快上线就手动启动部署，跟踪结果，告诉 Eddie 成功与否。
 6. 所有资料、方案、样品都放进本仓库，不只留在对话里。
 
 ## 产品原则
@@ -35,8 +35,10 @@
 | 前端（uni-app，网页 + 微信小程序） | `apps/web/` | `npm ci && npm test && npm run build:h5` |
 | 接口网关（FastAPI） | `services/gateway/` | `pip install -r requirements-dev.txt && python -m pytest -q` |
 | Moodle 插件 | `plugins/` | — |
-| 部署 | `.github/workflows/deploy.yml`、`deploy/` | 推送 main 跑检查，每半小时定时上线；手动 `gh workflow run deploy.yml --ref main` 默认增量（没改的教材跳过），全量重建要加 `-f fresh=true`（几个小时的用量，第 116 轮） |
+| 部署 | `.github/workflows/deploy.yml`、`deploy/` | 推送 main 只跑检查、不上线；定时上线写的是每半小时，实际 GitHub 限流后大约几小时才一次（2026-11-14 实测约 6 小时，第 170 轮），要马上上线就手动启动；手动 `gh workflow run deploy.yml --ref main` 默认增量（没改的教材跳过），全量重建要加 `-f fresh=true`（几个小时的用量，第 116 轮） |
 | 本地完整环境（Moodle + 网关 + 网页端） | `tools/local/setup.sh`，说明见 `docs/帮助/本地测试环境.md` | 推送前用老师和学生账号实际走一遍 |
+
+改了 `factory/`、`library/` 里教材会读的数据（各书 `meta.yaml` 的 `program_deps` 登记了哪些），推送后要看 “Build and deploy” 推送检查里那几本书的结果，红了当场修——2026-11-14 第 167 轮给 WQ-CR5 加了一项物料，《机器人学》30.4 的图报错，推送检查红了没人管，整整一个上午什么都上不了线（第 168、170 轮）。
 
 改了平台要读的数据格式（例如教材 `web/index.json` 的字段或类型），必须连 `services/gateway` 的测试一起跑，并且用真实构建产物把页面打开一遍再推——只跑 `textbook/tools` 的测试不够：2026-10-08 加数学篇的 M 章号时就是这样把《人工智能》整本的目录页跑成了 500。
 

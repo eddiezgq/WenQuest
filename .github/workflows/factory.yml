@@ -918,8 +918,9 @@ jobs:
           ssh cn "flock -w 1500 /tmp/wenquest-deploy.lock /opt/wenquest/factory/deploy/update.sh $app $bridge $openplc" 2>&1 | tee /tmp/update.log
           st=${PIPESTATUS[0]}
           if [ "$st" = 3 ]; then
-            echo "::warning::国内服务器可用内存不够，数字工厂这次没装（升配后要重启服务器才生效）；学习平台未受影响。"
-            exit 0
+            # 第 170 轮：原来 exit 0 算成功，国内工厂会悄悄停在旧版本；改成失败，好让人看见
+            echo "::error::国内服务器可用内存不够，数字工厂这次没装（升配后要重启服务器才生效）；学习平台未受影响。"
+            exit 1
           fi
           if [ "$st" != 0 ]; then
             python3 factory/deploy/ci_annotate.py 国内服务器更新 /tmp/update.log 180
