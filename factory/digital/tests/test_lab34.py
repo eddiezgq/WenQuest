@@ -27,8 +27,8 @@ from hub import lab24, lab34
 db = DB(BASE + "/wq_lab34_test")
 db.init()
 out = {{"exp": lab34.expected_counts()}}
-out["t1_right"] = lab34.answer(db, "甲", "l34_t1", {{"work_orders": 8, "key_parts": 5}})["score"]
-out["t1_half"] = lab34.answer(db, "乙", "l34_t1", {{"work_orders": 8, "key_parts": 6}})["score"]
+out["t1_right"] = lab34.answer(db, "甲", "l34_t1", {{"work_orders": 9, "key_parts": 6}})["score"]
+out["t1_half"] = lab34.answer(db, "乙", "l34_t1", {{"work_orders": 9, "key_parts": 5}})["score"]
 out["t1_bad"] = lab34.answer(db, "丙", "l34_t1", {{"work_orders": "x", "key_parts": None}})["score"]
 out["t6_right"] = lab34.answer(db, "甲", "l34_t6", {{"choices": ["foundry", "age2", "cmm", "runin"]}})["score"]
 out["t6_part"] = lab34.answer(db, "乙", "l34_t6", {{"choices": ["foundry"]}})["score"]
@@ -60,7 +60,7 @@ def test_lab34_answers_and_layers():
                        timeout=300)
     assert r.returncode == 0, r.stderr[-3000:]
     out = json.loads(r.stdout)
-    assert out["exp"] == {"work_orders": 8, "key_parts": 5}, out
+    assert out["exp"] == {"work_orders": 9, "key_parts": 6}, out          # 第 138 轮 G7.1：BOM 由设计生成，多了抬牙偏心 LS-402
     assert (out["t1_right"], out["t1_half"], out["t1_bad"]) == (10, 5, 0), out
     assert (out["t6_right"], out["t6_part"], out["t6_wrong"]) == (5, 2, 0), out
     assert out["t3_no_order"] == 0
