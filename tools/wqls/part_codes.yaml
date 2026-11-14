@@ -33,6 +33,8 @@ docs:
   G5m: G5/机壳机加工工艺.md
 assemblies:
   HSG-LS: [机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P）, Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)]
+extra_items:              # 三维里没有、但有图纸的物料（物料卡片上挂图）
+  CAST-LS: {parts: [housing_upper, housing_lower], dwg: [G5/工程图/毛坯图_上件.pdf, G5/工程图/毛坯图_下件.pdf]}
 parts:
   # —— 机壳 ——
   housing_upper: {code: HSG-LS-U, name: [机壳上件, "Housing, upper part"], kind: make, group: hsg, mat: HT250, of: HSG-LS,
@@ -40,8 +42,8 @@ parts:
   housing_lower: {code: HSG-LS-L, name: [机壳下件（机座）, "Housing, lower part (bed)"], kind: make, group: hsg, mat: HT250, of: HSG-LS,
                   doc: "G5m#〇、G5.2：先做精基准、合箱，再整体精加工（以本节为准）", dwg: [G5/工程图/零件图_下件.pdf, G5/工程图/合件图.pdf] }
   # —— 主轴与传动、电机 ——
-  shaft: {code: LS-101, name: [上轴, Upper shaft], kind: make, group: main, mat: 45 钢调质, doc: "G2#五、上轴 LS-101 B 版 · Upper shaft"}
-  lower_shaft: {code: LS-102, name: [下轴, Lower shaft], kind: make, group: hook, mat: 45 钢调质, doc: "G4h#二、零件"}
+  shaft: {code: LS-101, name: [上轴, Upper shaft], kind: make, group: main, mat: 45 钢调质, doc: "G2#五、上轴 LS-101 B 版 · Upper shaft", dwg: [G7/工程图/LS-101.pdf]}
+  lower_shaft: {code: LS-102, name: [下轴, Lower shaft], kind: make, group: hook, mat: 45 钢调质, doc: "G4h#二、零件", dwg: [G7/工程图/LS-102.pdf]}
   crank: {code: LS-103, name: [曲柄（带平衡块）, Crank with counterweight], kind: buy, group: needle, doc: "G2#四、平衡 · Balancing"}
   crank_pin: {code: LS-104, name: [曲柄销, Crank pin], kind: buy, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
   pulley_upper: {code: LS-105, name: [上带轮, Upper timing pulley], kind: buy, group: hook, doc: "G4h#二、零件"}
@@ -61,7 +63,7 @@ parts:
   rotor_magnets: {code: BUY-MOTOR-LS, sub: [磁钢, magnets], name: [直驱电机, Direct-drive motor], kind: buy, group: main}
   encoder_disc: {code: BUY-MOTOR-LS, sub: [编码器码盘, encoder disc], name: [直驱电机, Direct-drive motor], kind: buy, group: main}
   # —— 刺布挑线 ——
-  needle_bar: {code: LS-201, name: [针杆, Needle bar], kind: make, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
+  needle_bar: {code: LS-201, name: [针杆, Needle bar], kind: make, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）", dwg: [G7/工程图/LS-201.pdf]}
   needle_clamp: {code: LS-202, name: [针夹, Needle clamp], kind: buy, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
   nb_link: {code: LS-203, name: [针杆连接块, Needle-bar connecting block], kind: buy, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
   rod: {code: LS-204, name: [针杆连杆, Needle-bar connecting rod], kind: buy, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
@@ -79,8 +81,8 @@ parts:
   bushes_hook: {code: LS-305, qty: 2, name: [旋梭轴铜套, Hook-shaft bushings], kind: buy, group: hook, mat: 锡青铜, doc: "G4h#四、校核（全部合格）"}
   bobbin_case: {code: BUY-BOBCASE, name: [梭壳与梭芯, Bobbin case & bobbin], kind: buy, group: hook}
   # —— 送布与油泵 ——
-  feed_ecc: {code: LS-401, name: [送布偏心, Feed eccentric], kind: make, group: feed, mat: 45 钢, doc: "G4f#一、布置"}
-  lift_ecc: {code: LS-402, name: [抬牙偏心, Lift eccentric], kind: make, group: feed, mat: 45 钢, doc: "G4f#一、布置"}
+  feed_ecc: {code: LS-401, name: [送布偏心, Feed eccentric], kind: make, group: feed, mat: 45 钢, doc: "G4f#一、布置", dwg: [G7/工程图/LS-401.pdf]}
+  lift_ecc: {code: LS-402, name: [抬牙偏心, Lift eccentric], kind: make, group: feed, mat: 45 钢, doc: "G4f#一、布置", dwg: [G7/工程图/LS-402.pdf]}
   feed_rod: {code: LS-403, name: [送布连杆, Feed connecting rod], kind: buy, group: feed, mat: ADC12 压铸铝, doc: "G4f#六、强度（5000 r/min、5 mm 针距；正缝、倒缝取大的）"}
   regulator: {code: LS-404, name: [送布调节器, Feed regulator], kind: buy, group: feed, mat: 45 钢, doc: "G4f#三、针距调节和倒缝"}
   reg_slider: {code: LS-405, name: [调节器滑块, Regulator slider], kind: buy, group: feed, mat: 45 钢, doc: "G4f#三、针距调节和倒缝"}
@@ -129,7 +131,7 @@ parts:
   trim_link: {code: LS-707, name: [剪线拉杆, Trimmer link], kind: buy, group: optT, doc: "G4o#二、剪线机构"}
   trim_lever: {code: LS-708, name: [剪线摆杆, Trimmer cam lever], kind: buy, group: optT, doc: "G4o#二、剪线机构"}
   trim_roller: {code: LS-709, name: [凸轮滚子, Cam roller], kind: buy, group: optT, doc: "G4o#二、剪线机构"}
-  trim_cam: {code: LS-710, name: [剪线凸轮, Trimmer cam], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  trim_cam: {code: LS-710, name: [剪线凸轮, Trimmer cam], kind: make, group: optT, doc: "G4o#二、剪线机构", dwg: [G7/工程图/LS-710.pdf]}
   wiper: {code: LS-711, name: [拨线钩, Thread wiper], kind: buy, group: optT, doc: "G4o#三、松线电磁铁和拨线器"}
   release_arm_t: {code: LS-712, name: [松线臂, Release arm], kind: buy, group: optT, doc: "G4o#三、松线电磁铁和拨线器"}
   trim_solenoid: {code: BUY-SOL-TRIM, name: [剪线电磁铁, Trimmer solenoid], kind: buy, group: optT, doc: "G4o#二、剪线机构"}

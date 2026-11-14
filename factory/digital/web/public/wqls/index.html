@@ -102,8 +102,8 @@ const TXT = {
     hintWipe: '拨线：针停在 80°，拨线钩从压脚外侧扫过针下，把剪断的线头拨到压脚上面。', hintE: '选项 E：针距由步进电机经同步带转调节器，去掉了针距旋钮、拉杆、倒缝扳手和拉簧，倒缝改成按钮。',
     hintD: '选项 D：只多一道工序——旋梭的梭床和梭尖镀 DLC 膜（2–3 µm），零件形状不变。',
     code: '物料号', kind: '来源', make: '自制', buy: '外购', buyDwg: '按我们的图外协加工或外购', grp: '部件', mat: '材料', matNone: '未定（质量按钢 7.85 g/cm³ 算）',
-    mass: '质量', qty: '件数', of: '属于', dwg: '图纸', calc: '计算书', inAsm: '外购部件里的一件', dlc: '选 D 时梭床、梭尖镀 DLC 膜',
-    noDwg: '图纸：这一件还没有出零件图（G5 只出了机壳的图）。', g: 'g', kg: 'kg', hsgNote: '机壳上下件合箱后一起精加工，合件物料号 HSG-LS-P。', fps: '帧/秒' },
+    mass: '质量', qty: '件数', of: '属于', dwg: '图纸', calc: '计算书', step: '三维模型 STEP', inAsm: '外购部件里的一件', dlc: '选 D 时梭床、梭尖镀 DLC 膜',
+    noDwg: '图纸：这一件外协或外购，零件图还没出（本厂自制件都有图）。', g: 'g', kg: 'kg', hsgNote: '机壳上下件合箱后一起精加工，合件物料号 HSG-LS。', fps: '帧/秒' },
   en: { title: 'WQ-LS complete machine', controls: 'Controls', lead: 'The real design of an industrial direct-drive lockstitch machine: every part is a FreeCAD solid and every 2° of motion comes from the design calculations. Drag the handwheel to turn the main shaft; click a part for its item number.',
     s_turn: 'Turn', pause: 'Pause', play: 'Play', slow: 'Slow', mid: 'Medium', fast: 'Fast', phi: 'Main-shaft angle φ', wipeProg: 'Wiper sweep', tip: 'Needle tip above plate',
     wheelHint: 'You can also grab the handwheel and drag it round (Handwheel view: the wheel at the right end).', s_state: 'States and options', presser: 'Presser', down: 'Down', hand: 'Hand lift', knee: 'Knee lift',
@@ -116,8 +116,8 @@ const TXT = {
     hintWipe: 'Wipe: the needle stops at 80° and the wiper sweeps under it from outside the presser foot, flicking the cut thread end up onto the foot.', hintE: 'Option E: a stepper motor turns the feed regulator through a timing belt; the stitch dial, pull rod, reverse lever and spring are gone and reverse becomes a push-button.',
     hintD: 'Option D adds one process step only — a DLC coating (2–3 µm) on the hook race and point; no part changes shape.',
     code: 'Item no.', kind: 'Source', make: 'Made in-house', buy: 'Bought', buyDwg: 'Made by a supplier to our drawing', grp: 'Assembly', mat: 'Material', matNone: 'Not yet specified (mass taken at steel 7.85 g/cm³)',
-    mass: 'Mass', qty: 'Quantity', of: 'Part of', dwg: 'Drawing', calc: 'Calculations', inAsm: 'Inside a bought assembly', dlc: 'With D: race and point DLC-coated',
-    noDwg: 'Drawing: no detail drawing yet (G5 drew the housing only).', g: 'g', kg: 'kg', hsgNote: 'Upper and lower housing are finish-machined together as item HSG-LS-P.', fps: 'fps' },
+    mass: 'Mass', qty: 'Quantity', of: 'Part of', dwg: 'Drawing', calc: 'Calculations', step: '3D model STEP', inAsm: 'Inside a bought assembly', dlc: 'With D: race and point DLC-coated',
+    noDwg: 'Drawing: this part is outsourced or bought; no detail drawing yet (every in-house part has one).', g: 'g', kg: 'kg', hsgNote: 'Upper and lower housing are finish-machined together as item HSG-LS.', fps: 'fps' },
 };
 function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 // 语言：?lang= → 点过的“中文/EN”（和数字工厂同一个设置 wq-factory-lang）→ 按网站：国内站 wenquestech.online 中文，其余英文（同数字工厂）
@@ -437,6 +437,7 @@ function showCard(k) {
   if (i.of) rows.push([t('of'), `<span class="code">${esc(i.of)}</span> ${esc((D.assemblies[i.of] || [])[L] || '')}`]);
   let links = '';
   if (i.dwg) links += i.dwg.map(d => `<a href="${encodeURI(BASE + '/' + d.u)}" target="_blank" rel="noopener">${t('dwg')}${LANG === 'en' ? ': ' : '：'}${esc(d.t)} ↗</a>`).join('');
+  if (i.step) links += `<a href="${encodeURI(BASE + '/' + i.step)}" download>${t('step')} ↓</a>`;
   if (i.doc) links += `<a href="${encodeURI(BASE + '/' + i.doc.u)}" target="_blank" rel="noopener">${t('calc')}${LANG === 'en' ? ': ' : '：'}${esc(i.doc.t)} ↗</a>`;
   c.innerHTML = `<button class="x" aria-label="close">×</button><h2>${esc(nm)}</h2>` +
     `<table>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>` +

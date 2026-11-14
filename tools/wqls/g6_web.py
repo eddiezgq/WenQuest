@@ -302,6 +302,30 @@ def main():
                 groups=codes["groups"], assemblies=codes.get("assemblies", {}),
                 meshes=pack.meshes, parts=parts, threads=threads, thread_of=[thread_of[k] for k in FKEYS],
                 mesh_bytes=len(pack.buf), frame_bytes=len(fbuf))
+    # 自制件的三维模型（STEP）：网页里点零件、数字工厂物料卡片上都能下载
+    (out / "step").mkdir(exist_ok=True)
+    for f in (out / "step").glob("*.step"):
+        f.unlink()
+    for k, c in parts.items():
+        if c["kind"] == "make":
+            src = (hdir if k in hmesh else builds[("s3", "down", "TE")]) / f"{k}.step"
+            shutil.copyfile(src, out / "step" / f"{c['code']}.step")
+            c["step"] = f"step/{c['code']}.step"
+    items = {}
+    for k, c in parts.items():
+        for code in [c["code"]] + ([c["of"]] if c.get("of") else []):
+            it = items.setdefault(code, dict(parts=[], dwg=[], doc=None, steps=[], kind=c["kind"]))
+            it["parts"].append(k)
+            it["dwg"] += [d for d in c.get("dwg", []) if d not in it["dwg"]]
+            it["doc"] = it["doc"] or c.get("doc")
+            it["steps"] += [c["step"]] if c.get("step") else []
+    for code, e in codes.get("extra_items", {}).items():          # 三维里没有、但有图的物料（如铸件毛坯）
+        it = items.setdefault(code, dict(parts=list(e.get("parts", [])), dwg=[], doc=None, steps=[], kind="make"))
+        for rel in e.get("dwg", []):
+            p = DOC / rel
+            shutil.copyfile(p, out / "dwg" / p.name)
+            it["dwg"].append(dict(u=f"dwg/{p.name}", t=p.stem))
+    (out / "items.json").write_text(json.dumps(items, ensure_ascii=False, sort_keys=True), encoding="utf-8")
     by_code = {}
     for k, c in parts.items():
         by_code.setdefault(c["code"], []).append(k)

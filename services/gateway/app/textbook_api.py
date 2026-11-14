@@ -58,7 +58,7 @@ TASKDOCS = ("task", "rubric", "calc")
 WEB_TTL = 12 * 3600
 WEB_TYPES = {".html": "text/html; charset=utf-8", ".webp": "image/webp", ".png": "image/png", ".svg": "image/svg+xml",
              ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
-             ".bin": "application/octet-stream", ".pdf": "application/pdf"}   # 第 138 轮：三维整机的网格、图纸
+             ".bin": "application/octet-stream", ".pdf": "application/pdf", ".step": "model/step"}   # 第 138 轮：三维整机的网格、图纸、STEP
 
 
 def media_dir(m, book: str) -> Path:

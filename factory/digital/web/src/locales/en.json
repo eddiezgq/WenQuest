@@ -9119,5 +9119,9 @@
 "生成一转负载表": "Builds the one-revolution load table",
 "从 159c 的模型多取两个对照量": "Takes two more comparison values from the 159c model",
 "四个场景与判据": "Four scenarios and checks",
-"这条规则不属于本厂，自动解除": "This rule does not belong to this plant; resolved automatically"
+"这条规则不属于本厂，自动解除": "This rule does not belong to this plant; resolved automatically",
+"设计资料：": "Design files:",
+"图纸 {a}": "Drawing {a}",
+"三维 {a}": "3D {a}",
+"（外协、外购件，没有零件图）": "(outsourced or bought; no detail drawing)"
 }

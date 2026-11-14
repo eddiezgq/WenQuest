@@ -170,6 +170,13 @@
         <div class="card-head"><h2>{{ $t('{a} · {b}', { a: $td(cur.item), b: $td(cur.name) }) }}</h2>
           <span class="muted small">{{ $t('工艺路线 {a}', { a: $td(cur.routing) }) }}</span>
           <a v-if="model3d" class="btn ghost small" :href="model3d" target="_blank" rel="noopener">{{ $t('在三维整机里看 ↗') }}</a></div>
+        <div v-if="item3d" class="small plm-files">
+          <span class="muted">{{ $t('设计资料：') }}</span>
+          <a v-for="d in item3d.dwg" :key="d.u" :href="'/wqls/' + d.u" target="_blank" rel="noopener">{{ $t('图纸 {a}', { a: d.t }) }} ↗</a>
+          <a v-for="u in item3d.steps" :key="u" :href="'/wqls/' + u" download>{{ $t('三维 {a}', { a: u.split('/').pop() }) }} ↓</a>
+          <a v-if="item3d.doc" :href="'/wqls/' + item3d.doc.u" target="_blank" rel="noopener">{{ $t('计算书') }} ↗</a>
+          <span v-if="!item3d.dwg.length" class="muted">{{ $t('（外协、外购件，没有零件图）') }}</span>
+        </div>
         <h3 class="sub">{{ $t('物料清单（每件）') }}</h3>
         <div class="tw"><table class="t">
           <thead><tr><th>{{ $t('物料') }}</th><th>{{ $t('名称') }}</th><th class="num">{{ $t('用量') }}</th><th>{{ $t('单位') }}</th><th>{{ $t('来源') }}</th></tr></thead>
@@ -256,12 +263,15 @@ const sel = ref('');
 const cur = computed(() => (ps.value?.items || []).find((x) => x.item === sel.value) || null);
 // 第 138 轮 G6.1：问渠缝纫机厂的物料在网页三维整机（/wqls/，tools/wqls/g6_web.py 生成）里有零件的，给一个“在三维整机里看”
 const codes3d = ref({});
+const item3d = computed(() => {            // 这个物料在三维整机里的资料：零件、图纸、计算书、STEP（/wqls/items.json）
+  const it = cur.value?.item;
+  return (it && codes3d.value[it]) || null;
+});
 const model3d = computed(() => {
   const it = cur.value?.item;
   if (!it) return '';
-  if (it === 'WQ-LS') return '/wqls/index.html?opt=TED';
-  const code = { 'HSG-LS': 'HSG-LS-P' }[it] || it;        // 工厂里的机壳 HSG-LS 就是 G5 的合件 HSG-LS-P（G7.1 统一）
-  return codes3d.value[code] ? `/wqls/index.html?part=${encodeURIComponent(code)}` : '';
+  if (/^WQ-LS(-[TED]+)?$/.test(it)) return `/wqls/index.html?opt=${it.slice(6)}`;
+  return item3d.value?.parts?.length ? `/wqls/index.html?part=${encodeURIComponent(item3d.value.parts[0])}` : '';
 });
 const groups = computed(() => {
   const it = ps.value?.items || [];
@@ -358,7 +368,7 @@ async function loadDesign() {
 }
 
 onMounted(async () => {
-  fetch('/wqls/codes.json').then((r) => (r.ok ? r.json() : {})).then((j) => { codes3d.value = j || {}; }).catch(() => {});
+  fetch('/wqls/items.json').then((r) => (r.ok ? r.json() : {})).then((j) => { codes3d.value = j || {}; }).catch(() => {});
   await loadConfig().catch(() => null);
   const loadStructure = get('/products/structure').then((r) => { ps.value = r; sel.value = route.query.item || r.items[0]?.item || ''; });
   pbLoadPending();
@@ -373,6 +383,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.plm-files { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 2px 0 8px; }
 .grow { flex-grow: 1; min-width: 0; }
 .plist { width: 280px; flex-shrink: 0; }
 .grp { margin-bottom: 10px; }
