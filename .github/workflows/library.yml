@@ -13,6 +13,12 @@ on:
       - "factory/digital/std/*.yaml"
       - ".github/workflows/library.yml"
   workflow_dispatch:
+    inputs:
+      cn_only:
+        description: "yes：不重新生成，只把最新已发布的零件库传到国内数字工厂（第 169 轮）"
+        type: choice
+        options: ["no", "yes"]
+        default: "no"
 
 permissions:
   contents: write
@@ -28,6 +34,7 @@ defaults:
 jobs:
   build:
     name: 生成与发布
+    if: github.event_name != 'workflow_dispatch' || inputs.cn_only != 'yes'
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     environment: production
@@ -132,3 +139,48 @@ jobs:
           if [ "$got" != "$VER" ]; then
             echo "::warning::线上 latest.json 还不是 $VER（${got:-打不开}）。如果数字工厂这次也有更新，等它部署完成后再打开看。"
           fi
+
+  # 国内数字工厂（第 169 轮，2026-11-14）：原来只解包到美国，国内 factory.<国内域名>/library/latest.json 一直是 404，
+  # 国内“零件与机器人库”打不开。这里取 GitHub Releases 上最新一版网页包，传到国内服务器，用同一个 library.sh 解包。
+  cn:
+    name: 传到国内数字工厂
+    needs: build
+    if: always() && !cancelled() && (needs.build.result == 'success' || needs.build.result == 'skipped')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    environment: production
+    env:
+      HOST: ${{ secrets.CN_DEPLOY_HOST }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 取最新一版网页包
+        if: env.HOST != ''
+        run: |
+          tag=$(gh release list -R "$GITHUB_REPOSITORY" -L 100 --json tagName,createdAt -q '[.[]|select(.tagName|startswith("library-v"))]|sort_by(.createdAt)|last|.tagName')
+          [ -n "$tag" ] || { echo "::error::没找到 library-v 的发布"; exit 1; }
+          gh release download "$tag" -R "$GITHUB_REPOSITORY" -p "library-web-*.tar.gz" -D web
+          ls -la web
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+      - name: 解包到国内数字工厂
+        if: env.HOST != ''
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.CN_DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts
+          fi
+          printf 'Host cn\n  HostName %s\n  User deploy\n  ServerAliveInterval 30\n  ServerAliveCountMax 6\n' "$HOST" > ~/.ssh/config
+          tar czf - -C factory/deploy lib.sh library.sh | ssh cn \
+            'mkdir -p /opt/wenquest/factory/deploy && tar xzf - -C /opt/wenquest/factory/deploy && chmod +x /opt/wenquest/factory/deploy/*.sh'
+          ssh cn /opt/wenquest/factory/deploy/library.sh < web/library-web-*.tar.gz
+      - name: 检查网址
+        if: env.HOST != ''
+        run: |
+          domain=$(ssh cn "grep '^SITE_DOMAIN=' /opt/wenquest/factory/.env | cut -d= -f2")
+          got=$(curl -s --max-time 30 "https://factory.$domain/library/latest.json" | python3 -c "import json,sys; print(json.load(sys.stdin)['version'])" 2>/dev/null || true)
+          echo "国内 https://factory.$domain/library/latest.json → ${got:-打不开}（发布 $TAG）"
+          [ -n "$got" ] || { echo "::warning::国内零件库网址还打不开"; exit 1; }

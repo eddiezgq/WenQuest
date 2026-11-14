@@ -4,6 +4,7 @@
 # 只保留最近 3 个版本。用法：ssh deploy@服务器 /opt/wenquest/factory/deploy/library.sh < library-web.tar.gz
 source "$(dirname "$0")/lib.sh"
 
+mkdir -p "$FD/library"     # 国内第一次传（第 169 轮）时还没有这个目录
 tmp=$(mktemp -d "$FD/library/.incoming.XXXX")
 trap 'rm -rf "$tmp"' EXIT
 tar xzf - -C "$tmp"
