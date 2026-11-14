@@ -4,7 +4,7 @@
 # 编号规则：
 #   - 我们自己设计的件（有我们的图）一律 LS-xxx：1xx 主轴与传动、2xx 刺布挑线、3xx 旋梭、4xx 送布与油泵、
 #     5xx 压脚与操纵件、7xx 选配件 T（自动剪线、拨线、松线）、8xx 选配件 E（电子针距）。
-#     kind 按《缝纫机厂工艺方案》1.2 节的分工（G7.1 定）：make = 本厂做（机壳、上下轴、针杆、旋梭、送布 / 抬牙偏心、剪线凸轮，
+#     kind 按《缝纫机厂工艺方案》1.2 节的分工（G7.1 定；旋梭 Eddie 11-13 定为外购，工厂的旋梭线在 G7.2 去掉）：make = 本厂做（机壳、上下轴、针杆、送布 / 抬牙偏心、剪线凸轮，
 #     缝纫机厂里有工艺路线）；其余我们设计的件 buy = 按我们的图外协加工或外购（带轮、弹簧、铜套、连杆等）。
 #   - 目录件、标准件（照型号买）一律 BUY-…；外购部件的内部零件（如电机里的定子）用部件的号，sub 写是部件里的哪一件。
 #   - 机壳：上件 HSG-LS-U、下件 HSG-LS-L（G5 的号）；合件用缝纫机厂已有的 HSG-LS（G5 文档里叫 HSG-LS-P，是同一件）。
@@ -72,7 +72,7 @@ parts:
   thread_guide: {code: LS-209, name: [过线环, Thread guide], kind: buy, group: needle, doc: "G4c#八、一转干涉和面线路径"}
   needle: {code: BUY-NEEDLE-DB, name: [机针 DB×1, Needle DB×1], kind: buy, group: needle}
   # —— 旋梭 ——
-  hook: {code: LS-301, name: [旋梭, Rotary hook], kind: make, group: hook, doc: "G4h#二、零件"}
+  hook: {code: LS-301, name: [旋梭, Rotary hook], kind: buy, mat: 外购（专业旋梭厂，按我们的接口尺寸；三维是示例外形）, group: hook, doc: "G4h#二、零件"}
   hook_shaft: {code: LS-302, name: [旋梭轴, Hook shaft], kind: buy, group: hook, mat: 45 钢, doc: "G4h#二、零件"}
   gear_hook: {code: LS-303, name: [旋梭轴齿轮 z20, Hook-shaft gear z20], kind: buy, group: hook, mat: 20CrMnTi 渗碳淬火 58–62 HRC, doc: "G4h#四、校核（全部合格）"}
   gear_lower: {code: LS-304, name: [下轴齿轮 z40, Lower-shaft gear z40], kind: buy, group: hook, mat: 20CrMnTi 渗碳淬火 58–62 HRC, doc: "G4h#四、校核（全部合格）"}

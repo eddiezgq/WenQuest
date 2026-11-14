@@ -3302,7 +3302,7 @@ items:
 - {code: LS-207, name: 挑线杆销 M Take-up pin M（按图外协）, kind: buy, uom: Nos, price: 1.06, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-208, name: 摇杆支点销 Q Rocker stud Q（按图外协）, kind: buy, uom: Nos, price: 1.14, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-209, name: 过线环 Thread guide（按图外协）, kind: buy, uom: Nos, price: 1.02, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
-- {code: LS-301D, name: '旋梭（少油型，镀 DLC） Rotary hook, low-oil (DLC-coated)', kind: make, uom: Nos}
+- {code: LS-301D, name: '旋梭（少油型，梭床和梭尖镀 DLC；外购） Rotary hook, low-oil (DLC-coated, bought)', kind: buy, uom: Nos, price: 8.0, supplier: sewparts}
 - {code: LS-302, name: 旋梭轴 Hook shaft（按图外协）, kind: buy, uom: Nos, price: 2.28, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-303, name: 旋梭轴齿轮 z20 Hook-shaft gear z20（按图外协）, kind: buy, uom: Nos, price: 1.65, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-304, name: 下轴齿轮 z40 Lower-shaft gear z40（按图外协）, kind: buy, uom: Nos, price: 3.59, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
@@ -4497,10 +4497,6 @@ boms:
   routing: RT-偏心 Eccentric
   components:
   - [RM-20CRMNTI-D40, 0.3]
-- item: LS-301D
-  routing: RT-旋梭 Rotary hook
-  components:
-  - [RM-20CRMNTI-D40, 0.25]
 # <<< g7_bom（BOM）
 products:
 - item: WQ-LS
@@ -4584,6 +4580,7 @@ stock:
     LS-207: 20
     LS-208: 20
     LS-209: 20
+    LS-301D: 20
     LS-302: 20
     LS-303: 20
     LS-304: 20

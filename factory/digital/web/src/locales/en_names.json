@@ -76,6 +76,10 @@
 "Flyback switcher"
 ],
 [
+"旋梭（少油型，梭床和梭尖镀 DLC；外购） Rotary hook, low-oil (DLC-coated, bought)",
+"Rotary hook, low-oil (DLC-coated, bought)"
+],
+[
 "升压开关管 600 V 60 mΩ（示例选型 Infineon IPW60R060P7，未经硬件验证） PFC MOSFET",
 "PFC MOSFET"
 ],
@@ -398,10 +402,6 @@
 [
 "并联稳压基准（示例选型 TL431AIDBZR，未经硬件验证） Shunt reference",
 "Shunt reference"
-],
-[
-"旋梭（少油型，镀 DLC） Rotary hook, low-oil (DLC-coated)",
-"Rotary hook, low-oil (DLC-coated)"
 ],
 [
 "示例·谐波减速器代理商 Strain-wave Gear Distributor (Demo)",

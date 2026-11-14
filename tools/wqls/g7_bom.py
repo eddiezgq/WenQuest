@@ -8,6 +8,7 @@
   - 物料号、名称、自制 / 外购：tools/wqls/part_codes.yaml
   - 三维里没有、整机要的（电控箱、针板、盖板、螺钉、包装、上轴后轴承……）：本文件 EXTRA，每一行写了理由
 变型：T 自动剪线、E 电子针距、D 少油旋梭，型号 WQ-LS[-T][E][D]；D 只把旋梭 LS-301 换成镀 DLC 的 LS-301D。
+旋梭外购（Eddie 11-13 定）：LS-301D 是新的外购件；工厂里 LS-301 现在还是自制件，G7.2 改成外购、去掉旋梭线。
 单价是示例值（工厂清单本来就是示例数据）：外协件按质量粗估，见 price()。
 工厂清单里由本程序写的段落夹在“# >>> g7_bom”和“# <<< g7_bom”之间，别手改；其余部分照旧手工维护。
 """
@@ -52,12 +53,12 @@ NEW_BUY = {
     "BUY-STEP-42": ("42 步进电机 48 mm 带磁编码器（型号待确认） NEMA 17 stepper with encoder", "drive", 15.0),
     "BUY-BELT-E": ("同步带 HTD 3M 宽 9（型号待确认） Timing belt HTD 3M 9 mm", "sewparts", 1.5),
     "BUY-BTN-E": ("倒缝按钮（型号待确认） Reverse push-button", "drive", 1.0),
+    "LS-301D": ("旋梭（少油型，梭床和梭尖镀 DLC；外购） Rotary hook, low-oil (DLC-coated, bought)", "sewparts", 8.0),
 }
 # 新的自制件：编码 → (中英文名, 工艺路线, 原材料, 用量)
 NEW_MAKE = {
     "LS-402": ("抬牙偏心 Lift eccentric", "RT-偏心 Eccentric", "RM-20CRMNTI-D40", 0.2),
     "LS-710": ("剪线凸轮 Trimmer cam", "RT-偏心 Eccentric", "RM-20CRMNTI-D40", 0.3),
-    "LS-301D": ("旋梭（少油型，镀 DLC） Rotary hook, low-oil (DLC-coated)", "RT-旋梭 Rotary hook", "RM-20CRMNTI-D40", 0.25),
 }
 # 工厂清单里已有、名称要跟设计对上的物料（只改名称）
 RENAME = {"LS-401": "送布偏心 Feed eccentric"}
@@ -113,7 +114,8 @@ def build():
 
 def plant_blocks(B):
     """工厂清单里的四段：物料、BOM、成品、期初库存。"""
-    P = yaml.safe_load(PLANT.read_text(encoding="utf-8"))
+    hand = re.sub(r"[ ]*" + re.escape(MARK[0]) + r".*?" + re.escape(MARK[1]) + r"[^\n]*\n", "", PLANT.read_text(encoding="utf-8"), flags=re.S)
+    P = yaml.safe_load(hand)                                 # 只看手工维护的部分（生成段每次重写）
     have = {i["code"] for i in P["items"]}
     gen_codes = set()
     items = []
