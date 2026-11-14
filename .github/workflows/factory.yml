@@ -161,6 +161,15 @@ jobs:
           test -z "$(git status --porcelain factory/designs/drv-joint-b/fw)"
           python3 -m pytest -q factory/designs/tests/test_drv_b_fw.py factory/designs/tests/test_drv_b_motor.py factory/designs/tests/test_drv_b_master.py
           test -z "$(git status --porcelain factory/designs/wq-encif/out)"
+      - name: 平缝机控制器 CTRL-LS 固件（第 159 轮 159f）：重新编译、在 Renode 里接 G2 一转负载跑四个场景，结果与提交的一字不差
+        run: |
+          cd factory/designs/ctrl-ls/fw
+          python3 run_sew.py --renode ~/renode/renode
+          python3 pack.py
+          cd "$GITHUB_WORKSPACE"
+          git diff --stat --exit-code -- factory/designs/ctrl-ls/fw
+          test -z "$(git status --porcelain factory/designs/ctrl-ls/fw)"
+          python3 -m pytest -q factory/designs/tests/test_ctrl_ls_fw.py
       - name: 可制造性检查（改坏能报出来）、芯片规格值
         run: python3 -m pytest -q factory/designs/tests
       - name: 问渠电子（第 102、104、111 轮）：设计描述、功能块计算器与生成器、标准题、两条入口一致、仿真核对、板子检查与热、读回、判定代码不联网
