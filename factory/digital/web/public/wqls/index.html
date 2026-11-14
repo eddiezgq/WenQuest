@@ -1,0 +1,532 @@
+<!doctype html>
+<!-- 第 138 轮 G6.1：网页三维整机“WQ-LS 整机”。
+     数据由 tools/wqls/g6_web.py 生成（machine.json、mesh.bin、frames.bin、doc/、dwg/），都在本目录。
+     挂两处：数字工厂（/wqls/index.html，公开）和《缝纫机设计与制造》第 27 章（构建时复制到 labs/wqls/）。
+     参数：?lang=en  ?part=<零件名或物料号>  ?opt=TED  ?view=iso|face|front|hook|feed|press|trim|whole  ?fps=1（显示帧率）
+     three.js r128：先用平台的 /vendor/，没有就用本目录的 three.min.js（数字工厂没有 /vendor/）。 -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WQ-LS 整机</title>
+<style>
+:root{--bg:#dfe3e7;--bg2:#f3f5f7;--ink:#1d2329;--mut:#5b6670;--card:rgba(255,255,255,.9);--line:#cfd5db;--acc:#0b4fae;--acc-ink:#fff;--warn:#a15c00}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15181b;--bg2:#22272c;--ink:#e6e9ec;--mut:#9aa5ae;--card:rgba(28,32,36,.92);--line:#39414a;--acc:#6aa7ff;--acc-ink:#0d1117;--warn:#e0a24a}}
+:root[data-theme="dark"]{--bg:#15181b;--bg2:#22272c;--ink:#e6e9ec;--mut:#9aa5ae;--card:rgba(28,32,36,.92);--line:#39414a;--acc:#6aa7ff;--acc-ink:#0d1117;--warn:#e0a24a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh;touch-action:none;outline:none}
+.panel{position:fixed;left:12px;top:12px;width:min(330px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.panel h1{font-size:16px;margin:0}.sub{color:var(--mut);font-size:12px;margin:2px 0 6px}
+.model{font:600 13px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--acc)}
+.sec{border-top:1px solid var(--line);margin-top:8px;padding-top:6px}
+.sec>b{display:block;font-size:12px;color:var(--mut);font-weight:600;margin-bottom:2px}
+.row{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin:4px 0}
+.row>span.l{font-size:12.5px;color:var(--mut);min-width:3.4em}
+button{font:inherit;font-size:12.5px;border:1px solid var(--line);background:var(--bg2);color:var(--ink);border-radius:7px;padding:4px 9px;cursor:pointer;min-height:28px}
+button.on{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.read{display:flex;justify-content:space-between;font-size:12.5px;font-variant-numeric:tabular-nums}
+.hint{font-size:12px;color:var(--mut);margin:4px 0 0}
+.top{position:fixed;right:12px;top:12px;display:flex;gap:6px}
+.toggle{display:none}
+.card{position:fixed;right:12px;bottom:12px;width:min(340px,calc(100vw - 24px));background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.card h2{font-size:15px;margin:0 0 2px;padding-right:28px}.card .code{font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--acc)}
+.card table{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0}.card td{padding:2px 0;vertical-align:top}.card td:first-child{color:var(--mut);width:5.2em}
+.card a{color:var(--acc);display:inline-block;margin:2px 10px 0 0}
+.card .x{position:absolute;right:8px;top:8px;min-height:0;padding:2px 8px}
+.load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-direction:column;gap:10px}
+.bar{width:min(320px,70vw);height:6px;border-radius:3px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--acc)}
+.fps{position:fixed;left:50%;top:8px;transform:translateX(-50%);font:12px ui-monospace,monospace;background:var(--card);padding:2px 8px;border-radius:6px;border:1px solid var(--line)}
+.warn{color:var(--warn)}
+body.shot .panel,body.shot .top,body.shot .card{display:none!important}
+@media (max-width:640px){
+  .panel{top:auto;bottom:0;left:0;width:100vw;max-height:52vh;border-radius:12px 12px 0 0;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+  .panel.closed .body{display:none}
+  .toggle{display:inline-block}
+  .card{bottom:auto;top:52px;right:8px;width:calc(100vw - 16px)}
+}
+</style></head>
+<body>
+<canvas id="c" tabindex="0" aria-label="WQ-LS 3D"></canvas>
+<div class="load" id="load"><div id="loadT">正在载入三维模型…</div><div class="bar"><i id="loadB"></i></div><div class="hint" id="loadN"></div></div>
+<div class="top"><button id="lang">English</button></div>
+<div class="panel" id="panel">
+  <div class="row" style="justify-content:space-between;margin:0"><div><h1 data-t="title">WQ-LS 整机</h1><div class="model" id="model">WQ-LS</div></div>
+    <button class="toggle" id="fold" data-t="controls">控制</button></div>
+  <div class="body">
+  <p class="sub" data-t="lead">工业直驱平缝机的真设计：每个零件是 FreeCAD 实体，每 2° 的运动来自设计计算。拖动手轮转主轴，点零件看物料号。</p>
+  <div class="sec"><b data-t="s_turn">转动</b>
+    <div class="row"><button id="play" class="on" data-t="pause">暂停</button><button data-sp="0.25" data-t="slow">慢</button><button data-sp="1" class="on" data-t="mid">中</button><button data-sp="3" data-t="fast">快</button></div>
+    <input id="phi" type="range" min="0" max="359.9" step="0.1" value="0" aria-label="φ">
+    <div class="read"><span id="phiL" data-t="phi">上轴转角 φ</span><span id="phiV">0°</span></div>
+    <div class="read"><span data-t="tip">针尖高出针板</span><span id="tipV">—</span></div>
+    <p class="hint" data-t="wheelHint">也可以按住手轮拖着转（点“手轮”视角，右端的轮子）。</p>
+  </div>
+  <div class="sec"><b data-t="s_state">状态与选项</b>
+    <div class="row"><span class="l" data-t="presser">压脚</span><button data-press="down" class="on" data-t="down">放下</button><button data-press="hand" data-t="hand">手抬</button><button data-press="knee" data-t="knee">膝抬</button></div>
+    <div class="row"><span class="l" data-t="stitch">针距</span><button data-feed="s3" class="on">3 mm</button><button data-feed="s5">5 mm</button><button data-feed="r5" data-t="rev5">倒缝 5</button></div>
+    <div class="row"><span class="l" data-t="options">选项</span><button data-opt="T" data-t="optT">T 自动剪线</button><button data-opt="E" data-t="optE">E 电子针距</button><button data-opt="D" data-t="optD">D 少油旋梭</button></div>
+    <div class="row"><span class="l" data-t="action">动作</span><button data-trim="sew" class="on" data-t="sew">缝纫</button><button data-trim="trim" data-t="trim">剪线那一转</button><button data-trim="wipe" data-t="wipe">拨线</button></div>
+    <p class="hint" id="stateHint"></p>
+  </div>
+  <div class="sec"><b data-t="s_view">看</b>
+    <div class="row"><button data-v="whole" class="on" data-t="v_whole">整机</button><button data-v="iso" data-t="v_iso">机头</button><button data-v="face" data-t="v_face">端面</button><button data-v="front" data-t="v_front">正面</button><button data-v="hook" data-t="v_hook">旋梭</button><button data-v="feed" data-t="v_feed">送布</button><button data-v="press" data-t="v_press">压脚</button><button data-v="trim" data-t="v_trim">剪线</button><button data-v="wheel" data-t="v_wheel">手轮</button></div>
+    <div class="row"><span class="l" data-t="housing">机壳</span><button data-shell="solid" class="on" data-t="solid">实体</button><button data-shell="glass" data-t="glass">半透明</button><button data-shell="off" data-t="off">隐藏</button></div>
+    <div class="row"><button id="thr" class="on" data-t="thread">面线</button><button id="grp" data-t="bygroup">按部件着色</button></div>
+    <div class="read"><span data-t="explode">爆炸（按部件推开）</span><span id="exV">0</span></div>
+    <input id="ex" type="range" min="0" max="1" step="0.01" value="0" aria-label="explode">
+    <div class="row"><span class="l" data-t="section">剖开</span><button data-cut="" class="on" data-t="none">不剖</button><button data-cut="x" data-t="cx">左右</button><button data-cut="y" data-t="cy">前后</button><button data-cut="z" data-t="cz">上下</button></div>
+    <input id="cutp" type="range" min="0" max="1" step="0.002" value="0.5" aria-label="section" disabled>
+  </div>
+  </div>
+</div>
+<div class="card" id="card" hidden></div>
+<div class="fps" id="fps" hidden></div>
+<script src="/vendor/three/r128/three.min.js"></script>
+<script>window.THREE || document.write('<script src="three.min.js"><\/script>')</script>
+<script>
+(async function () {
+'use strict';
+const q = new URLSearchParams(location.search);
+const BASE = q.get('d') || '.';
+// ---------------------------------------------------------------- 文字
+const TXT = {
+  zh: { title: 'WQ-LS 整机', controls: '控制', lead: '工业直驱平缝机的真设计：每个零件是 FreeCAD 实体，每 2° 的运动来自设计计算。拖动手轮转主轴，点零件看物料号。',
+    s_turn: '转动', pause: '暂停', play: '播放', slow: '慢', mid: '中', fast: '快', phi: '上轴转角 φ', wipeProg: '拨线进度', tip: '针尖高出针板',
+    wheelHint: '也可以按住手轮拖着转（点“手轮”视角，右端的轮子）。', s_state: '状态与选项', presser: '压脚', down: '放下', hand: '手抬', knee: '膝抬',
+    stitch: '针距', rev5: '倒缝 5', options: '选项', optT: 'T 自动剪线', optE: 'E 电子针距', optD: 'D 少油旋梭', action: '动作', sew: '缝纫',
+    trim: '剪线那一转', wipe: '拨线', s_view: '看', v_whole: '整机', v_iso: '机头', v_face: '端面', v_front: '正面', v_hook: '旋梭', v_feed: '送布',
+    v_press: '压脚', v_trim: '剪线', v_wheel: '手轮', housing: '机壳', solid: '实体', glass: '半透明', off: '隐藏', thread: '面线', bygroup: '按部件着色',
+    explode: '爆炸（按部件推开）', section: '剖开', none: '不剖', cx: '左右', cy: '前后', cz: '上下',
+    loading: '正在载入三维模型…', building: '正在生成零件…', failed: '载入失败：',
+    hintT: '“剪线那一转”“拨线”要先打开选项 T。', hintTrim: '剪线那一转：电磁铁把摆杆推进凸轮槽，动刀在 φ 280°–75° 往前转、挑住面线和底线，再退回剪断。',
+    hintWipe: '拨线：针停在 80°，拨线钩从压脚外侧扫过针下，把剪断的线头拨到压脚上面。', hintE: '选项 E：针距由步进电机经同步带转调节器，去掉了针距旋钮、拉杆、倒缝扳手和拉簧，倒缝改成按钮。',
+    hintD: '选项 D：只多一道工序——旋梭的梭床和梭尖镀 DLC 膜（2–3 µm），零件形状不变。',
+    code: '物料号', kind: '来源', make: '自制', buy: '外购', buyDwg: '按我们的图外购', grp: '部件', mat: '材料', matNone: '未定（质量按钢 7.85 g/cm³ 算）',
+    mass: '质量', qty: '件数', of: '属于', dwg: '图纸', calc: '计算书', inAsm: '外购部件里的一件', dlc: '选 D 时梭床、梭尖镀 DLC 膜',
+    noDwg: '图纸：这一件还没有出零件图（G5 只出了机壳的图）。', g: 'g', kg: 'kg', hsgNote: '机壳上下件合箱后一起精加工，合件物料号 HSG-LS-P。', fps: '帧/秒' },
+  en: { title: 'WQ-LS complete machine', controls: 'Controls', lead: 'The real design of an industrial direct-drive lockstitch machine: every part is a FreeCAD solid and every 2° of motion comes from the design calculations. Drag the handwheel to turn the main shaft; click a part for its item number.',
+    s_turn: 'Turn', pause: 'Pause', play: 'Play', slow: 'Slow', mid: 'Medium', fast: 'Fast', phi: 'Main-shaft angle φ', wipeProg: 'Wiper sweep', tip: 'Needle tip above plate',
+    wheelHint: 'You can also grab the handwheel and drag it round (Handwheel view: the wheel at the right end).', s_state: 'States and options', presser: 'Presser', down: 'Down', hand: 'Hand lift', knee: 'Knee lift',
+    stitch: 'Stitch', rev5: 'Reverse 5', options: 'Options', optT: 'T thread trimmer', optE: 'E electronic stitch', optD: 'D low-oil hook', action: 'Action', sew: 'Sewing',
+    trim: 'Trimming turn', wipe: 'Wipe', s_view: 'View', v_whole: 'Whole', v_iso: 'Head', v_face: 'End', v_front: 'Front', v_hook: 'Hook', v_feed: 'Feed',
+    v_press: 'Presser', v_trim: 'Trimmer', v_wheel: 'Handwheel', housing: 'Housing', solid: 'Solid', glass: 'See-through', off: 'Hidden', thread: 'Needle thread', bygroup: 'Colour by group',
+    explode: 'Explode (by assembly)', section: 'Section', none: 'None', cx: 'Left–right', cy: 'Front–back', cz: 'Top–bottom',
+    loading: 'Loading the 3D model…', building: 'Building parts…', failed: 'Could not load: ',
+    hintT: 'Turn on option T for the trimming turn and the wipe.', hintTrim: 'Trimming turn: the solenoid pushes the lever into the cam groove; between φ 280° and 75° the moving knife swings forward, picks up the needle and bobbin threads, then returns and cuts them.',
+    hintWipe: 'Wipe: the needle stops at 80° and the wiper sweeps under it from outside the presser foot, flicking the cut thread end up onto the foot.', hintE: 'Option E: a stepper motor turns the feed regulator through a timing belt; the stitch dial, pull rod, reverse lever and spring are gone and reverse becomes a push-button.',
+    hintD: 'Option D adds one process step only — a DLC coating (2–3 µm) on the hook race and point; no part changes shape.',
+    code: 'Item no.', kind: 'Source', make: 'Made in-house', buy: 'Bought', buyDwg: 'Bought to our drawing', grp: 'Assembly', mat: 'Material', matNone: 'Not yet specified (mass taken at steel 7.85 g/cm³)',
+    mass: 'Mass', qty: 'Quantity', of: 'Part of', dwg: 'Drawing', calc: 'Calculations', inAsm: 'Inside a bought assembly', dlc: 'With D: race and point DLC-coated',
+    noDwg: 'Drawing: no detail drawing yet (G5 drew the housing only).', g: 'g', kg: 'kg', hsgNote: 'Upper and lower housing are finish-machined together as item HSG-LS-P.', fps: 'fps' },
+};
+function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+// 语言：?lang= → 数字工厂里点过的“中文/EN”（同一个网站，wq-factory-lang）→ 中文
+let LANG = (q.get('lang') || ls('wq-factory-lang') || 'zh').startsWith('en') ? 'en' : 'zh';
+const t = k => TXT[LANG][k] ?? TXT.zh[k] ?? k;
+const $ = id => document.getElementById(id);
+function applyLang() {
+  document.documentElement.lang = LANG === 'en' ? 'en' : 'zh-CN';
+  document.title = t('title');
+  document.querySelectorAll('[data-t]').forEach(e => { e.textContent = t(e.dataset.t); });
+  $('lang').textContent = LANG === 'en' ? '中文' : 'English';
+  $('play').textContent = play ? t('pause') : t('play');
+  if (READY) { refreshState(); if (sel) showCard(sel); }
+}
+let play = !q.has('shot'), sel = null, READY = false;
+applyLang();
+$('lang').onclick = () => { LANG = LANG === 'en' ? 'zh' : 'en'; applyLang(); };
+$('fold').onclick = () => $('panel').classList.toggle('closed');
+if (matchMedia('(max-width:640px)').matches) $('panel').classList.add('closed');
+
+// ---------------------------------------------------------------- 数据
+$('loadT').textContent = t('loading');
+async function fetchBin(url, onp) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(url + ' ' + r.status);
+  const n = +r.headers.get('content-length') || 0;
+  if (!r.body || !n) return new Uint8Array(await r.arrayBuffer()).buffer;
+  const rd = r.body.getReader(), out = new Uint8Array(n);
+  let got = 0;
+  for (;;) { const { done, value } = await rd.read(); if (done) break; out.set(value, got); got += value.length; onp(got / n); }
+  return out.buffer;
+}
+let D, MB, FB;
+try {
+  const prog = [0, 0];
+  const show = () => { const p = 0.8 * prog[0] + 0.2 * prog[1]; $('loadB').style.width = (100 * p).toFixed(0) + '%'; };
+  [D, MB, FB] = await Promise.all([fetch(`${BASE}/machine.json`).then(r => r.json()),
+    fetchBin(`${BASE}/mesh.bin`, p => { prog[0] = p; show(); }), fetchBin(`${BASE}/frames.bin`, p => { prog[1] = p; show(); })]);
+} catch (e) { $('loadT').textContent = t('failed') + e.message; return; }
+$('loadT').textContent = t('building');
+await new Promise(r => setTimeout(r, 0));
+const NF = D.frames, STEP = D.step_deg;
+const FR = new Float32Array(FB);
+
+// ---------------------------------------------------------------- 场景
+const canvas = $('c');
+const mobile = matchMedia('(pointer:coarse)').matches || Math.min(innerWidth, innerHeight) < 640;
+const r = new THREE.WebGLRenderer({ canvas, antialias: !mobile || devicePixelRatio < 2, preserveDrawingBuffer: q.has('shot') });
+r.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.5 : 2));
+r.setSize(innerWidth, innerHeight);
+r.outputEncoding = THREE.sRGBEncoding; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 0.82;
+const scene = new THREE.Scene();
+const darkUI = () => getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() === '#15181b';
+scene.background = new THREE.Color(darkUI() ? 0x15181b : 0xdfe3e7);
+// 环境光照：一个简单的“房间”（灯板 + 墙）做反射，金属件才有光泽
+(function env() {
+  const s = new THREE.Scene();
+  const room = new THREE.Mesh(new THREE.BoxGeometry(10, 6, 10), new THREE.MeshBasicMaterial({ color: 0x5d6268, side: THREE.BackSide }));
+  room.position.y = 2; s.add(room);
+  const panel = (w, h, x, y, z, ry, rx, k) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })); m.material.color.setRGB(k, k, k); m.position.set(x, y, z); m.rotation.set(rx, ry, 0); s.add(m); };
+  panel(4, 2, 0, 4.9, 0, 0, Math.PI / 2, 4.5); panel(2, 3, -4.9, 2, 1, Math.PI / 2, 0, 2.5); panel(3, 2, 4.9, 2.5, -1, -Math.PI / 2, 0, 1.6); panel(4, 1.5, 0, 2, -4.9, 0, 0, 1.3);
+  scene.environment = new THREE.PMREMGenerator(r).fromScene(s, 0.04).texture;
+})();
+const key = new THREE.DirectionalLight(0xffffff, 1.3); key.position.set(-0.6, 1.4, 1.0); scene.add(key);
+const rim = new THREE.DirectionalLight(0xffffff, 0.6); rim.position.set(0.8, 0.6, -1.2); scene.add(rim);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f96, 0.35));
+// 机器坐标 mm、z 向上 → three：m、y 向上
+const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; root.scale.setScalar(0.001); scene.add(root);
+
+// 材料：剖开时背面画成橙色（看起来像剖面）
+const CUT = { value: 0 };
+function mk(o) {
+  const m = new THREE.MeshStandardMaterial(o);
+  m.onBeforeCompile = sh => {
+    sh.uniforms.uCut = CUT;
+    sh.fragmentShader = 'uniform float uCut;\n' + sh.fragmentShader.replace('#include <dithering_fragment>',
+      '#include <dithering_fragment>\n if (uCut > 0.5 && !gl_FrontFacing) gl_FragColor = vec4(0.93, 0.46, 0.16, 1.0);');
+  };
+  return m;
+}
+const SHOW = {
+  metal: mk({ color: 0xc3c7cc, metalness: 0.85, roughness: 0.32 }), chrome: mk({ color: 0xeef0f2, metalness: 1, roughness: 0.12 }),
+  black: mk({ color: 0x2a2d31, metalness: 0.3, roughness: 0.55 }), brass: mk({ color: 0xc9a25a, metalness: 0.9, roughness: 0.3 }),
+  steelDark: mk({ color: 0x6d7278, metalness: 0.8, roughness: 0.4 }), copper: mk({ color: 0xc46e3c, metalness: 0.9, roughness: 0.35 }),
+  magnet: mk({ color: 0x8f969e, metalness: 0.7, roughness: 0.3 }), glassDisc: mk({ color: 0x9fc4d9, metalness: 0.2, roughness: 0.1 }),
+  graphite: mk({ color: 0x3a3f45, metalness: 0.2, roughness: 0.5, envMapIntensity: 0.5 }), blue: mk({ color: 0x2f6fd6, metalness: 0.2, roughness: 0.4 }),
+  shell: mk({ color: 0x8c949c, metalness: 0.2, roughness: 0.55, envMapIntensity: 0.35 }),
+};
+const GLASS = mk({ color: 0xb7bbc0, metalness: 0.3, roughness: 0.4, transparent: true, opacity: 0.2, depthWrite: false });
+const GCOL = { hsg: 0xb9bdc2, main: 0x7d8590, needle: 0x3b7dd8, hook: 0x2a9d8f, feed: 0xe0a33b, press: 0x8e6cc9, optT: 0xd9622b, optE: 0x4caf50 };
+const GMAT = Object.fromEntries(Object.entries(GCOL).map(([k, c]) => [k, mk({ color: c, metalness: 0.3, roughness: 0.45 })]));
+const HL = new Map();
+function hlOf(m) {
+  if (!HL.has(m)) { const h = m.clone(); h.onBeforeCompile = m.onBeforeCompile; h.emissive = new THREE.Color(0xff8a00); h.emissiveIntensity = 0.55; HL.set(m, h); }
+  return HL.get(m);
+}
+
+// 网格：Int16 量化顶点 + 索引；按需建 BufferGeometry
+const GEO = new Map();
+function geom(id) {
+  if (GEO.has(id)) return GEO.get(id);
+  const m = D.meshes[id];
+  const qv = new Int16Array(MB, m.v, m.nv * 3), pos = new Float32Array(m.nv * 3);
+  for (let i = 0; i < m.nv; i++) for (let k = 0; k < 3; k++) pos[3 * i + k] = m.lo[k] + (qv[3 * i + k] + 32768) * m.sc[k];
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setIndex(new THREE.BufferAttribute(m.i32 ? new Uint32Array(MB, m.i, m.ni) : new Uint16Array(MB, m.i, m.ni), 1));
+  g.computeVertexNormals(); g.computeBoundingSphere();
+  GEO.set(id, g);
+  return g;
+}
+const center = id => { const m = D.meshes[id]; return m.lo.map((l, k) => l + m.sc[k] * 65535 / 2); };
+
+// ---------------------------------------------------------------- 状态
+const S = { feed: 's3', press: 'down', trim: 'sew', T: false, E: false, Dd: false, shell: 'solid', group: false, ex: 0, cut: '', cutp: 0.5, phi: 0, wipe: 0 };
+(q.get('opt') || '').toUpperCase().split('').forEach(c => { if (c === 'T') S.T = true; if (c === 'E') S.E = true; if (c === 'D') S.Dd = true; });
+const optKey = () => (S.T && S.E) ? 'TE' : S.T ? 'T' : S.E ? 'E' : 'none';
+const gIndex = () => D.gkeys.indexOf(`${S.feed},${S.press},${optKey()}`);
+const fIndex = () => D.fkeys.indexOf(`${S.feed},${S.press},${S.trim}`);
+const P = {};                                         // 零件名 → { info, mesh, gid }
+for (const [k, info] of Object.entries(D.parts)) {
+  const mesh = new THREE.Mesh(undefined, SHOW[info.show] || SHOW.metal);
+  mesh.matrixAutoUpdate = false; mesh.userData.k = k;
+  if (info.group === 'hsg') mesh.renderOrder = 2;
+  P[k] = { info, mesh, gid: -1 };
+  root.add(mesh);
+}
+function present(info) {
+  if (info.need === 'T') return S.T;
+  if (info.need === 'E') return S.E;
+  if (info.need === '!E') return !S.E;
+  return true;
+}
+// 爆炸方向（机器坐标，mm）：机壳不动，各部件往它们装进去的方向退出来
+const GDIR = { hsg: [0, 0, 0], main: [1, 0, 0.15], needle: [-0.9, 0, 0.6], hook: [-0.35, -0.2, -1], feed: [0.1, 0.55, -0.85], press: [-0.6, -0.55, 0.65], optT: [-0.2, -0.9, -0.55], optE: [0.3, 0.75, -0.6] };
+const GLEN = { hsg: 0, main: 240, needle: 120, hook: 150, feed: 130, press: 120, optT: 150, optE: 160 };
+const GC = {};
+function groupCenters() {
+  const acc = {};
+  for (const p of Object.values(P)) { if (p.gid < 0) continue; const c = center(p.gid), g = p.info.group; acc[g] = acc[g] || [0, 0, 0, 0]; for (let k = 0; k < 3; k++) acc[g][k] += c[k]; acc[g][3]++; }
+  for (const [g, a] of Object.entries(acc)) GC[g] = [a[0] / a[3], a[1] / a[3], a[2] / a[3]];
+}
+function refreshState() {
+  const gi = gIndex();
+  let any = false;
+  for (const p of Object.values(P)) {
+    const g = p.info.g, id = typeof g === 'number' ? g : g[gi];
+    const on = present(p.info) && id >= 0 && !(p.info.group === 'hsg' && S.shell === 'off');
+    p.mesh.visible = on;
+    if (id >= 0 && id !== p.gid) { p.mesh.geometry = geom(id); p.gid = id; any = true; }
+  }
+  if (any || !GC.main) groupCenters();
+  paint();
+  // 文字
+  const name = 'WQ-LS' + ((S.T || S.E || S.Dd) ? '-' + (S.T ? 'T' : '') + (S.E ? 'E' : '') + (S.Dd ? 'D' : '') : '');
+  $('model').textContent = name;
+  document.querySelectorAll('[data-press]').forEach(b => b.classList.toggle('on', b.dataset.press === S.press));
+  document.querySelectorAll('[data-feed]').forEach(b => b.classList.toggle('on', b.dataset.feed === S.feed));
+  document.querySelectorAll('[data-opt]').forEach(b => b.classList.toggle('on', S[b.dataset.opt === 'D' ? 'Dd' : b.dataset.opt]));
+  document.querySelectorAll('[data-trim]').forEach(b => { b.classList.toggle('on', b.dataset.trim === S.trim); b.disabled = b.dataset.trim !== 'sew' && !S.T; });
+  document.querySelectorAll('[data-shell]').forEach(b => b.classList.toggle('on', b.dataset.shell === S.shell));
+  document.querySelectorAll('[data-cut]').forEach(b => b.classList.toggle('on', b.dataset.cut === S.cut));
+  $('grp').classList.toggle('on', S.group);
+  $('phiL').textContent = S.trim === 'wipe' ? t('wipeProg') : t('phi');
+  const h = [];
+  if (S.trim === 'trim') h.push(t('hintTrim')); else if (S.trim === 'wipe') h.push(t('hintWipe')); else if (!S.T) h.push(t('hintT'));
+  if (S.E) h.push(t('hintE'));
+  if (S.Dd) h.push(t('hintD'));
+  $('stateHint').textContent = h.join(' ');
+  pose();
+}
+function paint() {
+  for (const p of Object.values(P)) {
+    const info = p.info;
+    let m = info.group === 'hsg' ? (S.shell === 'glass' ? GLASS : (S.group ? GMAT.hsg : SHOW.shell)) : S.group ? GMAT[info.group] : (SHOW[info.show] || SHOW.metal);
+    if (sel === p.mesh.userData.k) m = hlOf(m);
+    p.mesh.material = m;
+  }
+}
+// ---------------------------------------------------------------- 运动：每 2° 一帧，帧间插值（平移线性、转动球面插值）
+const DEC = new Map();
+function dec(seq) {
+  if (DEC.has(seq)) return DEC.get(seq);
+  const out = [], M = new THREE.Matrix4(), s = new THREE.Vector3();
+  for (let i = 0; i < NF; i++) {
+    const o = (seq * NF + i) * 12, a = FR;
+    M.set(a[o], a[o + 1], a[o + 2], a[o + 3], a[o + 4], a[o + 5], a[o + 6], a[o + 7], a[o + 8], a[o + 9], a[o + 10], a[o + 11], 0, 0, 0, 1);
+    const p = new THREE.Vector3(), qq = new THREE.Quaternion(); M.decompose(p, qq, s); out.push([p, qq]);
+  }
+  DEC.set(seq, out);
+  return out;
+}
+const tp = new THREE.Vector3(), tq = new THREE.Quaternion(), one = new THREE.Vector3(1, 1, 1);
+const thrGeo = new THREE.BufferGeometry();
+const thr = new THREE.Line(thrGeo, new THREE.LineBasicMaterial({ color: 0xd2283a }));
+thr.frustumCulled = false; root.add(thr);
+let thrOn = true;
+function pose() {
+  const fi = fIndex();
+  const x = S.trim === 'wipe' ? S.wipe : S.phi / STEP;
+  const i0 = ((Math.floor(x) % NF) + NF) % NF, i1 = (i0 + 1) % NF, u = x - Math.floor(x);
+  for (const p of Object.values(P)) {
+    if (!p.mesh.visible) continue;
+    const f = p.info.f, seq = f === undefined ? -1 : typeof f === 'number' ? f : f[fi];
+    if (seq >= 0) {
+      const d = dec(seq), a = d[i0], b = d[i1];
+      tp.copy(a[0]).lerp(b[0], u); tq.copy(a[1]).slerp(b[1], u);
+    } else { tp.set(0, 0, 0); tq.set(0, 0, 0, 1); }
+    if (S.ex > 0 && p.gid >= 0) {
+      const g = p.info.group, c = center(p.gid), gc = GC[g] || c, dir = GDIR[g], L = GLEN[g] * S.ex;
+      tp.x += dir[0] * L + (c[0] - gc[0]) * 0.55 * S.ex; tp.y += dir[1] * L + (c[1] - gc[1]) * 0.55 * S.ex; tp.z += dir[2] * L + (c[2] - gc[2]) * 0.55 * S.ex;
+    }
+    p.mesh.matrix.compose(tp, tq, one); p.mesh.matrixWorldNeedsUpdate = true;
+  }
+  const th = D.threads[D.thread_of[fi]];
+  const A = th.pts[i0], B = th.pts[i1];
+  thrGeo.setFromPoints(A.map((pt, k) => new THREE.Vector3(pt[0] + (B[k][0] - pt[0]) * u, pt[1] + (B[k][1] - pt[1]) * u, pt[2] + (B[k][2] - pt[2]) * u)));
+  thr.visible = thrOn && S.ex === 0;
+  const tip = th.tip[i0] + (th.tip[i1] - th.tip[i0]) * u;
+  $('phiV').textContent = S.trim === 'wipe' ? `${Math.round(100 * S.wipe / (NF - 1))}%` : `${S.phi.toFixed(0)}°`;
+  $('phi').value = S.trim === 'wipe' ? (359.9 * S.wipe / (NF - 1)) : S.phi;
+  $('tipV').textContent = `${tip.toFixed(1)} mm`;
+}
+
+// ---------------------------------------------------------------- 相机与拖动（自己写的轨道控制：单指 / 左键转，双指 / 右键平移，滚轮 / 捏合缩放）
+const cam = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.005, 20);
+const ctl = { target: new THREE.Vector3(), sph: new THREE.Spherical(1, 1, 0) };
+function camApply() { const off = new THREE.Vector3().setFromSpherical(ctl.sph); cam.position.copy(ctl.target).add(off); cam.lookAt(ctl.target); }
+const VIEWS = { whole: [[-0.42, 0.42, 1.2], [0.12, 0.08, 0.0]], iso: [[-0.5, 0.36, 0.6], [0.04, 0.12, 0.0]], face: [[-0.8, 0.13, 0.0], [0.0, 0.13, 0.0]],
+  front: [[0.16, 0.12, 1.05], [0.16, 0.12, 0.0]], hook: [[-0.31, -0.03, 0.36], [0.04, -0.03, -0.01]], feed: [[0.0, 0.3, 0.75], [0.17, -0.03, 0.0]],
+  press: [[-0.45, 0.2, 0.5], [-0.02, 0.095, 0.0]], trim: [[-0.2, -0.13, 0.22], [0.0, -0.01, -0.01]], wheel: [[0.95, 0.36, 0.5], [0.40, 0.16, 0.0]] };
+function view(v) {
+  const [p, tg] = VIEWS[v] || VIEWS.whole;
+  ctl.target.set(...tg); ctl.sph.setFromVector3(new THREE.Vector3(...p).sub(ctl.target));
+  const asp = innerWidth / innerHeight; if (asp < 1.2) ctl.sph.radius *= Math.min(1.8, 1.2 / asp);   // 竖屏退远一点
+  camApply();
+  document.querySelectorAll('[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+}
+const ptrs = new Map();
+let mode = null, last = null, pinch0 = 0, wheelC = null, wheelA = 0, wheelS = 1, downAt = null;
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function hit(x, y) {
+  ndc.set(x / innerWidth * 2 - 1, -y / innerHeight * 2 + 1);
+  ray.setFromCamera(ndc, cam);
+  scene.updateMatrixWorld();
+  const hs = ray.intersectObjects(Object.values(P).map(p => p.mesh).filter(m => m.visible && !(m.material === GLASS)), false);
+  return hs.find(h => !r.clippingPlanes.length || r.clippingPlanes[0].distanceToPoint(h.point) >= 0) || null;
+}
+const hwX = () => { const p = P.handwheel; const c = center(p.gid); return new THREE.Vector3(c[0], c[1], c[2]); };
+canvas.addEventListener('pointerdown', e => {
+  canvas.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+  downAt = [e.clientX, e.clientY, performance.now()];
+  if (ptrs.size === 1) {
+    const h = e.button === 0 ? hit(e.clientX, e.clientY) : null;
+    const k = h && h.object.userData.k;
+    if ((k === 'handwheel' || k === 'handwheel_ring') && S.trim !== 'wipe' && S.ex === 0) {
+      mode = 'wheel';
+      const w = hwX(); const c = w.clone().applyMatrix4(root.matrixWorld).project(cam);
+      wheelC = [(c.x + 1) / 2 * innerWidth, (1 - c.y) / 2 * innerHeight];
+      wheelA = Math.atan2(-(e.clientY - wheelC[1]), e.clientX - wheelC[0]);
+      const ax = new THREE.Vector3(1, 0, 0).transformDirection(root.matrixWorld), toCam = cam.position.clone().sub(w.clone().applyMatrix4(root.matrixWorld));
+      wheelS = ax.dot(toCam) > 0 ? 1 : -1;
+      play = false; $('play').classList.remove('on'); $('play').textContent = t('play');
+    } else mode = e.button === 2 || e.shiftKey ? 'pan' : 'rot';
+  } else if (ptrs.size === 2) {
+    mode = 'pinch'; const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a[0] - b[0], a[1] - b[1]); last = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  }
+  if (mode !== 'pinch') last = [e.clientX, e.clientY];
+});
+canvas.addEventListener('pointermove', e => {
+  if (!ptrs.has(e.pointerId)) return;
+  ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+  if (mode === 'wheel') {
+    const a = Math.atan2(-(e.clientY - wheelC[1]), e.clientX - wheelC[0]);
+    let d = a - wheelA; if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI;
+    wheelA = a; S.phi = ((S.phi + wheelS * d * 180 / Math.PI) % 360 + 360) % 360; pose(); return;
+  }
+  if (mode === 'pinch' && ptrs.size === 2) {
+    const [a, b] = [...ptrs.values()], dd = Math.hypot(a[0] - b[0], a[1] - b[1]), c = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    ctl.sph.radius = Math.min(4, Math.max(0.03, ctl.sph.radius * pinch0 / Math.max(dd, 1))); pinch0 = dd;
+    panBy(c[0] - last[0], c[1] - last[1]); last = c; camApply(); return;
+  }
+  const dx = e.clientX - last[0], dy = e.clientY - last[1]; last = [e.clientX, e.clientY];
+  if (mode === 'rot') { ctl.sph.theta -= dx * 0.006; ctl.sph.phi = Math.min(Math.PI - 0.05, Math.max(0.05, ctl.sph.phi - dy * 0.006)); camApply(); }
+  else if (mode === 'pan') { panBy(dx, dy); camApply(); }
+});
+function panBy(dx, dy) {
+  const k = 2 * ctl.sph.radius * Math.tan(cam.fov * Math.PI / 360) / innerHeight;
+  const xa = new THREE.Vector3().setFromMatrixColumn(cam.matrix, 0), ya = new THREE.Vector3().setFromMatrixColumn(cam.matrix, 1);
+  ctl.target.addScaledVector(xa, -dx * k).addScaledVector(ya, dy * k);
+}
+const up = e => {
+  ptrs.delete(e.pointerId);
+  if (downAt && mode !== 'pinch' && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) < 6 && performance.now() - downAt[2] < 500) {
+    const h = hit(e.clientX, e.clientY); select(h ? h.object.userData.k : null);
+  }
+  downAt = null;
+  if (ptrs.size === 0) mode = null;
+  else if (ptrs.size === 1) { mode = 'rot'; last = [...ptrs.values()][0]; }
+};
+canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+canvas.addEventListener('wheel', e => { e.preventDefault(); ctl.sph.radius = Math.min(4, Math.max(0.03, ctl.sph.radius * Math.exp(e.deltaY * 0.001))); camApply(); }, { passive: false });
+
+// ---------------------------------------------------------------- 点零件
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function showCard(k) {
+  const i = D.parts[k], L = LANG === 'en' ? 1 : 0, c = $('card');
+  const nm = i.name[L] + (i.sub ? ` · ${i.sub[L]}` : '');
+  const kind = i.code.startsWith('BUY-') ? (i.sub ? t('inAsm') : t('buy')) : i.kind === 'buy' ? t('buyDwg') : t('make');
+  const mass = i.mass_g >= 1000 ? `${(i.mass_g / 1000).toFixed(2)} ${t('kg')}` : `${i.mass_g} ${t('g')}`;
+  let mat = i.mat || t('matNone');
+  if (S.Dd && k === 'hook') mat += ' · ' + t('dlc');
+  const rows = [[t('code'), `<span class="code">${esc(i.code)}</span>`], [t('kind'), esc(kind)], [t('grp'), esc(D.groups[i.group][L])],
+    [t('mat'), esc(mat)], [t('mass'), esc(mass) + (i.qty ? ` · ${t('qty')} ${i.qty}` : '')]];
+  if (i.of) rows.push([t('of'), `<span class="code">${esc(i.of)}</span> ${esc((D.assemblies[i.of] || [])[L] || '')}`]);
+  let links = '';
+  if (i.dwg) links += i.dwg.map(d => `<a href="${encodeURI(BASE + '/' + d.u)}" target="_blank" rel="noopener">${t('dwg')}${LANG === 'en' ? ': ' : '：'}${esc(d.t)} ↗</a>`).join('');
+  if (i.doc) links += `<a href="${encodeURI(BASE + '/' + i.doc.u)}" target="_blank" rel="noopener">${t('calc')}${LANG === 'en' ? ': ' : '：'}${esc(i.doc.t)} ↗</a>`;
+  c.innerHTML = `<button class="x" aria-label="close">×</button><h2>${esc(nm)}</h2>` +
+    `<table>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>` +
+    `<div>${links}</div>${i.dwg ? '' : `<p class="hint">${t('noDwg')}</p>`}`;
+  c.hidden = false;
+  c.querySelector('.x').onclick = () => select(null);
+}
+function select(k) {
+  sel = k || null;
+  paint();
+  if (sel) showCard(sel); else $('card').hidden = true;
+}
+
+// ---------------------------------------------------------------- 剖开
+const plane = new THREE.Plane();
+const BB = { lo: [-110, -80, -85], hi: [485, 132, 272] };     // 整机外廓（机器坐标 mm），剖切滑块的范围
+function cut() {
+  $('cutp').disabled = !S.cut;
+  root.updateMatrixWorld(true);
+  if (!S.cut) { r.clippingPlanes = []; CUT.value = 0; } else {
+    const ax = 'xyz'.indexOf(S.cut), v = BB.lo[ax] + (BB.hi[ax] - BB.lo[ax]) * S.cutp;
+    const n = new THREE.Vector3(...[0, 1, 2].map(k => k === ax ? (ax === 2 ? -1 : 1) : 0))   // 留右边、后边、下边：从左、前、上看得到剖面
+    .transformDirection(root.matrixWorld);
+    const p = new THREE.Vector3(...[0, 1, 2].map(k => k === ax ? v : 0)).applyMatrix4(root.matrixWorld);
+    plane.setFromNormalAndCoplanarPoint(n, p); r.clippingPlanes = [plane]; CUT.value = 1;
+  }
+  const side = S.cut ? THREE.DoubleSide : THREE.FrontSide;
+  for (const m of [...Object.values(SHOW), ...Object.values(GMAT), ...HL.values()]) if (m.side !== side) { m.side = side; m.needsUpdate = true; }
+}
+
+// ---------------------------------------------------------------- 界面
+document.querySelectorAll('[data-press]').forEach(b => b.onclick = () => { S.press = b.dataset.press; refreshState(); });
+document.querySelectorAll('[data-feed]').forEach(b => b.onclick = () => { S.feed = b.dataset.feed; refreshState(); });
+document.querySelectorAll('[data-opt]').forEach(b => b.onclick = () => {
+  const o = b.dataset.opt === 'D' ? 'Dd' : b.dataset.opt; S[o] = !S[o];
+  if (!S.T) S.trim = 'sew';
+  if (sel && !present(D.parts[sel])) select(null);
+  refreshState(); if (sel) showCard(sel);
+});
+document.querySelectorAll('[data-trim]').forEach(b => b.onclick = () => {
+  S.trim = b.dataset.trim; S.wipe = 0; if (S.trim === 'trim') S.phi = 260;
+  if (S.trim !== 'sew') { play = true; $('play').classList.add('on'); $('play').textContent = t('pause'); }
+  refreshState();
+});
+document.querySelectorAll('[data-shell]').forEach(b => b.onclick = () => { S.shell = b.dataset.shell; refreshState(); });
+document.querySelectorAll('[data-cut]').forEach(b => b.onclick = () => { S.cut = b.dataset.cut; cut(); refreshState(); });
+$('cutp').oninput = e => { S.cutp = +e.target.value; cut(); };
+$('ex').oninput = e => { S.ex = +e.target.value; $('exV').textContent = Math.round(100 * S.ex) + '%'; pose(); };
+$('thr').onclick = () => { thrOn = !thrOn; $('thr').classList.toggle('on', thrOn); pose(); };
+$('grp').onclick = () => { S.group = !S.group; refreshState(); };
+$('phi').oninput = e => { const v = +e.target.value; if (S.trim === 'wipe') S.wipe = v / 359.9 * (NF - 1); else S.phi = v; pose(); };
+$('play').onclick = () => { play = !play; $('play').classList.toggle('on', play); $('play').textContent = play ? t('pause') : t('play'); };
+let speed = 1;
+document.querySelectorAll('[data-sp]').forEach(b => b.onclick = () => { speed = +b.dataset.sp; document.querySelectorAll('[data-sp]').forEach(x => x.classList.toggle('on', x === b)); });
+document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => view(b.dataset.v));
+function fit() {                                       // 桌面上左边有面板：把画面中心往右挪半个面板宽
+  r.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight;
+  const pw = innerWidth > 640 && !q.has('shot') ? $('panel').offsetWidth + 24 : 0;
+  if (pw) cam.setViewOffset(innerWidth + pw, innerHeight, 0, 0, innerWidth, innerHeight); else cam.clearViewOffset();
+  cam.updateProjectionMatrix();
+}
+fit();
+addEventListener('resize', fit);
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { scene.background.set(darkUI() ? 0x15181b : 0xdfe3e7); });
+
+// ---------------------------------------------------------------- 开始
+READY = true;
+refreshState();
+view(q.get('view') || 'whole');
+const want = q.get('part');
+if (want) {
+  const k = D.parts[want] ? want : Object.keys(D.parts).find(x => D.parts[x].code === want || D.parts[x].of === want);
+  if (k) { if (D.parts[k].need === 'T') S.T = true; if (D.parts[k].need === 'E') S.E = true; refreshState(); select(k); }
+}
+$('load').remove();
+if (q.has('shot')) {                                  // 出图：?shot=<φ> 只渲染一帧
+  S.phi = +q.get('shot') || 0; pose(); camApply(); r.render(scene, cam); document.body.classList.add('shot'); document.title = 'done'; return;
+}
+const fpsEl = $('fps'); if (q.has('fps')) fpsEl.hidden = false;
+let tl = performance.now(), acc = 0, nfps = 0, tf = tl;
+window.__wq = { S, P, pose, refreshState, view, select, cut, setPhi: v => { S.phi = v; pose(); } }; window.__cam = cam; window.__hit = (x, y) => { const h = hit(x, y); return h && h.object.userData.k; };   // 截图、录屏脚本用
+r.setAnimationLoop(now => {
+  const dt = Math.max(0, Math.min(0.1, (now - tl) / 1000)); tl = now;
+  if (play && mode !== 'wheel') {
+    if (S.trim === 'wipe') { S.wipe += dt * speed * 30; if (S.wipe > NF - 1) S.wipe = 0; }
+    else S.phi = (S.phi + dt * speed * 120) % 360;
+    pose();
+  }
+  r.render(scene, cam);
+  nfps++; if (now - tf > 1000) { fpsEl.textContent = `${Math.round(nfps * 1000 / (now - tf))} ${t('fps')}`; nfps = 0; tf = now; }
+});
+})();
+</script></body></html>

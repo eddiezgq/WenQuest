@@ -272,6 +272,11 @@ def test_web_edition(client, tmp_path):
     r = client.get(pre + "ch01.html")
     assert r.status_code == 200 and "frame-ancestors" in r.headers["content-security-policy"]
     assert client.get(pre + "img/a.webp").headers["content-type"] == "image/webp"
+    (we / "labs" / "wqls" / "dwg").mkdir(parents=True)                                       # 第 138 轮：三维整机的网格和图纸
+    (we / "labs" / "wqls" / "mesh.bin").write_bytes(b"\0\1")
+    (we / "labs" / "wqls" / "dwg" / "a.pdf").write_bytes(b"%PDF-1.4")
+    assert client.get(pre + "labs/wqls/mesh.bin").content == b"\0\1"
+    assert client.get(pre + "labs/wqls/dwg/a.pdf").headers["content-type"] == "application/pdf"
     assert client.get(pre).text.startswith("<a")                                              # the book's front page
     en = client.get("/api/v1/textbooks/sewing/webed?lang=en", headers=hs).json()["url"]
     assert client.get(en[en.index("/api/"):]).text == "English"

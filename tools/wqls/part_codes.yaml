@@ -1,0 +1,143 @@
+# WQ-LS 零件号对照表（第 138 轮 G6.1）：三维零件名（tools/wqls/cad/*.py 里的名字）→ 物料号。
+# 网页三维整机（g6_web.py）点零件时显示它；G7.1 的 BOM 也按这张表生成。
+#
+# 编号规则：
+#   - 我们自己设计的件（有我们的图）一律 LS-xxx：1xx 主轴与传动、2xx 刺布挑线、3xx 旋梭、4xx 送布与油泵、
+#     5xx 压脚与操纵件、7xx 选配件 T（自动剪线、拨线、松线）、8xx 选配件 E（电子针距）。
+#     kind: make = 本厂做（缝纫机厂要有工艺路线）；buy = 按我们的图外购（弹簧、衬套等）。
+#   - 目录件、标准件（照型号买）一律 BUY-…；外购部件的内部零件（如电机里的定子）用部件的号，sub 写是部件里的哪一件。
+#   - 机壳用 G5 的号：上件 HSG-LS-U、下件 HSG-LS-L、合件 HSG-LS-P（缝纫机厂现在的 HSG-LS 在 G7.1 换成这三个）。
+#   - 沿用缝纫机厂已有的号：LS-101、LS-102、LS-201、LS-301、LS-401、BUY-MOTOR-LS、BUY-NEEDLE-DB、BUY-BOBCASE、BUY-BELT-LS。
+#     G4 旋梭组.md 里把下轴写成了 LS-501，与工厂的 LS-102 冲突，以工厂为准（已改文档）。
+# 字段：name [中文, English]；group 爆炸分组；qty 这个三维零件里有几件；mat 材料（设计文档里写了的才写，没写的留空，页面显示“未定”）；
+#      doc 计算书（docs 里的简称，# 后面是那一节标题的开头）；dwg 图纸（相对 docs/设计/WQ-LS/，网页里复制成 dwg/<物料号>.pdf）。
+groups:
+  hsg: [机壳, Housing]
+  main: [主轴与电机, Main shaft & motor]
+  needle: [刺布挑线, Needle & take-up]
+  hook: [旋梭, Rotary hook]
+  feed: [送布与油泵, Feed & oil pump]
+  press: [压脚与操纵, Presser & controls]
+  optT: [选配件 T：剪线拨线, "Option T: trimmer & wiper"]
+  optE: [选配件 E：电子针距, "Option E: electronic stitch"]
+docs:
+  G2: G2/设计计算书.md
+  G3: G3/外观与机壳铸件.md
+  G4a: G4/刺布与挑线机构.md
+  G4h: G4/旋梭组.md
+  G4f: G4/送布组.md
+  G4c: G4/压脚与操纵件.md
+  G4o: G4/剪线与电子针距.md
+  G5c: G5/机壳铸造工艺.md
+  G5m: G5/机壳机加工工艺.md
+assemblies:
+  HSG-LS-P: [机壳合件（上下件合箱后精加工）, Housing pair (upper and lower finish-machined together)]
+parts:
+  # —— 机壳 ——
+  housing_upper: {code: HSG-LS-U, name: [机壳上件, "Housing, upper part"], kind: make, group: hsg, mat: HT250, of: HSG-LS-P,
+                  doc: "G3#十二、G4.4 补上机臂底壁、机壳分上下两件（2026-11-11）", dwg: [G5/工程图/零件图_上件.pdf, G5/工程图/合件图.pdf] }
+  housing_lower: {code: HSG-LS-L, name: [机壳下件（机座）, "Housing, lower part (bed)"], kind: make, group: hsg, mat: HT250, of: HSG-LS-P,
+                  doc: "G5m#〇、G5.2：先做精基准、合箱，再整体精加工（以本节为准）", dwg: [G5/工程图/零件图_下件.pdf, G5/工程图/合件图.pdf] }
+  # —— 主轴与传动、电机 ——
+  shaft: {code: LS-101, name: [上轴, Upper shaft], kind: make, group: main, mat: 45 钢调质, doc: "G2#五、上轴 LS-101 B 版 · Upper shaft"}
+  lower_shaft: {code: LS-102, name: [下轴, Lower shaft], kind: make, group: hook, mat: 45 钢调质, doc: "G4h#二、零件"}
+  crank: {code: LS-103, name: [曲柄（带平衡块）, Crank with counterweight], kind: make, group: needle, doc: "G2#四、平衡 · Balancing"}
+  crank_pin: {code: LS-104, name: [曲柄销, Crank pin], kind: make, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
+  pulley_upper: {code: LS-105, name: [上带轮, Upper timing pulley], kind: make, group: hook, doc: "G4h#二、零件"}
+  pulley_lower: {code: LS-106, name: [下带轮, Lower timing pulley], kind: make, group: hook, doc: "G4h#二、零件"}
+  handwheel: {code: LS-107, name: [手轮, Handwheel], kind: make, group: main, doc: "G3#十一、G4.3 按铸件重做、机头开口加盖板、装上电机（2026-11-11）"}
+  handwheel_ring: {code: LS-108, name: [手轮标记环, Handwheel marker ring], kind: make, group: main}
+  bearing_front: {code: BUY-BRG-6202, name: [上轴前轴承 6202, Front bearing 6202], kind: buy, group: main, doc: "G2#五、上轴 LS-101 B 版 · Upper shaft"}
+  belt: {code: BUY-BELT-LS, name: [同步带, Timing belt], kind: buy, group: hook, doc: "G4h#二、零件"}
+  bearings_lower: {code: BUY-BRG-6201, qty: 2, name: [下轴轴承 6201, Lower shaft bearings 6201], kind: buy, group: hook, doc: "G4h#四、校核（全部合格）"}
+  motor_cap: {code: BUY-MOTOR-LS, sub: [前端盖, front cap], name: [直驱电机, Direct-drive motor], kind: buy, group: main, doc: "G2#六、电机、惯量与控制方式（交给 GC）· Motor, inertia and control strategy"}
+  motor_bolts: {code: BUY-MOTOR-LS, sub: [端盖螺钉, cap screws], name: [直驱电机, Direct-drive motor], kind: buy, group: main}
+  motor_housing: {code: BUY-MOTOR-LS, sub: [定子机座, stator housing], name: [直驱电机, Direct-drive motor], kind: buy, group: main}
+  motor_rods: {code: BUY-MOTOR-LS, sub: [拉杆, tie rods], name: [直驱电机, Direct-drive motor], kind: buy, group: main}
+  stator_core: {code: BUY-MOTOR-LS, sub: [定子铁心, stator core], name: [直驱电机, Direct-drive motor], kind: buy, group: main}
+  stator_winding: {code: BUY-MOTOR-LS, sub: [定子绕组, stator winding], name: [直驱电机, Direct-drive motor], kind: buy, group: main}
+  rotor: {code: BUY-MOTOR-LS, sub: [转子, rotor], name: [直驱电机, Direct-drive motor], kind: buy, group: main}
+  rotor_magnets: {code: BUY-MOTOR-LS, sub: [磁钢, magnets], name: [直驱电机, Direct-drive motor], kind: buy, group: main}
+  encoder_disc: {code: BUY-MOTOR-LS, sub: [编码器码盘, encoder disc], name: [直驱电机, Direct-drive motor], kind: buy, group: main}
+  # —— 刺布挑线 ——
+  needle_bar: {code: LS-201, name: [针杆, Needle bar], kind: make, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
+  needle_clamp: {code: LS-202, name: [针夹, Needle clamp], kind: make, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
+  nb_link: {code: LS-203, name: [针杆连接块, Needle-bar connecting block], kind: make, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
+  rod: {code: LS-204, name: [针杆连杆, Needle-bar connecting rod], kind: make, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
+  lever: {code: LS-205, name: [挑线杆, Take-up lever], kind: make, group: needle, doc: "G4a#二、新挑线四连杆怎么定的"}
+  rocker: {code: LS-206, name: [挑线摇杆, Take-up rocker], kind: make, group: needle, doc: "G4a#二、新挑线四连杆怎么定的"}
+  pin_M: {code: LS-207, name: [挑线杆销 M, Take-up pin M], kind: make, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
+  stud_Q: {code: LS-208, name: [摇杆支点销 Q, Rocker stud Q], kind: make, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
+  thread_guide: {code: LS-209, name: [过线环, Thread guide], kind: make, group: needle, doc: "G4c#八、一转干涉和面线路径"}
+  needle: {code: BUY-NEEDLE-DB, name: [机针 DB×1, Needle DB×1], kind: buy, group: needle}
+  # —— 旋梭 ——
+  hook: {code: LS-301, name: [旋梭, Rotary hook], kind: make, group: hook, doc: "G4h#二、零件"}
+  hook_shaft: {code: LS-302, name: [旋梭轴, Hook shaft], kind: make, group: hook, mat: 45 钢, doc: "G4h#二、零件"}
+  gear_hook: {code: LS-303, name: [旋梭轴齿轮 z20, Hook-shaft gear z20], kind: make, group: hook, mat: 20CrMnTi 渗碳淬火 58–62 HRC, doc: "G4h#四、校核（全部合格）"}
+  gear_lower: {code: LS-304, name: [下轴齿轮 z40, Lower-shaft gear z40], kind: make, group: hook, mat: 20CrMnTi 渗碳淬火 58–62 HRC, doc: "G4h#四、校核（全部合格）"}
+  bushes_hook: {code: LS-305, qty: 2, name: [旋梭轴铜套, Hook-shaft bushings], kind: buy, group: hook, mat: 锡青铜, doc: "G4h#四、校核（全部合格）"}
+  bobbin_case: {code: BUY-BOBCASE, name: [梭壳与梭芯, Bobbin case & bobbin], kind: buy, group: hook}
+  # —— 送布与油泵 ——
+  feed_ecc: {code: LS-401, name: [送布偏心, Feed eccentric], kind: make, group: feed, mat: 45 钢, doc: "G4f#一、布置"}
+  lift_ecc: {code: LS-402, name: [抬牙偏心, Lift eccentric], kind: make, group: feed, mat: 45 钢, doc: "G4f#一、布置"}
+  feed_rod: {code: LS-403, name: [送布连杆, Feed connecting rod], kind: make, group: feed, mat: ADC12 压铸铝, doc: "G4f#六、强度（5000 r/min、5 mm 针距；正缝、倒缝取大的）"}
+  regulator: {code: LS-404, name: [送布调节器, Feed regulator], kind: make, group: feed, mat: 45 钢, doc: "G4f#三、针距调节和倒缝"}
+  reg_slider: {code: LS-405, name: [调节器滑块, Regulator slider], kind: make, group: feed, mat: 45 钢, doc: "G4f#三、针距调节和倒缝"}
+  feed_link: {code: LS-406, name: [水平连杆, Feed link], kind: make, group: feed, mat: 45 钢, doc: "G4f#二、尺寸综合与轨迹"}
+  feed_rock: {code: LS-407, name: [送布摆轴, Feed rock shaft], kind: make, group: feed, mat: 45 钢, doc: "G4f#六、强度（5000 r/min、5 mm 针距；正缝、倒缝取大的）"}
+  feed_bar: {code: LS-408, name: [牙架与送布牙, Feed bar & feed dog], kind: make, group: feed, mat: 20CrMnTi 渗碳淬火, doc: "G4f#六、强度（5000 r/min、5 mm 针距；正缝、倒缝取大的）"}
+  lift_link: {code: LS-409, name: [抬牙连杆, Lift link], kind: make, group: feed, mat: ADC12 压铸铝, doc: "G4f#二、尺寸综合与轨迹"}
+  lift_rock: {code: LS-410, name: [抬牙摆轴, Lift rock shaft], kind: make, group: feed, mat: 45 钢, doc: "G4f#六、强度（5000 r/min、5 mm 针距；正缝、倒缝取大的）"}
+  oil_ecc: {code: LS-411, name: [油泵偏心, Oil-pump eccentric], kind: make, group: feed, doc: "G4f#七、油泵与润滑"}
+  oil_plunger: {code: LS-412, name: [油泵柱塞, Oil-pump plunger], kind: make, group: feed, doc: "G4f#七、油泵与润滑"}
+  oil_pump: {code: LS-413, name: [油泵体, Oil-pump body], kind: make, group: feed, doc: "G4f#七、油泵与润滑"}
+  # —— 压脚与操纵件 ——
+  presser_bar: {code: LS-501, name: [压脚杆, Presser bar], kind: make, group: press, doc: "G4c#二、压脚组"}
+  presser_collar: {code: LS-502, name: [压脚弹簧座, Presser spring collar], kind: make, group: press, doc: "G4c#二、压脚组"}
+  presser_foot: {code: LS-503, name: [压脚, Presser foot], kind: make, group: press, doc: "G4c#二、压脚组"}
+  lift_bracket: {code: LS-504, name: [抬压脚板, Presser lifting bracket], kind: make, group: press, doc: "G4c#三、手抬压脚"}
+  presser_screw: {code: LS-505, name: [调压螺钉, Pressure adjusting screw], kind: make, group: press, doc: "G4c#二、压脚组"}
+  presser_spring: {code: LS-506, name: [压脚弹簧, Presser spring], kind: buy, group: press, mat: 琴钢丝 SWP-B, doc: "G4c#二、压脚组"}
+  presser_bushes: {code: LS-507, qty: 2, name: [压脚杆导套, Presser-bar bushings], kind: buy, group: press, doc: "G4c#二、压脚组"}
+  hand_lifter: {code: LS-508, name: [手抬扳手, Hand lifter], kind: make, group: press, doc: "G4c#三、手抬压脚"}
+  knee_c1: {code: LS-509, name: [膝抬曲柄 C1, Knee-lift crank C1], kind: make, group: press, doc: "G4c#四、膝抬压脚"}
+  knee_c2: {code: LS-510, name: [膝抬曲柄 C2, Knee-lift crank C2], kind: make, group: press, doc: "G4c#四、膝抬压脚"}
+  knee_rod: {code: LS-511, name: [膝抬拉杆, Knee-lift rod], kind: make, group: press, doc: "G4c#四、膝抬压脚"}
+  knee_push: {code: LS-512, name: [膝抬推杆, Knee-lift push rod], kind: make, group: press, doc: "G4c#四、膝抬压脚"}
+  knee_link: {code: LS-513, name: [膝抬连杆, Knee-lift link], kind: make, group: press, doc: "G4c#四、膝抬压脚"}
+  release_shaft: {code: LS-514, name: [松线轴, Tension-release shaft], kind: make, group: press, doc: "G4c#五、松线"}
+  release_rod: {code: LS-515, name: [松线拉杆, Tension-release rod], kind: make, group: press, doc: "G4c#五、松线"}
+  release_lever: {code: LS-516, name: [松线杆, Tension-release lever], kind: make, group: press, doc: "G4c#五、松线"}
+  release_pin: {code: LS-517, name: [松线顶针, Tension-release pin], kind: make, group: press, doc: "G4c#五、松线"}
+  tension_post: {code: LS-518, name: [夹线柱, Tension post], kind: make, group: press, doc: "G4c#六、夹线器和挑线簧"}
+  tension_discs: {code: LS-519, name: [夹线盘, Tension discs], kind: make, group: press, doc: "G4c#六、夹线器和挑线簧"}
+  tension_spring: {code: LS-520, name: [夹线簧, Tension spring], kind: buy, group: press, mat: 琴钢丝, doc: "G4c#六、夹线器和挑线簧"}
+  tension_nut: {code: LS-521, name: [夹线螺母, Tension nut], kind: make, group: press, doc: "G4c#六、夹线器和挑线簧"}
+  check_spring: {code: LS-522, name: [挑线簧, Check spring], kind: buy, group: press, mat: 琴钢丝, doc: "G4c#六、夹线器和挑线簧"}
+  stitch_dial: {code: LS-523, name: [针距旋钮, Stitch-length dial], kind: make, group: press, doc: "G4c#七、针距旋钮和倒缝扳手"}
+  pull_rod: {code: LS-524, name: [针距拉杆, Stitch-length pull rod], kind: make, group: press, doc: "G4c#七、针距旋钮和倒缝扳手"}
+  reverse_lever: {code: LS-525, name: [倒缝扳手, Reverse lever], kind: make, group: press, doc: "G4c#七、针距旋钮和倒缝扳手"}
+  reverse_spring: {code: LS-526, name: [倒缝拉簧, Reverse return spring], kind: buy, group: press, doc: "G4c#七、针距旋钮和倒缝扳手"}
+  # —— 选配件 T：自动剪线、拨线、松线 ——
+  moving_knife: {code: LS-701, name: [动刀, Moving knife], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  knife_shaft: {code: LS-702, name: [动刀轴, Moving-knife shaft], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  fixed_knife: {code: LS-703, name: [定刀, Fixed knife], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  trim_base: {code: LS-704, name: [动刀轴座, Knife-shaft base], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  trim_rock: {code: LS-705, name: [剪线摆轴, Trimmer rock shaft], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  trim_brackets: {code: LS-706, name: [摆轴座, Rock-shaft brackets], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  trim_link: {code: LS-707, name: [剪线拉杆, Trimmer link], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  trim_lever: {code: LS-708, name: [剪线摆杆, Trimmer cam lever], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  trim_roller: {code: LS-709, name: [凸轮滚子, Cam roller], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  trim_cam: {code: LS-710, name: [剪线凸轮, Trimmer cam], kind: make, group: optT, doc: "G4o#二、剪线机构"}
+  wiper: {code: LS-711, name: [拨线钩, Thread wiper], kind: make, group: optT, doc: "G4o#三、松线电磁铁和拨线器"}
+  release_arm_t: {code: LS-712, name: [松线臂, Release arm], kind: make, group: optT, doc: "G4o#三、松线电磁铁和拨线器"}
+  trim_solenoid: {code: BUY-SOL-TRIM, name: [剪线电磁铁, Trimmer solenoid], kind: buy, group: optT, doc: "G4o#二、剪线机构"}
+  wiper_solenoid: {code: BUY-SOL-WIPE, name: [拨线电磁铁, Wiper solenoid], kind: buy, group: optT, doc: "G4o#三、松线电磁铁和拨线器"}
+  release_solenoid: {code: BUY-SOL-REL, name: [松线电磁铁, Release solenoid], kind: buy, group: optT, doc: "G4o#三、松线电磁铁和拨线器"}
+  # —— 选配件 E：电子针距 ——
+  estep_bracket: {code: LS-801, name: [步进电机支架, Stepper bracket], kind: make, group: optE, doc: "G4o#四、电子针距"}
+  estep_pulley_m: {code: LS-802, name: [电机带轮, Motor pulley], kind: make, group: optE, doc: "G4o#四、电子针距"}
+  estep_pulley_r: {code: LS-803, name: [调节器带轮, Regulator pulley], kind: make, group: optE, doc: "G4o#四、电子针距"}
+  estep_motor: {code: BUY-STEP-42, name: [步进电机 42 型（48 mm）, Stepper motor NEMA 17 (48 mm)], kind: buy, group: optE, doc: "G4o#四、电子针距"}
+  estep_belt: {code: BUY-BELT-E, name: [针距同步带, Stitch-drive belt], kind: buy, group: optE, doc: "G4o#四、电子针距"}
+  reverse_button: {code: BUY-BTN-E, name: [倒缝按钮, Reverse button], kind: buy, group: optE, doc: "G4o#四、电子针距"}

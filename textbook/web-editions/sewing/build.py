@@ -190,6 +190,11 @@ def copy_labs(lang):
             html = inline(f.read())
         with open(os.path.join(d, os.path.basename(p)), 'w', encoding='utf-8') as f:
             f.write(html)
+    # 第 138 轮 G6.1：三维模型 27-2“WQ-LS 整机”。页面和数据在数字工厂（factory/digital/web/public/wqls，tools/wqls/g6_web.py 生成），
+    # 原样复制一份到 labs/wqls/；英文版用同一份（?lang=en），不再复制
+    src = os.path.join(ROOT, '..', '..', '..', 'factory', 'digital', 'web', 'public', 'wqls')
+    if lang == 'zh' and os.path.isdir(src):
+        shutil.copytree(src, os.path.join(d, 'wqls'), dirs_exist_ok=True)
 
 if __name__ == '__main__':
     import sys

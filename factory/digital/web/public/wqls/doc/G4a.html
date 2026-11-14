@@ -1,0 +1,379 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WQ-LS 第 4 关 · G4.1 刺布与挑线机构</title><style>
+:root{--bg:#fbfbfa;--ink:#1d2329;--mut:#5b6670;--line:#d8dde2;--acc:#0b4fae;--hl:#fff3c4}
+@media (prefers-color-scheme: dark){:root{--bg:#15181b;--ink:#e6e9ec;--mut:#9aa5ae;--line:#39414a;--acc:#6aa7ff;--hl:#4a3f12}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 system-ui,"Noto Sans CJK SC","PingFang SC",sans-serif}
+main{max-width:860px;margin:0 auto;padding:16px 16px 64px}
+.note{color:var(--mut);font-size:13px;border-bottom:1px solid var(--line);padding-bottom:8px}
+h1{font-size:22px}h2{font-size:18px;margin-top:2em;scroll-margin-top:12px}h3{font-size:16px;scroll-margin-top:12px}
+h2:target,h3:target{background:var(--hl);border-radius:4px}
+table{border-collapse:collapse;display:block;overflow-x:auto;font-size:13.5px;margin:1em 0}
+td,th{border:1px solid var(--line);padding:4px 8px;vertical-align:top}th{background:rgba(127,127,127,.08)}
+code{font-size:.9em;background:rgba(127,127,127,.12);padding:0 3px;border-radius:3px}pre{overflow-x:auto}
+img{max-width:100%;height:auto}a{color:var(--acc)}blockquote{margin:1em 0;padding:0 12px;border-left:3px solid var(--line);color:var(--mut)}
+</style></head><body><main><p class="note">WQ-LS 设计文档 · G4/刺布与挑线机构.md · 设计计算的原文（中文） · Design document (Chinese original)</p><h1 id="s1">WQ-LS 第 4 关 · G4.1 刺布与挑线机构</h1>
+<h1 id="s2">WQ-LS Gate 4 · G4.1 Needle-bar and take-up mechanism</h1>
+<p>示例设计，经计算和三维校核，<strong>没有实物试制</strong>。2026-11-10。</p>
+<blockquote>
+<p><strong>G4.2 修订（2026-11-10 晚）</strong>
+1. 挑线杆减重：杆身改 3 mm 钢板、只在两个毂处保留 5 mm，41.2 g → <strong>24.2 g</strong>（真机 15–25 g）。
+2. 平衡率重扫：水平一阶力最小在 <strong>0.25</strong>（3 N），平衡块折合 72 g、张角 ±30.8°。整机二阶力由 229 N 降到 181 N；前轴承寿命由 21 497 h 升到 <strong>27 802 h</strong>，曲柄处挠度 96.5 µm，疲劳安全系数最小 3.62。
+3. 前轴承座由“整块隔板”改为“轴承座圈 Ø50 + 上、后、前、下四条筋”。整块隔板是按机臂壁厚挖的内腔求交的，机头壁只有 4.5 mm，板和机头内壁之间差 1.3 mm，等于悬空。第一次带凸台做模态，就出了一阶 93 Hz 的假局部振型。改成筋伸进壁里、和壁连成一体以后，机壳带全部凸台的模态是 <strong>125 / 221 Hz</strong>（前后摆 / 上下），铸件 <strong>24.6 kg</strong>（倒圆后）。
+4. 一转每 2° 干涉检查重做一遍：最小间隙仍都 ≥ 1.0 mm。</p>
+<p>下面正文是 G4.1 当时的数，被这里替换的以这里为准。</p>
+</blockquote>
+<h2 id="s3">结论</h2>
+<ol>
+<li><strong>教材的挑线机构造不出来，已改成真机的做法。</strong> 教材（设计软件的平缝机参数）把挑线曲柄放在刺布曲柄对面，单独用一根销（半径 20.7）。画成实体后发现两处必撞：</li>
+<li>挑线杆一转里要扫过上轴中心，离轴心最近只有 0.2 mm，所以它只能装在轴端外侧；</li>
+<li>这样刺布曲柄销要穿过挑线杆所在的平面（最近 0.15 mm），挑线销也要穿过连杆所在的平面（最近 0.27 mm）。</li>
+</ol>
+<p>真机（Juki DDL 一类）是<strong>挑线杆和针杆连杆套在同一根曲柄销上</strong>，本机也改成这样，并重新设计了挑线四连杆。
+2. <strong>新挑线机构的线路判据全部合格，而且比教材机构好</strong>（判据都用设计软件的供线、耗线计算）：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>本机（共用曲柄销）</th>
+<th>教材机构</th>
+<th>要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>钩线后余量</td>
+<td>3.0 mm</td>
+<td>1.9 mm</td>
+<td>≥ 1 mm，且不超过 6 mm</td>
+</tr>
+<tr>
+<td>入布前缺线</td>
+<td>0.90 mm</td>
+<td>0</td>
+<td>≤ 1 mm（线的弹性伸长能补）</td>
+</tr>
+<tr>
+<td>入布前多出的线</td>
+<td>4.1 mm</td>
+<td>9.2 mm</td>
+<td>≤ 10 mm（挑线簧收得住）</td>
+</tr>
+<tr>
+<td>最小传动角</td>
+<td>44.7°</td>
+<td>41.0°</td>
+<td>越大越好，≥ 40°</td>
+</tr>
+<tr>
+<td>最大供线量</td>
+<td>83.5 mm</td>
+<td>81.6 mm</td>
+<td>—</td>
+</tr>
+<tr>
+<td>供线加速度</td>
+<td>30 310 m/s²</td>
+<td>29 973 m/s²</td>
+<td>≤ 教材的 1.1 倍</td>
+</tr>
+<tr>
+<td>线眼位置</td>
+<td>z 183–227，最多伸出前盖板 37 mm</td>
+<td>—</td>
+<td>最高点不低于上轴中心，方便穿线</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>零件都是 FreeCAD 实体，一转每 2° 检查一次干涉：零件之间、零件与机壳之间的最小间隙都 ≥ 1.0 mm</strong>（180 个位置，FreeCAD 精确求实体表面距离）。</li>
+<li><strong>平衡块按实体质量算出</strong>：平衡率 0.40，折合到曲柄半径 89 g，张角 ±37.6°。0.40 是重新扫出来的：挑线杆改到曲柄销上以后，它的惯性力和刺布曲柄同相。取 0.40 时，水平（机头前后摆方向）一阶力只剩 6 N；教材机构取 0.35 时这个力是 264 N。所以机壳最弱的那一阶（前后摆，129 Hz）几乎不受激励。</li>
+<li><strong>上轴改 D 版</strong>：曲柄、挑线杆、连杆都在轴端外侧，伸出变长，所以前端加粗到 Ø15、前轴承改 6202（后轴承仍 6201）。复算结果：前轴承寿命 21 500 h，临界转速 12 600 r/min，疲劳安全系数最小 3.4，都够。G2 的动力学已经换成实体质量和新挑线机构，重新算过。</li>
+</ol>
+<h2 id="s4">一、为什么改：两根销装不下</h2>
+<p>教材的挑线机构是“曲柄—挑线杆—摇杆”四连杆，挑线曲柄 P 在刺布曲柄 C 对面（设计软件 <code>lk_d = −6.8°</code>，P = −r(sin, cos)），半径 20.7。用设计软件的运动学每 2° 算一次几何关系（<code>tools/wqls/g4_takeup.py</code> 文件头）：</p>
+<ul>
+<li>挑线杆 P→线眼这条线离上轴中心最近 0.16 mm：挑线杆一定会扫过轴心，所以只能放在轴端外侧；</li>
+<li>刺布曲柄销中心到挑线杆的最近距离 0.15 mm（φ = 98°）：刺布曲柄销穿不过挑线杆的平面；</li>
+<li>挑线销中心到连杆中线的最近距离 0.27 mm（φ = 6°）：挑线销也穿不过连杆的平面。</li>
+</ul>
+<p>结论是两根销无论怎么排都会撞。真机的做法是挑线杆和连杆共用一根曲柄销，两根杆在 X 方向错开两个平面。</p>
+<h2 id="s5">二、新挑线四连杆怎么定的</h2>
+<ul>
+<li>曲柄 = 刺布曲柄（r = 15.5，相位相同，即设计软件里 d = 180°）。</li>
+<li>设计变量共 10 个：挑线杆 P–M 长 a、摇杆长 b、P–线眼长 c、线眼偏角、摇杆支点 Q 的两个坐标、上下两个导线点的位置；另外有两个选择：四杆的装配分支、摇杆装在挑线杆的内侧还是外侧。</li>
+<li>判据用设计软件的：余量 ≥ 1、入布前缺线 ≤ 1、入布前多余 ≤ 挑线簧行程 10。</li>
+<li>实体约束：</li>
+<li>线眼伸出机头前壁 10–37 mm，上下在前盖板能开的竖槽里（z 126–228），最高点不低于上轴中心；</li>
+<li>摇杆支点、各销孔都在机头内腔里（机头顶内壁 z ≈ 240，是在 FreeCAD 里对机壳实测的）；</li>
+<li>摇杆支点的销座整个在前壁里面；</li>
+<li>两个导线点在前壁外面；</li>
+<li>摇杆和连杆在同一平面时，两杆中线一转里至少隔开 14 mm；</li>
+<li>供线加速度不超过教材机构的 1.1 倍。</li>
+<li>搜索方法：差分进化（scipy，种子固定）把四种组合各搜一遍，再用 Nelder–Mead 细调，目标是最小传动角最大、余量适中。细调时比要求多留一点余地，保证尺寸取整到 0.01 mm 后仍然满足。先试过 optuna：约束太多太窄，6000 次一个可行解都没找到，所以改用差分进化。</li>
+<li>结果（<code>G4/挑线机构.json</code>，图 <code>挑线机构.png</code>）：</li>
+<li>装配分支 −1，摇杆装在外侧（与连杆同一平面 x 6–10）；</li>
+<li>a = 33.37，b = 23.41，c = 72.72，线眼偏角 −18.51°；</li>
+<li>摇杆支点 Q 在 y = −20.7、z = 233，销座从机头顶内壁吊下来；</li>
+<li>导线点 A 在 y = −51.2、z = 193.5，B 在 y = −50.2、z = 147.7，都装在前盖板外面。</li>
+<li>四种组合的结果：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>组合</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>分支 +1、摇杆在内侧</td>
+<td>余量不够，线眼最高点太低</td>
+</tr>
+<tr>
+<td>分支 +1、摇杆在外侧</td>
+<td>可行，但细调后取整不能同时保住余地</td>
+</tr>
+<tr>
+<td>分支 −1、摇杆在内侧</td>
+<td>杆件伸出机头</td>
+</tr>
+<tr>
+<td>分支 −1、摇杆在外侧</td>
+<td>可行，选定</td>
+</tr>
+</tbody>
+</table>
+<h2 id="s6">三、零件（<code>tools/wqls/cad/mech.py</code>，FreeCAD 实体）</h2>
+<p>沿上轴方向（X）从面板往里依次是：</p>
+<table>
+<thead>
+<tr>
+<th>位置 x</th>
+<th>零件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>针杆</td>
+</tr>
+<tr>
+<td>6–12</td>
+<td>针杆连杆和挑线摇杆</td>
+</tr>
+<tr>
+<td>13.5–18.5</td>
+<td>挑线杆</td>
+</tr>
+<tr>
+<td>20–30</td>
+<td>曲柄（带平衡块）</td>
+</tr>
+<tr>
+<td>32–43</td>
+<td>前轴承 6202</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>零件</th>
+<th>做法</th>
+<th>质量 g</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>针杆</td>
+<td>Ø8 × 180，两头倒角；上导套 z 170–194、下导套 z 46–74</td>
+<td>71.0</td>
+</tr>
+<tr>
+<td>针夹、机针 DB×1</td>
+<td>针夹 Ø11 × 8，带 M4 紧针螺钉和线钩；机针按 DB×1 Nm 90</td>
+<td>3.2 + 0.3</td>
+</tr>
+<tr>
+<td>针杆连接块和连接销</td>
+<td>夹在针杆上，连接销 Ø6 伸进连杆小头</td>
+<td>17.2</td>
+</tr>
+<tr>
+<td>针杆连杆</td>
+<td>中心距 55；大头 Ø22（装 Ø8/Ø12 滚针轴承），小头 Ø13；两面各铣 1.5 深的减重槽</td>
+<td>46.2</td>
+</tr>
+<tr>
+<td>挑线杆</td>
+<td>P 毂 Ø18（滚针轴承），M 毂 Ø12，线眼 Ø3；厚 5</td>
+<td>41.2</td>
+</tr>
+<tr>
+<td>挑线摇杆</td>
+<td>中心距 23.41，两端 Ø12 毂；Q 销 Ø6 固定在机头顶的销座上</td>
+<td>10.9</td>
+</tr>
+<tr>
+<td>曲柄（带平衡块）</td>
+<td>毂 Ø33 夹在 Ø15 轴端（M5 紧定螺钉 2 只），销座 Ø20，平衡块扇形 R 38、张角 ±37.6°</td>
+<td>120.7</td>
+</tr>
+<tr>
+<td>曲柄销</td>
+<td>Ø8，压在曲柄上，穿过挑线杆和连杆</td>
+<td>7.3</td>
+</tr>
+</tbody>
+</table>
+<p>质量按钢 7.85 g/cm³ 从实体算（<code>G4/零件质量.json</code>），已经替换了 G2 里的估计值：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>实体</th>
+<th>G2 估计</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>针杆组件</td>
+<td>91.7 g</td>
+<td>90 g</td>
+</tr>
+<tr>
+<td>连杆</td>
+<td>46.2 g，质心离曲柄销 0.42 l</td>
+<td>40 g，0.38 l</td>
+</tr>
+<tr>
+<td>挑线杆</td>
+<td>41.2 g</td>
+<td>25 g</td>
+</tr>
+</tbody>
+</table>
+<p>机壳上为这些零件加了凸台（<code>cad/housing.py</code> 的 BOSSES），机壳铸件因此从 24.2 kg 增加到 25.9 kg：</p>
+<ul>
+<li>针杆上导套座和下导套座；</li>
+<li>前轴承座：一整块隔板，上面开 Ø35 轴承孔；</li>
+<li>摇杆销座。</li>
+</ul>
+<h2 id="s7">四、一转干涉检查（<code>tools/wqls/cad/mech_check.py</code>）</h2>
+<p>每 2° 摆一次零件（变换由 <code>g4_mech.py</code> 按设计软件的运动学给出）。每个位置都要算零件两两之间、零件与机壳之间的最小距离。本来就相连的不算：销与孔、轴与轴承、针与针夹等。180 个位置全部 ≥ 1.0 mm（<code>G4/干涉检查.json</code>）。最近的几处如下：</p>
+<table>
+<thead>
+<tr>
+<th>部位</th>
+<th>最小间隙</th>
+<th>在 φ</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>摇杆—摇杆销座端面</td>
+<td>1.0 mm</td>
+<td>352°</td>
+<td>两个平行平面，装配间隙</td>
+</tr>
+<tr>
+<td>曲柄—前轴承隔板</td>
+<td>1.0 mm</td>
+<td>352°</td>
+<td>平行平面</td>
+</tr>
+<tr>
+<td>摇杆销 M—曲柄</td>
+<td>1.0 mm</td>
+<td>286°</td>
+<td>销端面与曲柄面</td>
+</tr>
+<tr>
+<td>针杆—曲柄销端面</td>
+<td>1.5 mm</td>
+<td>358°</td>
+<td></td>
+</tr>
+<tr>
+<td>针夹—机头底沉孔</td>
+<td>1.5 mm</td>
+<td>358°</td>
+<td>上止点时针夹进到机头底沉孔里</td>
+</tr>
+<tr>
+<td>连杆—挑线杆</td>
+<td>1.5 mm</td>
+<td>350°</td>
+<td>相邻两个平面</td>
+</tr>
+</tbody>
+</table>
+<p>过程中发现并改掉的问题：</p>
+<ol>
+<li>曲柄销伸出太长，碰到针杆。</li>
+<li>针夹在上止点时撞到机头底的旧凸台。针夹改短，机头底开 Ø14 沉孔。</li>
+<li>摇杆销原来从曲柄那一侧装，穿过了曲柄的平面。改为从机头顶吊下来的销座装。</li>
+<li>摇杆支点先放在机头顶内壁外面了：机头顶内壁在 z 240，原先按 257 估算。改成在 FreeCAD 里实测，并把这个实测值加进约束。</li>
+<li>平衡块外半径 34 时，张角开到 ±89° 还差 1%。改为外半径 38。</li>
+</ol>
+<h2 id="s8">五、会动的三维</h2>
+<ul>
+<li>视频 <code>刺布与挑线机构_一转.mp4</code>：斜视，机壳半透明，红线是面线的走向。</li>
+<li>静图：<code>机构_斜视.png</code>、<code>机构_端面.png</code>。</li>
+<li>网页 <code>tools/wqls/render/mech.html</code>：</li>
+<li>可以拖动画面，可以播放、暂停、调快慢，可以停在任意转角；</li>
+<li>显示针尖高度和线眼位置；</li>
+<li>机壳可以切换为半透明或实体。</li>
+</ul>
+<p>所需文件由 <code>python3 tools/wqls/g4_parts.py &lt;工作目录&gt; &lt;housing.step&gt;</code> 生成。</p>
+<h2 id="s9">六、对 G2 的影响（已复算，<code>G2/设计计算书.md</code> 第四、五节的修订说明）</h2>
+<ul>
+<li>驱动力矩：平均 0.123 N·m（64 W），范围 −4.5 … +4.8 N·m。MuJoCo 对照差 0.19%。</li>
+<li>整机振动力最大 536 N（G2 用教材机构是 351 N）。增加的部分主要是：</li>
+<li>铅垂一阶 340 N；</li>
+<li>二阶 229 N。二阶力的频率是转速的 2 倍，即 167 Hz；机壳上下那一阶在 228 Hz，比值 1.37。</li>
+</ul>
+<p>原因是挑线杆 41 g，比估计重，而且和刺布曲柄同相。下一步（G4 后面）把挑线杆减薄、开减重孔（真机的挑线杆一般 15–25 g），再做谐响应分析最终定平衡率。
+- 上轴 D 版的复算结果：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>前轴承寿命 L10h（6202）</td>
+<td>21 497 h</td>
+</tr>
+<tr>
+<td>后轴承寿命 L10h（6201）</td>
+<td>541 775 h</td>
+</tr>
+<tr>
+<td>曲柄处挠度</td>
+<td>103 µm</td>
+</tr>
+<tr>
+<td>临界转速</td>
+<td>12 597 / 23 920 r/min</td>
+</tr>
+<tr>
+<td>疲劳安全系数，截面 I–IV</td>
+<td>3.40 / 4.24 / 6.88 / 4.29</td>
+</tr>
+</tbody>
+</table>
+<p>加中间轴套可以把挠度减到 46 µm，但会让前轴承寿命降到 13 000 h，所以不加。曲柄毂边缘是夹紧配合，它的微动疲劳在教材数据表里查不到应力集中系数，G5 定配合时再补。</p>
+<h2 id="s10">七、还没做的（G4 后面几组）</h2>
+<ul>
+<li>挑线杆减重；</li>
+<li>旋梭组：下轴、1 : 2 齿轮、旋梭、梭壳、梭芯；</li>
+<li>送布和抬牙；</li>
+<li>压脚、夹线、剪线、拨线、润滑；</li>
+<li>电机、手轮、同步带、标准件；</li>
+<li>整机干涉检查和整机模态（带机构质量）；</li>
+<li>谐响应分析，最终定平衡率；</li>
+<li>BOM。</li>
+</ul></main></body></html>
