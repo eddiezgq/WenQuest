@@ -236,6 +236,12 @@ def main():
                       "minutes": x["minutes"], "chars": x["chars"]} for x in plant.get("sampling") or []],
         "metro": {"head": head71, "rows": metro, "intro": metro_intro, "src": f"《缝纫机厂工艺方案》{secs['7.1']['title']}"},
     }
+    # 第 171 轮：数字工厂 3D 车间的工艺文件也用这份（网关 /api/plantmap 读）：只放从《缝纫机厂工艺方案》拆出来的部分，清单里有的不重复
+    proc = {k: data[k] for k in ("docrows", "partrows", "castrows", "fqc", "defects", "principles", "holes", "asmNote", "general", "metro")}
+    proc["source"] = "docs/方案/缝纫机厂工艺方案.md（prototypes/缝纫机厂白板图/build.py 生成，别手改）"
+    out_json = ROOT / "factory/plants/procdocs/wenquest-sewing.json"
+    out_json.parent.mkdir(exist_ok=True)
+    out_json.write_text(json.dumps(proc, ensure_ascii=False, indent=0, sort_keys=True), encoding="utf-8")
     tpl = (HERE / "template.html").read_text(encoding="utf-8")
     out = tpl.replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")))
     (HERE / "index.html").write_text(out, encoding="utf-8")
