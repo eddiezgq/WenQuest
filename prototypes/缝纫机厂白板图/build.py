@@ -128,8 +128,9 @@ def main():
     for u in plant["units"]:
         lay = u.get("layout")
         z = None
-        if lay:
-            cx, cy = lay[0] + lay[2] / 2, lay[1] + lay[3] / 2
+        if lay:                                   # 清单的 layout 是设备中心（第 171b 轮改）；页面按左上角画
+            cx, cy = lay[0], lay[1]
+            lay = [round(lay[0] - lay[2] / 2, 3), round(lay[1] - lay[3] / 2, 3), lay[2], lay[3]]
             for zz in ZONES:
                 x0, y0, x1, y1 = zz["rect"]
                 if x0 <= cx <= x1 and y0 <= cy <= y1:
