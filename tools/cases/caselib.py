@@ -299,7 +299,7 @@ def render_solid(solid, path, elev=30, azim=-72, color=(0.80, 0.84, 0.88), size=
 
 
 # ---------------------------------------------------------------- 仿真车间
-def run_shop(item, qty, wo, seed=7, fixes=(), problems=()):
+def run_shop(item, qty, wo, seed=7, fixes=(), problems=(), units=None):
     """数字工厂仿真车间（sim/engine.py，和线上同一份代码）按现行工艺路线加工 qty 件。
     → dict(hours, measurements, events, cycle)：measurements 是 quality.measurement 的 data 列表。"""
     sys.path[:0] = [str(DIGITAL), str(ROOT / "factory")]
@@ -320,7 +320,8 @@ def run_shop(item, qty, wo, seed=7, fixes=(), problems=()):
         eng.errors.apply_fix(f)
     ops = routing_for(item)
     for op, _ in ops:
-        ok, why = eng.command(OP_UNITS[op][0], {"command": "dispatch", "work_order": wo, "operation": op, "qty": qty, "item": item, "routing": ops}, wo)
+        unit = (units or {}).get(op) or OP_UNITS[op][0]      # units：{工序: 设备}，指定在哪台设备上做（第 167b 轮：订阅开在哪台宿主机上）
+        ok, why = eng.command(unit, {"command": "dispatch", "work_order": wo, "operation": op, "qty": qty, "item": item, "routing": ops}, wo)
         if not ok:
             raise RuntimeError(why)
     while eng.q and clock.t < 7 * 86400:
@@ -356,12 +357,16 @@ def shop_table(meas):
             rows.append([name, f"{lo:g}", len(vals), f"不合格 {bad} 件", "—", "—（属性特性）"])
             continue
         one = lo == 0
+        low_one = unit == "%" and hi == 100 and lo > 0     # 百分比上限 100 % 是自然界限（测试通过率、可用性），只看下限：Cpl（第 167b 轮）
         mu, sd, c = cpk(vals, lo, hi, one)
+        if low_one:
+            c = (mu - lo) / (3 * sd) if sd > 0 else math.inf
         low = min(low, c)
         stats[cid if not multi else (item, cid)] = dict(name=name, mean=mu, sd=sd, cpk=c, lo=lo, hi=hi)
         # 公差带窄（尺寸、形位，mm）时标准差写成 μm；其余（力矩、角秒、粗糙度……）按这个特性自己的单位
         sd_s = f"{sd * 1000:.1f} μm" if (hi - lo) <= 0.1 and "Ra" not in name and unit == "mm" else f"{sd:.3g}"
-        rows.append([name, f"{lo:g}–{hi:g}" if not one else f"≤ {hi:g}", len(vals), f"{mu:.4f}", sd_s, f"{c:.2f}{'（单边）' if one else ''}"])
+        rows.append([name, f"≥ {lo:g}" if low_one else f"{lo:g}–{hi:g}" if not one else f"≤ {hi:g}", len(vals), f"{mu:.4f}", sd_s,
+                     f"{c:.2f}{'（单边）' if one or low_one else ''}"])
     return rows, low, fails, stats
 
 
