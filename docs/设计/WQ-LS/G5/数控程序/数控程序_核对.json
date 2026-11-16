@@ -29,7 +29,7 @@
  "O1202": {
   "title": "上件 工序 20 卧加粗加工",
   "machine": "HMC-01",
-  "lines": 318,
+  "lines": 334,
   "tools": [
    2,
    3,
@@ -37,11 +37,12 @@
    7,
    14,
    18,
-   39
+   39,
+   41
   ],
   "b_indexes": 2,
-  "time_min": 5.18,
-  "cut_min": 4.08,
+  "time_min": 5.32,
+  "cut_min": 4.13,
   "checks": [],
   "sim": [
    {
@@ -62,7 +63,7 @@
    },
    {
     "frame": "DOWN_HEAD",
-    "steps": 3,
+    "steps": 4,
     "issues": [],
     "over_cells": 0,
     "dev_min": 0.0,
@@ -73,20 +74,22 @@
  "O1205": {
   "title": "上件 工序 50 精铣接合面、扩铰针杆孔",
   "machine": "VMC-01",
-  "lines": 90,
+  "lines": 116,
   "tools": [
    1,
    7,
-   20
+   20,
+   42,
+   43
   ],
   "b_indexes": 0,
-  "time_min": 13.16,
-  "cut_min": 12.76,
+  "time_min": 14.04,
+  "cut_min": 13.49,
   "checks": [],
   "sim": [
    {
     "frame": "C_UP",
-    "steps": 5,
+    "steps": 7,
     "issues": [],
     "over_cells": 0,
     "dev_min": -0.0,
@@ -200,7 +203,7 @@
  "O1401": {
   "title": "合件 工序 70、80 锥销、测针杆轴线、精加工、钻攻",
   "machine": "HMC-01",
-  "lines": 1149,
+  "lines": 1199,
   "tools": [
    2,
    4,
@@ -235,6 +238,9 @@
    47,
    48,
    49,
+   50,
+   51,
+   52,
    61,
    62,
    63,
@@ -246,8 +252,8 @@
    69
   ],
   "b_indexes": 8,
-  "time_min": 25.83,
-  "cut_min": 19.0,
+  "time_min": 26.45,
+  "cut_min": 19.29,
   "checks": [],
   "sim": [
    {
@@ -260,10 +266,10 @@
    },
    {
     "frame": "B0",
-    "steps": 3,
+    "steps": 5,
     "issues": [],
     "over_cells": 0,
-    "dev_min": 0.0,
+    "dev_min": -0.01,
     "ap_max": 3.0
    },
    {
@@ -300,10 +306,12 @@
    },
    {
     "frame": "TOPARM",
-    "steps": 4,
-    "issues": [],
-    "over_cells": 0,
-    "dev_min": 0.0,
+    "steps": 5,
+    "issues": [
+     "过切：1 格比目标低，最多 11.991 mm"
+    ],
+    "over_cells": 1,
+    "dev_min": -11.991,
     "ap_max": 0.5
    },
    {
