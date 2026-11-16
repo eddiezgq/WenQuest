@@ -268,7 +268,7 @@ def fatigue(R, x, Mb, T):
     out = {}
     import _fea
     steps = [(s, n) for s, n in zip(S.UPPER_SEGS, S.UPPER_SEGS[1:]) if abs(s[2] - n[2]) > 1e-9]   # 只算有台阶的截面（同直径的分界没有缺口）
-    secs = [(f"截面 {k}", s[1], min(s[2], n[2]), max(s[2], n[2]), 0.5) for k, (s, n) in zip(("I", "II", "III", "IV"), steps)]
+    secs = [(f"截面 {k}", s[1], min(s[2], n[2]), max(s[2], n[2]), 0.5) for k, (s, n) in zip(("I", "II", "III", "IV", "V", "VI"), steps)]
     for name, xsec, d, D_, r_ in secs:
         j = int(np.argmin(abs(x - xsec)))
         Mx, My = Mb[:, j, 0], Mb[:, j, 1]
@@ -327,6 +327,7 @@ def bearing_life(reac, n):
 
 
 def shaft_report(R):
+    """F 版起设计按三支承（中间含油轴套）；两支承的数也算出来作对比。"""
     res = {}
     for mid in (False, True):
         x, xs, reac, Mb, dc = shaft(R, mid)
@@ -337,8 +338,8 @@ def shaft_report(R):
                         reac_max=[float(np.max(np.hypot(reac[:, b, 0], reac[:, b, 1]))) for b in range(reac.shape[1])],
                         defl_crank_um=float(np.max(np.hypot(*dc.T)) * 1000), nc=nc,
                         M_max=float(np.max(np.hypot(Mb[:, :, 0], Mb[:, :, 1]))))
-        if not mid:
-            res[tag]["fatigue"] = fatigue(R, x, Mb, T)
+        res[tag]["fatigue"] = fatigue(R, x, Mb, T)
+        if mid:
             two = (x, xs, reac, Mb, dc, T, xm, mode)
     # 图：轴的布置、弯矩包络、一阶振型
     x, xs, reac, Mb, dc, T, xm, mode = two
@@ -347,18 +348,18 @@ def shaft_report(R):
         a.add_patch(plt.Rectangle((x0, -d / 2), x1 - x0, d, fc="#dfe5ea", ec=INK, lw=0.8))
     for xb in S.X_BRG:
         a.add_patch(plt.Rectangle((xb - 5, -16), 10, 32, fc="none", ec=INK, lw=0.8, hatch="////"))
-    for xx, nm, tx, ty in ((S.X_CRANK, "针杆曲柄", -25, 28), (S.X_BRG[0], "6202", S.X_BRG[0] + 6, -30),
+    for xx, nm, tx, ty in ((S.X_CRANK, "针杆曲柄", -25, 28), (S.X_BRG[0], "6203", S.X_BRG[0] + 6, -30),
                            (S.X_TAKEUP, "挑线曲柄", 48, 28), (S.X_FEED_E, "送布偏心", S.X_FEED_E, 28),
                            (S.X_BRG[1], "6201", S.X_BRG[1] - 10, -30), (S.X_BELT, "同步带轮", S.X_BELT - 6, 28),
                            (S.X_ROTOR, "电机转子", S.X_ROTOR + 10, 28)):
         a.annotate(nm, (xx, 8 if ty > 0 else -16), (tx, ty), ha="center", fontsize=7.5,
                    arrowprops=dict(arrowstyle="-", color=MUTE, lw=0.6))
-    a.add_patch(plt.Rectangle((S.X_MID_BUSH - 6, -14), 12, 28, fc="none", ec=MUTE, lw=0.8, ls="--"))
-    a.text(S.X_MID_BUSH, -24, "可选中间轴套", ha="center", fontsize=7, color=MUTE)
+    a.add_patch(plt.Rectangle((S.X_MID_BUSH - 8, -13), 16, 26, fc="none", ec=INK, lw=0.8, hatch="xxxx"))
+    a.text(S.X_MID_BUSH, -24, "中间含油轴套", ha="center", fontsize=7, color=INK)
     a.set_ylim(-36, 36)
     a.set_aspect("auto")
     a.axis("off")
-    a.set_title("上轴 LS-101 D 版（单位 mm），前 6202、后 6201", loc="left", fontsize=10.5)
+    a.set_title("上轴 LS-101 F 版（单位 mm），前 6203、中间含油轴套、后 6201", loc="left", fontsize=10.5)
     Mm_ = np.hypot(Mb[:, :, 0], Mb[:, :, 1]) / 1000
     b.fill_between(x, Mm_.min(axis=0), Mm_.max(axis=0), color=BLU, alpha=0.18, lw=0)
     b.plot(x, Mm_.max(axis=0), color=BLU, lw=1.2, label="一转之内的最大合成弯矩")
@@ -366,7 +367,7 @@ def shaft_report(R):
     b.legend(frameon=False, fontsize=8)
     c.plot(xm, mode, color=ACC, lw=1.4)
     c.axhline(0, color=MUTE, lw=0.5)
-    nc2 = res["两支承"]["nc"][0]
+    nc2 = res["三支承"]["nc"][0]
     c.set_ylabel("一阶振型")
     c.text(x[0] + 5, 0.7, f"一阶临界转速 {nc2:.0f} r/min（最高转速的 {nc2 / 5000:.1f} 倍）", fontsize=8, color=ACC)
     c.set_xlabel("沿轴的位置 x / mm（机针 x = 0）")

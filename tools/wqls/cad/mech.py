@@ -203,11 +203,16 @@ for a, b, d, _n in S.UPPER_SEGS:
 shaft = shaft.removeSplitter()
 parts["shaft"], mats["shaft"] = shaft, "metal"
 
-# 前轴承 6202（15 × 35 × 11）
+# 前轴承 6203（17 × 40 × 12，F 版；E 版及以前是 6202）
 xb = S.X_BRG[0]
-brg = Part.makeCylinder(17.5, 11, V(xb - 5.5, 0, ZU), V(1, 0, 0)).cut(Part.makeCylinder(7.5, 13, V(xb - 6.5, 0, ZU), V(1, 0, 0)))
-brg = brg.cut(Part.makeCylinder(14.6, 1.2, V(xb - 6.1, 0, ZU), V(1, 0, 0)).cut(Part.makeCylinder(10.2, 2, V(xb - 6.5, 0, ZU), V(1, 0, 0))))
+brg = Part.makeCylinder(20.0, 12, V(xb - 6.0, 0, ZU), V(1, 0, 0)).cut(Part.makeCylinder(8.5, 14, V(xb - 7.0, 0, ZU), V(1, 0, 0)))
+brg = brg.cut(Part.makeCylinder(16.8, 1.2, V(xb - 6.6, 0, ZU), V(1, 0, 0)).cut(Part.makeCylinder(11.6, 2, V(xb - 7.0, 0, ZU), V(1, 0, 0))))
 parts["bearing_front"], mats["bearing_front"] = brg, "metal"
+
+# 中间含油轴套（F 版）：烧结含油青铜，压入机臂中间横隔板
+mb = S.MID_BUSH
+parts["bush_mid"], mats["bush_mid"] = (Part.makeCylinder(mb["D"] / 2, mb["L"], V(S.X_MID_BUSH - mb["L"] / 2, 0, ZU), V(1, 0, 0))
+                                       .cut(Part.makeCylinder(mb["d"] / 2 + 0.01, mb["L"] + 2, V(S.X_MID_BUSH - mb["L"] / 2 - 1, 0, ZU), V(1, 0, 0)))), "metal"
 
 
 # 曲柄（带平衡块）：毂 Ø30 夹在轴端，销座 Ø20；平衡块是销对面的一块扇形，半径 R_CW，张角由平衡要求定
@@ -225,7 +230,7 @@ def crank(half_deg):
     sec = Part.Face(w).extrude(V(t, 0, 0))
     body = hub.fuse(boss).fuse(sec).removeSplitter()
     body = rounded(body, 3.0)
-    body = body.cut(Part.makeCylinder(7.5, t + 2, V(x0 - 1, 0, ZU), V(1, 0, 0)))          # 轴孔 Ø15
+    body = body.cut(Part.makeCylinder(8.5, t + 2, V(x0 - 1, 0, ZU), V(1, 0, 0)))          # 轴孔 Ø17（F 版）
     body = body.cut(hole(*C0, PIN_R, x0, t))                                               # 销孔 Ø10 压配
     body = body.cut(Part.makeCylinder(2.5, 16, V((x0 + x1) / 2, 0, ZU - 17), V(0, 0, 1)))  # 紧定螺钉 M5 ×2
     body = body.cut(Part.makeCylinder(2.5, 16, V((x0 + x1) / 2, -17 * math.sin(60 * DEG), ZU - 17 * math.cos(60 * DEG)),

@@ -36,7 +36,8 @@ HEADWALL = float(os.environ.get("WQ_HEADWALL", 4.5))
 FRONT_COVER = os.environ.get("WQ_FRONTCOVER", "1") == "1"
 FC_WIN = (-40.0, 34.0, 118.0, 236.0)       # 机头前盖板窗口 x0, x1, z0, z1（G3）
 X_BRG_REAR = 380.0                         # 后轴承 6201 中心（spec.X_BRG[1]）
-S_X_BRG0 = 44.5                            # 前轴承 6202 中心（spec.X_BRG[0]；G8.0 由 37.5 外移）
+S_X_BRG0 = 45.0                            # 前轴承 6203 中心（spec.X_BRG[0]；G8.0 由 37.5 外移，F 版改 6203）
+X_MID_BUSH, MID_BUSH_D, MID_BUSH_L = 175.0, 26.0, 25.0   # 中间含油轴套（spec.X_MID_BUSH、MID_BUSH；F 版）
 LIP_W_F = 14.0                             # 面板口法兰宽（端面外圆角 R14 占掉约 10 mm，法兰要宽些面板才有贴合面）
 LIP_W, LIP_T, WIN_LIP_D = 8.0, 8.0, 8.0          # G4.3 面板口法兰宽、厚（沿 x），前窗口法兰宽、深（沿 y）（加宽加厚试过：频率不升反降，只是加了机头质量）
 MOTOR_SEAT_X = 408.0                       # G4.3 电机座端面（后轴承座伸出立柱右壁 12 mm）
@@ -831,6 +832,12 @@ def casting():
             hole = Part.makeCylinder(20, RIB_T + 2, V(x - RIB_T / 2 - 1, 0, ZU), V(1, 0, 0))
             hole = hole.fuse(Part.makeCylinder(12, RIB_T + 2, V(x - RIB_T / 2 - 1, 30, ARMB + 22), V(1, 0, 0)))
             rb.append(sl.common(cav).cut(hole))
+        # G8.0 F 版：中间含油轴套的横隔板（x = X_MID_BUSH）：隔板加 Ø40 × 25 的轴套座，孔 Ø26 压入轴套；留电线、油管孔（同上）
+        sl = Part.makeBox(RIB_T, 400, 400, V(X_MID_BUSH - RIB_T / 2, -200, ARMB - 20)).common(cav)
+        seat = Part.makeCylinder(20.0, MID_BUSH_L, V(X_MID_BUSH - MID_BUSH_L / 2, 0, ZU), V(1, 0, 0))
+        hole = Part.makeCylinder(MID_BUSH_D / 2, MID_BUSH_L + 2, V(X_MID_BUSH - MID_BUSH_L / 2 - 1, 0, ZU), V(1, 0, 0))
+        hole = hole.fuse(Part.makeCylinder(12, RIB_T + 2, V(X_MID_BUSH - RIB_T / 2 - 1, 30, ARMB + 22), V(1, 0, 0)))
+        rb.append(sl.fuse(seat).cut(hole))
         for z in (55.0, 115.0):
             sl = Part.makeBox(PIL["x1"] - PIL["x0"] + 20, 300, RIB_T, V(PIL["x0"] - 10, -150, z))
             # G4.5：槽 y −30…50（下轴在后面，带的后边在 z 55 处到 y 约 34）；G4.6：往左加宽到 x 325，送布连杆（x 327…335）
@@ -867,7 +874,7 @@ def casting():
         # 改成轴承座圈（Ø50 × 13）加四条筋（上、后、前、下，厚 8），接到机头四壁
         # G8.0：前轴承中心 x 37.5 → 44.5（spec.X_BRG），座圈和筋跟着外移 7 mm：x 38…51
         bx0 = S_X_BRG0 - 6.5
-        ring = Part.makeCylinder(25, 13, V(bx0, 0, ZU), V(1, 0, 0))
+        ring = Part.makeCylinder(27.5, 13, V(bx0, 0, ZU), V(1, 0, 0))          # F 版 6203：外圈 Ø40，座圈 Ø55
         rbs = [Part.makeBox(13, 8, 60, V(bx0, -4, ZU)), Part.makeBox(13, 80, 8, V(bx0, 0, ZU - 4)),
                Part.makeBox(10, 80, 8, V(bx0 + 3, -80, ZU - 4)), Part.makeBox(13, 8, 200, V(bx0, -4, ZU - 200))]
         wall = ring
@@ -875,7 +882,7 @@ def casting():
             wall = wall.fuse(rb_)
         # 不与内腔 cav 求交：cav 是按机臂壁厚 5.8 挖的，机头壁只有 4.5，求交后筋离机头内壁差 1.3 mm、是悬空的
         # （第一次模态 93 Hz 就是这块悬空的板在晃）。直接与外形 solid 求交，筋伸进壁里和壁连成一体
-        wall = wall.cut(Part.makeCylinder(17.5, 15, V(bx0 - 1, 0, ZU), V(1, 0, 0)))   # 6202 外圈 Ø35
+        wall = wall.cut(Part.makeCylinder(20.0, 15, V(bx0 - 1, 0, ZU), V(1, 0, 0)))   # 6203 外圈 Ø40
         bs.append(wall.removeSplitter())
         if TK_JSON:                                     # 摇杆销座：从轴承隔板伸出的凸台，销 Ø6
             qu, qv = TK_JSON["lk"]["Qz"], TK_JSON["lk"]["Qy"]
