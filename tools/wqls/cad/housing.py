@@ -448,6 +448,9 @@ def ctrl_seats(hollow, solid, info):
         Part.makeCylinder(6.0, 160.0, V(bx, by, 30.0), V(0, 0, 1)).common(Part.makeBox(40, 40, 28, V(bx - 20, by - 20, 30.0))),   # 下导套孔 z 30…58（凸台顶上的圆角高出 52，孔要穿透）
         Part.makeCylinder(6.0, 20.0, V(bx, by, 166.0), V(0, 0, 1)),                                                   # 上导套孔
         Part.makeCylinder(8.25, 40.0, V(bx, by, 236.0), V(0, 0, 1)),                                                  # M18 × 1.5 底孔 Ø16.5
+        # G8.0 第 6 步：机头顶针杆正上方 Ø12 橡胶塞孔。调压螺钉座 Ø25 的边伸进这个孔 1.5 mm（在机头顶壁 z 240…245 里），
+        # 所以孔要在凸台之后再钻一次；钻后孔壁到 M18 螺纹大径还剩 2.1 mm
+        Part.makeCylinder(6.0, 30.0, V(0, 0, 225.0), V(0, 0, 1)),
         Part.makeCylinder(4.05, 30.0, V(g["hand"]["x"], 50.0, hz), V(0, 1, 0)),
         Part.makeCylinder(3.05, 32.0, V(kn["C2"]["x"], 45.0, kn["C2"]["z"]), V(0, 1, 0)),                           # 从机头后壁外面钻进来，穿透后壁
         Part.makeCylinder(3.05, 60.0, V(rl["shaft"][0], -50.0, rl["shaft"][1]), V(0, 1, 0)).common(Part.makeBox(20, 13, 20, V(rl["shaft"][0] - 10, -8.0, rl["shaft"][1] - 10))),
