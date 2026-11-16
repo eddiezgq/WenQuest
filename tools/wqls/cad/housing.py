@@ -835,7 +835,14 @@ def casting():
             hole = hole.fuse(Part.makeCylinder(12, RIB_T + 2, V(x - RIB_T / 2 - 1, 30, ARMB + 22), V(1, 0, 0)))
             rb.append(sl.common(cav).cut(hole))
         # G8.0 F 版：中间含油轴套的横隔板（x = X_MID_BUSH）：隔板加 Ø50 × 25 的轴套座，孔 Ø35 H7 压入轴套；留电线、油管孔（同上）
-        sl = Part.makeBox(RIB_T, 400, 400, V(X_MID_BUSH - RIB_T / 2, -200, ARMB - 20)).common(cav)
+        sl = Part.makeBox(RIB_T, 400, 400, V(X_MID_BUSH - RIB_T / 2, -200, ARMB - 20))
+        if DETAIL:                                      # 同上面的筋拔模 1°：分型面处厚 7，到前后壁约 4.6（凝固仿真：不拔模时隔板与后壁的交接处成了热节）
+            h0, d_ = RIB_T / 2, 150 * math.tan(math.radians(1.0))
+            x = X_MID_BUSH
+            pts = [(x - h0, 0), (x - h0 + d_, 150), (x + h0 - d_, 150), (x + h0, 0), (x + h0 - d_, -150), (x - h0 + d_, -150)]
+            w_ = Part.makePolygon([V(a_, b_, ARMB - 20) for a_, b_ in pts] + [V(pts[0][0], pts[0][1], ARMB - 20)])
+            sl = Part.Face(w_).extrude(V(0, 0, 400))
+        sl = sl.common(cav)
         seat = Part.makeCylinder(25.0, MID_BUSH_L, V(X_MID_BUSH - MID_BUSH_L / 2, 0, ZU), V(1, 0, 0))
         hole = Part.makeCylinder(MID_BUSH_D / 2, MID_BUSH_L + 2, V(X_MID_BUSH - MID_BUSH_L / 2 - 1, 0, ZU), V(1, 0, 0))
         hole = hole.fuse(Part.makeCylinder(12, RIB_T + 2, V(X_MID_BUSH - RIB_T / 2 - 1, 30, ARMB + 22), V(1, 0, 0)))
