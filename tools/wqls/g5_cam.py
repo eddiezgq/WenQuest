@@ -227,6 +227,12 @@ def pair_hmc():
     fh = [to_frame("B0", p)[:2] for p in [(-62.0, -33.5, 134.79), (-62.0, -33.5, 194.79), (-62.0, 55.5, 134.79), (-62.0, 55.5, 194.79)]]
     ops.append(op("B0 钻面板口 M4 底孔", "B0", 11, "钻头 Ø3.3", 3.3, 60, cam.drill(fh, 9, 0, 0.08 * rpm(60, 3.3)), kind="drill"))
     ops.append(op("B0 攻 M4", "B0", 16, "丝锥 M4（仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(fh, 7, 0.7, rpm(8, 4)), kind="drill"))
+    # G8.0 第 6 步：滑块导轨的两个螺孔——加长钻头、丝锥从面板口伸进机头，攻在前轴承座下的竖筋上（x 38.5，y 0，z 125、148）
+    rh = [to_frame("B0", (-62.0, 0.0, z_))[:2] for z_ in (125.0, 148.0)]
+    ops.append(op("B0 加长钻滑块导轨螺孔 Ø2.9 深 10", "B0", 50, "加长钻头 Ø2.9（有效长 120）", 2.9, 50,
+                  cam.drill(rh, 62 + 38.5 + 10, 3, 0.05 * rpm(50, 2.9), r_plane=-(62 + 38.5 - 2), safe=5), kind="drill"))
+    ops.append(op("B0 加长丝锥攻 SM 9/64-40 深 8", "B0", 51, "加长丝锥 SM 9/64-40（仿真按底孔 Ø2.9）", 2.9, 6,
+                  cam.tap(rh, 62 + 38.5 + 8, 0.635, rpm(6, 3.6), r_plane=-(62 + 38.5 - 2), safe=5), kind="drill"))
     wh = [to_frame("B270", p)[:2] for p in [(-42, -48, 132), (-42, -48, 169), (-42, -48, 220), (32, -48, 132), (32, -48, 169), (32, -48, 220)]]
     ops.append(op("B270 钻前窗口 M4 底孔", "B270", 11, "钻头 Ø3.3", 3.3, 60, cam.drill(wh, 9, 0, 0.08 * rpm(60, 3.3)), kind="drill"))
     ops.append(op("B270 攻 M4", "B270", 16, "丝锥 M4（仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(wh, 7, 0.7, rpm(8, 4)), kind="drill"))
@@ -271,6 +277,10 @@ def ctrl_holes():
                   cam.drill(P, 259 - 236, 0, 0.15 * rpm(70, 16.5), r_plane=2, safe=8), kind="drill"))
     ops.append(op("TOPARM 攻 M18 × 1.5", "TOPARM", 48, "丝锥 M18 × 1.5（直角铣头，仿真按底孔 Ø16.5）", 16.5, 8,
                   cam.tap(P, 259 - 244, 1.5, rpm(8, 18), r_plane=2, safe=8), kind="drill"))
+    # G8.0 第 6 步：机头顶针杆正上方 Ø12 通孔（拆装针杆从这里抽出，平时橡胶塞堵住）
+    P = [to_frame("TOPARM", (0.0, 0.0, 242.0))[:2]]
+    ops.append(op("TOPARM 钻机头顶 Ø12 通孔（橡胶塞孔）", "TOPARM", 52, "钻头 Ø12（直角铣头）", 12, 60,
+                  cam.drill(P, 259 - 233, 0, 0.12 * rpm(60, 12), r_plane=-15, safe=8), kind="drill"))
     # 直角铣头在机座底下向上：针距拉杆过孔 Ø12（穿机座顶板，再穿立柱下横隔板，到 z 66）、膝抬推杆过孔 Ø12（穿机座顶板）
     pr = g["pull_rod"]
     P = [to_frame("UNDER", (pr["x"], pr["y"], -16.0))[:2]]
@@ -335,8 +345,11 @@ def upper_hmc_rough():
     r = rpm(60, 14)
     ops.append(op("直角铣头 锪针杆孔下端沉孔 Ø14 深 4", "DOWN_HEAD", 18, "锪钻 Ø14", 14, 60, cam.bore([(0.0, 0.0)], 5, 0.08 * r, r_plane=8, safe=15),
                   kind="drill"))
+    r = rpm(60, 9.5)
+    ops.append(op("直角铣头 钻针杆孔 Ø9.5（钻通上下两个导套座，G8.0 上孔改 Ø10）", "DOWN_HEAD", 41, "钻头 Ø9.5", 9.5, 60,
+                  cam.drill([(0.0, 0.0)], 150, 10, 0.15 * r, r_plane=8, safe=15), kind="drill"))
     r = rpm(60, 11.5)
-    ops.append(op("直角铣头 钻针杆孔 Ø11.5（钻通上下两个导套座）", "DOWN_HEAD", 7, "钻头 Ø11.5", 11.5, 60, cam.drill([(0.0, 0.0)], 150, 10, 0.15 * r, r_plane=8, safe=15),
+    ops.append(op("直角铣头 钻针杆下导套孔 Ø11.5 到 z 76", "DOWN_HEAD", 7, "钻头 Ø11.5", 11.5, 60, cam.drill([(0.0, 0.0)], 76 - 45, 10, 0.15 * r, r_plane=8, safe=15),
                   kind="drill"))
     # G4.7 压脚杆两孔（x −16、y 6）：同一把钻头，从机头下方钻通下导套座（底面 z 38）和上导套座（z 170…182）
     pb = CTRL["geo"]["bar"]
@@ -368,9 +381,14 @@ def upper_vmc(finish):
         ops.append(op("精铣接合面 C（平面度 0.02）", "C_UP", 1, "面铣刀 Ø80", 80, 220, face_rows(-56, 56, -98, 98, 80, 0.0, 0.06 * 8 * r, 10), machine="VMC-01"))
         nd = [to_frame("C_UP", (0.0, 0.0, 0.0))[:2]]
         # 机头底面比 C 低 46（倒放时在 C 下面）：快移到 R 点 −30（机头底面前 16，空当里），铰到 z 182（上导套座顶面）
-        ops.append(op("扩针杆孔 Ø11.85（上、下两孔一次扩通）", "C_UP", 20, "扩孔钻 Ø11.85（加长）", 11.85, 60,
-                      cam.bore(nd, 182, 0.12 * rpm(60, 11.85, "VMC-01"), r_plane=-30, safe=5), machine="VMC-01", kind="drill"))
-        ops.append(op("铰针杆孔 Ø12 H7（一次铰通）", "C_UP", 7, "铰刀 Ø12 H7（加长）", 12, 12, cam.bore(nd, 182, 0.25 * rpm(12, 12, "VMC-01"), r_plane=-30, safe=5),
+        # G8.0 第 6 步：上导套孔改 Ø10 H7（卷制轴套）：Ø9.85 扩、Ø10 铰穿过下导套孔一直到 z 182；下导套孔 Ø12 H7 只到 z 76
+        ops.append(op("扩针杆孔 Ø9.85（上、下两孔一次扩通）", "C_UP", 42, "扩孔钻 Ø9.85（加长）", 9.85, 60,
+                      cam.bore(nd, 182, 0.12 * rpm(60, 9.85, "VMC-01"), r_plane=-30, safe=5), machine="VMC-01", kind="drill"))
+        ops.append(op("铰针杆上导套孔 Ø10 H7", "C_UP", 43, "铰刀 Ø10 H7（加长）", 10, 12, cam.bore(nd, 182, 0.25 * rpm(12, 10, "VMC-01"), r_plane=-30, safe=5),
+                      machine="VMC-01", kind="drill"))
+        ops.append(op("扩针杆下导套孔 Ø11.85 到 z 76", "C_UP", 20, "扩孔钻 Ø11.85（加长）", 11.85, 60,
+                      cam.bore(nd, 76, 0.12 * rpm(60, 11.85, "VMC-01"), r_plane=-30, safe=5), machine="VMC-01", kind="drill"))
+        ops.append(op("铰针杆下导套孔 Ø12 H7 到 z 76", "C_UP", 7, "铰刀 Ø12 H7（加长）", 12, 12, cam.bore(nd, 76, 0.25 * rpm(12, 12, "VMC-01"), r_plane=-30, safe=5),
                       machine="VMC-01", kind="drill"))
         # G4.7 压脚杆两孔：同一次装夹、同两把刀，和针杆孔平行由机床保证
         pb = CTRL["geo"]["bar"]

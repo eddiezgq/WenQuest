@@ -140,8 +140,8 @@ blk = Part.makeBox(12, 14, 16, V(-6, -7, zB - 8)).cut(Part.makeCylinder(4.0, 20,
 blk = rounded(blk, 1.5) if False else blk
 # G8.0 第 6 步：连接销伸出连杆小头，外端套滑块（x 13.5…23.0），销到 x 23.5
 SB = dict(x=(13.5, 23.0), h=16.0, w=10.0)          # 滑块：x 范围、高（z）、宽（y，两滑动面 y ±5，10 × 16 = 160 mm²）
-RAIL = dict(z=(113.0, 170.0), back=(23.5, 38.5), back_top=156.0, jaw=4.0, screws=(125.0, 148.0))
-blk = blk.fuse(Part.makeCylinder(3.0, SB["x"][1] + 0.5 - 6, V(6, 0, zB), V(1, 0, 0)))
+RAIL = dict(z=(113.0, 170.0), back=(24.0, 38.5), back_top=156.0, jaw=4.0, screws=(125.0, 148.0))
+blk = blk.fuse(Part.makeCylinder(3.0, SB["x"][1] - 6, V(6, 0, zB), V(1, 0, 0)))         # 销外端与滑块外面平齐（x 23.0），离导轨背板 1.0
 blk = blk.fuse(Part.makeCylinder(2.5, 8, V(0, 4, zB), V(0, 1, 0)).cut(Part.makeCylinder(4.0, 20, V(0, 0, zB - 10), V(0, 0, 1))))  # 夹紧螺钉
 parts["nb_link"], mats["nb_link"] = blk, "metal"
 
@@ -156,7 +156,7 @@ rail = Part.makeBox(RAIL["back"][1] - RAIL["back"][0], SB["w"] + 2 * jw + 0.04, 
                     V(RAIL["back"][0], -SB["w"] / 2 - jw - 0.02, rz0))
 for sy in (1, -1):
     y0_ = SB["w"] / 2 + 0.02 if sy > 0 else -SB["w"] / 2 - 0.02 - jw
-    rail = rail.fuse(Part.makeBox(RAIL["back"][1] - SB["x"][0], jw, rz1 - rz0, V(SB["x"][0], y0_, rz0)))
+    rail = rail.fuse(Part.makeBox(RAIL["back"][0] + 0.5 - SB["x"][0], jw, rz1 - rz0, V(SB["x"][0], y0_, rz0)))   # 导轨面只到 x 24.5：再往后是曲柄平衡块的扫掠区
 rail = rail.removeSplitter()
 for zs in RAIL["screws"]:                                   # 通孔 Ø3.8、沉头孔 Ø6.5 × 3
     rail = rail.cut(Part.makeCylinder(1.9, 20, V(RAIL["back"][0] - 1, 0, zs), V(1, 0, 0)))
@@ -169,11 +169,13 @@ for zs in RAIL["screws"]:                                   # SM 9/64-40（大�
     scr = s_ if scr is None else scr.fuse(s_)
 parts["rail_screws"], mats["rail_screws"] = scr, "black"
 
-# G8.0 第 6 步：针杆上、下导套（烧结含油青铜，Ø8 F7 × Ø12 r6），后面（+y）各一个 Ø2 径向油孔（对着机壳的油芯孔，润滑系统另做）
-NB_BUSH = dict(up=(170.0, 12.0), low=(53.0, 20.0))
+# G8.0 第 6 步：针杆上、下导套，后面（+y）各一个 Ø2 径向油孔（对着机壳的油芯孔，润滑系统另做）
+# 下导套：烧结含油青铜 Ø8 × Ø12 × 20。上导套：卷制青铜轴套 Ø8 × Ø10 × 12（ISO 3547，CuSn8，壁厚 1）——上导套旁边就是连杆
+# （x 6 起）和曲柄销、滚针组件，Ø12 的导套外圆正好贴到 x 6，所以上面改用薄壁卷制轴套，外圆到 x 5，离连杆 1.0
+NB_BUSH = dict(up=(170.0, 12.0, 5.0), low=(53.0, 20.0, 6.0))
 bsh = None
-for z0_, L_ in NB_BUSH.values():
-    b_ = Part.makeCylinder(6.0, L_, V(0, 0, z0_), V(0, 0, 1)).cut(Part.makeCylinder(4.01, L_ + 2, V(0, 0, z0_ - 1), V(0, 0, 1)))
+for z0_, L_, ro_ in NB_BUSH.values():
+    b_ = Part.makeCylinder(ro_, L_, V(0, 0, z0_), V(0, 0, 1)).cut(Part.makeCylinder(4.01, L_ + 2, V(0, 0, z0_ - 1), V(0, 0, 1)))
     b_ = b_.cut(Part.makeCylinder(1.0, 8, V(0, 0, z0_ + L_ / 2), V(0, 1, 0)))
     bsh = b_ if bsh is None else bsh.fuse(b_)
 parts["nb_bushes"], mats["nb_bushes"] = bsh, "metal"
@@ -294,7 +296,7 @@ m_rod = pr["rod"]["mass_kg"]
 # 连杆质心离曲柄销的距离（沿杆）→ 两质量等效：销处回转 m_rod(1 − g/l)、往复 m_rod·g/l
 g_rod = abs(pr["rod"]["com"][2] - (ZU + C0[1]))
 m_rod_rot, m_rod_rec = m_rod * (1 - g_rod / L), m_rod * g_rod / L
-m_recip = sum(pr[k]["mass_kg"] for k in ("needle_bar", "needle_clamp", "needle", "nb_link")) + m_rod_rec
+m_recip = sum(pr[k]["mass_kg"] for k in ("needle_bar", "needle_clamp", "needle", "nb_link", "slide_block")) + m_rod_rec
 m_rot = m_rod_rot + pr["crank_pin"]["mass_kg"] + pr["cage_rod"]["mass_kg"]     # G8.0：连杆的滚针组件按实体算（挑线杆的惯性力由 dyn.py 按真实运动算，平衡率 k 已经把它算进去）
 K = S.SEW["k"]
 M_req = (m_rot + K * m_recip) * R                    # 平衡块要提供的矩（kg·mm），方向与销相反

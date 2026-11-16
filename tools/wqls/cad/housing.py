@@ -879,11 +879,12 @@ def casting():
         # G5.1：顶面由 z 194 降到 182。上轴两孔要用同轴镗杆从机头端伸进去镗（后轴承孔只能这样镗），镗杆 Ø28、刀 Ø35 要从
         # 这个凸台上面过去；原来凸台顶离上轴轴线只有 6 mm，挡住了。导套长 12（含油轴套 Ø8 × Ø12 × 12），与下导套相距约 125
         if DETAIL:                                      # G4.3：圆凸台（被 x = 3 平面切成 D 形，让开连杆），一条筋接到后壁
-            ub = Part.makeCylinder(11, 12, V(0, 0, 170), V(0, 0, 1)).common(Part.makeBox(40, 40, 40, V(-37, -20, 160)))
+            # G8.0 第 6 步：上导套改卷制轴套 Ø10，D 形平面由 x 3 移到 x 4.5（离连杆平面 x 6 还有 1.5），孔 Ø10 H7
+            ub = Part.makeCylinder(11, 12, V(0, 0, 170), V(0, 0, 1)).common(Part.makeBox(41.5, 40, 40, V(-37, -20, 160)))
             ub = ub.fuse(Part.makeBox(8, y_back + 1, 10, V(-12, 0, 172)))
         else:
             ub = Part.makeBox(19, 20, 24, V(-16, -10, 170)).fuse(Part.makeBox(10, y_back - 8 + 1, 14, V(-14, 8, 175)))
-        bs.append(ub.cut(Part.makeCylinder(6, 40, V(0, 0, 160), V(0, 0, 1))))
+        bs.append(ub.cut(Part.makeCylinder(5, 40, V(0, 0, 160), V(0, 0, 1))))
         # 前轴承座：x 31…44，轴承座圈加四条筋（G4.2 由整块隔板改，见下），中间 Ø35 轴承孔（6202）
         # 原来是一整块隔板：机头上多了约 1.7 kg，机壳一阶从 129 Hz 掉到 93 Hz（靠近 5000 r/min 的 83 Hz），
         # 改成轴承座圈（Ø50 × 13）加四条筋（上、后、前、下，厚 8），接到机头四壁
@@ -909,7 +910,8 @@ def casting():
             bs.append(qb.cut(Part.makeCylinder(3, 40, V(-20, -qu, ZU + qv), V(1, 0, 0))))
         for b_ in bs:
             hollow = fuse_fillet(hollow, b_.common(solid))
-        hollow = hollow.cut(Part.makeCylinder(6, 200, V(0, 0, 20), V(0, 0, 1)))       # 针杆孔 Ø12 穿过机头底（导套外径）
+        hollow = hollow.cut(Part.makeCylinder(6, 145, V(0, 0, 20), V(0, 0, 1)))       # 针杆下导套孔 Ø12 穿过机头底（导套外径），到机头里
+        hollow = hollow.cut(Part.makeCylinder(5, 40, V(0, 0, 160), V(0, 0, 1)))       # G8.0 第 6 步：上导套孔 Ø10 H7（卷制轴套）
         # G8.0 第 6 步：机头顶在针杆正上方开 Ø12 孔（拆装针杆从这里抽出，平时橡胶塞堵住）；
         # 滑块导轨的两个螺孔 SM 9/64-40（底孔 Ø2.9，深 10）攻在前轴承座下面的竖筋上（x 38.5 起，y 0，z 125、148）
         hollow = hollow.cut(Part.makeCylinder(6, 30, V(0, 0, 225), V(0, 0, 1)))
