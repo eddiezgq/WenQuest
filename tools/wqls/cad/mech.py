@@ -4,7 +4,8 @@
 
 零件都按 φ = 0（针杆上止点）的位置画在整机坐标里（与 spec.py 相同：原点在针板上表面、机针中心线上；X 向右、Y 向后、Z 向上，mm）。
 机构是平面的，端视坐标 u = −Y（向前为正）、v = Z − ZU（上轴中心为 0）。
-沿 X 的排布（从面板往里）：针杆 x = 0 → 针杆连杆 x 6–12（摇杆也在这个平面）→ 挑线杆 x 13.5–18.5 → 曲柄（带平衡块）x 20–30 → 前轴承 6202 x 32–43。
+沿 X 的排布（从面板往里，G8.0 E 版）：针杆 x = 0 → 针杆连杆杆身 x 6–12、大头 x 6–16 → 挑线杆毂 x 17.5–25.5 → 曲柄（带平衡块）x 27–37
+→ 前轴承 6202 x 39–50。曲柄销 Ø10，连杆大头和挑线杆毂里各一只滚针保持架组件（K10×14×10、K10×14×8）。
 挑线杆和针杆连杆套在同一根曲柄销上（真机做法，四连杆由 tools/wqls/g4_takeup.py 综合，结果在 docs/设计/WQ-LS/G4/挑线机构.json）。
 平衡块的大小在这里按平衡率 k（spec.SEW["k"]）算出：曲柄连同平衡块的质心矩 = 全部回转质量 × r + k × 往复质量 × r。
 
@@ -138,13 +139,26 @@ blk = blk.fuse(Part.makeCylinder(3.0, X["rod"][1] - 6 + 1.5, V(6, 0, zB), V(1, 0
 blk = blk.fuse(Part.makeCylinder(2.5, 8, V(0, 4, zB), V(0, 1, 0)).cut(Part.makeCylinder(4.0, 20, V(0, 0, zB - 10), V(0, 0, 1))))  # 夹紧螺钉
 parts["nb_link"], mats["nb_link"] = blk, "metal"
 
-# 针杆连杆：大头 Ø22（内装 Ø8/Ø12 滚针轴承），小头 Ø13（Ø6 连接销），两面各挖 1.5 深的减重槽
+# 针杆连杆：杆身 6 厚（x 6–12），小头 Ø13（Ø6 连接销），两面各挖 1.5 深的减重槽；
+# G8.0：大头 Ø24 × 10（x 6–16），孔 Ø14 淬硬磨削作滚道，装 K10×14×10 滚针保持架组件（曲柄销 Ø10 作内滚道）
 x0, t = X["rod"][0], X["rod"][1] - X["rod"][0]
-rod = link2(C0, 11.0, (0.0, B0v), 6.5, x0, t)
+hx0, hx1 = X["rod_hub"]
+PIN_R = X["pin_d"] / 2
+rod = link2(C0, 12.0, (0.0, B0v), 6.5, x0, t).fuse(disc(*C0, 12.0, hx0, hx1 - hx0)).removeSplitter()
 for xs in (x0 - 0.01, X["rod"][1] - 1.5):
-    rod = rod.cut(pocket((0.0, C0[1] - 14.5), 3.2, (0.0, B0v + 9.5), 2.4, xs, 1.51))
-rod = rod.cut(hole(*C0, 6.0, x0, t)).cut(hole(0.0, B0v, 3.0, x0, t))
+    rod = rod.cut(pocket((0.0, C0[1] - 16.0), 3.2, (0.0, B0v + 9.5), 2.4, xs, 1.51))
+rod = rod.cut(hole(*C0, X["cage_rod"][1] / 2, hx0, hx1 - hx0)).cut(hole(0.0, B0v, 3.0, x0, t))
 parts["rod"], mats["rod"] = rod, "metal"
+
+
+def cage(c, dims, xa):
+    """滚针保持架组件（K 系列）：内径 Fw、外径 Ew、宽 Bc，画成一个环（保持架和滚针不分开画）"""
+    fw, ew, bc = dims
+    return disc(*c, ew / 2 - 0.05, xa, bc).cut(hole(*c, fw / 2 + 0.05, xa, bc))
+
+
+cw = X["cage_rod"][2]
+parts["cage_rod"], mats["cage_rod"] = cage(C0, X["cage_rod"], hx0 + (hx1 - hx0 - cw) / 2), "chrome"
 
 # 挑线杆：P 套在曲柄销上（Ø18 毂，内装滚针轴承），M 接摇杆（Ø12 毂、Ø5 销），向前伸出到线眼（Ø3 眼、末端倒圆）
 import importlib.util  # noqa: E402
@@ -159,10 +173,11 @@ x0, t = X["lever"]
 # G4.2 减重：杆身改 3 mm 钢板（居中），只在 P、M 两个毂处保留 5 mm；杆身收窄（真机挑线杆 15–25 g）
 tp = 3.0
 xp = x0 + (t - tp) / 2
-lever = disc(*Pp, 9.0, x0, t).fuse(disc(*Mp, 5.5, x0, t))
+lever = disc(*Pp, 10.5, x0, t).fuse(disc(*Mp, 5.5, x0, t))      # G8.0：P 毂 Ø21 × 8，孔 Ø14 淬硬作滚道
 lever = lever.fuse(link2(Pp, 6.5, Mp, 4.5, xp, tp)).fuse(link2(Pp, 5.5, Ep, 3.0, xp, tp)).removeSplitter()
-lever = lever.cut(hole(*Pp, 6.0, x0, t)).cut(hole(*Mp, 2.5, x0, t)).cut(hole(*Ep, 1.5, x0, t))
+lever = lever.cut(hole(*Pp, X["cage_lever"][1] / 2, x0, t)).cut(hole(*Mp, 2.5, x0, t)).cut(hole(*Ep, 1.5, x0, t))
 parts["lever"], mats["lever"] = lever, "chrome"
+parts["cage_lever"], mats["cage_lever"] = cage(Pp, X["cage_lever"], x0), "chrome"
 
 # 摇杆（挑线连杆）：M–Q，两端 Ø12 毂；Q 的销固定在机壳凸台上
 x0, t = X["rocker_in"] if TK.get("side", "in") == "in" else X["rocker_out"]
@@ -172,13 +187,13 @@ xs0 = min(X["lever"][0], x0) - 0.5
 xs1 = max(X["lever"][0] + X["lever"][1], x0 + t) + 0.5
 parts["pin_M"], mats["pin_M"] = disc(*Mp, 2.5, xs0, xs1 - xs0), "chrome"
 if TK.get("side", "in") == "in":            # 摇杆在内侧：销从轴承隔板上的销座伸出来
-    parts["stud_Q"], mats["stud_Q"] = disc(*Qp, 3.0, x0 - 0.5, 32.0 - (x0 - 0.5)), "chrome"
+    parts["stud_Q"], mats["stud_Q"] = disc(*Qp, 3.0, x0 - 0.5, 39.0 - (x0 - 0.5)), "chrome"   # G8.0：轴承隔板外移到 x 38
 else:                                        # 摇杆在外侧：销从机头顶上吊下来的销座（x −10…5）伸出来
     parts["stud_Q"], mats["stud_Q"] = disc(*Qp, 3.0, -10.0, x0 + t + 0.5 + 10.0), "chrome"
 
 # 曲柄销 Ø8：从曲柄面穿过挑线杆、连杆
-pin_x0 = X["rod"][0] - 0.5
-parts["crank_pin"], mats["crank_pin"] = disc(*C0, 4.0, pin_x0, X["web"][0] - pin_x0 + 4), "chrome"
+pin_x0 = X["rod_hub"][0] - 0.5
+parts["crank_pin"], mats["crank_pin"] = disc(*C0, PIN_R, pin_x0, X["web"][0] - pin_x0 + 4), "chrome"
 
 # 上轴（C 版轴段）
 shaft = None
@@ -200,7 +215,7 @@ def crank(half_deg):
     x0, x1 = X["web"]
     t = x1 - x0
     hub = disc(0, 0, 16.5, x0, t)
-    boss = link2((0, 0), 16.5, C0, 10.0, x0, t)
+    boss = link2((0, 0), 16.5, C0, 11.0, x0, t)                                            # G8.0：销座 Ø22（销 Ø10）
     # 扇形：圆心在轴心，半径 R_CW，方向朝下（销在上），张角 ±half
     pts = [(0.0, 0.0)]
     for i in range(41):
@@ -211,7 +226,7 @@ def crank(half_deg):
     body = hub.fuse(boss).fuse(sec).removeSplitter()
     body = rounded(body, 3.0)
     body = body.cut(Part.makeCylinder(7.5, t + 2, V(x0 - 1, 0, ZU), V(1, 0, 0)))          # 轴孔 Ø15
-    body = body.cut(hole(*C0, 4.0, x0, t))                                                 # 销孔 Ø8 压配
+    body = body.cut(hole(*C0, PIN_R, x0, t))                                               # 销孔 Ø10 压配
     body = body.cut(Part.makeCylinder(2.5, 16, V((x0 + x1) / 2, 0, ZU - 17), V(0, 0, 1)))  # 紧定螺钉 M5 ×2
     body = body.cut(Part.makeCylinder(2.5, 16, V((x0 + x1) / 2, -17 * math.sin(60 * DEG), ZU - 17 * math.cos(60 * DEG)),
                                       V(0, math.sin(60 * DEG), math.cos(60 * DEG))))
@@ -232,7 +247,7 @@ m_rod = pr["rod"]["mass_kg"]
 g_rod = abs(pr["rod"]["com"][2] - (ZU + C0[1]))
 m_rod_rot, m_rod_rec = m_rod * (1 - g_rod / L), m_rod * g_rod / L
 m_recip = sum(pr[k]["mass_kg"] for k in ("needle_bar", "needle_clamp", "needle", "nb_link")) + m_rod_rec
-m_rot = m_rod_rot + pr["crank_pin"]["mass_kg"] + 0.010     # 销上两只滚针轴承约 10 g（挑线杆的惯性力由 dyn.py 按真实运动算，平衡率 k 已经把它算进去）
+m_rot = m_rod_rot + pr["crank_pin"]["mass_kg"] + pr["cage_rod"]["mass_kg"]     # G8.0：连杆的滚针组件按实体算（挑线杆的惯性力由 dyn.py 按真实运动算，平衡率 k 已经把它算进去）
 K = S.SEW["k"]
 M_req = (m_rot + K * m_recip) * R                    # 平衡块要提供的矩（kg·mm），方向与销相反
 lo, hi = 10.0, 89.0

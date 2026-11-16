@@ -36,6 +36,7 @@ HEADWALL = float(os.environ.get("WQ_HEADWALL", 4.5))
 FRONT_COVER = os.environ.get("WQ_FRONTCOVER", "1") == "1"
 FC_WIN = (-40.0, 34.0, 118.0, 236.0)       # 机头前盖板窗口 x0, x1, z0, z1（G3）
 X_BRG_REAR = 380.0                         # 后轴承 6201 中心（spec.X_BRG[1]）
+S_X_BRG0 = 44.5                            # 前轴承 6202 中心（spec.X_BRG[0]；G8.0 由 37.5 外移）
 LIP_W_F = 14.0                             # 面板口法兰宽（端面外圆角 R14 占掉约 10 mm，法兰要宽些面板才有贴合面）
 LIP_W, LIP_T, WIN_LIP_D = 8.0, 8.0, 8.0          # G4.3 面板口法兰宽、厚（沿 x），前窗口法兰宽、深（沿 y）（加宽加厚试过：频率不升反降，只是加了机头质量）
 MOTOR_SEAT_X = 408.0                       # G4.3 电机座端面（后轴承座伸出立柱右壁 12 mm）
@@ -50,7 +51,7 @@ if DETAIL:
     # 窗口上沿到 z 234（挑线杆、摇杆在前壁附近要摆到 z 230 左右），前盖板随形包到机头顶的圆角上（z 240）
     FC_WIN = (-38.0, 28.0, 120.0, 234.0)
 FC_PLATE = (FC_WIN[0] - 8, FC_WIN[1] + 8, FC_WIN[2] - 8, min(FC_WIN[3] + 8, 240.0))
-X_TAKEUP = 16.0                            # 挑线杆平面（G4.1 起与针杆连杆共用曲柄销，见 tools/wqls/g4_takeup.py）
+X_TAKEUP = 21.5                            # 挑线杆平面（G4.1 起与针杆连杆共用曲柄销；G8.0 外移 5.5 mm，spec.X_TAKEUP）
 TK_SLOT = (152.0, 214.0)                   # 前盖板上挑线杆竖槽的上下端；G4.1 起按挑线机构的线眼轨迹自动定（下面 TK_JSON）
 TK_POSE = [(-2.5, 20.6), (31.9, -5.9), (51.5, -17.0)]   # 外观件里的示意挑线杆（没有 G4 零件时用）：P、M、线眼，端视坐标 mm
 BOSSES = os.environ.get("WQ_BOSSES", "0" if os.environ.get("WQ_NOEDGE") else "1") == "1"   # 机头内的凸台（针杆导套、前轴承座、摇杆销座）；优化试算（不倒圆）默认不带，要带就 WQ_BOSSES=1
@@ -863,20 +864,22 @@ def casting():
         # 前轴承座：x 31…44，轴承座圈加四条筋（G4.2 由整块隔板改，见下），中间 Ø35 轴承孔（6202）
         # 原来是一整块隔板：机头上多了约 1.7 kg，机壳一阶从 129 Hz 掉到 93 Hz（靠近 5000 r/min 的 83 Hz），
         # 改成轴承座圈（Ø50 × 13）加四条筋（上、后、前、下，厚 8），接到机头四壁
-        ring = Part.makeCylinder(25, 13, V(31, 0, ZU), V(1, 0, 0))
-        rbs = [Part.makeBox(13, 8, 60, V(31, -4, ZU)), Part.makeBox(13, 80, 8, V(31, 0, ZU - 4)),
-               Part.makeBox(10, 80, 8, V(34, -80, ZU - 4)), Part.makeBox(13, 8, 200, V(31, -4, ZU - 200))]
+        # G8.0：前轴承中心 x 37.5 → 44.5（spec.X_BRG），座圈和筋跟着外移 7 mm：x 38…51
+        bx0 = S_X_BRG0 - 6.5
+        ring = Part.makeCylinder(25, 13, V(bx0, 0, ZU), V(1, 0, 0))
+        rbs = [Part.makeBox(13, 8, 60, V(bx0, -4, ZU)), Part.makeBox(13, 80, 8, V(bx0, 0, ZU - 4)),
+               Part.makeBox(10, 80, 8, V(bx0 + 3, -80, ZU - 4)), Part.makeBox(13, 8, 200, V(bx0, -4, ZU - 200))]
         wall = ring
         for rb_ in rbs:
             wall = wall.fuse(rb_)
         # 不与内腔 cav 求交：cav 是按机臂壁厚 5.8 挖的，机头壁只有 4.5，求交后筋离机头内壁差 1.3 mm、是悬空的
         # （第一次模态 93 Hz 就是这块悬空的板在晃）。直接与外形 solid 求交，筋伸进壁里和壁连成一体
-        wall = wall.cut(Part.makeCylinder(17.5, 15, V(30, 0, ZU), V(1, 0, 0)))   # 6202 外圈 Ø35
+        wall = wall.cut(Part.makeCylinder(17.5, 15, V(bx0 - 1, 0, ZU), V(1, 0, 0)))   # 6202 外圈 Ø35
         bs.append(wall.removeSplitter())
         if TK_JSON:                                     # 摇杆销座：从轴承隔板伸出的凸台，销 Ø6
             qu, qv = TK_JSON["lk"]["Qz"], TK_JSON["lk"]["Qy"]
             if TK_JSON["lk"].get("side", "in") == "in":       # 摇杆在内侧：销座从轴承隔板往外伸
-                qb = Part.makeCylinder(8, 32 - 25.5, V(25.5, -qu, ZU + qv), V(1, 0, 0))
+                qb = Part.makeCylinder(8, bx0 + 1 - 32.5, V(32.5, -qu, ZU + qv), V(1, 0, 0))   # G8.0：摇杆 x 28–32
             else:                                             # 摇杆在外侧（与连杆同一平面 x 6–10）：销座从机头顶内壁吊下来，在摇杆外侧 x −10…5
                 qb = Part.makeCylinder(8, 15, V(-10, -qu, ZU + qv), V(1, 0, 0)).fuse(
                     Part.makeBox(15, 12, 60, V(-10, -qu - 6, ZU + qv)))

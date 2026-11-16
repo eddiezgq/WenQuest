@@ -169,7 +169,7 @@ def frames(step=2):
         dM = w(lp["M"]) - w(lp0["M"])
         rot = rot_x(phi)
         M = dict(shaft=rot, crank=rot, crank_pin=rot, needle_bar=tb, needle_clamp=tb, needle=tb, nb_link=tb, rod=rod,
-                 lever=lev, rocker=rck, pin_M=trans(*dM),
+                 lever=lev, rocker=rck, pin_M=trans(*dM), cage_rod=rod, cage_lever=lev,   # G8.0 滚针组件跟着杆走
                  rotor=rot, rotor_magnets=rot, encoder_disc=rot, handwheel=rot, handwheel_ring=rot,   # G4.3 电机转子、码盘、手轮随上轴转
                  pulley_upper=rot)
         # G4.5 旋梭组：下轴经同步带 1 : 1 同向转；旋梭轴经外啮合齿轮 1 : 2 反向转

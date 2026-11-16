@@ -35,6 +35,7 @@ if os.environ.get("WQ_HOUSING_LOWER"):                                        # 
 parts = {k: Part.read(os.path.join(D, f"{k}.step")) for k in info["parts"]}
 JOINT = {frozenset(p) for p in [
     ("crank", "crank_pin"), ("crank", "shaft"), ("rod", "crank_pin"), ("lever", "crank_pin"), ("rod", "nb_link"),
+    ("cage_rod", "rod"), ("cage_rod", "crank_pin"), ("cage_lever", "lever"), ("cage_lever", "crank_pin"),   # G8.0 滚针组件
     ("lever", "pin_M"), ("rocker", "pin_M"), ("rocker", "stud_Q"), ("needle_bar", "nb_link"), ("needle_bar", "needle_clamp"),
     ("needle_clamp", "needle"), ("needle", "needle_bar"), ("shaft", "bearing_front"), ("crank", "bearing_front"),
     ("casting", "bearing_front"), ("casting", "stud_Q"), ("casting", "shaft"),
