@@ -237,7 +237,7 @@ else:                                        # 摇杆在外侧：销从机头顶
     parts["stud_Q"], mats["stud_Q"] = disc(*Qp, 3.0, -10.0, x0 + t + 0.5 + 10.0), "chrome"
 
 # 曲柄销 Ø8：从曲柄面穿过挑线杆、连杆
-pin_x0 = X["rod_hub"][0] - 0.5
+pin_x0 = X["rod_hub"][0]          # G8.0 第 6 步：曲柄销外端与连杆大头平齐（原来伸出 0.5，离上导套只剩 0.5）；连杆小头靠针杆连接块、滑块轴向定位
 parts["crank_pin"], mats["crank_pin"] = disc(*C0, PIN_R, pin_x0, X["web"][0] - pin_x0 + 4), "chrome"
 
 # 上轴（C 版轴段）
