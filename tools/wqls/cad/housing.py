@@ -925,8 +925,6 @@ def casting():
         info["bosses"] = len(bs)
     if DETAIL:
         hollow = details(solid, hollow, info)
-        if hollow is not None:                          # 细节（内圆角、筋）会在机头顶内侧补回一点材料，顶孔 Ø12 再钻一次才是真通孔
-            hollow = hollow.cut(Part.makeCylinder(6, 30, V(0, 0, 225), V(0, 0, 1))).removeSplitter()
     # 机头前盖板窗口（Eddie 11-10 14:08）：机头前面开窗，调针杆高度、挑线机构、加油都从这里；窗口四周留 8 mm 法兰装前盖板
     if FRONT_COVER and not DETAIL:
         win = Part.makeBox(FC_WIN[1] - FC_WIN[0], WALL + 4, FC_WIN[3] - FC_WIN[2], V(FC_WIN[0], HEAD["y0"] - 2, FC_WIN[2]))
