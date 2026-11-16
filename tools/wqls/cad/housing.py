@@ -20,7 +20,7 @@ import MeshPart
 import Part
 
 V = App.Vector
-VAR = os.environ.get("WQ_VARIANT", "A")
+VAR = os.environ.get("WQ_VARIANT", "B")       # 2026-11-10 Eddie 选定外观 B；G8.0 起默认 B（之前默认 A，G5 的机壳就是按 A 生成的）
 OUT = os.environ.get("WQ_OUT", "/tmp/wqls_g3")
 os.makedirs(OUT, exist_ok=True)
 
