@@ -280,7 +280,7 @@ def ctrl_holes():
     # G8.0 第 6 步：机头顶针杆正上方 Ø12 通孔（拆装针杆从这里抽出，平时橡胶塞堵住）
     P = [to_frame("TOPARM", (0.0, 0.0, 242.0))[:2]]
     ops.append(op("TOPARM 钻机头顶 Ø12 通孔（橡胶塞孔）", "TOPARM", 52, "钻头 Ø12（直角铣头）", 12, 60,
-                  cam.drill(P, 259 - 233, 0, 0.12 * rpm(60, 12), r_plane=-15, safe=8), kind="drill"))
+                  cam.drill(P, 259 - 233, 0, 0.12 * rpm(60, 12), r_plane=-12, safe=8), kind="drill"))
     # 直角铣头在机座底下向上：针距拉杆过孔 Ø12（穿机座顶板，再穿立柱下横隔板，到 z 66）、膝抬推杆过孔 Ø12（穿机座顶板）
     pr = g["pull_rod"]
     P = [to_frame("UNDER", (pr["x"], pr["y"], -16.0))[:2]]
