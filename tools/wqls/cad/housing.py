@@ -594,7 +594,7 @@ def machined_faces(shape):
                 out.append(f)
         elif name == "Cylinder":
             r = s.Radius
-            if any(abs(r - v) < 0.02 for v in (1.65, 2.1, 1.25, 16.0, 17.5, 6.0, 3.0, 4.1, 4.25, 5.5, 5.0, 9.0)):
+            if any(abs(r - v) < 0.02 for v in (1.65, 2.1, 1.25, 1.45, 16.0, 17.5, 6.0, 3.0, 4.1, 4.25, 5.5, 5.0, 9.0)):
                 out.append(f)
             elif abs(r - 26.0) < 0.02 and c.x > PIL["x1"] - 0.5:                 # 电机止口 Ø52
                 out.append(f)
@@ -910,6 +910,11 @@ def casting():
         for b_ in bs:
             hollow = fuse_fillet(hollow, b_.common(solid))
         hollow = hollow.cut(Part.makeCylinder(6, 200, V(0, 0, 20), V(0, 0, 1)))       # 针杆孔 Ø12 穿过机头底（导套外径）
+        # G8.0 第 6 步：机头顶在针杆正上方开 Ø12 孔（拆装针杆从这里抽出，平时橡胶塞堵住）；
+        # 滑块导轨的两个螺孔 SM 9/64-40（底孔 Ø2.9，深 10）攻在前轴承座下面的竖筋上（x 38.5 起，y 0，z 125、148）
+        hollow = hollow.cut(Part.makeCylinder(6, 30, V(0, 0, 225), V(0, 0, 1)))
+        for zs_ in (125.0, 148.0):
+            hollow = hollow.cut(Part.makeCylinder(1.45, 10.0, V(S_X_BRG0 - 6.5 - 0.01, 0, zs_), V(1, 0, 0)))
         hollow = hollow.cut(Part.makeCylinder(7, 14, V(0, 0, 36), V(0, 0, 1)))        # 底下沉孔 Ø14 到 z 50：上止点时针夹进来 0.5 mm
         hollow = hollow.removeSplitter()
         info["bosses"] = len(bs)

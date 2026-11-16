@@ -112,6 +112,9 @@ parts, mats = {}, {}
 y, zb = W(0, NB_BOT0)
 nb = Part.makeCylinder(4.0, X["nb_below"] + X["nb_above"], V(0, 0, zb), V(0, 0, 1))
 nb = nb.makeChamfer(0.5, [e for e in nb.Edges])
+# G8.0 第 6 步：刻线 A、B（宽 0.5、深 0.2）。A：下止点时对齐下导套下端 z 53 → 上止点位置 z 53 + 2r；B 在 A 下方 2.0（钩线时机针回升 2.0）
+for zm in (53.0 + 2 * R, 53.0 + 2 * R - 2.0):
+    nb = nb.cut(Part.makeCylinder(4.1, 0.5, V(0, 0, zm - 0.25), V(0, 0, 1)).cut(Part.makeCylinder(3.8, 0.7, V(0, 0, zm - 0.35), V(0, 0, 1))))
 parts["needle_bar"], mats["needle_bar"] = nb, "chrome"
 
 # 针夹（套在针杆下端）和机针 DB×1：针尖到针杆下端 tip_below
@@ -135,9 +138,49 @@ parts["needle"], mats["needle"] = needle, "chrome"
 yB, zB = W(0, B0v)
 blk = Part.makeBox(12, 14, 16, V(-6, -7, zB - 8)).cut(Part.makeCylinder(4.0, 20, V(0, 0, zB - 10), V(0, 0, 1)))
 blk = rounded(blk, 1.5) if False else blk
-blk = blk.fuse(Part.makeCylinder(3.0, X["rod"][1] - 6 + 1.5, V(6, 0, zB), V(1, 0, 0)))
+# G8.0 第 6 步：连接销伸出连杆小头，外端套滑块（x 13.5…23.0），销到 x 23.5
+SB = dict(x=(13.5, 23.0), h=16.0, w=10.0)          # 滑块：x 范围、高（z）、宽（y，两滑动面 y ±5，10 × 16 = 160 mm²）
+RAIL = dict(z=(113.0, 170.0), back=(23.5, 38.5), back_top=156.0, jaw=4.0, screws=(125.0, 148.0))
+blk = blk.fuse(Part.makeCylinder(3.0, SB["x"][1] + 0.5 - 6, V(6, 0, zB), V(1, 0, 0)))
 blk = blk.fuse(Part.makeCylinder(2.5, 8, V(0, 4, zB), V(0, 1, 0)).cut(Part.makeCylinder(4.0, 20, V(0, 0, zB - 10), V(0, 0, 1))))  # 夹紧螺钉
 parts["nb_link"], mats["nb_link"] = blk, "metal"
+
+# G8.0 第 6 步：滑块（GCr15 淬硬）套在连接销外端，能绕销转，连杆斜了滑块仍平贴导轨；导轨（45 钢淬火，U 形）夹住滑块前后两面，
+# 背板用两个 SM 9/64-40 螺钉固定在前轴承座下面的竖筋（x 38.5）上，螺钉头沉在背板里（滑块从上面滑过）
+sb = Part.makeBox(SB["x"][1] - SB["x"][0], SB["w"], SB["h"], V(SB["x"][0], -SB["w"] / 2, zB - SB["h"] / 2))
+sb = sb.cut(Part.makeCylinder(3.02, 20, V(SB["x"][0] - 1, 0, zB), V(1, 0, 0)))
+parts["slide_block"], mats["slide_block"] = sb, "chrome"
+rz0, rz1 = RAIL["z"]
+jw = RAIL["jaw"]
+rail = Part.makeBox(RAIL["back"][1] - RAIL["back"][0], SB["w"] + 2 * jw + 0.04, RAIL["back_top"] - rz0,
+                    V(RAIL["back"][0], -SB["w"] / 2 - jw - 0.02, rz0))
+for sy in (1, -1):
+    y0_ = SB["w"] / 2 + 0.02 if sy > 0 else -SB["w"] / 2 - 0.02 - jw
+    rail = rail.fuse(Part.makeBox(RAIL["back"][1] - SB["x"][0], jw, rz1 - rz0, V(SB["x"][0], y0_, rz0)))
+rail = rail.removeSplitter()
+for zs in RAIL["screws"]:                                   # 通孔 Ø3.8、沉头孔 Ø6.5 × 3
+    rail = rail.cut(Part.makeCylinder(1.9, 20, V(RAIL["back"][0] - 1, 0, zs), V(1, 0, 0)))
+    rail = rail.cut(Part.makeCylinder(3.25, 3.5, V(RAIL["back"][0] - 0.5, 0, zs), V(1, 0, 0)))
+parts["slide_rail"], mats["slide_rail"] = rail, "metal"
+scr = None
+for zs in RAIL["screws"]:                                   # SM 9/64-40（大径 3.57）× 16，头 Ø6 × 2.5，沉在背板里
+    s_ = Part.makeCylinder(3.0, 2.5, V(RAIL["back"][0] + 0.5, 0, zs), V(1, 0, 0)).fuse(
+        Part.makeCylinder(1.78, 16.0, V(RAIL["back"][0] + 3.0, 0, zs), V(1, 0, 0)))
+    scr = s_ if scr is None else scr.fuse(s_)
+parts["rail_screws"], mats["rail_screws"] = scr, "black"
+
+# G8.0 第 6 步：针杆上、下导套（烧结含油青铜，Ø8 F7 × Ø12 r6），后面（+y）各一个 Ø2 径向油孔（对着机壳的油芯孔，润滑系统另做）
+NB_BUSH = dict(up=(170.0, 12.0), low=(53.0, 20.0))
+bsh = None
+for z0_, L_ in NB_BUSH.values():
+    b_ = Part.makeCylinder(6.0, L_, V(0, 0, z0_), V(0, 0, 1)).cut(Part.makeCylinder(4.01, L_ + 2, V(0, 0, z0_ - 1), V(0, 0, 1)))
+    b_ = b_.cut(Part.makeCylinder(1.0, 8, V(0, 0, z0_ + L_ / 2), V(0, 1, 0)))
+    bsh = b_ if bsh is None else bsh.fuse(b_)
+parts["nb_bushes"], mats["nb_bushes"] = bsh, "metal"
+
+# G8.0 第 6 步：机头顶 Ø12 孔的橡胶塞（拆针杆从这里抽出；z 237.5…242，帽 Ø15 × 1.5）
+parts["nb_plug"], mats["nb_plug"] = (Part.makeCylinder(6.1, 5.5, V(0, 0, 236.5), V(0, 0, 1)).fuse(
+    Part.makeCylinder(7.5, 1.5, V(0, 0, 242.0), V(0, 0, 1)))), "black"
 
 # 针杆连杆：杆身 6 厚（x 6–12），小头 Ø13（Ø6 连接销），两面各挖 1.5 深的减重槽；
 # G8.0：大头 Ø24 × 10（x 6–16），孔 Ø14 淬硬磨削作滚道，装 K10×14×10 滚针保持架组件（曲柄销 Ø10 作内滚道）
@@ -270,7 +313,7 @@ bal = dict(k=K, m_recip_kg=round(m_recip, 4), m_rot_kg=round(m_rot, 4), g_rod_mm
            crank_moment_kgmm=round(-mv, 3), sector_half_deg=round(hi, 2), equiv_at_r_g=round(1000 * (-mv) / R, 1))
 
 # G4.3 主轴直驱电机与手轮（cad/motor.py）
-dens = {}
+dens = {"nb_bushes": 7.0e-6}                    # 烧结含油青铜约 7.0 g/cm³
 spec_m = importlib.util.spec_from_file_location("wq_motor", os.path.join(HERE, "motor.py"))
 motor = importlib.util.module_from_spec(spec_m)
 spec_m.loader.exec_module(motor)

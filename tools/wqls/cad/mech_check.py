@@ -36,6 +36,9 @@ parts = {k: Part.read(os.path.join(D, f"{k}.step")) for k in info["parts"]}
 JOINT = {frozenset(p) for p in [
     ("crank", "crank_pin"), ("crank", "shaft"), ("rod", "crank_pin"), ("lever", "crank_pin"), ("rod", "nb_link"),
     ("bush_mid", "shaft"), ("bush_mid", "casting"),   # G8.0 F 版中间含油轴套
+    # G8.0 第 6 步：滑块套在连接销上、在导轨里滑；导轨和螺钉装在机壳竖筋上；针杆在上下导套里；橡胶塞在机头顶孔里
+    ("slide_block", "nb_link"), ("slide_block", "slide_rail"), ("slide_rail", "casting"), ("rail_screws", "slide_rail"),
+    ("rail_screws", "casting"), ("needle_bar", "nb_bushes"), ("nb_bushes", "casting"), ("nb_plug", "casting"),
     ("cage_rod", "rod"), ("cage_rod", "crank_pin"), ("cage_lever", "lever"), ("cage_lever", "crank_pin"),   # G8.0 滚针组件
     ("lever", "pin_M"), ("rocker", "pin_M"), ("rocker", "stud_Q"), ("needle_bar", "nb_link"), ("needle_bar", "needle_clamp"),
     ("needle_clamp", "needle"), ("needle", "needle_bar"), ("shaft", "bearing_front"), ("crank", "bearing_front"),
