@@ -82,15 +82,17 @@ for f in part.Faces:
             if abs(ax.y) > 0.99 and abs(p0.x - cg["geo"]["hand"]["x"]) < 0.5 and abs(p0.z - hz_) < 0.5 and r > 3.5:
                 ctrl_bore = "hand"                       # 手抬扳手轴孔 Ø8
             rp = cg["geo"]["release"]["pivot"]
-            if abs(ax.z) > 0.99 and abs(p0.x - rp[0]) < 0.5 and abs(p0.y - rp[1]) < 0.5 and r > 3.5:
-                ctrl_bore = "release"                    # G8.0 松线摆杆销孔：不铸出时凸台是实心的，凝固仿真（方案 B）M 0.41 的孤立区碰到孔
+            if abs(ax.z) > 0.99 and abs(p0.x - rp[0]) < 0.5 and abs(p0.y - rp[1]) < 0.5 and not hole:
+                # G8.0 松线摆杆销座（Ø12 立柱，孔 Ø6.1 钻铰）：外圆不是加工面（housing.machined_faces 按半径 6 误收了它），
+                # 不加余量——加了余量就成了 Ø17 实心柱，凝固仿真（方案 B）里 M 0.41 的孤立区碰到销孔
+                continue
             for k_ in ("dial", "reverse"):               # 针距旋钮、倒缝扳手轴孔 Ø8
                 if abs(ax.y) > 0.99 and abs(p0.x - cg["geo"][k_]["x"]) < 0.5 and abs(p0.z - cg["geo"][k_]["z"]) < 0.5 and r > 3.5:
                     ctrl_bore = k_
         if hole and ctrl_bore:
             # G4.7 压脚杆孔、调压螺钉孔、手抬扳手轴孔用砂芯铸出（不铸出时 Ø18–Ø26 的凸台成了实心热节，凝固仿真 9–18 cm³ 的孤立液相区）：
             # 比成品小 3（Ø12 → Ø9，Ø16.5 → Ø13.5），手抬、针距旋钮、倒缝扳手轴孔 Ø8 → Ø5
-            dc = 5.0 if ctrl_bore in ("hand", "dial", "reverse", "release") else 2 * r - 3.0
+            dc = 5.0 if ctrl_bore in ("hand", "dial", "reverse") else 2 * r - 3.0
             adds.append(Part.makeCylinder(r + 0.4, L + 0.2, p0 - ax * 0.1, ax).cut(Part.makeCylinder(dc / 2, L + 2, p0 - ax, ax)))
             log["bores"].append(dict(d=round(2 * r, 1), cast_d=dc, at=[round(x, 1) for x in p0], ctrl=ctrl_bore))
         elif hole and feed_bore:

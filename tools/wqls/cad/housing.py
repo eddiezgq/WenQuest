@@ -849,6 +849,12 @@ def casting():
         rb.append(sl.fuse(seat).cut(hole))
         for z in (55.0, 115.0):
             sl = Part.makeBox(PIL["x1"] - PIL["x0"] + 20, 300, RIB_T, V(PIL["x0"] - 10, -150, z))
+            if DETAIL:                                  # G8.0：同机臂的筋拔模 1°（分型面 y = 0 处厚 7，往前后壁变薄）；凝固仿真：不拔模时隔板与前后壁交接处 M 0.47
+                h0, d_ = RIB_T / 2, 150 * math.tan(math.radians(1.0))
+                zc = z + RIB_T / 2
+                pts = [(0, zc - h0), (150, zc - h0 + d_), (150, zc + h0 - d_), (0, zc + h0), (-150, zc + h0 - d_), (-150, zc - h0 + d_)]
+                w_ = Part.makePolygon([V(PIL["x0"] - 10, a_, b_) for a_, b_ in pts] + [V(PIL["x0"] - 10, pts[0][0], pts[0][1])])
+                sl = Part.Face(w_).extrude(V(PIL["x1"] - PIL["x0"] + 20, 0, 0))
             # G4.5：槽 y −30…50（下轴在后面，带的后边在 z 55 处到 y 约 34）；G4.6：往左加宽到 x 325，送布连杆（x 327…335）
             # 从这里竖着穿过；电线、油管孔挪到 (378, 85)。（G4.5 改这一行时把注释写到了 .fuse 前面，电线孔被注释掉了，这次一并改正）
             slot = Part.makeBox(44, 80, RIB_T + 2, V(325.0, -30, z - 1)).fuse(Part.makeCylinder(10, RIB_T + 2, V(378, 85, z - 1), V(0, 0, 1)))
