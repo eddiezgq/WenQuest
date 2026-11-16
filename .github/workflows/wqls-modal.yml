@@ -1,0 +1,44 @@
+# WQ-LS 机壳模态（第 138 轮 G8.0）：本地会话内存不够（CalculiX 要 5 GB 以上），放到 Actions 上算。
+# 手动启动：输入要算的 STEP（仓库里的路径，逗号分隔）和网格尺寸；结果打在日志里，也作为制品上传。
+name: WQ-LS 机壳模态
+on:
+  workflow_dispatch:
+    inputs:
+      steps:
+        description: "STEP 文件（逗号分隔）"
+        default: "docs/设计/WQ-LS/G8/模态/机壳_E版前.step,docs/设计/WQ-LS/G8/模态/机壳_F版.step"
+      mesh:
+        description: "网格尺寸 mm"
+        default: "14"
+jobs:
+  modal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: CalculiX、gmsh
+        run: |
+          sudo rm -f /var/lib/man-db/auto-update
+          sudo apt-get update -q && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1
+          pip install -q -r factory/digital/requirements.txt
+      - name: 模态
+        env:
+          STEPS: ${{ inputs.steps }}
+          MESH: ${{ inputs.mesh }}
+          WQ_ALG3D: "4"
+          WQ_CAE_TIME_LIMIT_S: "5400"
+        run: |
+          mkdir -p out
+          IFS=',' read -ra FS <<< "$STEPS"
+          for f in "${FS[@]}"; do
+            n=$(basename "$f" .step)
+            python3 tools/wqls/g3_modal.py "$f" "out/$n.json" "$MESH" | tee "out/$n.log"
+          done
+          for f in out/*.json; do python3 -c "import json,sys;d=json.load(open(sys.argv[1]));print(sys.argv[1], [m['hz'] for m in d['stats']['freqs']], d['stats'].get('elements'))" "$f"; done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: modal
+          path: out/*.json
