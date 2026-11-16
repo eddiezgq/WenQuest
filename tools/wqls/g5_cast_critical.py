@@ -70,6 +70,8 @@ def main():
     f_pro = C.MATERIALS["HT250"]["f_pro"]
     zones = {k: zone_mask(o, dx, mat.shape, v) & cast for k, v in ZONES.items()} if use_zones else {}
     mm = machined_mask(mach, o, dx, mat.shape, cast) if mach else None
+    _, _, B = C.plate_test(20.0, 2.0)                        # 同 g5_cast：由凝固时间折算热模数
+    Mod = C.modulus(np.where(cast, d["t_sol"], np.nan), B)
     mach_hits = {}
     out = {k: dict(cells=int(m.sum()), isolated_cells=0, first_t=None, max_vol_cm3=0.0) for k, m in zones.items()}
     fs = np.ones(mat.shape, np.float32)
@@ -89,8 +91,10 @@ def main():
                 ii = np.argwhere(hit & reg).mean(axis=0)
                 cen = tuple(int(round(float(o[j] + (ii[j] + 0.5) * dx) / 5) * 5) for j in range(3))
                 vol = round(float(reg.sum() * dx ** 3 / 1000), 1)
-                r = mach_hits.setdefault(cen, dict(center_mm=list(cen), first_t=round(float(t), 1), cells=0, vol_cm3=0.0))
+                mloc = float(np.nanmax(np.where(hit & reg, Mod, np.nan)))
+                r = mach_hits.setdefault(cen, dict(center_mm=list(cen), first_t=round(float(t), 1), cells=0, vol_cm3=0.0, modulus_cm=0.0))
                 r["cells"], r["vol_cm3"] = max(r["cells"], cells), max(r["vol_cm3"], vol)
+                r["modulus_cm"] = round(max(r["modulus_cm"], mloc), 2)
         for k, m in zones.items():
             hit = iso & m
             if hit.any():
@@ -104,7 +108,8 @@ def main():
         print(f"{k}：{r['cells']} 格；孤立 {r['isolated_cells']} 格" + (f"（{r['first_t']} s 起，所在孤立区最大 {r['max_vol_cm3']} cm³）" if r["first_t"] else ""))
     if mm is not None:
         out["加工面"] = sorted(mach_hits.values(), key=lambda r: -r["cells"])
-        print(f"加工面附近金属 {int(mm.sum())} 格；落在孤立液相区里的：{len(mach_hits)} 处")
+        big = [r for r in out["加工面"] if r["modulus_cm"] > 0.35]
+        print(f"加工面附近金属 {int(mm.sum())} 格；落在孤立液相区里的：{len(mach_hits)} 处，其中加工面处热模数 > 0.35 cm 的 {len(big)} 处")
         for r in out["加工面"][:20]:
             print("  ", r)
     if len(sys.argv) > 2:
