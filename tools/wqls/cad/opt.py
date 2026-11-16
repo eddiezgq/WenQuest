@@ -262,7 +262,7 @@ def build_T():
     rarm = strip([(pvx, pvy), tipr], 6.0, 186.0, 190.0).cut(cyl(2.55, (pvx, pvy, 185.0), (pvx, pvy, 191.0)))
     P["release_arm_t"] = (rarm, "metal", "steel", None)
     P["release_solenoid"] = (cyl(sr["d"] / 2, (sr["x"][0], tipr[1], 188.0), (sr["x"][1], tipr[1], 188.0)).fuse(
-        cyl(1.5, (sr["x"][1], tipr[1], 188.0), (tipr[0] - 1.5, tipr[1], 188.0))).fuse(box(47.0, 60.0, -38.0, tipr[1] - 6.0, 184.0, 192.0)), "graphite", "copper", None)
+        cyl(1.5, (sr["x"][1], tipr[1], 188.0), (tipr[0] - 1.5, tipr[1], 188.0))).fuse(box(sr["x"][0], sr["x"][0] + 13.0, -38.0, tipr[1] - 6.0, 184.0, 192.0)), "graphite", "copper", None)
     return P
 
 

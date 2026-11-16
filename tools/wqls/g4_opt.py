@@ -51,7 +51,9 @@ GEO = dict(
     link=dict(d=6.0, ball_d=8.0),
     solenoid_trim=dict(x=(108.0, 124.0), stroke=5.0, d=22.0),     # 推摆杆沿摆轴进槽（沿 +x）
     # ⑤ 松线电磁铁：拉立轴拨杆上加的第三条臂（朝 +y 10）往 −x；拨线器：机头左前下方的竖轴
-    sol_release=dict(arm=(0.0, 10.0), x=(47.0, 64.0), d=16.0, stroke=3.0),
+    # G8.0：前轴承座外移 7 mm（x 38…51）后，电磁铁 x 47…64 碰上轴承座 → 电磁铁外移到 x 54…71，臂端跟着外伸 6 mm（arm x 6）；
+    # 电磁铁拉力沿 −x，力臂只看 arm 的 y 分量（10 mm），不变
+    sol_release=dict(arm=(6.0, 10.0), x=(54.0, 71.0), d=16.0, stroke=3.0),
     # 拨线器：竖轴 (−30, −10) 从机头底板的轴座伸下来；钢丝 Ø0.8 在 z 5.3（压脚面 3.3、压脚前端翘起 3.8、耳子 6.8 都让开 ≥ 1.0），长 31；收回时朝 −100°（在压脚前面外侧），扫到 +15° 时钩尖过针前
     wiper=dict(pivot=(-30.0, -10.0), wire_d=0.8, wire_z=5.3, r=31.0, rest_deg=-100.0, sweep_deg=115.0,
                sol=dict(x=(-26.0, -12.0), z=61.5, d=16.0, stroke=10.0)),
@@ -203,7 +205,7 @@ def solenoids():
     ten = CTRL["tension"]
     F_pin = ten["N_range_N"][1] + ten["spring"]["k_Nmm"] * 0.5
     r_pin = math.hypot(*CTRL["geo"]["release"]["r_pin"])
-    r_sol = math.hypot(*GEO["sol_release"]["arm"])
+    r_sol = abs(GEO["sol_release"]["arm"][1])        # 拉力沿 x，力臂是 arm 的 y 分量
     need_rel = F_pin * r_pin / r_sol
     rel = dict(need_N=round(need_rel, 1), pick="24 V 拉式电磁铁 Ø16（示例：行程 3 mm 时 15 N）", F_at_stroke_N=15.0,
                SF=round(15.0 / need_rel, 2), opening_mm=round(GEO["sol_release"]["stroke"] * r_pin / r_sol - 0.5, 2),
