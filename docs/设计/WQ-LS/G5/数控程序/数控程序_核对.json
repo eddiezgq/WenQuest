@@ -29,18 +29,19 @@
  "O1202": {
   "title": "上件 工序 20 卧加粗加工",
   "machine": "HMC-01",
-  "lines": 302,
+  "lines": 318,
   "tools": [
    2,
    3,
    5,
    7,
    14,
-   18
+   18,
+   39
   ],
   "b_indexes": 2,
-  "time_min": 4.85,
-  "cut_min": 3.88,
+  "time_min": 5.18,
+  "cut_min": 4.08,
   "checks": [],
   "sim": [
    {
@@ -199,7 +200,7 @@
  "O1401": {
   "title": "合件 工序 70、80 锥销、测针杆轴线、精加工、钻攻",
   "machine": "HMC-01",
-  "lines": 1117,
+  "lines": 1149,
   "tools": [
    2,
    4,
@@ -245,8 +246,8 @@
    69
   ],
   "b_indexes": 8,
-  "time_min": 24.6,
-  "cut_min": 17.99,
+  "time_min": 25.83,
+  "cut_min": 19.0,
   "checks": [],
   "sim": [
    {
@@ -255,7 +256,7 @@
     "issues": [],
     "over_cells": 0,
     "dev_min": 0.0,
-    "ap_max": 0.0
+    "ap_max": 0.5
    },
    {
     "frame": "B0",
@@ -316,7 +317,7 @@
   ]
  },
  "linebar": {
-  "min_clearance_mm": 0.86,
+  "min_clearance_mm": 0.85,
   "at_x": 374.0
  }
 }
