@@ -37,7 +37,7 @@ FRONT_COVER = os.environ.get("WQ_FRONTCOVER", "1") == "1"
 FC_WIN = (-40.0, 34.0, 118.0, 236.0)       # 机头前盖板窗口 x0, x1, z0, z1（G3）
 X_BRG_REAR = 380.0                         # 后轴承 6201 中心（spec.X_BRG[1]）
 S_X_BRG0 = 45.0                            # 前轴承 6203 中心（spec.X_BRG[0]；G8.0 由 37.5 外移，F 版改 6203）
-X_MID_BUSH, MID_BUSH_D, MID_BUSH_L = 175.0, 26.0, 25.0   # 中间含油轴套（spec.X_MID_BUSH、MID_BUSH；F 版）
+X_MID_BUSH, MID_BUSH_D, MID_BUSH_L = 175.0, 35.0, 25.0   # 中间含油轴套（spec.X_MID_BUSH、MID_BUSH；F 版；孔径 35 见 spec）
 LIP_W_F = 14.0                             # 面板口法兰宽（端面外圆角 R14 占掉约 10 mm，法兰要宽些面板才有贴合面）
 LIP_W, LIP_T, WIN_LIP_D = 8.0, 8.0, 8.0          # G4.3 面板口法兰宽、厚（沿 x），前窗口法兰宽、深（沿 y）（加宽加厚试过：频率不升反降，只是加了机头质量）
 MOTOR_SEAT_X = 408.0                       # G4.3 电机座端面（后轴承座伸出立柱右壁 12 mm）
@@ -598,6 +598,8 @@ def machined_faces(shape):
                 out.append(f)
             elif abs(r - 26.0) < 0.02 and c.x > PIL["x1"] - 0.5:                 # 电机止口 Ø52
                 out.append(f)
+            elif abs(r - 20.0) < 0.02 and abs(c.y) < 0.5 and abs(c.z - ZU) < 0.5:   # F 版前轴承孔 Ø40（6203）
+                out.append(f)
     return out
 
 
@@ -832,9 +834,9 @@ def casting():
             hole = Part.makeCylinder(20, RIB_T + 2, V(x - RIB_T / 2 - 1, 0, ZU), V(1, 0, 0))
             hole = hole.fuse(Part.makeCylinder(12, RIB_T + 2, V(x - RIB_T / 2 - 1, 30, ARMB + 22), V(1, 0, 0)))
             rb.append(sl.common(cav).cut(hole))
-        # G8.0 F 版：中间含油轴套的横隔板（x = X_MID_BUSH）：隔板加 Ø40 × 25 的轴套座，孔 Ø26 压入轴套；留电线、油管孔（同上）
+        # G8.0 F 版：中间含油轴套的横隔板（x = X_MID_BUSH）：隔板加 Ø50 × 25 的轴套座，孔 Ø35 H7 压入轴套；留电线、油管孔（同上）
         sl = Part.makeBox(RIB_T, 400, 400, V(X_MID_BUSH - RIB_T / 2, -200, ARMB - 20)).common(cav)
-        seat = Part.makeCylinder(20.0, MID_BUSH_L, V(X_MID_BUSH - MID_BUSH_L / 2, 0, ZU), V(1, 0, 0))
+        seat = Part.makeCylinder(25.0, MID_BUSH_L, V(X_MID_BUSH - MID_BUSH_L / 2, 0, ZU), V(1, 0, 0))
         hole = Part.makeCylinder(MID_BUSH_D / 2, MID_BUSH_L + 2, V(X_MID_BUSH - MID_BUSH_L / 2 - 1, 0, ZU), V(1, 0, 0))
         hole = hole.fuse(Part.makeCylinder(12, RIB_T + 2, V(X_MID_BUSH - RIB_T / 2 - 1, 30, ARMB + 22), V(1, 0, 0)))
         rb.append(sl.fuse(seat).cut(hole))

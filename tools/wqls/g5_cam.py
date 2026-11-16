@@ -177,12 +177,14 @@ def pair_hmc():
         ops.append(op(f"B0 摆轴镗杆 Ø{d_:g} 镗抬牙摆轴前孔（x 24…38，左端壁 Ø18 工艺孔进）", "LB0", tno, f"摆轴镗杆 Ø{d_:g}", d_, vc_,
                       cam.bore([(gx, gy_)], 38 + 105 + 1, fz_ * r, r_plane=-(24 + 105 - 2)), kind="linebar"))
     r = rpm(140, 34.7)
-    ops.append(op("B0 同轴半精镗上轴两孔 Ø34.7 / Ø31.7（程序按前刀编）", "B0", 25, "同轴半精镗杆", 31.7, 140,
+    # G8.0 F 版：三把刀（前 Ø40、中 Ø35、后 Ø32），按“三孔同时走到孔底”布置：前—中 136.5、前—后 334，进给 25（中孔长），
+    # 后刀先在立柱内腔的空当里走 15 再进 6201 孔；前刀走到 x 51（6203 孔底）时后刀正好到 x 385 台肩，不能多走
+    ops.append(op("B0 同轴半精镗上轴三孔 Ø39.7 / Ø34.7 / Ø31.7（程序按前刀编）", "B0", 25, "同轴半精镗杆", 31.7, 140,
                   [{"t": "comment", "text": "右导向套支架翻上；压板油压降到 40%（M 代码由夹具 PLC 处理）"}]
-                  + cam.bore([(0.0, 0.0)], 62 + 44 + 1, 0.12 * r, r_plane=-(62 + 31 - 2)), kind="linebar"))
+                  + cam.bore([(0.0, 0.0)], 62 + 51, 0.12 * r, r_plane=-(62 + 26 - 2)), kind="linebar"))
     r = rpm(150, 35)
-    ops.append(op("B0 同轴精镗上轴两孔 Ø35 H7 / Ø32 H7（前刀走完 6202 孔时后刀正好走完 6201 孔）", "B0", 13, "同轴精镗杆", 32, 150,
-                  cam.bore([(0.0, 0.0)], 62 + 44 + 1, 0.06 * r, r_plane=-(62 + 31 - 2)), kind="linebar"))
+    ops.append(op("B0 同轴精镗上轴三孔 Ø40 H7 / Ø35 H7 / Ø32 H7（三刀同时走到孔底）", "B0", 13, "同轴精镗杆", 32, 150,
+                  cam.bore([(0.0, 0.0)], 62 + 51, 0.06 * r, r_plane=-(62 + 26 - 2)), kind="linebar"))
     r = rpm(120, 20)
     ops.append(op("B180 镗轴过孔 Ø20 H11", "B180", 4, "精镗刀 Ø20", 20, 120, cam.bore([(0.0, 0.0)], 36, 0.12 * r, r_plane=2)))
     r = rpm(200, 63)
@@ -318,8 +320,8 @@ def upper_hmc_rough():
     r = rpm(160, 63)
     ops.append(op("B0 粗铣面板口端面（留 0.5）", "B0", 2, "面铣刀 Ø63", 63, 160, face_rows(-72, 50, -82, 60, 63, 0.5, 0.15 * 5 * r, stock_top=8)))
     r = rpm(110, 34)
-    ops.append(op("B0 同轴粗镗两轴承孔 Ø34 / Ø31（程序按前刀编）", "B0", 3, "同轴粗镗杆", 31, 110,
-                  cam.bore([(0.0, 0.0)], 62 + 44 + 1, 0.25 * r, r_plane=-(62 + 31 - 2)), kind="linebar"))
+    ops.append(op("B0 同轴粗镗上轴三孔 Ø39 / Ø34 / Ø31（程序按前刀编）", "B0", 3, "同轴粗镗杆", 31, 110,
+                  cam.bore([(0.0, 0.0)], 62 + 51, 0.25 * r, r_plane=-(62 + 26 - 2)), kind="linebar"))
     r = rpm(60, 14)
     ops.append(op("直角铣头 锪针杆孔下端沉孔 Ø14 深 4", "DOWN_HEAD", 18, "锪钻 Ø14", 14, 60, cam.bore([(0.0, 0.0)], 5, 0.08 * r, r_plane=8, safe=15),
                   kind="drill"))
@@ -478,7 +480,7 @@ def simulate(ops, text, machine, tris_blank, tris_part, frames, tol=0.02):
 
 
 def linebar_clearance(tris_part):
-    """同轴镗杆的通过检查：镗杆 Ø28、刀 Ø35（前）/ Ø32（后）、尾部导向柱 Ø17，沿上轴轴线从机头端伸到电机端，
+    """同轴镗杆的通过检查：镗杆 Ø28、刀 Ø40（前）/ Ø35（中）/ Ø32（后）（G8.0 F 版）、尾部导向柱 Ø17，沿上轴轴线从机头端伸到电机端，
     每 2 mm 取一个截面，算轴线周围最近的零件材料（成品）半径，比较镗杆在这一段的半径"""
     import trimesh
     m = trimesh.Trimesh(vertices=tris_part.reshape(-1, 3), faces=np.arange(len(tris_part) * 3).reshape(-1, 3), process=True)
@@ -487,14 +489,11 @@ def linebar_clearance(tris_part):
     _, dist, _ = trimesh.proximity.closest_point(m, pts)
 
     def need(x):
-        if x < 31 or (44 < x < 375):
-            return 14.0                     # 镗杆 Ø28 穿过
-        if x <= 44:
-            return 17.5 - 0.05              # 前刀在 6202 孔里切削（孔本身）
         if x <= 385:
-            return 16.0 - 0.05
+            return 16.0                     # 后刀 Ø32 要从机头端一路穿过去（前孔 Ø40、中孔 Ø35 都比它大）
         return 8.5                          # 尾部导向柱 Ø17 穿过 Ø20 轴过孔
-    worst = min(((float(d) - need(x)), float(x)) for x, d in zip(xs, dist) if not (31 <= x <= 44 or 375 <= x <= 385))
+    holes = ((39, 51), (162.5, 187.5), (375, 385))
+    worst = min(((float(d) - need(x)), float(x)) for x, d in zip(xs, dist) if not any(a <= x <= b for a, b in holes))
     return dict(min_clearance_mm=round(worst[0], 2), at_x=worst[1])
 
 

@@ -174,7 +174,7 @@
     "ok": true
    }
   ],
-  "pdf": "docs/设计/WQ-LS/G5/工艺卡_上件.pdf"
+  "pdf": "/home/claude/wenquest/docs/设计/WQ-LS/G5/工艺卡_上件.pdf"
  },
  "HSG-LS-L": {
   "ops": [
@@ -296,7 +296,7 @@
     "ok": true
    }
   ],
-  "pdf": "docs/设计/WQ-LS/G5/工艺卡_下件.pdf"
+  "pdf": "/home/claude/wenquest/docs/设计/WQ-LS/G5/工艺卡_下件.pdf"
  },
  "HSG-LS-P": {
   "ops": [
@@ -474,6 +474,6 @@
     "ok": true
    }
   ],
-  "pdf": "docs/设计/WQ-LS/G5/工艺卡_合件.pdf"
+  "pdf": "/home/claude/wenquest/docs/设计/WQ-LS/G5/工艺卡_合件.pdf"
  }
 }
