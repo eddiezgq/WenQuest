@@ -50,7 +50,7 @@ JOINT = {frozenset(p) for p in [
     ("oil_box", "casting"), ("oil_wicks", "casting"), ("oil_wicks", "oil_block"), ("oil_wicks", "oil_box"),
     ("oil_wicks", "oil_cups"), ("oil_wicks", "bush_mid"), ("oil_cups", "casting"), ("oil_cups", "needle_bar"),
     ("oil_cups", "nb_bushes"), ("oil_line", "oil_block"), ("oil_line", "oil_box"), ("oil_tubes", "oil_block"),
-    ("oil_tubes", "oil_pump"),
+    ("oil_tubes", "oil_pump"), ("oil_screws", "oil_wicks"),
     ("cage_rod", "rod"), ("cage_rod", "crank_pin"), ("cage_lever", "lever"), ("cage_lever", "crank_pin"),   # G8.0 滚针组件
     ("lever", "pin_M"), ("rocker", "pin_M"), ("rocker", "stud_Q"), ("needle_bar", "nb_link"), ("needle_bar", "needle_clamp"),
     ("needle_clamp", "needle"), ("needle", "needle_bar"), ("shaft", "bearing_front"), ("crank", "bearing_front"),

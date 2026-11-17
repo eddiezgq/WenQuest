@@ -367,7 +367,7 @@ def upper_hmc_rough():
     ops.append(op("B0 中孔粗镗杆粗镗中间轴套孔 Ø34（G8.0 F 版）", "B0", 39, "中孔粗镗杆", 34, 110,
                   cam.bore([(0.0, 0.0)], 62 + 187.5 + 1, 0.25 * r, r_plane=-(62 + 162.5 - 2)), kind="linebar"))
     r = rpm(60, 14)
-    ops.append(op("直角铣头 锪针杆孔下端沉孔 Ø14 深 4", "DOWN_HEAD", 18, "锪钻 Ø14", 14, 60, cam.bore([(0.0, 0.0)], 5, 0.08 * r, r_plane=8, safe=15),
+    ops.append(op("直角铣头 锪针杆孔下端沉孔 Ø20 深 4", "DOWN_HEAD", 18, "锪钻 Ø20", 20, 60, cam.bore([(0.0, 0.0)], 5, 0.08 * r, r_plane=8, safe=15),
                   kind="drill"))
     r = rpm(60, 9.5)
     ops.append(op("直角铣头 钻针杆孔 Ø9.5（钻通上下两个导套座，G8.0 上孔改 Ø10）", "DOWN_HEAD", 41, "钻头 Ø9.5", 9.5, 60,

@@ -956,7 +956,7 @@ def casting():
         hollow = hollow.cut(Part.makeCylinder(6, 30, V(0, 0, 225), V(0, 0, 1)))
         for zs_ in (125.0, 148.0):
             hollow = hollow.cut(Part.makeCylinder(1.475, 11.5, V(S_X_BRG0 - 6.5 - 0.01, 0, zs_), V(1, 0, 0)))
-        hollow = hollow.cut(Part.makeCylinder(7, 14, V(0, 0, 36), V(0, 0, 1)))        # 底下沉孔 Ø14 到 z 50：上止点时针夹进来 0.5 mm
+        hollow = hollow.cut(Part.makeCylinder(10, 14, V(0, 0, 36), V(0, 0, 1)))       # 底下沉孔 Ø20 到 z 50：上止点时针夹（连紧针螺钉头、线钩）进来 3.5 mm（G8.0 第 7 步，原 Ø14）
         hollow = hollow.removeSplitter()
         info["bosses"] = len(bs)
     if DETAIL:

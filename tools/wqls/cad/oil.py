@@ -43,7 +43,7 @@ def box(x, y, z):
 
 def cup(c):
     ring = Part.makeCylinder(c["r_out"], c["h"], V(0, 0, c["z"])).cut(Part.makeCylinder(c["r_in"], c["h"] + 2, V(0, 0, c["z"] - 1)))
-    return ring.common(Part.makeBox(40, 40, c["h"] + 2, V(-3.5, -20, c["z"] - 1)))
+    return ring.common(Part.makeBox(c["x"][1] - c["x"][0], 40, c["h"] + 2, V(c["x"][0], -20, c["z"] - 1)))
 
 
 def build():

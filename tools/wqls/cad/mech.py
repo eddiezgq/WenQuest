@@ -66,7 +66,7 @@ def hole(u, v, rad, x0, t):
 
 
 # G8.0 第 7 步：机构里的小螺钉按 Q/WQ 001（SM 螺纹）。规格 → (大径 d, 头径 dk, 头高 k, 攻丝底孔)，数值同 library/std_tables/thr_sm.yaml
-SM = {"1/8-44": (3.175, 6.0, 1.9, 2.6), "9/64-40": (3.5719, 6.8, 2.1, 2.95), "11/64-40": (4.3656, 8.3, 2.6, 3.75),
+SM = {"3/32-56": (2.3812, 4.5, 1.4, 1.95), "1/8-44": (3.175, 6.0, 1.9, 2.6), "9/64-40": (3.5719, 6.8, 2.1, 2.95), "11/64-40": (4.3656, 8.3, 2.6, 3.75),
       "15/64-28": (5.9531, 11.3, 3.6, 5.05)}
 
 
@@ -135,7 +135,7 @@ nb = nb.makeChamfer(0.5, [e for e in nb.Edges])
 # G8.0 第 6 步：刻线 A、B（宽 0.5、深 0.2）。A：下止点时对齐下导套下端 z 53 → 上止点位置 z 53 + 2r；B 在 A 下方 2.0（钩线时机针回升 2.0）
 for zm in (53.0 + 2 * R, 53.0 + 2 * R - 2.0):
     nb = nb.cut(Part.makeCylinder(4.1, 0.5, V(0, 0, zm - 0.25), V(0, 0, 1)).cut(Part.makeCylinder(3.8, 0.7, V(0, 0, zm - 0.35), V(0, 0, 1))))
-nb = nb.cut(tap("1/8-44", V(0, -4.5, zb + 3.5), V(0, 1, 0), 3.5))                                          # 线钩螺钉孔
+nb = nb.cut(tap("3/32-56", V(0, -4.5, zb + 3.5), V(0, 1, 0), 3.5))                                         # 线钩螺钉孔
 parts["needle_bar"], mats["needle_bar"] = nb, "chrome"
 
 # 针夹（套在针杆下端）和机针 DB×1：针尖到针杆下端 tip_below
@@ -143,15 +143,16 @@ parts["needle_bar"], mats["needle_bar"] = nb, "chrome"
 # G4.7：针夹上移 2.5（针杆下端 −1.5…+6.5）——手抬压脚 5.5 时针杆走到下止点，针夹底离压脚顶 1.5（原来压在压脚上 1 mm）；
 # 上止点时针夹顶到 z 49，机头底沉孔到 z 50
 clamp = Part.makeCylinder(5.5, 8, V(0, 0, zb - 1.5), V(0, 0, 1)).cut(Part.makeCylinder(4.0, 10, V(0, 0, zb - 2.5), V(0, 0, 1)))
-# G8.0 第 7 步：紧针螺钉 SMP 11/64-40 × 5 改到右侧（+x，头朝右）——前面让给线钩；线钩改成单独零件，SMP 1/8-44 × 6 拧进针杆
+# G8.0 第 7 步：紧针螺钉 SMP 9/64-40 × 5 改到右侧（+x，头朝右）——前面让给线钩；线钩改成单独零件（厚 2），SMP 3/32-56 × 5 拧进针杆。
+# 上止点时针夹顶进到机头底沉孔里 3.5 mm：螺钉头、线钩最远到半径 8.7，机头底沉孔由 Ø14 改 Ø20
 clamp = clamp.cut(Part.makeBox(12, 2, 10, V(-6, -7.0, zb - 2.5)))                                              # 前面铣平到 y −5.0，装线钩
-clamp = clamp.cut(tap("11/64-40", V(6, 0, zb + 2.5), V(-1, 0, 0), 6)).cut(tap("1/8-44", V(0, -6, zb + 3.5), V(0, 1, 0), 3))
+clamp = clamp.cut(tap("9/64-40", V(6, 0, zb + 2.5), V(-1, 0, 0), 6)).cut(tap("3/32-56", V(0, -6, zb + 3.5), V(0, 1, 0), 3))
 parts["needle_clamp"], mats["needle_clamp"] = clamp, "metal"
-parts["clamp_screw"], mats["clamp_screw"] = sm_pan("11/64-40", V(5.5, 0, zb + 2.5), V(-1, 0, 0), 5.0), "chrome"
-guide = Part.makeBox(7, 3, 8, V(-3.5, -8.0, zb - 1.5)).cut(Part.makeCylinder(0.9, 9, V(-4.5, -6, zb + 0.3), V(1, 0, 0)))   # 线孔位置不变（面线路径检查用）
-guide = guide.cut(Part.makeCylinder(1.7, 4, V(0, -8.5, zb + 3.5), V(0, 1, 0)))
+parts["clamp_screw"], mats["clamp_screw"] = sm_pan("9/64-40", V(5.5, 0, zb + 2.5), V(-1, 0, 0), 5.0), "chrome"
+guide = Part.makeBox(7, 2, 8, V(-3.5, -7.0, zb - 1.5)).cut(Part.makeCylinder(0.9, 9, V(-4.5, -6, zb + 0.3), V(1, 0, 0)))   # 线孔位置不变（面线路径检查用）
+guide = guide.cut(Part.makeCylinder(1.3, 4, V(0, -7.5, zb + 3.5), V(0, 1, 0)))
 parts["nb_guide"], mats["nb_guide"] = guide, "chrome"
-parts["guide_screw"], mats["guide_screw"] = sm_pan("1/8-44", V(0, -8.0, zb + 3.5), V(0, 1, 0), 6.0), "chrome"
+parts["guide_screw"], mats["guide_screw"] = sm_pan("3/32-56", V(0, -7.0, zb + 3.5), V(0, 1, 0), 5.0), "chrome"
 tip_z = zb - X["tip_below"]
 shank = Part.makeCylinder(0.81, 10.0, V(0, 0, zb - 0.0), V(0, 0, 1))
 blade = Part.makeCylinder(0.45, (zb - tip_z) - 2.0, V(0, 0, tip_z + 2.0), V(0, 0, 1))
