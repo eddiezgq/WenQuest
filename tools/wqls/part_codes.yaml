@@ -18,6 +18,7 @@ groups:
   needle: [刺布挑线, Needle & take-up]
   hook: [旋梭, Rotary hook]
   feed: [送布与油泵, Feed & oil pump]
+  oil: [润滑油路, Lubrication]
   press: [压脚与操纵, Presser & controls]
   optT: [选配件 T：剪线拨线, "Option T: trimmer & wiper"]
   optE: [选配件 E：电子针距, "Option E: electronic stitch"]
@@ -109,13 +110,13 @@ parts:
   oil_plunger: {code: LS-412, name: [油泵柱塞, Oil-pump plunger], kind: buy, group: feed, doc: "G4f#七、油泵与润滑"}
   oil_pump: {code: LS-413, name: [油泵体, Oil-pump body], kind: buy, group: feed, doc: "G4f#七、油泵与润滑"}
   # G8.0 第 7 步 润滑油路（cad/oil.py）
-  oil_block: {code: LS-414, name: [分油块（带溢流孔）, Oil distribution block], kind: buy, group: feed, mat: ADC12, doc: "G8a#第 7 步"}
-  oil_tubes: {code: LS-415, name: [上油铜管 Ø4 与溢流铜管 Ø6, Oil riser and return tubes], kind: buy, group: feed, mat: T2, doc: "G8a#第 7 步"}
-  oil_line: {code: BUY-TUBE-NY2, name: [尼龙油管 Ø2 × 0.4, Nylon oil line], kind: buy, group: feed, doc: "G8a#第 7 步"}
-  oil_box: {code: LS-416, name: [机头油毡盒, Head oil-felt box], kind: buy, group: feed, mat: ADC12, doc: "G8a#第 7 步"}
-  oil_wicks: {code: LS-417, name: [油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头）, Oil wicks], kind: buy, group: feed, doc: "G8a#第 7 步"}
-  oil_cups: {code: LS-418, qty: 2, name: [针杆油毡杯, Needle-bar oil-felt cups], kind: buy, group: feed, doc: "G8a#第 7 步"}
-  oil_screws: {code: BUY-SCR-OIL, sub: [分油块 M4 × 10 两个、油毡盒 SMP 9/64-40 × 12 两个, 2 × M4 × 10 and 2 × SMP 9/64-40 × 12], name: [油路螺钉, Oil-system screws], kind: buy, group: feed, doc: "G8a#第 7 步"}
+  oil_block: {code: LS-414, name: [分油块（带溢流孔）, Oil distribution block], kind: buy, group: oil, mat: ADC12, doc: "G8a#第 7 步"}
+  oil_tubes: {code: LS-415, name: [上油铜管 Ø4 与溢流铜管 Ø6, Oil riser and return tubes], kind: buy, group: oil, mat: T2, doc: "G8a#第 7 步"}
+  oil_line: {code: BUY-TUBE-NY2, name: [尼龙油管 Ø2 × 0.4, Nylon oil line], kind: buy, group: oil, doc: "G8a#第 7 步"}
+  oil_box: {code: LS-416, name: [机头油毡盒, Head oil-felt box], kind: buy, group: oil, mat: ADC12, doc: "G8a#第 7 步"}
+  oil_wicks: {code: LS-417, name: [油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头）, Oil wicks], kind: buy, group: oil, doc: "G8a#第 7 步"}
+  oil_cups: {code: LS-418, qty: 2, name: [针杆油毡杯, Needle-bar oil-felt cups], kind: buy, group: oil, doc: "G8a#第 7 步"}
+  oil_screws: {code: BUY-SCR-OIL, sub: [分油块 M4 × 10 两个、油毡盒 SMP 9/64-40 × 12 两个, 2 × M4 × 10 and 2 × SMP 9/64-40 × 12], name: [油路螺钉, Oil-system screws], kind: buy, group: oil, doc: "G8a#第 7 步"}
   # —— 压脚与操纵件 ——
   presser_bar: {code: LS-501, name: [压脚杆, Presser bar], kind: buy, group: press, doc: "G4c#二、压脚组"}
   presser_collar: {code: LS-502, name: [压脚弹簧座, Presser spring collar], kind: buy, group: press, doc: "G4c#二、压脚组"}

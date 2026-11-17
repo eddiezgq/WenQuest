@@ -208,7 +208,7 @@ const SHOW = {
   shell: mk({ color: 0x8c949c, metalness: 0.2, roughness: 0.55, envMapIntensity: 0.35 }),
 };
 const GLASS = mk({ color: 0xb7bbc0, metalness: 0.3, roughness: 0.4, transparent: true, opacity: 0.2, depthWrite: false });
-const GCOL = { hsg: 0xb9bdc2, main: 0x7d8590, needle: 0x3b7dd8, hook: 0x2a9d8f, feed: 0xe0a33b, press: 0x8e6cc9, optT: 0xd9622b, optE: 0x4caf50 };
+const GCOL = { hsg: 0xb9bdc2, main: 0x7d8590, needle: 0x3b7dd8, hook: 0x2a9d8f, feed: 0xe0a33b, oil: 0xc8a000, press: 0x8e6cc9, optT: 0xd9622b, optE: 0x4caf50 };
 const GMAT = Object.fromEntries(Object.entries(GCOL).map(([k, c]) => [k, mk({ color: c, metalness: 0.3, roughness: 0.45 })]));
 const HL = new Map();
 function hlOf(m) {
@@ -253,8 +253,8 @@ function present(info) {
   return true;
 }
 // 爆炸方向（机器坐标，mm）：机壳不动，各部件往它们装进去的方向退出来
-const GDIR = { hsg: [0, 0, 0], main: [1, 0, 0.15], needle: [-0.9, 0, 0.6], hook: [-0.35, -0.2, -1], feed: [0.1, 0.55, -0.85], press: [-0.6, -0.55, 0.65], optT: [-0.2, -0.9, -0.55], optE: [0.3, 0.75, -0.6] };
-const GLEN = { hsg: 0, main: 240, needle: 120, hook: 150, feed: 130, press: 120, optT: 150, optE: 160 };
+const GDIR = { hsg: [0, 0, 0], main: [1, 0, 0.15], needle: [-0.9, 0, 0.6], hook: [-0.35, -0.2, -1], feed: [0.1, 0.55, -0.85], oil: [0.15, 0.4, 1], press: [-0.6, -0.55, 0.65], optT: [-0.2, -0.9, -0.55], optE: [0.3, 0.75, -0.6] };
+const GLEN = { hsg: 0, main: 240, needle: 120, hook: 150, feed: 130, oil: 110, press: 120, optT: 150, optE: 160 };
 const GC = {};
 function groupCenters() {
   const acc = {};
