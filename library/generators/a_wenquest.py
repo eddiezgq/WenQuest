@@ -7,11 +7,12 @@ engine 写成 wenquest:<造型名>：
     ball_screw     滚珠丝杠副 SFU            linear_guide 直线导轨副 HG 型
     timing_pulley  同步带轮 GT2/HTD          jaw_coupling 梅花形弹性联轴器 LM
     compression_spring 圆柱螺旋压缩弹簧 YA 型（第 5 轮第 5 步）
+    sm_pan         缝纫机盘头一字螺钉（含左旋）  sm_set  缝纫机内六角平端紧定螺钉（Q/WQ 001，WQ-LS G8.0 第 7 步）
 外形是按标准外形尺寸的简化造型（不画螺纹、弹簧垫圈不画扭曲），用于装配、网页预览和课件插图。
 """
 import math
 
-from build123d import Axis, Box, Circle, Cone, Cylinder, Pos, RegularPolygon, Rot, extrude
+from build123d import Axis, Box, Circle, Cone, Cylinder, Pos, RegularPolygon, Rot, extrude, fillet
 
 
 def _ring(r_out, r_in, h):
@@ -181,9 +182,29 @@ def compression_spring(row):
     return [("spring", Pos(0, 0, -0.25 * d) * coil)]
 
 
+def sm_pan(row):
+    """缝纫机盘头一字螺钉（Q/WQ 001）：杆（不画螺纹）+ 盘头（上缘倒圆）+ 一字槽；末端 z=0，头朝 +Z"""
+    d, L, dk, k, n, t = (float(row[x]) for x in ("d_mm", "l_mm", "dk_mm", "k_mm", "n_mm", "t_mm"))
+    shank = Pos(0, 0, L / 2) * Cylinder(d / 2, L)
+    head = Pos(0, 0, L + k / 2) * Cylinder(dk / 2, k)
+    head = fillet(head.edges().group_by(Axis.Z)[-1], min(0.4 * k, 0.15 * dk))
+    head -= Pos(0, 0, L + k - t / 2 + 0.01) * Box(dk * 1.2, n, t + 0.02)
+    return [("screw", shank + head)]
+
+
+def sm_set(row):
+    """缝纫机内六角平端紧定螺钉（Q/WQ 001）：全螺纹杆（不画螺纹）+ 平端倒角 + 内六角；末端 z=0，内六角朝 +Z"""
+    d, L, dp, s, t = (float(row[x]) for x in ("d_mm", "l_mm", "dp_mm", "s_mm", "t_mm"))
+    c = (d - dp) / 2
+    body = Pos(0, 0, c / 2) * Cone(dp / 2, d / 2, c) + Pos(0, 0, c + (L - c) / 2) * Cylinder(d / 2, L - c)
+    body -= Pos(0, 0, L - t / 2 + 0.01) * extrude(RegularPolygon(s / 2, 6, major_radius=False), t + 0.02, both=True)
+    return [("screw", body)]
+
+
 BUILDERS = {"spring_washer": spring_washer, "taper_pin": taper_pin, "lip_seal": lip_seal, "hex_plug": hex_plug,
             "ball_screw": ball_screw, "linear_guide": linear_guide, "timing_pulley": timing_pulley,
-            "jaw_coupling": jaw_coupling, "compression_spring": compression_spring}
+            "jaw_coupling": jaw_coupling, "compression_spring": compression_spring,
+            "sm_pan": sm_pan, "sm_set": sm_set}
 
 
 def build(entry, row):

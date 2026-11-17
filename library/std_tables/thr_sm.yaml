@@ -1,0 +1,94 @@
+# 缝纫机螺纹 SM（JIS B 0226）基本尺寸——由 tools/import_sm.py 生成，勿手改
+standard:
+  code: JIS B 0226
+  title: ミシン用ねじ（缝纫机螺纹）
+note: 基本尺寸按定义计算（见 tools/import_sm.py 开头）；公差未列，按 SM 2 级螺纹量规验收
+columns:
+- - d_mm
+  - 大径
+  - major diameter
+  - mm
+- - P_mm
+  - 螺距
+  - pitch
+  - mm
+- - d2_mm
+  - 基本中径
+  - basic pitch diameter
+  - mm
+- - D1_mm
+  - 基本小径（内螺纹）
+  - basic minor diameter
+  - mm
+- - H1_mm
+  - 基本牙高
+  - basic thread depth
+  - mm
+- - drill_mm
+  - 攻丝底孔（75% 牙高）
+  - tap drill (75 % thread)
+  - mm
+rows:
+- size: SM3/32-56
+  inch: 3/32
+  tpi: 56
+  d_mm: 2.3812
+  P_mm: 0.4536
+  d2_mm: 2.0866
+  D1_mm: 1.8902
+  H1_mm: 0.2455
+  drill_mm: 1.95
+- size: SM1/8-44
+  inch: 1/8
+  tpi: 44
+  d_mm: 3.175
+  P_mm: 0.5773
+  d2_mm: 2.8001
+  D1_mm: 2.5501
+  H1_mm: 0.3125
+  drill_mm: 2.6
+- size: SM9/64-40
+  inch: 9/64
+  tpi: 40
+  d_mm: 3.5719
+  P_mm: 0.635
+  d2_mm: 3.1594
+  D1_mm: 2.8845
+  H1_mm: 0.3437
+  drill_mm: 2.95
+- size: SM5/32-32
+  inch: 5/32
+  tpi: 32
+  d_mm: 3.9688
+  P_mm: 0.7937
+  d2_mm: 3.4532
+  D1_mm: 3.1095
+  H1_mm: 0.4296
+  drill_mm: 3.2
+- size: SM11/64-40
+  inch: 11/64
+  tpi: 40
+  d_mm: 4.3656
+  P_mm: 0.635
+  d2_mm: 3.9532
+  D1_mm: 3.6782
+  H1_mm: 0.3437
+  drill_mm: 3.75
+- size: SM15/64-28
+  inch: 15/64
+  tpi: 28
+  d_mm: 5.9531
+  P_mm: 0.9071
+  d2_mm: 5.3639
+  D1_mm: 4.9711
+  H1_mm: 0.491
+  drill_mm: 5.05
+- size: SM1/4-40
+  inch: 1/4
+  tpi: 40
+  d_mm: 6.35
+  P_mm: 0.635
+  d2_mm: 5.9376
+  D1_mm: 5.6626
+  H1_mm: 0.3437
+  drill_mm: 5.75

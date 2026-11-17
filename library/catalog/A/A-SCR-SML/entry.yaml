@@ -1,0 +1,113 @@
+# A-SCR-SML · 缝纫机盘头一字螺钉，左旋（SM 螺纹）（WQ-LS G8.0 第 7 步）
+schema: 1
+id: A-SCR-SML
+kind: family
+name:
+  zh: 缝纫机盘头一字螺钉，左旋（SM 螺纹）
+  en: Slotted pan head screw, left-hand, sewing-machine thread (SM)
+category: SCR
+tags:
+- 螺钉
+- 缝纫机螺钉
+- SM 螺纹
+- 英制细牙
+- sewing machine screw
+- SM thread
+- 左旋
+- left-hand
+standards:
+- code: Q/WQ 001—2026
+  title: 缝纫机螺纹与螺钉（问渠企业标准；螺纹按 JIS B 0226）
+- code: JIS B 0226
+  title: ミシン用ねじ（缝纫机螺纹）
+params:
+- key: thread
+  zh: 螺纹规格
+  en: Thread
+  role: key
+- key: l_mm
+  zh: 公称长度
+  en: Nominal length
+  role: key
+  unit: mm
+- key: d_mm
+  zh: 螺纹大径
+  en: Major diameter
+  role: dim
+  unit: mm
+- key: P_mm
+  zh: 螺距
+  en: Pitch
+  role: dim
+  unit: mm
+- key: dk_mm
+  zh: 头部直径
+  en: Head diameter
+  role: dim
+  unit: mm
+- key: k_mm
+  zh: 头高
+  en: Head height
+  role: dim
+  unit: mm
+- key: n_mm
+  zh: 槽宽
+  en: Slot width
+  role: dim
+  unit: mm
+- key: t_mm
+  zh: 槽深
+  en: Slot depth
+  role: dim
+  unit: mm
+- key: b_mm
+  zh: 螺纹长度（全螺纹）
+  en: Thread length (full)
+  role: dim
+  unit: mm
+- key: drill_mm
+  zh: 攻丝底孔
+  en: Tap drill
+  role: info
+  unit: mm
+specs: specs.csv
+default: SM9/64-40x6
+model:
+  engine: wenquest:sm_pan
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 螺钉末端在 z=0，轴线沿 Z，头部朝 +Z（紧定螺钉内六角朝 +Z）；不画螺纹；左旋只在标记里体现
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库；螺纹基本尺寸按 JIS B 0226 的定义计算，头部尺寸为问渠企业标准 Q/WQ 001
+  checked:
+    by: Claude
+    'on': '2026-11-16'
+    note: 螺纹按定义计算（大径、螺距、60° 基本牙型）；测试核对公式与单调性。公差未列，按 SM 2 级螺纹量规验收
+  data_sources:
+  - title: improwis 螺纹表：Japanese and Korean threads for sewing machines（SM，60°，JIS
+      B 0226 / KS B 0225）
+    url: https://www.improwis.com/tables/threads2.webt
+    retrieved: '2026-11-16'
+  - title: OSG 螺纹量规样本：ミシン（SM）ねじ 2 级，SM3/32-56 ～ SM1/4-40
+    url: https://osg.co.jp/media_dl/flier/file/p_9.pdf
+    retrieved: '2026-11-16'
+  - title: JUKI DDL-8700 零件表（各规格的用法）
+    url: https://www.juki.co.jp/industrial_j/download_j/manual_j/ddl8700/menu/ddl8700/pdf/partslist.pdf
+    retrieved: '2026-11-16'
+  notes: SM 螺纹是日本缝纫机行业的英制细牙螺纹（名义尺寸用英寸分数，牙数比 UNC/UNF 更细），国内外缝纫机零件普遍沿用。公差待买到 JIS B 0226
+    正文后补进规格表。
+teaching:
+  principle: 左旋SM 螺纹牙型与公制、统一螺纹同为 60°，但直径按英寸分数、牙更细，小直径下牙数多、自锁好，适合缝纫机这类高速振动、零件小的机构。左旋螺钉用在转动件上：选成转动和振动时越拧越紧的旋向。
+  uses:
+  - WQ-LS 平缝机：紧针螺钉、针杆连接块、针杆导轨、线钩、曲柄销
+  courses:
+  - course: 机械设计基础
+    chapter: 螺纹连接
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []
