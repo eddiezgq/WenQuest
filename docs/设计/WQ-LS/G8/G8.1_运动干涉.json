@@ -1,0 +1,1740 @@
+{
+ "pairs": [
+  [
+   "needle_clamp | presser_foot",
+   0.0,
+   136,
+   "C1"
+  ],
+  [
+   "needle_bar | presser_foot",
+   0.0,
+   144,
+   "C0"
+  ],
+  [
+   "clamp_screw | presser_foot",
+   0.0,
+   140,
+   "C1"
+  ],
+  [
+   "hook | moving_knife",
+   0.6,
+   352,
+   "D2"
+  ],
+  [
+   "feed_bar | moving_knife",
+   0.662,
+   336,
+   "D2"
+  ],
+  [
+   "motor_cap | stator_winding",
+   1.0,
+   0,
+   "A0"
+  ],
+  [
+   "presser_collar | presser_bushes",
+   1.0,
+   100,
+   "A0"
+  ],
+  [
+   "needle_clamp | casting",
+   1.0,
+   0,
+   "A2"
+  ],
+  [
+   "reg_slider | casting",
+   1.0,
+   0,
+   "A2"
+  ],
+  [
+   "nb_bushes | crank_pin",
+   1.0,
+   186,
+   "A2"
+  ],
+  [
+   "nb_bushes | rod",
+   1.0,
+   330,
+   "A3"
+  ],
+  [
+   "nb_link | slide_rail",
+   1.0,
+   30,
+   "A4"
+  ],
+  [
+   "nb_bushes | cage_rod",
+   1.0,
+   202,
+   "A4"
+  ],
+  [
+   "needle_bar | casting",
+   1.0,
+   358,
+   "A5"
+  ],
+  [
+   "regulator | casting",
+   1.0,
+   0,
+   "A5"
+  ],
+  [
+   "pin_M | crank",
+   1.0,
+   290,
+   "A5"
+  ],
+  [
+   "moving_knife | casting",
+   1.0,
+   0,
+   "A6"
+  ],
+  [
+   "rocker | casting",
+   1.0,
+   352,
+   "A7"
+  ],
+  [
+   "presser_collar | casting",
+   1.0,
+   100,
+   "A7"
+  ],
+  [
+   "hook | feed_bar",
+   1.073,
+   198,
+   "A5"
+  ],
+  [
+   "needle | bobbin_case",
+   1.08,
+   166,
+   "A0"
+  ],
+  [
+   "stator_core | rotor_magnets",
+   1.099,
+   4,
+   "A0"
+  ],
+  [
+   "feed_bar | casting",
+   1.144,
+   288,
+   "C3"
+  ],
+  [
+   "check_spring | casting",
+   1.15,
+   0,
+   "A5"
+  ],
+  [
+   "lift_rock | casting",
+   1.19,
+   22,
+   "A3"
+  ],
+  [
+   "regulator | feed_link",
+   1.199,
+   340,
+   "A1"
+  ],
+  [
+   "trim_lever | trim_cam",
+   1.199,
+   48,
+   "D1"
+  ],
+  [
+   "oil_tubes | casting",
+   1.25,
+   0,
+   "A1"
+  ],
+  [
+   "feed_rod | casting",
+   1.299,
+   324,
+   "A7"
+  ],
+  [
+   "estep_motor | casting",
+   1.4,
+   0,
+   "A1"
+  ],
+  [
+   "knife_shaft | casting",
+   1.4,
+   0,
+   "A2"
+  ],
+  [
+   "nb_link | rail_screws",
+   1.4,
+   298,
+   "A5"
+  ],
+  [
+   "slide_block | rail_screws",
+   1.4,
+   334,
+   "A6"
+  ],
+  [
+   "release_lever | tension_post",
+   1.4,
+   0,
+   "C3"
+  ],
+  [
+   "hook_shaft | bobbin_case",
+   1.47,
+   358,
+   "A1"
+  ],
+  [
+   "release_lever | release_solenoid",
+   1.472,
+   0,
+   "A3"
+  ],
+  [
+   "slide_rail | rod",
+   1.5,
+   356,
+   "A0"
+  ],
+  [
+   "lever | crank",
+   1.5,
+   358,
+   "A0"
+  ],
+  [
+   "cage_lever | crank",
+   1.5,
+   358,
+   "A0"
+  ],
+  [
+   "feed_bar | fixed_knife",
+   1.5,
+   304,
+   "A0"
+  ],
+  [
+   "crank_pin | oil_cups",
+   1.5,
+   232,
+   "A0"
+  ],
+  [
+   "slide_block | rod",
+   1.5,
+   356,
+   "A1"
+  ],
+  [
+   "cage_rod | oil_cups",
+   1.5,
+   240,
+   "A1"
+  ],
+  [
+   "nb_link | casting",
+   1.5,
+   0,
+   "A3"
+  ],
+  [
+   "rod | lever",
+   1.5,
+   350,
+   "A4"
+  ],
+  [
+   "crank | casting",
+   1.5,
+   352,
+   "A4"
+  ],
+  [
+   "rod | casting",
+   1.5,
+   358,
+   "A5"
+  ],
+  [
+   "lever | shaft",
+   1.5,
+   358,
+   "A5"
+  ],
+  [
+   "fixed_knife | casting",
+   1.5,
+   0,
+   "A5"
+  ],
+  [
+   "nb_link | nb_bushes",
+   1.5,
+   0,
+   "A6"
+  ],
+  [
+   "crank_pin | casting",
+   1.5,
+   206,
+   "A6"
+  ],
+  [
+   "rod | oil_cups",
+   1.5,
+   358,
+   "A7"
+  ],
+  [
+   "cage_rod | cage_lever",
+   1.5,
+   350,
+   "A7"
+  ],
+  [
+   "cage_rod | casting",
+   1.5,
+   218,
+   "A7"
+  ],
+  [
+   "rod | cage_lever",
+   1.501,
+   358,
+   "A5"
+  ],
+  [
+   "cage_lever | shaft",
+   1.501,
+   358,
+   "A5"
+  ],
+  [
+   "cage_rod | lever",
+   1.501,
+   358,
+   "A6"
+  ],
+  [
+   "needle | presser_foot",
+   1.59,
+   224,
+   "C0"
+  ],
+  [
+   "clamp_screw | casting",
+   1.6,
+   0,
+   "A6"
+  ],
+  [
+   "lower_shaft | oil_plunger",
+   1.6,
+   180,
+   "A7"
+  ],
+  [
+   "nb_plug | presser_spring",
+   1.688,
+   0,
+   "A4"
+  ],
+  [
+   "trim_rock | trim_cam",
+   1.694,
+   352,
+   "A4"
+  ],
+  [
+   "feed_rock | trim_solenoid",
+   1.888,
+   4,
+   "A6"
+  ],
+  [
+   "motor_housing | rotor",
+   1.998,
+   24,
+   "A2"
+  ],
+  [
+   "motor_rods | handwheel",
+   1.999,
+   356,
+   "A0"
+  ],
+  [
+   "motor_cap | rotor",
+   1.999,
+   356,
+   "A1"
+  ],
+  [
+   "motor_housing | encoder_disc",
+   1.999,
+   14,
+   "A4"
+  ],
+  [
+   "motor_housing | handwheel",
+   1.999,
+   356,
+   "A5"
+  ],
+  [
+   "needle_bar | crank_pin",
+   2.0,
+   358,
+   "A1"
+  ],
+  [
+   "feed_rock | casting",
+   2.0,
+   358,
+   "A1"
+  ],
+  [
+   "needle_bar | rod",
+   2.0,
+   358,
+   "A2"
+  ],
+  [
+   "hook_shaft | casting",
+   2.0,
+   358,
+   "A2"
+  ],
+  [
+   "needle_bar | cage_rod",
+   2.0,
+   358,
+   "A3"
+  ],
+  [
+   "crank_pin | shaft",
+   2.0,
+   358,
+   "A3"
+  ],
+  [
+   "bearing_front | release_solenoid",
+   2.0,
+   0,
+   "A4"
+  ],
+  [
+   "lift_link | casting",
+   2.0,
+   344,
+   "A4"
+  ],
+  [
+   "presser_bar | casting",
+   2.0,
+   358,
+   "A5"
+  ],
+  [
+   "trim_rock | trim_solenoid",
+   2.0,
+   0,
+   "A5"
+  ],
+  [
+   "lever | casting",
+   2.039,
+   60,
+   "A0"
+  ],
+  [
+   "shaft | feed_rod",
+   2.048,
+   166,
+   "A2"
+  ],
+  [
+   "nb_link | release_shaft",
+   2.061,
+   0,
+   "C1"
+  ],
+  [
+   "hook_shaft | feed_bar",
+   2.074,
+   208,
+   "C0"
+  ],
+  [
+   "presser_bar | presser_spring",
+   2.1,
+   358,
+   "A7"
+  ],
+  [
+   "tension_discs | check_spring",
+   2.15,
+   0,
+   "A2"
+  ],
+  [
+   "crank_screws | casting",
+   2.195,
+   336,
+   "A3"
+  ],
+  [
+   "oil_line | oil_screws",
+   2.214,
+   0,
+   "A2"
+  ],
+  [
+   "oil_line | casting",
+   2.295,
+   0,
+   "A3"
+  ],
+  [
+   "bearing_front | crank_screws",
+   2.4,
+   352,
+   "A4"
+  ],
+  [
+   "crank | knee_rod",
+   2.412,
+   94,
+   "A3"
+  ],
+  [
+   "slide_rail | crank",
+   2.5,
+   358,
+   "A3"
+  ],
+  [
+   "presser_foot | fixed_knife",
+   2.5,
+   100,
+   "A5"
+  ],
+  [
+   "shaft | release_solenoid",
+   2.632,
+   4,
+   "A2"
+  ],
+  [
+   "lower_shaft | feed_link",
+   2.67,
+   108,
+   "C0"
+  ],
+  [
+   "lower_shaft | lift_link",
+   2.857,
+   36,
+   "A4"
+  ],
+  [
+   "gear_hook | casting",
+   2.87,
+   356,
+   "A1"
+  ],
+  [
+   "pulley_lower | casting",
+   2.899,
+   342,
+   "A3"
+  ],
+  [
+   "pulley_upper | feed_ecc",
+   2.9,
+   358,
+   "A1"
+  ],
+  [
+   "motor_housing | rotor_magnets",
+   2.998,
+   24,
+   "A3"
+  ],
+  [
+   "nb_link | lift_bracket",
+   3.0,
+   48,
+   "A3"
+  ],
+  [
+   "crank | oil_box",
+   3.0,
+   202,
+   "A4"
+  ],
+  [
+   "presser_foot | presser_bushes",
+   3.0,
+   0,
+   "C1"
+  ],
+  [
+   "pin_M | crank_screws",
+   3.023,
+   228,
+   "A6"
+  ],
+  [
+   "needle | feed_bar",
+   3.05,
+   240,
+   "A7"
+  ],
+  [
+   "pulley_upper | feed_rod",
+   3.082,
+   64,
+   "C2"
+  ],
+  [
+   "needle | nb_bushes",
+   3.239,
+   0,
+   "A4"
+  ],
+  [
+   "feed_rock | trim_brackets",
+   3.246,
+   356,
+   "A1"
+  ],
+  [
+   "bearings_lower | knee_push",
+   3.284,
+   0,
+   "A3"
+  ],
+  [
+   "link_screws | casting",
+   3.317,
+   0,
+   "A4"
+  ],
+  [
+   "link_screws | nb_bushes",
+   3.317,
+   0,
+   "A7"
+  ],
+  [
+   "pin_M | casting",
+   3.397,
+   60,
+   "A5"
+  ],
+  [
+   "cage_lever | crank_screws",
+   3.412,
+   204,
+   "A1"
+  ],
+  [
+   "stator_winding | rotor_magnets",
+   3.499,
+   4,
+   "A1"
+  ],
+  [
+   "crank | oil_line",
+   3.5,
+   154,
+   "A2"
+  ],
+  [
+   "lower_shaft | trim_lever",
+   3.5,
+   352,
+   "A6"
+  ],
+  [
+   "lever | crank_screws",
+   3.523,
+   220,
+   "A1"
+  ],
+  [
+   "oil_ecc | oil_pump",
+   3.555,
+   8,
+   "A5"
+  ],
+  [
+   "stator_core | rotor",
+   3.599,
+   4,
+   "A7"
+  ],
+  [
+   "oil_line | oil_wicks",
+   3.64,
+   0,
+   "A4"
+  ],
+  [
+   "release_pin | tension_spring",
+   3.643,
+   0,
+   "A7"
+  ],
+  [
+   "trim_cam | casting",
+   3.807,
+   358,
+   "A6"
+  ],
+  [
+   "link_screws | rod",
+   3.817,
+   0,
+   "A1"
+  ],
+  [
+   "trim_rock | casting",
+   3.868,
+   358,
+   "A0"
+  ],
+  [
+   "knee_rod | casting",
+   3.984,
+   0,
+   "A4"
+  ],
+  [
+   "motor_cap | rotor_magnets",
+   3.999,
+   356,
+   "A2"
+  ],
+  [
+   "motor_bolts | rotor",
+   3.999,
+   356,
+   "A6"
+  ],
+  [
+   "motor_bolts | rotor_magnets",
+   3.999,
+   356,
+   "A7"
+  ],
+  [
+   "tension_discs | casting",
+   4.0,
+   0,
+   "A0"
+  ],
+  [
+   "estep_pulley_m | casting",
+   4.0,
+   0,
+   "A2"
+  ],
+  [
+   "nb_link | crank",
+   4.0,
+   358,
+   "A3"
+  ],
+  [
+   "slide_block | crank",
+   4.0,
+   358,
+   "A4"
+  ],
+  [
+   "needle_clamp | nb_bushes",
+   4.0,
+   0,
+   "A5"
+  ],
+  [
+   "crank | oil_wicks",
+   4.0,
+   186,
+   "A5"
+  ],
+  [
+   "motor_cap | stator_core",
+   4.0,
+   0,
+   "A7"
+  ],
+  [
+   "lower_shaft | trim_roller",
+   4.0,
+   352,
+   "A7"
+  ],
+  [
+   "presser_bushes | presser_spring",
+   4.001,
+   0,
+   "A1"
+  ],
+  [
+   "lower_shaft | knee_push",
+   4.208,
+   0,
+   "A4"
+  ],
+  [
+   "nb_bushes | presser_collar",
+   4.209,
+   304,
+   "A4"
+  ],
+  [
+   "nb_link | presser_bushes",
+   4.272,
+   0,
+   "A4"
+  ],
+  [
+   "gear_lower | hook_shaft",
+   4.353,
+   352,
+   "A2"
+  ],
+  [
+   "bobbin_case | moving_knife",
+   4.4,
+   356,
+   "D3"
+  ],
+  [
+   "cage_rod | oil_wicks",
+   4.5,
+   342,
+   "A0"
+  ],
+  [
+   "belt | casting",
+   4.5,
+   0,
+   "A4"
+  ],
+  [
+   "rod | oil_wicks",
+   4.5,
+   358,
+   "A6"
+  ],
+  [
+   "release_rod | casting",
+   4.5,
+   0,
+   "A6"
+  ],
+  [
+   "crank_pin | oil_wicks",
+   4.5,
+   334,
+   "A7"
+  ],
+  [
+   "crank | release_rod",
+   4.622,
+   320,
+   "C3"
+  ],
+  [
+   "trim_solenoid | casting",
+   4.77,
+   0,
+   "A1"
+  ],
+  [
+   "feed_rock | trim_lever",
+   4.868,
+   356,
+   "A3"
+  ],
+  [
+   "estep_belt | casting",
+   4.883,
+   0,
+   "A7"
+  ],
+  [
+   "pulley_lower | bearings_lower",
+   4.899,
+   342,
+   "A4"
+  ],
+  [
+   "presser_foot | casting",
+   5.0,
+   0,
+   "C0"
+  ],
+  [
+   "release_pin | casting",
+   5.0,
+   0,
+   "A7"
+  ],
+  [
+   "bobbin_case | feed_bar",
+   5.083,
+   256,
+   "C2"
+  ],
+  [
+   "needle_bar | presser_collar",
+   5.088,
+   0,
+   "A3"
+  ],
+  [
+   "presser_bushes | release_shaft",
+   5.18,
+   0,
+   "A1"
+  ],
+  [
+   "needle | casting",
+   5.19,
+   358,
+   "A1"
+  ],
+  [
+   "motor_bolts | stator_core",
+   5.218,
+   0,
+   "A4"
+  ],
+  [
+   "crank | oil_screws",
+   5.246,
+   192,
+   "A3"
+  ],
+  [
+   "rod | rocker",
+   5.46,
+   32,
+   "A6"
+  ],
+  [
+   "needle_bar | oil_wicks",
+   5.5,
+   0,
+   "A6"
+  ],
+  [
+   "oil_plunger | casting",
+   5.5,
+   0,
+   "A6"
+  ],
+  [
+   "shaft | belt",
+   5.778,
+   310,
+   "A0"
+  ],
+  [
+   "nb_bushes | presser_spring",
+   5.791,
+   0,
+   "A0"
+  ],
+  [
+   "oil_ecc | oil_tubes",
+   5.808,
+   88,
+   "A6"
+  ],
+  [
+   "motor_bolts | stator_winding",
+   5.836,
+   0,
+   "A5"
+  ],
+  [
+   "nb_bushes | presser_bushes",
+   5.907,
+   0,
+   "A7"
+  ],
+  [
+   "gear_lower | trim_rock",
+   5.946,
+   4,
+   "D1"
+  ],
+  [
+   "stator_winding | rotor",
+   5.999,
+   4,
+   "A0"
+  ],
+  [
+   "knee_rod | oil_tubes",
+   6.0,
+   0,
+   "A1"
+  ],
+  [
+   "bearings_lower | lift_ecc",
+   6.0,
+   358,
+   "A2"
+  ],
+  [
+   "bearings_lower | lift_link",
+   6.0,
+   344,
+   "A3"
+  ],
+  [
+   "gear_lower | casting",
+   6.0,
+   312,
+   "A6"
+  ],
+  [
+   "presser_bar | hand_lifter",
+   6.073,
+   0,
+   "A1"
+  ],
+  [
+   "lift_ecc | casting",
+   6.254,
+   356,
+   "A4"
+  ],
+  [
+   "presser_collar | release_shaft",
+   6.328,
+   304,
+   "A1"
+  ],
+  [
+   "belt | bearings_lower",
+   6.5,
+   0,
+   "A5"
+  ],
+  [
+   "nb_plug | oil_wicks",
+   6.583,
+   0,
+   "A3"
+  ],
+  [
+   "tension_spring | casting",
+   6.706,
+   0,
+   "A0"
+  ],
+  [
+   "nb_bushes | oil_wicks",
+   6.727,
+   0,
+   "A7"
+  ],
+  [
+   "pin_M | shaft",
+   6.943,
+   234,
+   "A2"
+  ],
+  [
+   "shaft | motor_cap",
+   6.999,
+   4,
+   "A3"
+  ],
+  [
+   "shaft | motor_housing",
+   6.999,
+   4,
+   "A5"
+  ],
+  [
+   "needle_bar | release_shaft",
+   7.101,
+   0,
+   "C3"
+  ],
+  [
+   "presser_bar | release_shaft",
+   7.18,
+   0,
+   "A7"
+  ],
+  [
+   "rotor_magnets | encoder_disc",
+   7.211,
+   0,
+   "A1"
+  ],
+  [
+   "trim_lever | casting",
+   7.338,
+   356,
+   "D1"
+  ],
+  [
+   "hook | casting",
+   7.47,
+   356,
+   "A7"
+  ],
+  [
+   "shaft | oil_wicks",
+   7.499,
+   14,
+   "A2"
+  ],
+  [
+   "release_pin | check_spring",
+   7.65,
+   0,
+   "A1"
+  ],
+  [
+   "belt | lower_shaft",
+   7.779,
+   358,
+   "A4"
+  ],
+  [
+   "trim_roller | casting",
+   7.838,
+   356,
+   "D2"
+  ],
+  [
+   "lever | oil_wicks",
+   7.999,
+   332,
+   "A1"
+  ],
+  [
+   "trim_base | trim_rock",
+   8.0,
+   356,
+   "D2"
+  ],
+  [
+   "shaft | release_arm_t",
+   8.027,
+   266,
+   "A1"
+  ],
+  [
+   "feed_rod | regulator",
+   8.199,
+   324,
+   "A1"
+  ],
+  [
+   "lower_shaft | oil_tubes",
+   8.208,
+   0,
+   "A1"
+  ],
+  [
+   "trim_brackets | trim_link",
+   8.383,
+   0,
+   "D1"
+  ],
+  [
+   "rod | stud_Q",
+   8.716,
+   24,
+   "A0"
+  ],
+  [
+   "lift_bracket | casting",
+   9.0,
+   0,
+   "C0"
+  ],
+  [
+   "lift_bracket | presser_bushes",
+   9.0,
+   0,
+   "C1"
+  ],
+  [
+   "slide_block | casting",
+   9.124,
+   0,
+   "A4"
+  ],
+  [
+   "oil_ecc | casting",
+   9.484,
+   8,
+   "A1"
+  ],
+  [
+   "feed_bar | trim_base",
+   9.6,
+   334,
+   "A1"
+  ],
+  [
+   "stator_core | encoder_disc",
+   9.682,
+   356,
+   "A1"
+  ],
+  [
+   "hand_lifter | knee_link",
+   9.847,
+   0,
+   "A7"
+  ],
+  [
+   "stator_winding | casting",
+   9.849,
+   0,
+   "A0"
+  ],
+  [
+   "nb_bushes | lift_bracket",
+   9.849,
+   356,
+   "C2"
+  ],
+  [
+   "pulley_lower | feed_rod",
+   9.898,
+   100,
+   "C0"
+  ],
+  [
+   "feed_link | casting",
+   9.999,
+   340,
+   "A6"
+  ],
+  [
+   "lower_shaft | casting",
+   10.0,
+   358,
+   "A4"
+  ],
+  [
+   "stator_winding | encoder_disc",
+   10.049,
+   356,
+   "A2"
+  ],
+  [
+   "nb_plug | rocker",
+   10.148,
+   236,
+   "A3"
+  ],
+  [
+   "oil_plunger | oil_tubes",
+   10.208,
+   0,
+   "A3"
+  ],
+  [
+   "knee_link | casting",
+   10.484,
+   0,
+   "C3"
+  ],
+  [
+   "cage_rod | rocker",
+   10.51,
+   32,
+   "A0"
+  ],
+  [
+   "shaft | motor_bolts",
+   10.749,
+   4,
+   "A4"
+  ],
+  [
+   "needle | moving_knife",
+   10.838,
+   134,
+   "A4"
+  ],
+  [
+   "pulley_upper | casting",
+   10.899,
+   342,
+   "A1"
+  ],
+  [
+   "estep_bracket | estep_pulley_r",
+   11.0,
+   0,
+   "A3"
+  ],
+  [
+   "nb_link | oil_wicks",
+   11.5,
+   0,
+   "A4"
+  ],
+  [
+   "cage_lever | oil_wicks",
+   11.549,
+   332,
+   "A1"
+  ],
+  [
+   "nb_plug | oil_screws",
+   11.761,
+   0,
+   "A1"
+  ],
+  [
+   "lift_bracket | knee_c2",
+   11.831,
+   356,
+   "C1"
+  ],
+  [
+   "rocker | crank_pin",
+   12.46,
+   32,
+   "A3"
+  ],
+  [
+   "bobbin_case | casting",
+   12.817,
+   0,
+   "A0"
+  ],
+  [
+   "shaft | oil_tubes",
+   12.999,
+   8,
+   "A6"
+  ],
+  [
+   "cage_lever | casting",
+   13.0,
+   358,
+   "A0"
+  ],
+  [
+   "estep_bracket | estep_belt",
+   13.0,
+   0,
+   "A4"
+  ],
+  [
+   "nb_link | oil_cups",
+   13.7,
+   0,
+   "A5"
+  ],
+  [
+   "nb_bushes | release_shaft",
+   14.133,
+   0,
+   "C0"
+  ],
+  [
+   "release_arm_t | casting",
+   14.205,
+   0,
+   "A4"
+  ],
+  [
+   "gear_lower | trim_brackets",
+   14.222,
+   350,
+   "A6"
+  ],
+  [
+   "regulator | estep_pulley_m",
+   15.045,
+   0,
+   "C1"
+  ],
+  [
+   "slide_rail | oil_cups",
+   15.16,
+   0,
+   "A5"
+  ],
+  [
+   "link_screws | oil_cups",
+   15.517,
+   0,
+   "A6"
+  ],
+  [
+   "tension_nut | casting",
+   16.0,
+   0,
+   "A7"
+  ],
+  [
+   "slide_block | oil_cups",
+   16.392,
+   0,
+   "A6"
+  ],
+  [
+   "lower_shaft | feed_rod",
+   16.868,
+   92,
+   "C1"
+  ],
+  [
+   "crank_screws | oil_wicks",
+   17.076,
+   332,
+   "A4"
+  ],
+  [
+   "lever | release_rod",
+   17.221,
+   142,
+   "A3"
+  ],
+  [
+   "slide_rail | oil_wicks",
+   17.495,
+   0,
+   "A4"
+  ],
+  [
+   "presser_screw | oil_wicks",
+   18.834,
+   0,
+   "A3"
+  ],
+  [
+   "shaft | rotor_magnets",
+   19.0,
+   358,
+   "A2"
+  ],
+  [
+   "belt | knee_rod",
+   19.309,
+   0,
+   "C3"
+  ],
+  [
+   "feed_bar | knife_shaft",
+   19.391,
+   288,
+   "C3"
+  ],
+  [
+   "belt | knee_c1",
+   19.714,
+   0,
+   "C2"
+  ],
+  [
+   "motor_housing | casting",
+   20.0,
+   0,
+   "A2"
+  ],
+  [
+   "slide_block | oil_wicks",
+   20.07,
+   358,
+   "A5"
+  ],
+  [
+   "trim_brackets | trim_lever",
+   20.1,
+   358,
+   "A2"
+  ],
+  [
+   "bearing_front | oil_wicks",
+   21.26,
+   0,
+   "A4"
+  ],
+  [
+   "release_shaft | oil_cups",
+   21.342,
+   0,
+   "C3"
+  ],
+  [
+   "link_screws | oil_wicks",
+   21.5,
+   0,
+   "A5"
+  ],
+  [
+   "shaft | stator_core",
+   22.599,
+   4,
+   "A7"
+  ],
+  [
+   "regulator | oil_tubes",
+   23.327,
+   0,
+   "A2"
+  ],
+  [
+   "feed_link | oil_tubes",
+   23.858,
+   108,
+   "C3"
+  ],
+  [
+   "bearings_lower | trim_lever",
+   24.0,
+   0,
+   "A5"
+  ],
+  [
+   "shaft | stator_winding",
+   24.999,
+   4,
+   "A0"
+  ],
+  [
+   "motor_rods | rotor",
+   26.385,
+   14,
+   "A5"
+  ],
+  [
+   "feed_bar | trim_brackets",
+   27.6,
+   334,
+   "A3"
+  ],
+  [
+   "motor_bolts | motor_housing",
+   27.75,
+   0,
+   "A2"
+  ],
+  [
+   "release_shaft | oil_wicks",
+   27.847,
+   0,
+   "C2"
+  ],
+  [
+   "oil_tubes | estep_belt",
+   27.895,
+   0,
+   "A7"
+  ],
+  [
+   "motor_rods | encoder_disc",
+   27.95,
+   336,
+   "A7"
+  ],
+  [
+   "reg_slider | oil_tubes",
+   28.347,
+   108,
+   "C3"
+  ],
+  [
+   "lever | oil_screws",
+   28.557,
+   56,
+   "A7"
+  ],
+  [
+   "oil_tubes | estep_pulley_r",
+   29.395,
+   0,
+   "A6"
+  ],
+  [
+   "rail_screws | oil_wicks",
+   29.685,
+   0,
+   "A2"
+  ],
+  [
+   "rocker | oil_screws",
+   30.793,
+   234,
+   "A6"
+  ],
+  [
+   "oil_tubes | estep_bracket",
+   31.187,
+   0,
+   "A4"
+  ],
+  [
+   "bearings_lower | feed_rod",
+   31.75,
+   100,
+   "C0"
+  ],
+  [
+   "bearings_lower | trim_roller",
+   32.6,
+   358,
+   "A6"
+  ],
+  [
+   "presser_bushes | hand_lifter",
+   32.815,
+   0,
+   "A3"
+  ],
+  [
+   "feed_ecc | casting",
+   36.999,
+   336,
+   "A0"
+  ],
+  [
+   "bearings_lower | trim_cam",
+   38.0,
+   358,
+   "A7"
+  ],
+  [
+   "trim_link | casting",
+   39.172,
+   356,
+   "D3"
+  ],
+  [
+   "bearings_lower | feed_link",
+   39.999,
+   332,
+   "A7"
+  ],
+  [
+   "oil_tubes | estep_motor",
+   40.202,
+   0,
+   "A3"
+  ],
+  [
+   "shaft | motor_rods",
+   42.499,
+   4,
+   "A6"
+  ],
+  [
+   "bearings_lower | oil_tubes",
+   47.0,
+   0,
+   "A0"
+  ],
+  [
+   "bearings_lower | regulator",
+   47.245,
+   0,
+   "C1"
+  ],
+  [
+   "bearings_lower | oil_pump",
+   66.0,
+   0,
+   "A7"
+  ],
+  [
+   "bearings_lower | oil_plunger",
+   69.0,
+   0,
+   "A6"
+  ],
+  [
+   "bearings_lower | estep_pulley_r",
+   69.345,
+   0,
+   "A0"
+  ],
+  [
+   "bearings_lower | oil_ecc",
+   69.999,
+   336,
+   "A5"
+  ],
+  [
+   "bearings_lower | estep_belt",
+   73.03,
+   0,
+   "A1"
+  ]
+ ],
+ "too_close": [
+  [
+   "C0",
+   [
+    "needle_bar | presser_foot",
+    0.0,
+    144
+   ]
+  ],
+  [
+   "C1",
+   [
+    "needle_clamp | presser_foot",
+    0.0,
+    136
+   ]
+  ],
+  [
+   "C1",
+   [
+    "clamp_screw | presser_foot",
+    0.0,
+    140
+   ]
+  ]
+ ]
+}
