@@ -59,7 +59,7 @@ def main():
     pe = (Ew[0] - Pw[0], Ew[1] - Pw[1])
     g_tk = ((c[1] - Pw[0]) * pe[0] + (c[2] - Pw[1]) * pe[1]) / (pe[0] ** 2 + pe[1] ** 2)
     bal = info["balance"]
-    dyn_mass = dict(m_bar=round(sum(P[k]["mass_kg"] for k in ("needle_bar", "needle_clamp", "needle", "nb_link", "slide_block") if k in P), 4),
+    dyn_mass = dict(m_bar=round(sum(P[k]["mass_kg"] for k in ("needle_bar", "needle_clamp", "needle", "nb_link", "slide_block", "clamp_screw", "nb_guide", "guide_screw", "link_screws") if k in P), 4),
                     m_rod=P["rod"]["mass_kg"], g_rod=round(bal["g_rod_mm"] / S.SEW["l"], 3), I_rod=round(P["rod"]["Ixx_kgmm2"] * 1e-6, 8),
                     m_pin=round(P["crank_pin"]["mass_kg"] + 0.010, 4), m_tk=P["lever"]["mass_kg"], g_tk=round(g_tk, 3))
     res = dict(dyn_mass=dyn_mass, balance=bal, parts={k: dict(mass_g=round(v["mass_kg"] * 1000, 1), material=v["material"]) for k, v in P.items()},

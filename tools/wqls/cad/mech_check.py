@@ -39,6 +39,18 @@ JOINT = {frozenset(p) for p in [
     # G8.0 第 6 步：滑块套在连接销上、在导轨里滑；导轨和螺钉装在机壳竖筋上；针杆在上下导套里；橡胶塞在机头顶孔里
     ("slide_block", "nb_link"), ("slide_block", "slide_rail"), ("slide_rail", "casting"), ("rail_screws", "slide_rail"),
     ("rail_screws", "casting"), ("needle_bar", "nb_bushes"), ("nb_bushes", "casting"), ("nb_plug", "casting"),
+    # G8.0 第 7 步：SM 螺钉拧在各自的零件里（紧针螺钉顶住机针，线钩螺钉穿过针夹拧进针杆，连接块紧定螺钉顶住针杆，曲柄销螺钉、曲柄紧定螺钉）
+    ("clamp_screw", "needle_clamp"), ("clamp_screw", "needle_bar"), ("clamp_screw", "needle"), ("nb_guide", "needle_clamp"),
+    ("guide_screw", "nb_guide"), ("guide_screw", "needle_clamp"), ("guide_screw", "needle_bar"),
+    ("link_screws", "nb_link"), ("link_screws", "needle_bar"),
+    ("crank_screws", "crank"), ("crank_screws", "crank_pin"), ("crank_screws", "shaft"),
+    # G8.0 第 7 步 润滑：分油块和油毡盒用螺钉装在机壳上；油芯压在中间轴套上、插进油毡杯；油毡杯坐在导套座上、贴着针杆；
+    # 铜管、尼龙管插在分油块、油毡盒、油泵的接头里。管子穿机壳的地方（过管孔）不算接触，要查间隙
+    ("oil_block", "casting"), ("oil_screws", "casting"), ("oil_screws", "oil_block"), ("oil_screws", "oil_box"),
+    ("oil_box", "casting"), ("oil_wicks", "casting"), ("oil_wicks", "oil_block"), ("oil_wicks", "oil_box"),
+    ("oil_wicks", "oil_cups"), ("oil_wicks", "bush_mid"), ("oil_cups", "casting"), ("oil_cups", "needle_bar"),
+    ("oil_cups", "nb_bushes"), ("oil_line", "oil_block"), ("oil_line", "oil_box"), ("oil_tubes", "oil_block"),
+    ("oil_tubes", "oil_pump"),
     ("cage_rod", "rod"), ("cage_rod", "crank_pin"), ("cage_lever", "lever"), ("cage_lever", "crank_pin"),   # G8.0 滚针组件
     ("lever", "pin_M"), ("rocker", "pin_M"), ("rocker", "stud_Q"), ("needle_bar", "nb_link"), ("needle_bar", "needle_clamp"),
     ("needle_clamp", "needle"), ("needle", "needle_bar"), ("shaft", "bearing_front"), ("crank", "bearing_front"),

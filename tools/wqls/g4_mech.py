@@ -168,7 +168,8 @@ def frames(step=2):
         rck = rigid(w(lp0["Q"]), w(lp0["M"]), w(lp["Q"]), w(lp["M"]))
         dM = w(lp["M"]) - w(lp0["M"])
         rot = rot_x(phi)
-        M = dict(shaft=rot, crank=rot, crank_pin=rot, needle_bar=tb, needle_clamp=tb, needle=tb, nb_link=tb, slide_block=tb, rod=rod,
+        M = dict(shaft=rot, crank=rot, crank_pin=rot, crank_screws=rot, needle_bar=tb, needle_clamp=tb, needle=tb, nb_link=tb, slide_block=tb, rod=rod,
+                 clamp_screw=tb, nb_guide=tb, guide_screw=tb, link_screws=tb,          # G8.0 第 7 步：随针杆动的螺钉、线钩
                  lever=lev, rocker=rck, pin_M=trans(*dM), cage_rod=rod, cage_lever=lev,   # G8.0 滚针组件跟着杆走
                  rotor=rot, rotor_magnets=rot, encoder_disc=rot, handwheel=rot, handwheel_ring=rot,   # G4.3 电机转子、码盘、手轮随上轴转
                  pulley_upper=rot)

@@ -29,7 +29,7 @@ worst = {}
 for f in FR[:: max(1, STEP // 2)]:
     pts = [V(*p) for p in f["thread"]]
     own = f.get("thread_own", [""] * len(pts))
-    OWNER = dict(tension=("tension_post", "tension_discs"), lever=("lever",), needle_clamp=("needle_clamp",), needle=("needle",),
+    OWNER = dict(tension=("tension_post", "tension_discs"), lever=("lever",), needle_clamp=("needle_clamp", "nb_guide"), needle=("needle",),
                  check_spring=("check_spring",), thread_guide=("thread_guide",))
     segs = []
     for i in range(len(pts) - 1):

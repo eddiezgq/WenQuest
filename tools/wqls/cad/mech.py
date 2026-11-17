@@ -65,6 +65,26 @@ def hole(u, v, rad, x0, t):
     return disc(u, v, rad, x0 - 1, t + 2)
 
 
+# G8.0 第 7 步：机构里的小螺钉按 Q/WQ 001（SM 螺纹）。规格 → (大径 d, 头径 dk, 头高 k, 攻丝底孔)，数值同 library/std_tables/thr_sm.yaml
+SM = {"1/8-44": (3.175, 6.0, 1.9, 2.6), "9/64-40": (3.5719, 6.8, 2.1, 2.95), "11/64-40": (4.3656, 8.3, 2.6, 3.75),
+      "15/64-28": (5.9531, 11.3, 3.6, 5.05)}
+
+
+def sm_pan(size, p0, u, L):
+    """盘头螺钉：头的支承面在 p0，杆沿单位向量 u 伸进去 L，头在反方向（不画螺纹）"""
+    d, dk, k, _ = SM[size]
+    return Part.makeCylinder(d / 2, L, p0, u).fuse(Part.makeCylinder(dk / 2, k, p0 - u * k, u))
+
+
+def sm_set(size, p0, u, L):
+    """紧定螺钉：外端面在 p0，沿 u 伸进去 L"""
+    return Part.makeCylinder(SM[size][0] / 2, L, p0, u)
+
+
+def tap(size, p0, u, depth):
+    return Part.makeCylinder(SM[size][3] / 2, depth, p0, u)
+
+
 def pocket(c1, r1, c2, r2, x0, t):
     return link2(c1, r1, c2, r2, x0, t)
 
@@ -115,6 +135,7 @@ nb = nb.makeChamfer(0.5, [e for e in nb.Edges])
 # G8.0 第 6 步：刻线 A、B（宽 0.5、深 0.2）。A：下止点时对齐下导套下端 z 53 → 上止点位置 z 53 + 2r；B 在 A 下方 2.0（钩线时机针回升 2.0）
 for zm in (53.0 + 2 * R, 53.0 + 2 * R - 2.0):
     nb = nb.cut(Part.makeCylinder(4.1, 0.5, V(0, 0, zm - 0.25), V(0, 0, 1)).cut(Part.makeCylinder(3.8, 0.7, V(0, 0, zm - 0.35), V(0, 0, 1))))
+nb = nb.cut(tap("1/8-44", V(0, -4.5, zb + 3.5), V(0, 1, 0), 3.5))                                          # 线钩螺钉孔
 parts["needle_bar"], mats["needle_bar"] = nb, "chrome"
 
 # 针夹（套在针杆下端）和机针 DB×1：针尖到针杆下端 tip_below
@@ -122,9 +143,15 @@ parts["needle_bar"], mats["needle_bar"] = nb, "chrome"
 # G4.7：针夹上移 2.5（针杆下端 −1.5…+6.5）——手抬压脚 5.5 时针杆走到下止点，针夹底离压脚顶 1.5（原来压在压脚上 1 mm）；
 # 上止点时针夹顶到 z 49，机头底沉孔到 z 50
 clamp = Part.makeCylinder(5.5, 8, V(0, 0, zb - 1.5), V(0, 0, 1)).cut(Part.makeCylinder(4.0, 10, V(0, 0, zb - 2.5), V(0, 0, 1)))
-clamp = clamp.fuse(Part.makeCylinder(2.0, 4, V(0, -5, zb + 2.5), V(0, -1, 0)))                             # 紧针螺钉 M4
-clamp = clamp.fuse(Part.makeBox(3, 3, 3.5, V(-1.5, -7.5, zb - 1.5)).cut(Part.makeCylinder(0.9, 5, V(-2, -6, zb + 0.3), V(1, 0, 0))))  # 针杆线钩
+# G8.0 第 7 步：紧针螺钉 SMP 11/64-40 × 5 改到右侧（+x，头朝右）——前面让给线钩；线钩改成单独零件，SMP 1/8-44 × 6 拧进针杆
+clamp = clamp.cut(Part.makeBox(12, 2, 10, V(-6, -7.0, zb - 2.5)))                                              # 前面铣平到 y −5.0，装线钩
+clamp = clamp.cut(tap("11/64-40", V(6, 0, zb + 2.5), V(-1, 0, 0), 6)).cut(tap("1/8-44", V(0, -6, zb + 3.5), V(0, 1, 0), 3))
 parts["needle_clamp"], mats["needle_clamp"] = clamp, "metal"
+parts["clamp_screw"], mats["clamp_screw"] = sm_pan("11/64-40", V(5.5, 0, zb + 2.5), V(-1, 0, 0), 5.0), "chrome"
+guide = Part.makeBox(7, 3, 8, V(-3.5, -8.0, zb - 1.5)).cut(Part.makeCylinder(0.9, 9, V(-4.5, -6, zb + 0.3), V(1, 0, 0)))   # 线孔位置不变（面线路径检查用）
+guide = guide.cut(Part.makeCylinder(1.7, 4, V(0, -8.5, zb + 3.5), V(0, 1, 0)))
+parts["nb_guide"], mats["nb_guide"] = guide, "chrome"
+parts["guide_screw"], mats["guide_screw"] = sm_pan("1/8-44", V(0, -8.0, zb + 3.5), V(0, 1, 0), 6.0), "chrome"
 tip_z = zb - X["tip_below"]
 shank = Part.makeCylinder(0.81, 10.0, V(0, 0, zb - 0.0), V(0, 0, 1))
 blade = Part.makeCylinder(0.45, (zb - tip_z) - 2.0, V(0, 0, tip_z + 2.0), V(0, 0, 1))
@@ -142,8 +169,14 @@ blk = rounded(blk, 1.5) if False else blk
 SB = dict(x=(13.5, 23.0), h=16.0, w=10.0)          # 滑块：x 范围、高（z）、宽（y，两滑动面 y ±5，10 × 16 = 160 mm²）
 RAIL = dict(z=(113.0, 170.0), back=(24.0, 38.5), back_top=156.0, jaw=4.0, screws=(125.0, 148.0))
 blk = blk.fuse(Part.makeCylinder(3.0, SB["x"][1] - 6, V(6, 0, zB), V(1, 0, 0)))         # 销外端与滑块外面平齐（x 23.0），离导轨背板 1.0
-blk = blk.fuse(Part.makeCylinder(2.5, 8, V(0, 4, zB), V(0, 1, 0)).cut(Part.makeCylinder(4.0, 20, V(0, 0, zB - 10), V(0, 0, 1))))  # 夹紧螺钉
+# G8.0 第 7 步：两个紧定螺钉 SMS 11/64-40 × 4（后面 +y，z ±4），平端顶在针杆上
+nls = None
+for dz in (-4.0, 4.0):
+    blk = blk.cut(tap("11/64-40", V(0, 7.5, zB + dz), V(0, -1, 0), 4))
+    s_ = sm_set("11/64-40", V(0, 7.0, zB + dz), V(0, -1, 0), 4.0).translate(V(0, 0.0, 0))
+    nls = s_ if nls is None else nls.fuse(s_)
 parts["nb_link"], mats["nb_link"] = blk, "metal"
+parts["link_screws"], mats["link_screws"] = nls, "black"
 
 # G8.0 第 6 步：滑块（GCr15 淬硬）套在连接销外端，能绕销转，连杆斜了滑块仍平贴导轨；导轨（45 钢淬火，U 形）夹住滑块前后两面，
 # 背板用两个 SM 9/64-40 螺钉固定在前轴承座下面的竖筋（x 38.5）上，螺钉头沉在背板里（滑块从上面滑过）
@@ -158,25 +191,23 @@ for sy in (1, -1):
     y0_ = SB["w"] / 2 + 0.02 if sy > 0 else -SB["w"] / 2 - 0.02 - jw
     rail = rail.fuse(Part.makeBox(RAIL["back"][0] + 0.5 - SB["x"][0], jw, rz1 - rz0, V(SB["x"][0], y0_, rz0)))   # 导轨面只到 x 24.5：再往后是曲柄平衡块的扫掠区
 rail = rail.removeSplitter()
-for zs in RAIL["screws"]:                                   # 通孔 Ø3.8、沉头孔 Ø6.5 × 3
-    rail = rail.cut(Part.makeCylinder(1.9, 20, V(RAIL["back"][0] - 1, 0, zs), V(1, 0, 0)))
-    rail = rail.cut(Part.makeCylinder(3.25, 3.5, V(RAIL["back"][0] - 0.5, 0, zs), V(1, 0, 0)))
+for zs in RAIL["screws"]:                                   # Q/WQ 001：通孔 Ø3.9，盘头沉孔 Ø7.5 × 2.5
+    rail = rail.cut(Part.makeCylinder(1.95, 20, V(RAIL["back"][0] - 1, 0, zs), V(1, 0, 0)))
+    rail = rail.cut(Part.makeCylinder(3.75, 3.5, V(RAIL["back"][0] - 1.0, 0, zs), V(1, 0, 0)))
 parts["slide_rail"], mats["slide_rail"] = rail, "metal"
 scr = None
-for zs in RAIL["screws"]:                                   # SM 9/64-40（大径 3.57）× 16，头 Ø6 × 2.5，沉在背板里
-    s_ = Part.makeCylinder(3.0, 2.5, V(RAIL["back"][0] + 0.5, 0, zs), V(1, 0, 0)).fuse(
-        Part.makeCylinder(1.78, 16.0, V(RAIL["back"][0] + 3.0, 0, zs), V(1, 0, 0)))
+for zs in RAIL["screws"]:                                   # SMP 9/64-40 × 20（头 Ø6.8 × 2.1 沉在背板里，拧进机壳竖筋 8.1，≥ 1.5d）
+    s_ = sm_pan("9/64-40", V(RAIL["back"][0] + 2.5, 0, zs), V(1, 0, 0), 20.0)
     scr = s_ if scr is None else scr.fuse(s_)
 parts["rail_screws"], mats["rail_screws"] = scr, "black"
 
-# G8.0 第 6 步：针杆上、下导套，后面（+y）各一个 Ø2 径向油孔（对着机壳的油芯孔，润滑系统另做）
+# G8.0 第 6 步：针杆上、下导套。第 7 步：导套上不开油孔——油从导套座顶上的油毡杯（cad/oil.py）抹到针杆上，由针杆带进导套
 # 下导套：烧结含油青铜 Ø8 × Ø12 × 20。上导套：卷制青铜轴套 Ø8 × Ø10 × 12（ISO 3547，CuSn8，壁厚 1）——上导套旁边就是连杆
 # （x 6 起）和曲柄销、滚针组件，Ø12 的导套外圆正好贴到 x 6，所以上面改用薄壁卷制轴套，外圆到 x 5，离连杆 1.0
 NB_BUSH = dict(up=(170.0, 12.0, 5.0), low=(53.0, 20.0, 6.0))
 bsh = None
 for z0_, L_, ro_ in NB_BUSH.values():
     b_ = Part.makeCylinder(ro_, L_, V(0, 0, z0_), V(0, 0, 1)).cut(Part.makeCylinder(4.01, L_ + 2, V(0, 0, z0_ - 1), V(0, 0, 1)))
-    b_ = b_.cut(Part.makeCylinder(1.0, 8, V(0, 0, z0_ + L_ / 2), V(0, 1, 0)))
     bsh = b_ if bsh is None else bsh.fuse(b_)
 parts["nb_bushes"], mats["nb_bushes"] = bsh, "metal"
 
@@ -261,6 +292,11 @@ parts["bush_mid"], mats["bush_mid"] = (Part.makeCylinder(mb["D"] / 2, mb["L"], V
 
 
 # 曲柄（带平衡块）：毂 Ø30 夹在轴端，销座 Ø20；平衡块是销对面的一块扇形，半径 R_CW，张角由平衡要求定
+CRANK_SCREWS = [(V((X["web"][0] + X["web"][1]) / 2, 0, ZU - 16.5), V(0, 0, 1)),
+                (V((X["web"][0] + X["web"][1]) / 2, -16.5 * math.sin(60 * DEG), ZU - 16.5 * math.cos(60 * DEG)),
+                 V(0, math.sin(60 * DEG), math.cos(60 * DEG)))]
+
+
 def crank(half_deg):
     x0, x1 = X["web"]
     t = x1 - x0
@@ -277,9 +313,11 @@ def crank(half_deg):
     body = rounded(body, 3.0)
     body = body.cut(Part.makeCylinder(8.5, t + 2, V(x0 - 1, 0, ZU), V(1, 0, 0)))          # 轴孔 Ø17（F 版）
     body = body.cut(hole(*C0, PIN_R, x0, t))                                               # 销孔 Ø10 压配
-    body = body.cut(Part.makeCylinder(2.5, 16, V((x0 + x1) / 2, 0, ZU - 17), V(0, 0, 1)))  # 紧定螺钉 M5 ×2
-    body = body.cut(Part.makeCylinder(2.5, 16, V((x0 + x1) / 2, -17 * math.sin(60 * DEG), ZU - 17 * math.cos(60 * DEG)),
-                                      V(0, math.sin(60 * DEG), math.cos(60 * DEG))))
+    for p_, u_ in CRANK_SCREWS:                                                            # 紧定螺钉 SMS 15/64-28 × 8 ×2（G8.0 第 7 步，原 M5）
+        body = body.cut(tap("15/64-28", p_ - u_ * (X["R_cw"] - 16.5 + 1.0), u_, X["R_cw"] - 8.5 + 1.0))   # 螺孔从平衡块外圆通到轴孔，扳手从外面伸进去
+    # 曲柄销固定（第 7 项）：SML 9/64-40 × 8 左旋，从曲柄背面沿销轴线拧进销端；背面沉孔 Ø7.5 × 2.5、通孔 Ø3.9
+    yc, zc = W(*C0)
+    body = body.cut(Part.makeCylinder(3.75, 3.0, V(x1 - 2.5, yc, zc), V(1, 0, 0))).cut(Part.makeCylinder(1.95, 10, V(x0, yc, zc), V(1, 0, 0)))
     return body
 
 
@@ -311,6 +349,12 @@ for _ in range(30):
 cr = crank(hi)
 mv, mu_ = moment_about_axis(cr)
 parts["crank"], mats["crank"] = cr, "metal"
+yc_, zc_ = W(*C0)
+parts["crank_pin"] = parts["crank_pin"].cut(tap("9/64-40", V(X["web"][0] + 4.0, yc_, zc_), V(-1, 0, 0), 7.5))   # 销端螺孔：螺纹 4.5 + 2P，钻深再加 3P
+cps = sm_pan("9/64-40", V(X["web"][1] - 2.5, yc_, zc_), V(-1, 0, 0), 8.0)                                    # 头在曲柄背面沉孔里，拧进销端 4.5
+for p_, u_ in CRANK_SCREWS:
+    cps = cps.fuse(sm_set("15/64-28", p_, u_, 8.0))                                                           # 外端在轮毂外圆处（r 16.5），顶到轴上
+parts["crank_screws"], mats["crank_screws"] = cps, "black"
 bal = dict(k=K, m_recip_kg=round(m_recip, 4), m_rot_kg=round(m_rot, 4), g_rod_mm=round(g_rod, 2), M_req_kgmm=round(M_req, 3),
            crank_moment_kgmm=round(-mv, 3), sector_half_deg=round(hi, 2), equiv_at_r_g=round(1000 * (-mv) / R, 1))
 
@@ -355,6 +399,13 @@ spec_c.loader.exec_module(ctrlm)
 for k, (s, mat_, rk, spin) in ctrlm.build().items():
     parts[k], mats[k], dens[k] = s, mat_, ctrlm.RHO[rk]
 bal["press_state"] = ctrlm.PRESS
+
+# G8.0 第 7 步 润滑油路（cad/oil.py）：分油块、铜管、尼龙管、机头油毡盒、油芯、油毡杯
+spec_oil = importlib.util.spec_from_file_location("wq_oil", os.path.join(HERE, "oil.py"))
+oilm = importlib.util.module_from_spec(spec_oil)
+spec_oil.loader.exec_module(oilm)
+for k, (s, mat_, rk, spin) in oilm.build().items():
+    parts[k], mats[k], dens[k] = s, mat_, oilm.RHO[rk]
 
 # G4.8 选配件（cad/opt.py）：WQ_OPT=T,E。带 E 的去掉 G4.7 的机械针距件（针距拉杆、旋钮、倒缝扳手、拉簧）
 spec_o = importlib.util.spec_from_file_location("wq_opt", os.path.join(HERE, "opt.py"))

@@ -229,10 +229,10 @@ def pair_hmc():
     ops.append(op("B0 攻 M4", "B0", 16, "丝锥 M4（仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(fh, 7, 0.7, rpm(8, 4)), kind="drill"))
     # G8.0 第 6 步：滑块导轨的两个螺孔——加长钻头、丝锥从面板口伸进机头，攻在前轴承座下的竖筋上（x 38.5，y 0，z 125、148）
     rh = [to_frame("B0", (-62.0, 0.0, z_))[:2] for z_ in (125.0, 148.0)]
-    ops.append(op("B0 加长钻滑块导轨螺孔 Ø2.9 深 10", "B0", 50, "加长钻头 Ø2.9（有效长 120）", 2.9, 50,
-                  cam.drill(rh, 62 + 38.5 + 10, 3, 0.05 * rpm(50, 2.9), r_plane=-(62 + 38.5 - 2), safe=5), kind="drill"))
-    ops.append(op("B0 加长丝锥攻 SM 9/64-40 深 8", "B0", 51, "加长丝锥 SM 9/64-40（仿真按底孔 Ø2.9）", 2.9, 6,
-                  cam.tap(rh, 62 + 38.5 + 8, 0.635, rpm(6, 3.6), r_plane=-(62 + 38.5 - 2), safe=5), kind="drill"))
+    ops.append(op("B0 加长钻滑块导轨螺孔 Ø2.95 深 11.5", "B0", 50, "加长钻头 Ø2.95（有效长 120）", 2.95, 50,
+                  cam.drill(rh, 62 + 38.5 + 11.5, 3, 0.05 * rpm(50, 2.95), r_plane=-(62 + 38.5 - 2), safe=5), kind="drill"))
+    ops.append(op("B0 加长丝锥攻 SM 9/64-40 深 9.5", "B0", 51, "加长丝锥 SM 9/64-40 2 级（仿真按底孔 Ø2.95）", 2.95, 6,
+                  cam.tap(rh, 62 + 38.5 + 9.5, 0.635, rpm(6, 3.6), r_plane=-(62 + 38.5 - 2), safe=5), kind="drill"))
     wh = [to_frame("B270", p)[:2] for p in [(-42, -48, 132), (-42, -48, 169), (-42, -48, 220), (32, -48, 132), (32, -48, 169), (32, -48, 220)]]
     ops.append(op("B270 钻前窗口 M4 底孔", "B270", 11, "钻头 Ø3.3", 3.3, 60, cam.drill(wh, 9, 0, 0.08 * rpm(60, 3.3)), kind="drill"))
     ops.append(op("B270 攻 M4", "B270", 16, "丝锥 M4（仿真按底孔 Ø3.3）", 3.3, 8, cam.tap(wh, 7, 0.7, rpm(8, 4)), kind="drill"))
@@ -281,6 +281,29 @@ def ctrl_holes():
     P = [to_frame("TOPARM", (0.0, 0.0, 242.0))[:2]]
     ops.append(op("TOPARM 钻机头顶 Ø12 通孔（橡胶塞孔）", "TOPARM", 52, "钻头 Ø12（直角铣头）", 12, 60,
                   cam.drill(P, 259 - 233, 0, 0.12 * rpm(60, 12), r_plane=-12, safe=8), kind="drill"))
+    # G8.0 第 7 步 润滑油路（cad/oil.py）：直角铣头从上面——分油块平台（z 252，四角 R6）、2 × M4（打在中间横隔板上）、
+    # 中间轴套油芯孔 Ø3（钻到轴套外圆，深 34.5）、机头顶油毡盒 2 个螺钉过孔 Ø3.9
+    import importlib.util as _iu
+    _sp = _iu.spec_from_file_location("wq_oil_geo", str(Path(__file__).resolve().parent / "cad" / "oil_geo.py"))
+    OG = _iu.module_from_spec(_sp)
+    _sp.loader.exec_module(OG)
+    bx_, by_ = OG.BLOCK["x"], OG.BLOCK["y"]
+    pad = [to_frame("TOPARM", (x, y, 252.0))[:2] for x, y in ((bx_[0] - 0.5, by_[0] - 0.5), (bx_[1] + 0.5, by_[0] - 0.5),
+                                                              (bx_[1] + 0.5, by_[1] + 0.5), (bx_[0] - 0.5, by_[1] + 0.5))]
+    ops.append(op("TOPARM 铣分油块平台（z 252）", "TOPARM", 53, "立铣刀 Ø10（直角铣头）", 10, 120,
+                  cam.mill_pocket(pad, 259 - 252.0, 10, 0.6, 2.0, 0.04 * 4 * rpm(120, 10), 0.02 * 4 * rpm(120, 10), safe=8)))
+    P = [to_frame("TOPARM", (x, y, 252.0))[:2] for x, y in OG.BLOCK["screws"]]
+    ops.append(op("TOPARM 钻分油块 M4 底孔 Ø3.3 深 10", "TOPARM", 61, "钻头 Ø3.3（直角铣头）", 3.3, 60,
+                  cam.drill(P, 259 - 242.0, 0, 0.08 * rpm(60, 3.3), r_plane=-5, safe=8), kind="drill"))
+    ops.append(op("TOPARM 攻分油块 M4 深 8", "TOPARM", 62, "丝锥 M4（直角铣头，仿真按底孔 Ø3.3）", 3.3, 8,
+                  cam.tap(P, 259 - 244.0, 0.7, rpm(8, 4), r_plane=-5, safe=8), kind="drill"))
+    wx, wy, wz = OG.WICK_MID
+    P = [to_frame("TOPARM", (wx, wy, 252.0))[:2]]
+    ops.append(op("TOPARM 钻中间轴套油芯孔 Ø3（到轴套外圆）", "TOPARM", 54, "钻头 Ø3（直角铣头，加长）", 3.0, 50,
+                  cam.drill(P, 259 - wz + 0.5, 1.0, 0.04 * rpm(50, 3.0), r_plane=-5, safe=8), kind="drill"))
+    P = [to_frame("TOPARM", (x, y, 245.6))[:2] for x, y in OG.RES["screws"]]
+    ops.append(op("TOPARM 钻机头顶油毡盒螺钉过孔 Ø3.9", "TOPARM", 55, "钻头 Ø3.9（直角铣头）", 3.9, 60,
+                  cam.drill(P, 259 - 238.0, 0, 0.08 * rpm(60, 3.9), r_plane=-12, safe=8), kind="drill"))
     # 直角铣头在机座底下向上：针距拉杆过孔 Ø12（穿机座顶板，再穿立柱下横隔板，到 z 66）、膝抬推杆过孔 Ø12（穿机座顶板）
     pr = g["pull_rod"]
     P = [to_frame("UNDER", (pr["x"], pr["y"], -16.0))[:2]]

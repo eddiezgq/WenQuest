@@ -31,6 +31,7 @@ docs:
   G4o: G4/剪线与电子针距.md
   G5c: G5/机壳铸造工艺.md
   G5m: G5/机壳机加工工艺.md
+  G8a: G8/G8.0-2_刺布机构依据与改动清单.md
 assemblies:
   HSG-LS: [机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P）, Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)]
 extra_items:              # 三维里没有、但有图纸的物料（物料卡片上挂图）
@@ -46,11 +47,15 @@ parts:
   lower_shaft: {code: LS-102, name: [下轴, Lower shaft], kind: make, group: hook, mat: 45 钢调质, doc: "G4h#二、零件", dwg: [G7/工程图/LS-102.pdf]}
   crank: {code: LS-103, name: [曲柄（带平衡块）, Crank with counterweight], kind: buy, group: needle, doc: "G2#四、平衡 · Balancing"}
   crank_pin: {code: LS-104, name: [曲柄销, Crank pin], kind: buy, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
+  # G8.0 F 版（第 3–5 步）
+  bush_mid: {code: LS-109, name: [上轴中间含油轴套 Ø20 × Ø35 × 25, Upper-shaft middle sintered bush], kind: buy, group: main, doc: "G8a#第 5 步"}
+  cage_rod: {code: BUY-NRB-K10x14x10, name: [连杆大头滚针组件 K10×14×10, Needle cage K10×14×10 (rod)], kind: buy, group: needle, doc: "G8a#第 4 步"}
+  cage_lever: {code: BUY-NRB-K10x14x8, name: [挑线杆滚针组件 K10×14×8, Needle cage K10×14×8 (take-up lever)], kind: buy, group: needle, doc: "G8a#第 4 步"}
   pulley_upper: {code: LS-105, name: [上带轮, Upper timing pulley], kind: buy, group: hook, doc: "G4h#二、零件"}
   pulley_lower: {code: LS-106, name: [下带轮, Lower timing pulley], kind: buy, group: hook, doc: "G4h#二、零件"}
   handwheel: {code: LS-107, name: [手轮, Handwheel], kind: buy, group: main, doc: "G3#十一、G4.3 按铸件重做、机头开口加盖板、装上电机（2026-11-11）"}
   handwheel_ring: {code: LS-108, name: [手轮标记环, Handwheel marker ring], kind: buy, group: main}
-  bearing_front: {code: BUY-BRG-6202, name: [上轴前轴承 6202, Front bearing 6202], kind: buy, group: main, doc: "G2#五、上轴 LS-101 B 版 · Upper shaft"}
+  bearing_front: {code: BUY-BRG-6203-2RS, name: [上轴前轴承 6203-2RS（终身润滑脂，G8.0 F 版、第 7 步）, Front bearing 6203-2RS], kind: buy, group: main, doc: "G2#五、上轴 LS-101 B 版 · Upper shaft"}
   belt: {code: BUY-BELT-LS, name: [同步带, Timing belt], kind: buy, group: hook, doc: "G4h#二、零件"}
   bearings_lower: {code: BUY-BRG-6201, qty: 2, name: [下轴轴承 6201, Lower shaft bearings 6201], kind: buy, group: hook, doc: "G4h#四、校核（全部合格）"}
   motor_cap: {code: BUY-MOTOR-LS, sub: [前端盖, front cap], name: [直驱电机, Direct-drive motor], kind: buy, group: main, doc: "G2#六、电机、惯量与控制方式（交给 GC）· Motor, inertia and control strategy"}
@@ -72,6 +77,17 @@ parts:
   pin_M: {code: LS-207, name: [挑线杆销 M, Take-up pin M], kind: buy, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
   stud_Q: {code: LS-208, name: [摇杆支点销 Q, Rocker stud Q], kind: buy, group: needle, doc: "G4a#三、零件（`tools/wqls/cad/mech.py`，FreeCAD 实体）"}
   thread_guide: {code: LS-209, name: [过线环, Thread guide], kind: buy, group: needle, doc: "G4c#八、一转干涉和面线路径"}
+  # G8.0 第 6、7 步（刺布机构依据与改动清单 G8.0-2）：导轨滑块、针杆导套、橡胶塞、线钩；SM 螺钉按 Q/WQ 001（零件库 A-SCR-SMP / SMS / SML）
+  slide_block: {code: LS-210, name: [针杆滑块, Needle-bar slide block], kind: buy, group: needle, mat: GCr15, doc: "G8a#第 6 步"}
+  slide_rail: {code: LS-211, name: [针杆滑块导轨, Slide-block rail], kind: buy, group: needle, mat: 45, doc: "G8a#第 6 步"}
+  nb_bushes: {code: LS-212, qty: 2, name: [针杆上、下导套, Needle-bar bushes (upper wrapped, lower sintered)], kind: buy, group: needle, doc: "G8a#第 6 步"}
+  nb_plug: {code: BUY-PLUG-12, name: [机头顶橡胶塞 Ø12, Head-top rubber plug], kind: buy, group: needle, doc: "G8a#第 6 步"}
+  nb_guide: {code: LS-213, name: [针杆线钩, Needle-bar thread guide], kind: buy, group: needle, doc: "G8a#第 7 步"}
+  clamp_screw: {code: BUY-SCR-SMP-11/64x5, name: [紧针螺钉 SMP 11/64-40 × 5, Needle clamp screw], kind: buy, group: needle, doc: "G8a#第 7 步"}
+  guide_screw: {code: BUY-SCR-SMP-1/8x6, name: [线钩螺钉 SMP 1/8-44 × 6, Thread-guide screw], kind: buy, group: needle, doc: "G8a#第 7 步"}
+  link_screws: {code: BUY-SCR-SMS-11/64x4, qty: 2, name: [针杆连接块紧定螺钉 SMS 11/64-40 × 4, Connecting-block set screws], kind: buy, group: needle, doc: "G8a#第 7 步"}
+  rail_screws: {code: BUY-SCR-SMP-9/64x20, qty: 2, name: [导轨螺钉 SMP 9/64-40 × 20, Rail screws], kind: buy, group: needle, doc: "G8a#第 7 步"}
+  crank_screws: {code: BUY-SCR-SML-9/64x8, sub: [曲柄销螺钉（左旋）和两个曲柄紧定螺钉 SMS 15/64-28 × 8, crank-pin screw (LH) and two crank set screws], name: [曲柄螺钉组, Crank screws], kind: buy, group: needle, doc: "G8a#第 7 步"}
   needle: {code: BUY-NEEDLE-DB, name: [机针 DB×1, Needle DB×1], kind: buy, group: needle}
   # —— 旋梭 ——
   hook: {code: LS-301, name: [旋梭, Rotary hook], kind: buy, mat: 外购（专业旋梭厂，按我们的接口尺寸；三维是示例外形）, group: hook, doc: "G4h#二、零件"}
@@ -94,6 +110,14 @@ parts:
   oil_ecc: {code: LS-411, name: [油泵偏心, Oil-pump eccentric], kind: buy, group: feed, doc: "G4f#七、油泵与润滑"}
   oil_plunger: {code: LS-412, name: [油泵柱塞, Oil-pump plunger], kind: buy, group: feed, doc: "G4f#七、油泵与润滑"}
   oil_pump: {code: LS-413, name: [油泵体, Oil-pump body], kind: buy, group: feed, doc: "G4f#七、油泵与润滑"}
+  # G8.0 第 7 步 润滑油路（cad/oil.py）
+  oil_block: {code: LS-414, name: [分油块（带溢流孔）, Oil distribution block], kind: buy, group: feed, mat: ADC12, doc: "G8a#第 7 步"}
+  oil_tubes: {code: LS-415, name: [上油铜管 Ø4 与溢流铜管 Ø6, Oil riser and return tubes], kind: buy, group: feed, mat: T2, doc: "G8a#第 7 步"}
+  oil_line: {code: BUY-TUBE-NY2, name: [尼龙油管 Ø2 × 0.4, Nylon oil line], kind: buy, group: feed, doc: "G8a#第 7 步"}
+  oil_box: {code: LS-416, name: [机头油毡盒, Head oil-felt box], kind: buy, group: feed, mat: ADC12, doc: "G8a#第 7 步"}
+  oil_wicks: {code: LS-417, name: [油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头）, Oil wicks], kind: buy, group: feed, doc: "G8a#第 7 步"}
+  oil_cups: {code: LS-418, qty: 2, name: [针杆油毡杯, Needle-bar oil-felt cups], kind: buy, group: feed, doc: "G8a#第 7 步"}
+  oil_screws: {code: BUY-SCR-OIL, sub: [分油块 M4 × 10 两个、油毡盒 SMP 9/64-40 × 12 两个, 2 × M4 × 10 and 2 × SMP 9/64-40 × 12], name: [油路螺钉, Oil-system screws], kind: buy, group: feed, doc: "G8a#第 7 步"}
   # —— 压脚与操纵件 ——
   presser_bar: {code: LS-501, name: [压脚杆, Presser bar], kind: buy, group: press, doc: "G4c#二、压脚组"}
   presser_collar: {code: LS-502, name: [压脚弹簧座, Presser spring collar], kind: buy, group: press, doc: "G4c#二、压脚组"}

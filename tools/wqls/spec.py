@@ -81,6 +81,9 @@ BRG_6201 = dict(C=7280.0, C0=3100.0, n_lim=32000)   # SKF 6201 TN9/C3（RS Compo
 BRG_6202 = dict(C=8060.0, C0=3750.0, n_lim=28000)   # SKF 6202（Simply Bearings 目录，2026-11-10 查）
 BRG_6203 = dict(C=9950.0, C0=4750.0, n_lim=24000)   # SKF 6203（SKF 产品目录）
 BRG = (BRG_6203, BRG_6201)                           # 与 X_BRG 一一对应：前、后（F 版前轴承改 6203）
+# G8.0 第 7 步：上轴前、后轴承用两面接触密封、终身润滑脂的 2RSH 型，不再送油。额定载荷与开式相同；
+# 极限转速 6203-2RSH 12 000 r/min（coolenbearings.com SKF 目录页）、6201-2RSH 15 000 r/min（rubix.com SKF 目录页），都高于 5000 r/min
+BRG_SEAL = dict(front="6203-2RSH", rear="6201-2RSH", n_lim=(12000, 15000))
 
 # ---------- 刺布、挑线机构沿 X 的排布（G4.1，tools/wqls/cad/mech.py） ----------
 MECH_X = dict(rod=(6.0, 12.0),          # 针杆连杆杆身 x 范围（小头接针杆连接销）

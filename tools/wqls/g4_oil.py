@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import math
 from pathlib import Path
 
@@ -23,11 +24,21 @@ ETA_V = 0.7
 RHO = 860.0
 NU = dict(run_40C_VG10=10e-6, cold_20C_VG22=60e-6)        # 运动粘度 m²/s
 # 油路：(名字, 内径 m, 长度 m, 占总流量的份额)
-LINES = [("泵 → 立柱（Ø4 × 1 铜管（内径 2），机座里 + 立柱里）", 2.0e-3, 0.75, 1.0),
-         ("分油块 → 上轴前轴承（Ø2 尼龙管）", 1.2e-3, 0.40, 0.25),
-         ("分油块 → 上轴后轴承", 1.2e-3, 0.10, 0.15),
-         ("分油块 → 针杆、挑线油毡", 1.2e-3, 0.45, 0.25)]
-H_LIFT = 0.30               # 油从油盘到机臂顶分油块的高度 m
+# G8.0 第 7 步：管长按三维里的管子中心线（cad/oil_geo.py）算；上轴前、后轴承改 2RS 终身润滑脂，不再送油。
+# 分油块出两路：中间含油轴套的油芯（毛细作用，不算管路压降）、机头油毡盒（尼龙管）；其余从溢流管回油盘
+_sp = importlib.util.spec_from_file_location("wq_oil_geo", str(Path(__file__).resolve().parent / "cad" / "oil_geo.py"))
+OG = importlib.util.module_from_spec(_sp)
+_sp.loader.exec_module(OG)
+
+
+def _len(pts):
+    return sum(math.dist(a, b) for a, b in zip(pts[:-1], pts[1:])) / 1000.0
+
+
+LINES = [("泵 → 分油块（Ø4 × 1 铜管（内径 2），机座里、立柱里、机臂内顶）", 2.0e-3, round(_len(OG.RISER), 3), 1.0),
+         ("分油块 → 机头油毡盒（Ø2 尼龙管，内径 1.2）", 1.2e-3, round(_len(OG.LINE_HEAD), 3), 0.25)]
+RETURN = ("溢流 → 油盘（Ø6 × 1 铜管（内径 4），靠重力流回，不算进泵出口压力）", 4.0e-3, round(_len(OG.RETURN), 3), 0.75)
+H_LIFT = round((OG.BLOCK["z"][0] + 4.0 - OG.RISER[0][2]) / 1000.0, 3)   # 油从泵出口升到分油块进口的高度 m
 HOOK = dict(needle_valve_mm3_min=(0.0, 30.0), line_d=1.0e-3, line_L=0.30)   # 旋梭一路：针阀可调 0…30 mm³/min（约 0…1.8 mL/h）
 M_PLUNGER = 0.6e-3          # 柱塞 + 弹簧座 kg
 SPRING_SF = 3.0
@@ -55,6 +66,12 @@ def main():
             if share == 1.0:
                 dp_main = dp
         dp_branch = max(r["dp_kPa"] for r in rows[1:]) * 1e3
+        name, d, L, share = RETURN
+        q = Q * share
+        v = q / (math.pi * d ** 2 / 4)
+        rows.append(dict(line=name, d_mm=d * 1e3, L_m=L, Q_mL_min=round(q * 6e7, 2), v_ms=round(v, 3), Re=round(v * d / nu, 1),
+                         dp_kPa=round(128 * mu * L * q / (math.pi * d ** 4) / 1e3, 2),
+                         head_kPa=round(RHO * 9.81 * (OG.RETURN[0][2] - OG.RETURN[-1][2]) / 1000.0 / 1e3, 2)))
         p_pump = dp_main + dp_branch + RHO * 9.81 * H_LIFT
         res[case] = dict(lines=rows, lift_kPa=round(RHO * 9.81 * H_LIFT / 1e3, 2),
                          p_pump_kPa=round(p_pump / 1e3, 2), F_plunger_N=round(p_pump * a_p, 3),
@@ -69,6 +86,7 @@ def main():
         flow_ok=bool(15.0 <= res["pump"]["Q_mL_min"] <= 30.0),
         cold_pressure_ok=bool(res["cold_20C_VG22"]["p_pump_kPa"] < 100.0),          # 单向阀、泵体密封按 0.1 MPa 以内设计
         laminar_ok=bool(all(r["Re"] < 2000 for c in NU for r in res[c]["lines"])),
+        return_by_gravity_ok=bool(all(res[c]["lines"][-1]["dp_kPa"] < res[c]["lines"][-1]["head_kPa"] for c in NU)),   # 溢流管靠落差流得回去
         spring_ok=True)
     res["all_ok"] = all(res["checks"].values())
     OUT.write_text(json.dumps(res, ensure_ascii=False, indent=1))

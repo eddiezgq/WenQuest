@@ -60,6 +60,15 @@ BOSSES = os.environ.get("WQ_BOSSES", "0" if os.environ.get("WQ_NOEDGE") else "1"
 _tkj = os.path.join(os.path.dirname(os.path.abspath(__file__)) if "__file__" in dir() else os.path.join(os.getcwd(), "tools", "wqls", "cad"),
                     "..", "..", "..", "docs", "设计", "WQ-LS", "G4", "挑线机构.json")
 TK_JSON = json.load(open(_tkj)) if os.path.exists(_tkj) else None
+
+
+def _oil():
+    """G8.0 第 7 步：润滑油路的几何（cad/oil.py），机壳上的油孔、座、过管孔按它做"""
+    import importlib.util as _iu
+    sp = _iu.spec_from_file_location("wq_oil", os.path.join(os.path.dirname(_tkj), "..", "..", "..", "..", "tools", "wqls", "cad", "oil_geo.py"))
+    m = _iu.module_from_spec(sp)
+    sp.loader.exec_module(m)
+    return m
 TK_JSON_EXISTS = TK_JSON is not None
 REALMECH = os.environ.get("WQ_REALMECH", "1" if TK_JSON_EXISTS else "0") == "1"   # 有 G4 实体机构时，外观件里不再画示意的针杆、挑线杆
 CTRL_REAL = REALMECH and os.path.exists(os.path.join(os.path.dirname(_tkj), "操纵件.json"))   # G4.7：压脚等外观件换成 cad/ctrl.py 的实体零件
@@ -465,6 +474,22 @@ def ctrl_seats(hollow, solid, info):
         Part.makeCylinder(5.0, 20.0, V(g["pull_rod"]["x"], g["pull_rod"]["y"], -12.0), V(0, 0, 1)),                    # ⑫
         Part.makeCylinder(5.0, 20.0, V(kn["push"]["x"] + 0.1, kn["y"], -12.0), V(0, 0, 1)),     # 膝抬推杆过孔 Ø10：左边是下轴右轴承座（x 378.2），右边是机座右壁（x 390），钻头只能从这 11.8 宽的缝里上来
     ]
+    # G8.0 第 7 步 润滑油路（cad/oil.py）：机臂顶分油块平台和 2 × M4、中间轴套油芯孔 Ø3、机头顶油毡盒 2 个 Ø3.9 螺钉过孔，
+    # 立柱两道横隔板和机座顶板上过油管的孔 Ø16（铸出）、立柱脚左横筋过管孔 Ø6.5（铸出）
+    OL = _oil()
+    B_, R_ = OL.BLOCK, OL.RES
+    pad = Part.makeBox(B_["x"][1] - B_["x"][0] + 1, B_["y"][1] - B_["y"][0] + 1, 10, V(B_["x"][0] - 0.5, B_["y"][0] - 0.5, B_["z"][0]))
+    holes.append(pad.makeFillet(6.0, [e for e in pad.Edges if e.BoundBox.ZLength > 9]))                         # 平台四角 R6（立铣刀 Ø10 铣出）
+    for x_, y_ in B_["screws"]:
+        holes.append(Part.makeCylinder(M4_TAP / 2, 10.0, V(x_, y_, B_["z"][0] - 10.0), V(0, 0, 1)))                   # M4 盲孔，打在中间横隔板上（铸铁 ≥ 1.5d）
+    wx, wy, wz = OL.WICK_MID
+    holes.append(Part.makeCylinder(1.5, B_["z"][0] - wz + 0.5, V(wx, wy, wz - 0.5), V(0, 0, 1)))
+    for x_, y_ in R_["screws"]:
+        holes.append(Part.makeCylinder(1.95, 12.0, V(x_, y_, R_["z"][1] - 2.0), V(0, 0, 1)))
+    cx, cy, cr = OL.PASS["column"]
+    holes.append(Part.makeCylinder(cr + 0.5, 140.0, V(cx, cy, -10.0), V(0, 0, 1)))
+    rx, ry, rz, rr = OL.PASS["rib"]
+    holes.append(Part.makeCylinder(rr + 0.25, 12.0, V(rx - 2.0, ry, rz), V(1, 0, 0)))
     for h_ in holes:
         hollow = hollow.cut(h_)
     info["ctrl_seats"] = dict(presser_bar=(bx, by), hand_shaft=(g["hand"]["x"], round(hz, 2)), C2=(kn["C2"]["x"], kn["C2"]["z"]),
@@ -595,9 +620,11 @@ def machined_faces(shape):
                 out.append(f)                                                      # 下件螺钉锪平面
             elif abs(n.z) > 0.99 and (abs(c.z + 2.5) < 0.05 or abs(c.z + 1.5) < 0.05) and -33 < c.x < 33 and -59 < c.y < 23:
                 out.append(f)
+            elif abs(n.z) > 0.99 and abs(c.z - 252.0) < 0.05 and 165 < c.x < 205 and abs(c.y) < 12:
+                out.append(f)                                                      # G8.0 第 7 步：分油块平台
         elif name == "Cylinder":
             r = s.Radius
-            if any(abs(r - v) < 0.02 for v in (1.65, 2.1, 1.25, 1.45, 16.0, 17.5, 6.0, 3.0, 4.1, 4.25, 5.5, 5.0, 9.0)):
+            if any(abs(r - v) < 0.02 for v in (1.65, 2.1, 1.25, 1.475, 1.5, 1.95, 16.0, 17.5, 6.0, 3.0, 4.1, 4.25, 5.5, 5.0, 9.0)):
                 out.append(f)
             elif abs(r - 26.0) < 0.02 and c.x > PIL["x1"] - 0.5:                 # 电机止口 Ø52
                 out.append(f)
@@ -916,10 +943,10 @@ def casting():
         hollow = hollow.cut(Part.makeCylinder(6, 145, V(0, 0, 20), V(0, 0, 1)))       # 针杆下导套孔 Ø12 穿过机头底（导套外径），到机头里
         hollow = hollow.cut(Part.makeCylinder(5, 40, V(0, 0, 160), V(0, 0, 1)))       # G8.0 第 6 步：上导套孔 Ø10 H7（卷制轴套）
         # G8.0 第 6 步：机头顶在针杆正上方开 Ø12 孔（拆装针杆从这里抽出，平时橡胶塞堵住）；
-        # 滑块导轨的两个螺孔 SM 9/64-40（底孔 Ø2.9，深 10）攻在前轴承座下面的竖筋上（x 38.5 起，y 0，z 125、148）
+        # 滑块导轨的两个螺孔 SM 9/64-40（Q/WQ 001：底孔 Ø2.95 深 11.5，螺纹深 9.5）攻在前轴承座下面的竖筋上（x 38.5 起，y 0，z 125、148）
         hollow = hollow.cut(Part.makeCylinder(6, 30, V(0, 0, 225), V(0, 0, 1)))
         for zs_ in (125.0, 148.0):
-            hollow = hollow.cut(Part.makeCylinder(1.45, 10.0, V(S_X_BRG0 - 6.5 - 0.01, 0, zs_), V(1, 0, 0)))
+            hollow = hollow.cut(Part.makeCylinder(1.475, 11.5, V(S_X_BRG0 - 6.5 - 0.01, 0, zs_), V(1, 0, 0)))
         hollow = hollow.cut(Part.makeCylinder(7, 14, V(0, 0, 36), V(0, 0, 1)))        # 底下沉孔 Ø14 到 z 50：上止点时针夹进来 0.5 mm
         hollow = hollow.removeSplitter()
         info["bosses"] = len(bs)
@@ -1077,6 +1104,13 @@ def parts_visible(cast, hollow=None, info=None):
             prof = Part.makeBox(150, 52, 120, V(110, -14, 180))
             prof = prof.makeFillet(8, [e for e in prof.Edges if abs(e.BoundBox.ZLength - 120) < 1e-6])
             tc = th.common(prof)
+            # G8.0 第 7 步：分油块和进出油管在顶盖下面，顶盖这一段加高成罩子（外顶 z 264），罩顶开透明观油窗（PC 板）
+            ho = Part.makeBox(88, 44, 14, V(146, -13, 250))
+            ho = ho.makeFillet(4, [e for e in ho.Edges if e.BoundBox.ZLength > 13])
+            hood = ho.cut(Part.makeBox(84, 40, 14, V(148, -11, 248))).cut(cast)
+            win = Part.makeBox(57, 30, 2, V(165, -6, 262))
+            tc = tc.cut(Part.makeBox(88, 44, 30, V(146, -13, 245))).fuse(hood.cut(win)).removeSplitter()
+            g["glass"].append(win)
             for xs_ in (118.0, 252.0):
                 for ys_ in (-6.0, 30.0):
                     ln = Part.LineSegment(V(xs_, ys_, 300), V(xs_, ys_, 180)).toShape().common(tc)
