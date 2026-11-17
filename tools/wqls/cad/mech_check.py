@@ -115,6 +115,7 @@ ONLY = set(x for x in os.environ.get("WQ_ONLY", "").split(",") if x)    # 只查
 # G4.7：某个状态下由控制器联锁排除的组合（例如膝抬 13 mm 时只在针杆上面停针，针夹和压脚不会相遇），用 WQ_SKIP="a|b;c|d" 给出
 SKIP = {frozenset(p.split("|")) for p in os.environ.get("WQ_SKIP", "").split(";") if "|" in p}
 # G8.1：全机检查一次跑不完，按组合编号分片：WQ_SHARD="i/n" 只查编号 % n == i 的组合；结果写到 WQ_CLOUT（默认 <零件目录>/clearance.json）
+SLOW = float(os.environ.get("WQ_SLOW", "0"))                         # >0：单对距离计算超过这么多秒就打出来（找拖慢分片的零件对）
 SH_I, SH_N = (int(x) for x in os.environ.get("WQ_SHARD", "0/1").split("/"))
 worst = {}
 t0 = time.time()
@@ -140,7 +141,10 @@ for f in FR[::max(1, STEP // 2)]:
                 bb.enlarge(LIMIT + 3)
                 if not bb.intersect(B.BoundBox):
                     continue
+            tp = time.time()
             d = A.distToShape(B)[0]
+            if SLOW and time.time() - tp > SLOW:
+                print(f"SLOW {a} | {b} phi {f['phi']} {time.time() - tp:.0f}s", flush=True)
             key = f"{a} | {b}"
             if key not in worst or d < worst[key][0]:
                 worst[key] = (round(d, 3), f["phi"])
