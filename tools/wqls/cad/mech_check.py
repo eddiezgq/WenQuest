@@ -122,7 +122,7 @@ SH_I, SH_N = (int(x) for x in os.environ.get("WQ_SHARD", "0/1").split("/"))
 worst = {}
 t0 = time.time()
 first = True
-for n_fr, f in enumerate(FR[::max(1, STEP // 2)]:
+for n_fr, f in enumerate(FR[::max(1, STEP // 2)]):
     sh = {k: placed(k, f) for k in parts}
     sh["casting"] = near
     pidx = -1
