@@ -27,6 +27,7 @@ XA = S.MECH_X["lever"][0] + S.MECH_X["lever"][1] + 3.0          # 过线点 A：
 XB = XE
 FABS = dict(lining=0.4, cotton=1.5, light_denim_x4=3.0)
 S_REF = 3.0
+MU_MAX = 140.0          # G1 判据：挑线四杆传动角 40°–140°（G4 只限了下限；第一次搜出来上限 172°，接近死点）
 OUT8 = T.ROOT / "docs" / "设计" / "WQ-LS" / "G8"
 _M = T.Mech2(r=T.P["r"], l=T.P["l"], mr=T.P["mr"])
 _DRAW = {t: np.array([_M.demand(i, t, S_REF, T.PHC) for i in range(360)]) for t in FABS.values()}   # 只和布厚、钩线角有关
@@ -87,13 +88,15 @@ def feasible(r: dict) -> list[str]:
     bad = _feas2d(r)
     if r.get("ok") and r["margin_hi"] > T.MARGIN_MAX:
         bad.append("薄料余量太多")
+    if r.get("ok") and r["mu"][1] > MU_MAX:
+        bad.append("传动角太大")
     return bad
 
 
 def violation(r: dict) -> float:
     v = _viol2d(r)
     if r.get("ok"):
-        v += max(0, r["margin_hi"] - T.MARGIN_MAX) / 2
+        v += max(0, r["margin_hi"] - T.MARGIN_MAX) / 2 + max(0, r["mu"][1] - MU_MAX) / 10
     return v
 
 
