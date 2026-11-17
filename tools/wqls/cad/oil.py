@@ -49,6 +49,7 @@ def cup(c):
 def build():
     P = {}
     blk = box(BLOCK["x"], BLOCK["y"], BLOCK["z"])
+    blk = blk.makeFillet(5.5, [e for e in blk.Edges if e.BoundBox.ZLength > BLOCK["z"][1] - BLOCK["z"][0] - 0.1])   # 四个竖边 R5.5，和平台 R6 圆角同心，四周均匀留 0.5
     for x_, y_ in BLOCK["screws"]:                                           # M4 通孔 Ø4.5、沉孔 Ø8 × 4.5
         blk = blk.cut(Part.makeCylinder(2.25, 10, V(x_, y_, BLOCK["z"][0] - 1), V(0, 0, 1))).cut(Part.makeCylinder(4.0, 5, V(x_, y_, BLOCK["z"][1] - 4.5), V(0, 0, 1)))
     P["oil_block"] = (blk, "metal", "alu", None)
