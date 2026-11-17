@@ -167,11 +167,12 @@ blk = rounded(blk, 1.5) if False else blk
 SB = dict(x=(13.5, 23.0), h=16.0, w=10.0)          # 滑块：x 范围、高（z）、宽（y，两滑动面 y ±5，10 × 16 = 160 mm²）
 RAIL = dict(z=(113.0, 170.0), back=(24.0, 38.5), back_top=156.0, jaw=4.0, screws=(125.0, 148.0))
 blk = blk.fuse(Part.makeCylinder(3.0, SB["x"][1] - 6, V(6, 0, zB), V(1, 0, 0)))         # 销外端与滑块外面平齐（x 23.0），离导轨背板 1.0
-# G8.0 第 7 步：两个紧定螺钉 SMS 11/64-40 × 4（后面 +y，z ±4），平端顶在针杆上
+# G8.0 第 7 步：两个紧定螺钉 SMS 11/64-40 × 4（z ±4），平端顶在针杆上。
+# G8.1 工具通道检查：原来朝后（+y），机头里面扳手够不着；改朝前（−y），调针杆高度时内六角扳手从前窗口伸进来
 nls = None
 for dz in (-4.0, 4.0):
-    blk = blk.cut(tap("11/64-40", V(0, 7.5, zB + dz), V(0, -1, 0), 4))
-    s_ = sm_set("11/64-40", V(0, 7.0, zB + dz), V(0, -1, 0), 4.0).translate(V(0, 0.0, 0))
+    blk = blk.cut(tap("11/64-40", V(0, -7.5, zB + dz), V(0, 1, 0), 4))
+    s_ = sm_set("11/64-40", V(0, -7.0, zB + dz), V(0, 1, 0), 4.0)
     nls = s_ if nls is None else nls.fuse(s_)
 parts["nb_link"], mats["nb_link"] = blk, "metal"
 parts["link_screws"], mats["link_screws"] = nls, "black"
