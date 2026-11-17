@@ -40,8 +40,7 @@ JOINT = {frozenset(p) for p in [
     ("slide_block", "nb_link"), ("slide_block", "slide_rail"), ("slide_rail", "casting"), ("rail_screws", "slide_rail"),
     ("rail_screws", "casting"), ("needle_bar", "nb_bushes"), ("nb_bushes", "casting"), ("nb_plug", "casting"),
     # G8.0 第 7 步：SM 螺钉拧在各自的零件里（紧针螺钉顶住机针，线钩螺钉穿过针夹拧进针杆，连接块紧定螺钉顶住针杆，曲柄销螺钉、曲柄紧定螺钉）
-    ("clamp_screw", "needle_clamp"), ("clamp_screw", "needle_bar"), ("clamp_screw", "needle"), ("nb_guide", "needle_clamp"),
-    ("guide_screw", "nb_guide"), ("guide_screw", "needle_clamp"), ("guide_screw", "needle_bar"),
+    ("clamp_screw", "needle_clamp"), ("clamp_screw", "needle_bar"), ("clamp_screw", "needle"),
     ("link_screws", "nb_link"), ("link_screws", "needle_bar"),
     ("crank_screws", "crank"), ("crank_screws", "crank_pin"), ("crank_screws", "shaft"),
     # G8.0 第 7 步 润滑：分油块和油毡盒用螺钉装在机壳上；油芯压在中间轴套上、插进油毡杯；油毡杯坐在导套座上、贴着针杆；

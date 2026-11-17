@@ -1,5 +1,5 @@
 {
- "filled_holes": 48,
+ "filled_holes": 55,
  "pads": [
   {
    "area_cm2": 3.0,
@@ -9,6 +9,15 @@
     0.0
    ],
    "allowance": 3.0
+  },
+  {
+   "area_cm2": 5.3,
+   "normal": [
+    0,
+    0,
+    1
+   ],
+   "allowance": "铸出顶面（不加余量）"
   },
   {
    "area_cm2": 3.0,
@@ -29,7 +38,7 @@
    "allowance": 3.0
   },
   {
-   "area_cm2": 112.2,
+   "area_cm2": 111.9,
    "normal": [
     -0.0,
     -0.0,
@@ -228,8 +237,8 @@
  "part_outside_blank_mm3": 0.0,
  "part": "upper",
  "valid": true,
- "mass_part_kg": 15.22,
- "mass_blank_kg": 15.96,
+ "mass_part_kg": 15.18,
+ "mass_blank_kg": 15.98,
  "allowance": {
   "side": 3.0,
   "top": 4.0,

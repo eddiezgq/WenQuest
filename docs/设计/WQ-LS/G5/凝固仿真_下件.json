@@ -15,10 +15,10 @@
  ],
  "t_pour_c": 1380.0,
  "mass_casting_kg": 11.59,
- "mass_poured_kg": 15.98,
+ "mass_poured_kg": 15.97,
  "yield_pct": 72.5,
  "gating": {
-  "G_pour_kg": 14.5,
+  "G_pour_kg": 14.49,
   "tau_s": 6.5,
   "Hp_cm": 15.0,
   "mu": 0.42,
@@ -45,11 +45,11 @@
   "C": 7.0
  },
  "chvorinov_B_s_cm2": 322.0,
- "t_solid_total_s": 200.1,
- "modulus_max_cm": 0.79,
+ "t_solid_total_s": 198.0,
+ "modulus_max_cm": 0.78,
  "steps": 2154,
  "dt_s": 0.0975,
- "seconds": 160,
+ "seconds": 135,
  "pockets": [
   {
    "volume_cm3": 2.84,

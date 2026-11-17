@@ -52,7 +52,7 @@
     "ok": true
    },
    {
-    "feature": "针杆孔",
+    "feature": "针杆下导套孔",
     "from_": 20,
     "to": 50,
     "d_from": 11.5,
@@ -62,13 +62,33 @@
     "ok": true
    },
    {
-    "feature": "针杆孔",
+    "feature": "针杆下导套孔",
     "from_": 50,
     "to": 50,
     "d_from": 11.85,
     "d_to": 12.0,
     "z_min": 0.062,
     "z_max": 0.084,
+    "ok": true
+   },
+   {
+    "feature": "针杆上导套孔（G8.0）",
+    "from_": 20,
+    "to": 50,
+    "d_from": 9.5,
+    "d_to": 9.85,
+    "z_min": 0.125,
+    "z_max": 0.186,
+    "ok": true
+   },
+   {
+    "feature": "针杆上导套孔（G8.0）",
+    "from_": 50,
+    "to": 50,
+    "d_from": 9.85,
+    "d_to": 10.0,
+    "z_min": 0.064,
+    "z_max": 0.083,
     "ok": true
    },
    {
@@ -313,7 +333,7 @@
    [
     80,
     "钻攻螺纹孔",
-    15.5
+    17.5
    ],
    [
     90,
@@ -321,7 +341,7 @@
     30
    ]
   ],
-  "total_min": 92.5,
+  "total_min": 94.5,
   "review": [],
   "cards_check": [],
   "holes": [

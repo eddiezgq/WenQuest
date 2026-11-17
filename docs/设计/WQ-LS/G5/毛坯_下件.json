@@ -1,5 +1,5 @@
 {
- "filled_holes": 30,
+ "filled_holes": 32,
  "pads": [
   {
    "area_cm2": 4.6,
@@ -29,7 +29,7 @@
    "allowance": 4.0
   },
   {
-   "area_cm2": 798.3,
+   "area_cm2": 796.3,
    "normal": [
     0.0,
     0.0,
@@ -209,8 +209,8 @@
  "part_outside_blank_mm3": 0.0,
  "part": "lower",
  "valid": true,
- "mass_part_kg": 8.5,
- "mass_blank_kg": 11.6,
+ "mass_part_kg": 8.49,
+ "mass_blank_kg": 11.59,
  "allowance": {
   "side": 3.0,
   "top": 4.0,

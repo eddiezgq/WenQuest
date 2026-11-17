@@ -1,7 +1,6 @@
 {
- "upper_variant": 10,
+ "upper_variant": 12,
  "lower_variant": 8,
- "note": "g5_cast_critical.py：关键孔 + 全部加工面往里 1 格的金属，落在共晶前孤立液相区里的格子；判据：加工面处热模数 > 0.35 cm 的不得有",
  "upper": {
   "前轴承孔 Ø40（6203）": {
    "cells": 704,
@@ -11,9 +10,9 @@
   },
   "中间轴套孔 Ø35": {
    "cells": 1634,
-   "isolated_cells": 0,
-   "first_t": null,
-   "max_vol_cm3": 0.0
+   "isolated_cells": 4,
+   "first_t": 10.0,
+   "max_vol_cm3": 43.4
   },
   "后轴承孔 Ø32（6201）": {
    "cells": 640,
@@ -32,12 +31,23 @@
     "center_mm": [
      0,
      0,
-     65
+     60
     ],
     "first_t": 4.1,
-    "cells": 475,
-    "vol_cm3": 9.2,
-    "modulus_cm": 0.31
+    "cells": 524,
+    "vol_cm3": 10.9,
+    "modulus_cm": 0.32
+   },
+   {
+    "center_mm": [
+     0,
+     0,
+     65
+    ],
+    "first_t": 8.1,
+    "cells": 448,
+    "vol_cm3": 8.6,
+    "modulus_cm": 0.32
    },
    {
     "center_mm": [
@@ -46,8 +56,19 @@
      175
     ],
     "first_t": 8.1,
-    "cells": 340,
-    "vol_cm3": 7.8,
+    "cells": 353,
+    "vol_cm3": 8.1,
+    "modulus_cm": 0.33
+   },
+   {
+    "center_mm": [
+     60,
+     -15,
+     135
+    ],
+    "first_t": 8.1,
+    "cells": 278,
+    "vol_cm3": 31.3,
     "modulus_cm": 0.33
    },
    {
@@ -74,6 +95,17 @@
    },
    {
     "center_mm": [
+     -10,
+     0,
+     175
+    ],
+    "first_t": 12.1,
+    "cells": 212,
+    "vol_cm3": 4.1,
+    "modulus_cm": 0.33
+   },
+   {
+    "center_mm": [
      30,
      -45,
      180
@@ -96,17 +128,6 @@
    },
    {
     "center_mm": [
-     75,
-     -25,
-     140
-    ],
-    "first_t": 8.1,
-    "cells": 158,
-    "vol_cm3": 31.3,
-    "modulus_cm": 0.33
-   },
-   {
-    "center_mm": [
      390,
      35,
      60
@@ -123,19 +144,30 @@
      235
     ],
     "first_t": 8.1,
-    "cells": 122,
+    "cells": 143,
     "vol_cm3": 5.9,
     "modulus_cm": 0.33
    },
    {
     "center_mm": [
-     -10,
+     175,
      0,
-     175
+     245
     ],
-    "first_t": 14.0,
-    "cells": 120,
-    "vol_cm3": 2.3,
+    "first_t": 10.0,
+    "cells": 135,
+    "vol_cm3": 43.4,
+    "modulus_cm": 0.33
+   },
+   {
+    "center_mm": [
+     45,
+     0,
+     135
+    ],
+    "first_t": 10.0,
+    "cells": 104,
+    "vol_cm3": 13.3,
     "modulus_cm": 0.33
    },
    {
@@ -195,6 +227,17 @@
    },
    {
     "center_mm": [
+     175,
+     0,
+     250
+    ],
+    "first_t": 12.1,
+    "cells": 53,
+    "vol_cm3": 19.3,
+    "modulus_cm": 0.33
+   },
+   {
+    "center_mm": [
      -25,
      -45,
      80
@@ -217,17 +260,6 @@
    },
    {
     "center_mm": [
-     0,
-     0,
-     70
-    ],
-    "first_t": 20.1,
-    "cells": 24,
-    "vol_cm3": 0.6,
-    "modulus_cm": 0.31
-   },
-   {
-    "center_mm": [
      -35,
      -10,
      55
@@ -235,7 +267,7 @@
     "first_t": 8.1,
     "cells": 22,
     "vol_cm3": 0.8,
-    "modulus_cm": 0.22
+    "modulus_cm": 0.24
    },
    {
     "center_mm": [
@@ -250,6 +282,17 @@
    },
    {
     "center_mm": [
+     -5,
+     0,
+     175
+    ],
+    "first_t": 18.0,
+    "cells": 12,
+    "vol_cm3": 0.2,
+    "modulus_cm": 0.33
+   },
+   {
+    "center_mm": [
      75,
      -30,
      125
@@ -261,13 +304,13 @@
    },
    {
     "center_mm": [
-     -5,
-     0,
-     175
+     175,
+     -10,
+     250
     ],
-    "first_t": 18.0,
-    "cells": 8,
-    "vol_cm3": 0.1,
+    "first_t": 14.0,
+    "cells": 9,
+    "vol_cm3": 0.3,
     "modulus_cm": 0.33
    },
    {
@@ -291,6 +334,17 @@
     "cells": 5,
     "vol_cm3": 0.5,
     "modulus_cm": 0.25
+   },
+   {
+    "center_mm": [
+     50,
+     0,
+     120
+    ],
+    "first_t": 16.1,
+    "cells": 4,
+    "vol_cm3": 3.7,
+    "modulus_cm": 0.33
    },
    {
     "center_mm": [
