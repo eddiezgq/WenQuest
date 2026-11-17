@@ -3291,27 +3291,41 @@ items:
 - {code: WQ-LS-TED, name: 问渠工业直驱平缝机 WQ-LS-TED（示例）Direct-drive lockstitch machine WQ-LS-TED, kind: fg, uom: Nos}
 - {code: BUY-BELT-E, name: 同步带 HTD 3M 宽 9（型号待确认） Timing belt HTD 3M 9 mm, kind: buy, uom: Nos, price: 1.5, supplier: sewparts}
 - {code: BUY-BRG-6201, name: 深沟球轴承 6201 Ball bearing 12×32×10, kind: buy, uom: Nos, price: 1.2, supplier: hardware}
-- {code: BUY-BRG-6202, name: 深沟球轴承 6202 Ball bearing 15×35×11, kind: buy, uom: Nos, price: 1.5, supplier: hardware}
+- {code: BUY-BRG-6201-2RS, name: '深沟球轴承 6201-2RS（两面接触密封） Ball bearing 12×32×10, sealed', kind: buy, uom: Nos, price: 1.4, supplier: hardware}
+- {code: BUY-BRG-6203-2RS, name: '深沟球轴承 6203-2RS（两面接触密封） Ball bearing 17×40×12, sealed', kind: buy, uom: Nos, price: 1.9, supplier: hardware}
 - {code: BUY-BTN-E, name: 倒缝按钮（型号待确认） Reverse push-button, kind: buy, uom: Nos, price: 1.0, supplier: drive}
+- {code: BUY-NRB-K10x14x10, name: 滚针保持架组件 K10×14×10 Needle roller and cage K10×14×10, kind: buy, uom: Nos, price: 1.1, supplier: hardware}
+- {code: BUY-NRB-K10x14x8, name: 滚针保持架组件 K10×14×8 Needle roller and cage K10×14×8, kind: buy, uom: Nos, price: 1.0, supplier: hardware}
 - {code: BUY-PLATE-LS, name: 平缝机针板与推板（型号待确认） Throat plate & slide plate, kind: buy, uom: Nos, price: 3.0, supplier: sewparts}
+- {code: BUY-PLUG-12, name: 橡胶塞 Ø12（机头顶） Rubber plug Ø12, kind: buy, uom: Nos, price: 0.05, supplier: hardware}
+- {code: BUY-SCR-OIL, name: 油路螺钉组：M4 × 10 两个、SMP 9/64-40 × 12 两个 Oil-system screw set, kind: buy, uom: Nos, price: 0.12, supplier: hardware}
+- {code: BUY-SCR-SML-9/64x8, name: 缝纫机左旋盘头螺钉 SML 9/64-40 × 8 + 紧定螺钉 SMS 15/64-28 × 8 两个（曲柄螺钉组） Crank screw set, kind: buy, uom: Nos, price: 0.15, supplier: hardware}
+- {code: BUY-SCR-SMP-9/64x20, name: 缝纫机盘头螺钉 SMP 9/64-40 × 20（Q/WQ 001） Pan head screw SM 9/64-40 × 20, kind: buy, uom: Nos, price: 0.05, supplier: hardware}
+- {code: BUY-SCR-SMP-9/64x5, name: 缝纫机盘头螺钉 SMP 9/64-40 × 5（Q/WQ 001） Pan head screw SM 9/64-40 × 5, kind: buy, uom: Nos, price: 0.04, supplier: hardware}
+- {code: BUY-SCR-SMS-11/64x4, name: 缝纫机紧定螺钉 SMS 11/64-40 × 4（Q/WQ 001） Set screw SM 11/64-40 × 4, kind: buy, uom: Nos, price: 0.04, supplier: hardware}
 - {code: BUY-SOL-REL, name: 松线电磁铁 24 V Ø16（型号待确认） Tension-release solenoid, kind: buy, uom: Nos, price: 4.5, supplier: drive}
 - {code: BUY-SOL-TRIM, name: 剪线电磁铁 24 V Ø22（型号待确认） Trimmer solenoid, kind: buy, uom: Nos, price: 6.0, supplier: drive}
 - {code: BUY-SOL-WIPE, name: 拨线电磁铁 24 V Ø16（型号待确认） Wiper solenoid, kind: buy, uom: Nos, price: 4.5, supplier: drive}
 - {code: BUY-STEP-42, name: 42 步进电机 48 mm 带磁编码器（型号待确认） NEMA 17 stepper with encoder, kind: buy, uom: Nos, price: 15.0, supplier: drive}
-- {code: LS-103, name: 曲柄（带平衡块） Crank with counterweight（按图外协）, kind: buy, uom: Nos, price: 4.29, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
-- {code: LS-104, name: 曲柄销 Crank pin（按图外协）, kind: buy, uom: Nos, price: 1.22, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: BUY-TUBE-NY2, name: 尼龙油管 Ø2 × 0.4，0.2 m Nylon oil line Ø2, kind: buy, uom: Nos, price: 0.1, supplier: hardware}
+- {code: LS-103, name: 曲柄（带平衡块） Crank with counterweight（按图外协）, kind: buy, uom: Nos, price: 4.62, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-104, name: 曲柄销 Crank pin（按图外协）, kind: buy, uom: Nos, price: 1.45, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-105, name: 上带轮 Upper timing pulley（按图外协）, kind: buy, uom: Nos, price: 3.21, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-106, name: 下带轮 Lower timing pulley（按图外协）, kind: buy, uom: Nos, price: 3.69, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-107, name: 手轮 Handwheel（按图外协）, kind: buy, uom: Nos, price: 4.76, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-108, name: 手轮标记环 Handwheel marker ring（按图外协）, kind: buy, uom: Nos, price: 1.09, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-109, name: 上轴中间含油轴套 Ø20 × Ø35 × 25 Upper-shaft middle sintered bush（按图外协）, kind: buy, uom: Nos, price: 4.81, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-202, name: 针夹 Needle clamp（按图外协）, kind: buy, uom: Nos, price: 1.1, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
-- {code: LS-203, name: 针杆连接块 Needle-bar connecting block（按图外协）, kind: buy, uom: Nos, price: 1.52, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
-- {code: LS-204, name: 针杆连杆 Needle-bar connecting rod（按图外协）, kind: buy, uom: Nos, price: 2.39, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
-- {code: LS-205, name: 挑线杆 Take-up lever（按图外协）, kind: buy, uom: Nos, price: 1.73, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-203, name: 针杆连接块 Needle-bar connecting block（按图外协）, kind: buy, uom: Nos, price: 1.54, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-204, name: 针杆连杆 Needle-bar connecting rod（按图外协）, kind: buy, uom: Nos, price: 2.75, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-205, name: 挑线杆 Take-up lever（按图外协）, kind: buy, uom: Nos, price: 1.96, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-206, name: 挑线摇杆 Take-up rocker（按图外协）, kind: buy, uom: Nos, price: 1.33, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
-- {code: LS-207, name: 挑线杆销 M Take-up pin M（按图外协）, kind: buy, uom: Nos, price: 1.06, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-207, name: 挑线杆销 M Take-up pin M（按图外协）, kind: buy, uom: Nos, price: 1.1, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-208, name: 摇杆支点销 Q Rocker stud Q（按图外协）, kind: buy, uom: Nos, price: 1.14, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-209, name: 过线环 Thread guide（按图外协）, kind: buy, uom: Nos, price: 1.02, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-210, name: 针杆滑块 Needle-bar slide block（按图外协）, kind: buy, uom: Nos, price: 1.29, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-211, name: 针杆滑块导轨 Slide-block rail（按图外协）, kind: buy, uom: Nos, price: 4.67, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-212, name: '针杆上、下导套 Needle-bar bushes (upper wrapped, lower sintered)（按图外协）', kind: buy, uom: Nos, price: 1.17, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-301D, name: '旋梭（少油型，梭床和梭尖镀 DLC；外购） Rotary hook, low-oil (DLC-coated, bought)', kind: buy, uom: Nos, price: 8.0, supplier: sewparts}
 - {code: LS-302, name: 旋梭轴 Hook shaft（按图外协）, kind: buy, uom: Nos, price: 2.28, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-303, name: 旋梭轴齿轮 z20 Hook-shaft gear z20（按图外协）, kind: buy, uom: Nos, price: 1.65, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
@@ -3329,6 +3343,11 @@ items:
 - {code: LS-411, name: 油泵偏心 Oil-pump eccentric（按图外协）, kind: buy, uom: Nos, price: 1.12, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-412, name: 油泵柱塞 Oil-pump plunger（按图外协）, kind: buy, uom: Nos, price: 1.04, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-413, name: 油泵体 Oil-pump body（按图外协）, kind: buy, uom: Nos, price: 1.55, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-414, name: 分油块（带溢流孔） Oil distribution block（按图外协）, kind: buy, uom: Nos, price: 1.31, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-415, name: 上油铜管 Ø4 与溢流铜管 Ø6 Oil riser and return tubes（按图外协）, kind: buy, uom: Nos, price: 5.63, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-416, name: 机头油毡盒 Head oil-felt box（按图外协）, kind: buy, uom: Nos, price: 1.12, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-417, name: 油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头） Oil wicks（按图外协）, kind: buy, uom: Nos, price: 1.02, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-418, name: 针杆油毡杯 Needle-bar oil-felt cups（按图外协）, kind: buy, uom: Nos, price: 1.01, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-501, name: 压脚杆 Presser bar（按图外协）, kind: buy, uom: Nos, price: 2.39, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-502, name: 压脚弹簧座 Presser spring collar（按图外协）, kind: buy, uom: Nos, price: 1.11, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-503, name: 压脚 Presser foot（按图外协）, kind: buy, uom: Nos, price: 1.76, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
@@ -3366,7 +3385,7 @@ items:
 - {code: LS-709, name: 凸轮滚子 Cam roller（按图外协）, kind: buy, uom: Nos, price: 1.05, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-710, name: 剪线凸轮 Trimmer cam, kind: make, uom: Nos}
 - {code: LS-711, name: 拨线钩 Thread wiper（按图外协）, kind: buy, uom: Nos, price: 1.2, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
-- {code: LS-712, name: 松线臂 Release arm（按图外协）, kind: buy, uom: Nos, price: 1.06, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
+- {code: LS-712, name: 松线臂 Release arm（按图外协）, kind: buy, uom: Nos, price: 1.07, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-801, name: 步进电机支架 Stepper bracket（按图外协）, kind: buy, uom: Nos, price: 1.87, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-802, name: 电机带轮 Motor pulley（按图外协）, kind: buy, uom: Nos, price: 1.57, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
 - {code: LS-803, name: 调节器带轮 Regulator pulley（按图外协）, kind: buy, uom: Nos, price: 2.07, supplier: sewparts, note: WQ-LS 设计件，按我们的图纸外协加工或外购（单价按质量粗估，示例）}
@@ -3813,16 +3832,26 @@ boms:
   - [BUY-BELT-LS, 1]
   - [BUY-BOBCASE, 1]
   - [BUY-BOX-LS, 1]
-  - [BUY-BRG-6201, 3]
-  - [BUY-BRG-6202, 1]
+  - [BUY-BRG-6201, 2]
+  - [BUY-BRG-6201-2RS, 1]
+  - [BUY-BRG-6203-2RS, 1]
   - [BUY-COVERS-LS, 1]
   - [BUY-CTRL-LS, 1]
   - [BUY-MOTOR-LS, 1]
   - [BUY-NEEDLE-DB, 1]
+  - [BUY-NRB-K10x14x10, 1]
+  - [BUY-NRB-K10x14x8, 1]
   - [BUY-OILPAN-LS, 1]
   - [BUY-PLATE-LS, 1]
+  - [BUY-PLUG-12, 1]
+  - [BUY-SCR-OIL, 1]
+  - [BUY-SCR-SML-9/64x8, 1]
+  - [BUY-SCR-SMP-9/64x20, 2]
+  - [BUY-SCR-SMP-9/64x5, 1]
+  - [BUY-SCR-SMS-11/64x4, 2]
   - [BUY-SCREW-M4, 20]
   - [BUY-SCREW-M5, 40]
+  - [BUY-TUBE-NY2, 1]
   - [HSG-LS, 1]
   - [LS-101, 1]
   - [LS-102, 1]
@@ -3832,6 +3861,7 @@ boms:
   - [LS-106, 1]
   - [LS-107, 1]
   - [LS-108, 1]
+  - [LS-109, 1]
   - [LS-201, 1]
   - [LS-202, 1]
   - [LS-203, 1]
@@ -3841,6 +3871,9 @@ boms:
   - [LS-207, 1]
   - [LS-208, 1]
   - [LS-209, 1]
+  - [LS-210, 1]
+  - [LS-211, 1]
+  - [LS-212, 2]
   - [LS-301, 1]
   - [LS-302, 1]
   - [LS-303, 1]
@@ -3859,6 +3892,11 @@ boms:
   - [LS-411, 1]
   - [LS-412, 1]
   - [LS-413, 1]
+  - [LS-414, 1]
+  - [LS-415, 1]
+  - [LS-416, 1]
+  - [LS-417, 1]
+  - [LS-418, 2]
   - [LS-501, 1]
   - [LS-502, 1]
   - [LS-503, 1]
@@ -3891,16 +3929,26 @@ boms:
   - [BUY-BELT-LS, 1]
   - [BUY-BOBCASE, 1]
   - [BUY-BOX-LS, 1]
-  - [BUY-BRG-6201, 3]
-  - [BUY-BRG-6202, 1]
+  - [BUY-BRG-6201, 2]
+  - [BUY-BRG-6201-2RS, 1]
+  - [BUY-BRG-6203-2RS, 1]
   - [BUY-COVERS-LS, 1]
   - [BUY-CTRL-LS, 1]
   - [BUY-MOTOR-LS, 1]
   - [BUY-NEEDLE-DB, 1]
+  - [BUY-NRB-K10x14x10, 1]
+  - [BUY-NRB-K10x14x8, 1]
   - [BUY-OILPAN-LS, 1]
   - [BUY-PLATE-LS, 1]
+  - [BUY-PLUG-12, 1]
+  - [BUY-SCR-OIL, 1]
+  - [BUY-SCR-SML-9/64x8, 1]
+  - [BUY-SCR-SMP-9/64x20, 2]
+  - [BUY-SCR-SMP-9/64x5, 1]
+  - [BUY-SCR-SMS-11/64x4, 2]
   - [BUY-SCREW-M4, 20]
   - [BUY-SCREW-M5, 40]
+  - [BUY-TUBE-NY2, 1]
   - [HSG-LS, 1]
   - [LS-101, 1]
   - [LS-102, 1]
@@ -3910,6 +3958,7 @@ boms:
   - [LS-106, 1]
   - [LS-107, 1]
   - [LS-108, 1]
+  - [LS-109, 1]
   - [LS-201, 1]
   - [LS-202, 1]
   - [LS-203, 1]
@@ -3919,6 +3968,9 @@ boms:
   - [LS-207, 1]
   - [LS-208, 1]
   - [LS-209, 1]
+  - [LS-210, 1]
+  - [LS-211, 1]
+  - [LS-212, 2]
   - [LS-301D, 1]
   - [LS-302, 1]
   - [LS-303, 1]
@@ -3937,6 +3989,11 @@ boms:
   - [LS-411, 1]
   - [LS-412, 1]
   - [LS-413, 1]
+  - [LS-414, 1]
+  - [LS-415, 1]
+  - [LS-416, 1]
+  - [LS-417, 1]
+  - [LS-418, 2]
   - [LS-501, 1]
   - [LS-502, 1]
   - [LS-503, 1]
@@ -3970,18 +4027,28 @@ boms:
   - [BUY-BELT-LS, 1]
   - [BUY-BOBCASE, 1]
   - [BUY-BOX-LS, 1]
-  - [BUY-BRG-6201, 3]
-  - [BUY-BRG-6202, 1]
+  - [BUY-BRG-6201, 2]
+  - [BUY-BRG-6201-2RS, 1]
+  - [BUY-BRG-6203-2RS, 1]
   - [BUY-BTN-E, 1]
   - [BUY-COVERS-LS, 1]
   - [BUY-CTRL-LS, 1]
   - [BUY-MOTOR-LS, 1]
   - [BUY-NEEDLE-DB, 1]
+  - [BUY-NRB-K10x14x10, 1]
+  - [BUY-NRB-K10x14x8, 1]
   - [BUY-OILPAN-LS, 1]
   - [BUY-PLATE-LS, 1]
+  - [BUY-PLUG-12, 1]
+  - [BUY-SCR-OIL, 1]
+  - [BUY-SCR-SML-9/64x8, 1]
+  - [BUY-SCR-SMP-9/64x20, 2]
+  - [BUY-SCR-SMP-9/64x5, 1]
+  - [BUY-SCR-SMS-11/64x4, 2]
   - [BUY-SCREW-M4, 20]
   - [BUY-SCREW-M5, 40]
   - [BUY-STEP-42, 1]
+  - [BUY-TUBE-NY2, 1]
   - [HSG-LS, 1]
   - [LS-101, 1]
   - [LS-102, 1]
@@ -3991,6 +4058,7 @@ boms:
   - [LS-106, 1]
   - [LS-107, 1]
   - [LS-108, 1]
+  - [LS-109, 1]
   - [LS-201, 1]
   - [LS-202, 1]
   - [LS-203, 1]
@@ -4000,6 +4068,9 @@ boms:
   - [LS-207, 1]
   - [LS-208, 1]
   - [LS-209, 1]
+  - [LS-210, 1]
+  - [LS-211, 1]
+  - [LS-212, 2]
   - [LS-301, 1]
   - [LS-302, 1]
   - [LS-303, 1]
@@ -4018,6 +4089,11 @@ boms:
   - [LS-411, 1]
   - [LS-412, 1]
   - [LS-413, 1]
+  - [LS-414, 1]
+  - [LS-415, 1]
+  - [LS-416, 1]
+  - [LS-417, 1]
+  - [LS-418, 2]
   - [LS-501, 1]
   - [LS-502, 1]
   - [LS-503, 1]
@@ -4050,18 +4126,28 @@ boms:
   - [BUY-BELT-LS, 1]
   - [BUY-BOBCASE, 1]
   - [BUY-BOX-LS, 1]
-  - [BUY-BRG-6201, 3]
-  - [BUY-BRG-6202, 1]
+  - [BUY-BRG-6201, 2]
+  - [BUY-BRG-6201-2RS, 1]
+  - [BUY-BRG-6203-2RS, 1]
   - [BUY-BTN-E, 1]
   - [BUY-COVERS-LS, 1]
   - [BUY-CTRL-LS, 1]
   - [BUY-MOTOR-LS, 1]
   - [BUY-NEEDLE-DB, 1]
+  - [BUY-NRB-K10x14x10, 1]
+  - [BUY-NRB-K10x14x8, 1]
   - [BUY-OILPAN-LS, 1]
   - [BUY-PLATE-LS, 1]
+  - [BUY-PLUG-12, 1]
+  - [BUY-SCR-OIL, 1]
+  - [BUY-SCR-SML-9/64x8, 1]
+  - [BUY-SCR-SMP-9/64x20, 2]
+  - [BUY-SCR-SMP-9/64x5, 1]
+  - [BUY-SCR-SMS-11/64x4, 2]
   - [BUY-SCREW-M4, 20]
   - [BUY-SCREW-M5, 40]
   - [BUY-STEP-42, 1]
+  - [BUY-TUBE-NY2, 1]
   - [HSG-LS, 1]
   - [LS-101, 1]
   - [LS-102, 1]
@@ -4071,6 +4157,7 @@ boms:
   - [LS-106, 1]
   - [LS-107, 1]
   - [LS-108, 1]
+  - [LS-109, 1]
   - [LS-201, 1]
   - [LS-202, 1]
   - [LS-203, 1]
@@ -4080,6 +4167,9 @@ boms:
   - [LS-207, 1]
   - [LS-208, 1]
   - [LS-209, 1]
+  - [LS-210, 1]
+  - [LS-211, 1]
+  - [LS-212, 2]
   - [LS-301D, 1]
   - [LS-302, 1]
   - [LS-303, 1]
@@ -4098,6 +4188,11 @@ boms:
   - [LS-411, 1]
   - [LS-412, 1]
   - [LS-413, 1]
+  - [LS-414, 1]
+  - [LS-415, 1]
+  - [LS-416, 1]
+  - [LS-417, 1]
+  - [LS-418, 2]
   - [LS-501, 1]
   - [LS-502, 1]
   - [LS-503, 1]
@@ -4129,19 +4224,29 @@ boms:
   - [BUY-BELT-LS, 1]
   - [BUY-BOBCASE, 1]
   - [BUY-BOX-LS, 1]
-  - [BUY-BRG-6201, 3]
-  - [BUY-BRG-6202, 1]
+  - [BUY-BRG-6201, 2]
+  - [BUY-BRG-6201-2RS, 1]
+  - [BUY-BRG-6203-2RS, 1]
   - [BUY-COVERS-LS, 1]
   - [BUY-CTRL-LS, 1]
   - [BUY-MOTOR-LS, 1]
   - [BUY-NEEDLE-DB, 1]
+  - [BUY-NRB-K10x14x10, 1]
+  - [BUY-NRB-K10x14x8, 1]
   - [BUY-OILPAN-LS, 1]
   - [BUY-PLATE-LS, 1]
+  - [BUY-PLUG-12, 1]
+  - [BUY-SCR-OIL, 1]
+  - [BUY-SCR-SML-9/64x8, 1]
+  - [BUY-SCR-SMP-9/64x20, 2]
+  - [BUY-SCR-SMP-9/64x5, 1]
+  - [BUY-SCR-SMS-11/64x4, 2]
   - [BUY-SCREW-M4, 20]
   - [BUY-SCREW-M5, 40]
   - [BUY-SOL-REL, 1]
   - [BUY-SOL-TRIM, 1]
   - [BUY-SOL-WIPE, 1]
+  - [BUY-TUBE-NY2, 1]
   - [HSG-LS, 1]
   - [LS-101, 1]
   - [LS-102, 1]
@@ -4151,6 +4256,7 @@ boms:
   - [LS-106, 1]
   - [LS-107, 1]
   - [LS-108, 1]
+  - [LS-109, 1]
   - [LS-201, 1]
   - [LS-202, 1]
   - [LS-203, 1]
@@ -4160,6 +4266,9 @@ boms:
   - [LS-207, 1]
   - [LS-208, 1]
   - [LS-209, 1]
+  - [LS-210, 1]
+  - [LS-211, 1]
+  - [LS-212, 2]
   - [LS-301, 1]
   - [LS-302, 1]
   - [LS-303, 1]
@@ -4178,6 +4287,11 @@ boms:
   - [LS-411, 1]
   - [LS-412, 1]
   - [LS-413, 1]
+  - [LS-414, 1]
+  - [LS-415, 1]
+  - [LS-416, 1]
+  - [LS-417, 1]
+  - [LS-418, 2]
   - [LS-501, 1]
   - [LS-502, 1]
   - [LS-503, 1]
@@ -4222,19 +4336,29 @@ boms:
   - [BUY-BELT-LS, 1]
   - [BUY-BOBCASE, 1]
   - [BUY-BOX-LS, 1]
-  - [BUY-BRG-6201, 3]
-  - [BUY-BRG-6202, 1]
+  - [BUY-BRG-6201, 2]
+  - [BUY-BRG-6201-2RS, 1]
+  - [BUY-BRG-6203-2RS, 1]
   - [BUY-COVERS-LS, 1]
   - [BUY-CTRL-LS, 1]
   - [BUY-MOTOR-LS, 1]
   - [BUY-NEEDLE-DB, 1]
+  - [BUY-NRB-K10x14x10, 1]
+  - [BUY-NRB-K10x14x8, 1]
   - [BUY-OILPAN-LS, 1]
   - [BUY-PLATE-LS, 1]
+  - [BUY-PLUG-12, 1]
+  - [BUY-SCR-OIL, 1]
+  - [BUY-SCR-SML-9/64x8, 1]
+  - [BUY-SCR-SMP-9/64x20, 2]
+  - [BUY-SCR-SMP-9/64x5, 1]
+  - [BUY-SCR-SMS-11/64x4, 2]
   - [BUY-SCREW-M4, 20]
   - [BUY-SCREW-M5, 40]
   - [BUY-SOL-REL, 1]
   - [BUY-SOL-TRIM, 1]
   - [BUY-SOL-WIPE, 1]
+  - [BUY-TUBE-NY2, 1]
   - [HSG-LS, 1]
   - [LS-101, 1]
   - [LS-102, 1]
@@ -4244,6 +4368,7 @@ boms:
   - [LS-106, 1]
   - [LS-107, 1]
   - [LS-108, 1]
+  - [LS-109, 1]
   - [LS-201, 1]
   - [LS-202, 1]
   - [LS-203, 1]
@@ -4253,6 +4378,9 @@ boms:
   - [LS-207, 1]
   - [LS-208, 1]
   - [LS-209, 1]
+  - [LS-210, 1]
+  - [LS-211, 1]
+  - [LS-212, 2]
   - [LS-301D, 1]
   - [LS-302, 1]
   - [LS-303, 1]
@@ -4271,6 +4399,11 @@ boms:
   - [LS-411, 1]
   - [LS-412, 1]
   - [LS-413, 1]
+  - [LS-414, 1]
+  - [LS-415, 1]
+  - [LS-416, 1]
+  - [LS-417, 1]
+  - [LS-418, 2]
   - [LS-501, 1]
   - [LS-502, 1]
   - [LS-503, 1]
@@ -4316,21 +4449,31 @@ boms:
   - [BUY-BELT-LS, 1]
   - [BUY-BOBCASE, 1]
   - [BUY-BOX-LS, 1]
-  - [BUY-BRG-6201, 3]
-  - [BUY-BRG-6202, 1]
+  - [BUY-BRG-6201, 2]
+  - [BUY-BRG-6201-2RS, 1]
+  - [BUY-BRG-6203-2RS, 1]
   - [BUY-BTN-E, 1]
   - [BUY-COVERS-LS, 1]
   - [BUY-CTRL-LS, 1]
   - [BUY-MOTOR-LS, 1]
   - [BUY-NEEDLE-DB, 1]
+  - [BUY-NRB-K10x14x10, 1]
+  - [BUY-NRB-K10x14x8, 1]
   - [BUY-OILPAN-LS, 1]
   - [BUY-PLATE-LS, 1]
+  - [BUY-PLUG-12, 1]
+  - [BUY-SCR-OIL, 1]
+  - [BUY-SCR-SML-9/64x8, 1]
+  - [BUY-SCR-SMP-9/64x20, 2]
+  - [BUY-SCR-SMP-9/64x5, 1]
+  - [BUY-SCR-SMS-11/64x4, 2]
   - [BUY-SCREW-M4, 20]
   - [BUY-SCREW-M5, 40]
   - [BUY-SOL-REL, 1]
   - [BUY-SOL-TRIM, 1]
   - [BUY-SOL-WIPE, 1]
   - [BUY-STEP-42, 1]
+  - [BUY-TUBE-NY2, 1]
   - [HSG-LS, 1]
   - [LS-101, 1]
   - [LS-102, 1]
@@ -4340,6 +4483,7 @@ boms:
   - [LS-106, 1]
   - [LS-107, 1]
   - [LS-108, 1]
+  - [LS-109, 1]
   - [LS-201, 1]
   - [LS-202, 1]
   - [LS-203, 1]
@@ -4349,6 +4493,9 @@ boms:
   - [LS-207, 1]
   - [LS-208, 1]
   - [LS-209, 1]
+  - [LS-210, 1]
+  - [LS-211, 1]
+  - [LS-212, 2]
   - [LS-301, 1]
   - [LS-302, 1]
   - [LS-303, 1]
@@ -4367,6 +4514,11 @@ boms:
   - [LS-411, 1]
   - [LS-412, 1]
   - [LS-413, 1]
+  - [LS-414, 1]
+  - [LS-415, 1]
+  - [LS-416, 1]
+  - [LS-417, 1]
+  - [LS-418, 2]
   - [LS-501, 1]
   - [LS-502, 1]
   - [LS-503, 1]
@@ -4411,21 +4563,31 @@ boms:
   - [BUY-BELT-LS, 1]
   - [BUY-BOBCASE, 1]
   - [BUY-BOX-LS, 1]
-  - [BUY-BRG-6201, 3]
-  - [BUY-BRG-6202, 1]
+  - [BUY-BRG-6201, 2]
+  - [BUY-BRG-6201-2RS, 1]
+  - [BUY-BRG-6203-2RS, 1]
   - [BUY-BTN-E, 1]
   - [BUY-COVERS-LS, 1]
   - [BUY-CTRL-LS, 1]
   - [BUY-MOTOR-LS, 1]
   - [BUY-NEEDLE-DB, 1]
+  - [BUY-NRB-K10x14x10, 1]
+  - [BUY-NRB-K10x14x8, 1]
   - [BUY-OILPAN-LS, 1]
   - [BUY-PLATE-LS, 1]
+  - [BUY-PLUG-12, 1]
+  - [BUY-SCR-OIL, 1]
+  - [BUY-SCR-SML-9/64x8, 1]
+  - [BUY-SCR-SMP-9/64x20, 2]
+  - [BUY-SCR-SMP-9/64x5, 1]
+  - [BUY-SCR-SMS-11/64x4, 2]
   - [BUY-SCREW-M4, 20]
   - [BUY-SCREW-M5, 40]
   - [BUY-SOL-REL, 1]
   - [BUY-SOL-TRIM, 1]
   - [BUY-SOL-WIPE, 1]
   - [BUY-STEP-42, 1]
+  - [BUY-TUBE-NY2, 1]
   - [HSG-LS, 1]
   - [LS-101, 1]
   - [LS-102, 1]
@@ -4435,6 +4597,7 @@ boms:
   - [LS-106, 1]
   - [LS-107, 1]
   - [LS-108, 1]
+  - [LS-109, 1]
   - [LS-201, 1]
   - [LS-202, 1]
   - [LS-203, 1]
@@ -4444,6 +4607,9 @@ boms:
   - [LS-207, 1]
   - [LS-208, 1]
   - [LS-209, 1]
+  - [LS-210, 1]
+  - [LS-211, 1]
+  - [LS-212, 2]
   - [LS-301D, 1]
   - [LS-302, 1]
   - [LS-303, 1]
@@ -4462,6 +4628,11 @@ boms:
   - [LS-411, 1]
   - [LS-412, 1]
   - [LS-413, 1]
+  - [LS-414, 1]
+  - [LS-415, 1]
+  - [LS-416, 1]
+  - [LS-417, 1]
+  - [LS-418, 2]
   - [LS-501, 1]
   - [LS-502, 1]
   - [LS-503, 1]
@@ -4568,20 +4739,31 @@ stock:
     RM-TOPCOAT: 9.0
     # >>> g7_bom：tools/wqls/g7_bom.py 生成（第 138 轮 G7.1），别手改（期初库存）
     BUY-BELT-E: 20
-    BUY-BRG-6201: 60
-    BUY-BRG-6202: 20
+    BUY-BRG-6201: 40
+    BUY-BRG-6201-2RS: 20
+    BUY-BRG-6203-2RS: 20
     BUY-BTN-E: 20
+    BUY-NRB-K10x14x10: 20
+    BUY-NRB-K10x14x8: 20
     BUY-PLATE-LS: 20
+    BUY-PLUG-12: 20
+    BUY-SCR-OIL: 20
+    BUY-SCR-SML-9/64x8: 20
+    BUY-SCR-SMP-9/64x20: 40
+    BUY-SCR-SMP-9/64x5: 20
+    BUY-SCR-SMS-11/64x4: 40
     BUY-SOL-REL: 20
     BUY-SOL-TRIM: 20
     BUY-SOL-WIPE: 20
     BUY-STEP-42: 20
+    BUY-TUBE-NY2: 20
     LS-103: 20
     LS-104: 20
     LS-105: 20
     LS-106: 20
     LS-107: 20
     LS-108: 20
+    LS-109: 20
     LS-202: 20
     LS-203: 20
     LS-204: 20
@@ -4590,6 +4772,9 @@ stock:
     LS-207: 20
     LS-208: 20
     LS-209: 20
+    LS-210: 20
+    LS-211: 20
+    LS-212: 40
     LS-301D: 20
     LS-302: 20
     LS-303: 20
@@ -4606,6 +4791,11 @@ stock:
     LS-411: 20
     LS-412: 20
     LS-413: 20
+    LS-414: 20
+    LS-415: 20
+    LS-416: 20
+    LS-417: 20
+    LS-418: 40
     LS-501: 20
     LS-502: 20
     LS-503: 20

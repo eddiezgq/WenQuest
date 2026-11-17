@@ -33,7 +33,7 @@ OPT_PRICE = {"T": 90, "E": 70, "D": 15}   # 选项加价（示例）
 
 # 三维里没有、整机要的物料（所有变型都有）：(物料号, 数量, 理由)
 EXTRA = [
-    ("BUY-BRG-6201", 1, "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"),
+    ("BUY-BRG-6201-2RS", 1, "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）"),
     ("BUY-CTRL-LS", 1, "电控箱（GC 设计，外购）"),
     ("BUY-PLATE-LS", 1, "针板与推板（三维没有画）"),
     ("BUY-OILPAN-LS", 1, "油盘"),
@@ -54,6 +54,18 @@ NEW_BUY = {
     "BUY-BELT-E": ("同步带 HTD 3M 宽 9（型号待确认） Timing belt HTD 3M 9 mm", "sewparts", 1.5),
     "BUY-BTN-E": ("倒缝按钮（型号待确认） Reverse push-button", "drive", 1.0),
     "LS-301D": ("旋梭（少油型，梭床和梭尖镀 DLC；外购） Rotary hook, low-oil (DLC-coated, bought)", "sewparts", 8.0),
+    # G8.0 第 4–7 步（F 版上轴、刺布机构补全、SM 螺钉、润滑油路）；SM 螺钉按 Q/WQ 001，零件库 A-SCR-SMP / SMS / SML
+    "BUY-BRG-6201-2RS": ("深沟球轴承 6201-2RS（两面接触密封） Ball bearing 12×32×10, sealed", "hardware", 1.4),
+    "BUY-BRG-6203-2RS": ("深沟球轴承 6203-2RS（两面接触密封） Ball bearing 17×40×12, sealed", "hardware", 1.9),
+    "BUY-NRB-K10x14x10": ("滚针保持架组件 K10×14×10 Needle roller and cage K10×14×10", "hardware", 1.1),
+    "BUY-NRB-K10x14x8": ("滚针保持架组件 K10×14×8 Needle roller and cage K10×14×8", "hardware", 1.0),
+    "BUY-PLUG-12": ("橡胶塞 Ø12（机头顶） Rubber plug Ø12", "hardware", 0.05),
+    "BUY-SCR-SMP-9/64x5": ("缝纫机盘头螺钉 SMP 9/64-40 × 5（Q/WQ 001） Pan head screw SM 9/64-40 × 5", "hardware", 0.04),
+    "BUY-SCR-SMP-9/64x20": ("缝纫机盘头螺钉 SMP 9/64-40 × 20（Q/WQ 001） Pan head screw SM 9/64-40 × 20", "hardware", 0.05),
+    "BUY-SCR-SMS-11/64x4": ("缝纫机紧定螺钉 SMS 11/64-40 × 4（Q/WQ 001） Set screw SM 11/64-40 × 4", "hardware", 0.04),
+    "BUY-SCR-SML-9/64x8": ("缝纫机左旋盘头螺钉 SML 9/64-40 × 8 + 紧定螺钉 SMS 15/64-28 × 8 两个（曲柄螺钉组） Crank screw set", "hardware", 0.15),
+    "BUY-SCR-OIL": ("油路螺钉组：M4 × 10 两个、SMP 9/64-40 × 12 两个 Oil-system screw set", "hardware", 0.12),
+    "BUY-TUBE-NY2": ("尼龙油管 Ø2 × 0.4，0.2 m Nylon oil line Ø2", "hardware", 0.1),
 }
 # 新的自制件：编码 → (中英文名, 工艺路线, 原材料, 用量)
 NEW_MAKE = {

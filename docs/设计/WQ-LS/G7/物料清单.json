@@ -40,24 +40,32 @@
     },
     {
      "code": "BUY-BRG-6201",
-     "qty": 3,
+     "qty": 2,
      "parts": [
       "bearings_lower"
      ],
      "kind": "buy",
      "name": "下轴轴承 6201 Lower shaft bearings 6201",
-     "mass_g": 57.6,
-     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+     "mass_g": 57.6
     },
     {
-     "code": "BUY-BRG-6202",
+     "code": "BUY-BRG-6201-2RS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "extra": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6203-2RS",
      "qty": 1,
      "parts": [
       "bearing_front"
      ],
      "kind": "buy",
-     "name": "上轴前轴承 6202 Front bearing 6202",
-     "mass_g": 66.2
+     "name": "上轴前轴承 6203-2RS（终身润滑脂，G8.0 F 版、第 7 步） Front bearing 6203-2RS",
+     "mass_g": 94.8
     },
     {
      "code": "BUY-COVERS-LS",
@@ -106,6 +114,26 @@
      "mass_g": 0.3
     },
     {
+     "code": "BUY-NRB-K10x14x10",
+     "qty": 1,
+     "parts": [
+      "cage_rod"
+     ],
+     "kind": "buy",
+     "name": "连杆大头滚针组件 K10×14×10 Needle cage K10×14×10 (rod)",
+     "mass_g": 5.6
+    },
+    {
+     "code": "BUY-NRB-K10x14x8",
+     "qty": 1,
+     "parts": [
+      "cage_lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆滚针组件 K10×14×8 Needle cage K10×14×8 (take-up lever)",
+     "mass_g": 4.5
+    },
+    {
      "code": "BUY-OILPAN-LS",
      "qty": 1,
      "parts": [],
@@ -122,6 +150,66 @@
      "name": "针板与推板（三维没有画）",
      "extra": "针板与推板（三维没有画）",
      "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLUG-12",
+     "qty": 1,
+     "parts": [
+      "nb_plug"
+     ],
+     "kind": "buy",
+     "name": "机头顶橡胶塞 Ø12 Head-top rubber plug",
+     "mass_g": 7.1
+    },
+    {
+     "code": "BUY-SCR-OIL",
+     "qty": 1,
+     "parts": [
+      "oil_screws"
+     ],
+     "kind": "buy",
+     "name": "油路螺钉 Oil-system screws",
+     "mass_g": 7.5
+    },
+    {
+     "code": "BUY-SCR-SML-9/64x8",
+     "qty": 1,
+     "parts": [
+      "crank_screws"
+     ],
+     "kind": "buy",
+     "name": "曲柄螺钉组 Crank screws",
+     "mass_g": 4.7
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x20",
+     "qty": 2,
+     "parts": [
+      "rail_screws"
+     ],
+     "kind": "buy",
+     "name": "导轨螺钉 SMP 9/64-40 × 20 Rail screws",
+     "mass_g": 4.3
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x5",
+     "qty": 1,
+     "parts": [
+      "clamp_screw"
+     ],
+     "kind": "buy",
+     "name": "紧针螺钉 SMP 9/64-40 × 5 Needle clamp screw",
+     "mass_g": 1.0
+    },
+    {
+     "code": "BUY-SCR-SMS-11/64x4",
+     "qty": 2,
+     "parts": [
+      "link_screws"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块紧定螺钉 SMS 11/64-40 × 4 Connecting-block set screws",
+     "mass_g": 0.9
     },
     {
      "code": "BUY-SCREW-M4",
@@ -142,6 +230,16 @@
      "mass_g": 0.0
     },
     {
+     "code": "BUY-TUBE-NY2",
+     "qty": 1,
+     "parts": [
+      "oil_line"
+     ],
+     "kind": "buy",
+     "name": "尼龙油管 Ø2 × 0.4 Nylon oil line",
+     "mass_g": 0.7
+    },
+    {
      "code": "HSG-LS",
      "qty": 1,
      "parts": [
@@ -150,7 +248,7 @@
      ],
      "kind": "make",
      "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
-     "mass_g": 24208.0
+     "mass_g": 23669.0
     },
     {
      "code": "LS-101",
@@ -160,7 +258,7 @@
      ],
      "kind": "make",
      "name": "上轴 Upper shaft",
-     "mass_g": 621.7
+     "mass_g": 840.3
     },
     {
      "code": "LS-102",
@@ -180,7 +278,7 @@
      ],
      "kind": "buy",
      "name": "曲柄（带平衡块） Crank with counterweight",
-     "mass_g": 109.8
+     "mass_g": 120.7
     },
     {
      "code": "LS-104",
@@ -190,7 +288,7 @@
      ],
      "kind": "buy",
      "name": "曲柄销 Crank pin",
-     "mass_g": 7.3
+     "mass_g": 15.0
     },
     {
      "code": "LS-105",
@@ -233,6 +331,16 @@
      "mass_g": 3.1
     },
     {
+     "code": "LS-109",
+     "qty": 1,
+     "parts": [
+      "bush_mid"
+     ],
+     "kind": "buy",
+     "name": "上轴中间含油轴套 Ø20 × Ø35 × 25 Upper-shaft middle sintered bush",
+     "mass_g": 127.0
+    },
+    {
      "code": "LS-201",
      "qty": 1,
      "parts": [
@@ -240,7 +348,7 @@
      ],
      "kind": "make",
      "name": "针杆 Needle bar",
-     "mass_g": 71.0
+     "mass_g": 70.9
     },
     {
      "code": "LS-202",
@@ -250,7 +358,7 @@
      ],
      "kind": "buy",
      "name": "针夹 Needle clamp",
-     "mass_g": 3.2
+     "mass_g": 3.4
     },
     {
      "code": "LS-203",
@@ -260,7 +368,7 @@
      ],
      "kind": "buy",
      "name": "针杆连接块 Needle-bar connecting block",
-     "mass_g": 17.2
+     "mass_g": 18.0
     },
     {
      "code": "LS-204",
@@ -270,7 +378,7 @@
      ],
      "kind": "buy",
      "name": "针杆连杆 Needle-bar connecting rod",
-     "mass_g": 46.2
+     "mass_g": 58.2
     },
     {
      "code": "LS-205",
@@ -280,7 +388,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆 Take-up lever",
-     "mass_g": 24.2
+     "mass_g": 32.0
     },
     {
      "code": "LS-206",
@@ -300,7 +408,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆销 M Take-up pin M",
-     "mass_g": 2.1
+     "mass_g": 3.2
     },
     {
      "code": "LS-208",
@@ -321,6 +429,36 @@
      "kind": "buy",
      "name": "过线环 Thread guide",
      "mass_g": 0.8
+    },
+    {
+     "code": "LS-210",
+     "qty": 1,
+     "parts": [
+      "slide_block"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块 Needle-bar slide block",
+     "mass_g": 9.8
+    },
+    {
+     "code": "LS-211",
+     "qty": 1,
+     "parts": [
+      "slide_rail"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块导轨 Slide-block rail",
+     "mass_g": 122.3
+    },
+    {
+     "code": "LS-212",
+     "qty": 2,
+     "parts": [
+      "nb_bushes"
+     ],
+     "kind": "buy",
+     "name": "针杆上、下导套 Needle-bar bushes (upper wrapped, lower sintered)",
+     "mass_g": 11.1
     },
     {
      "code": "LS-301",
@@ -501,6 +639,56 @@
      "kind": "buy",
      "name": "油泵体 Oil-pump body",
      "mass_g": 18.2
+    },
+    {
+     "code": "LS-414",
+     "qty": 1,
+     "parts": [
+      "oil_block"
+     ],
+     "kind": "buy",
+     "name": "分油块（带溢流孔） Oil distribution block",
+     "mass_g": 10.4
+    },
+    {
+     "code": "LS-415",
+     "qty": 1,
+     "parts": [
+      "oil_tubes"
+     ],
+     "kind": "buy",
+     "name": "上油铜管 Ø4 与溢流铜管 Ø6 Oil riser and return tubes",
+     "mass_g": 154.2
+    },
+    {
+     "code": "LS-416",
+     "qty": 1,
+     "parts": [
+      "oil_box"
+     ],
+     "kind": "buy",
+     "name": "机头油毡盒 Head oil-felt box",
+     "mass_g": 4.0
+    },
+    {
+     "code": "LS-417",
+     "qty": 1,
+     "parts": [
+      "oil_wicks"
+     ],
+     "kind": "buy",
+     "name": "油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头） Oil wicks",
+     "mass_g": 0.7
+    },
+    {
+     "code": "LS-418",
+     "qty": 2,
+     "parts": [
+      "oil_cups"
+     ],
+     "kind": "buy",
+     "name": "针杆油毡杯 Needle-bar oil-felt cups",
+     "mass_g": 0.8
     },
     {
      "code": "LS-501",
@@ -803,24 +991,32 @@
     },
     {
      "code": "BUY-BRG-6201",
-     "qty": 3,
+     "qty": 2,
      "parts": [
       "bearings_lower"
      ],
      "kind": "buy",
      "name": "下轴轴承 6201 Lower shaft bearings 6201",
-     "mass_g": 57.6,
-     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+     "mass_g": 57.6
     },
     {
-     "code": "BUY-BRG-6202",
+     "code": "BUY-BRG-6201-2RS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "extra": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6203-2RS",
      "qty": 1,
      "parts": [
       "bearing_front"
      ],
      "kind": "buy",
-     "name": "上轴前轴承 6202 Front bearing 6202",
-     "mass_g": 66.2
+     "name": "上轴前轴承 6203-2RS（终身润滑脂，G8.0 F 版、第 7 步） Front bearing 6203-2RS",
+     "mass_g": 94.8
     },
     {
      "code": "BUY-COVERS-LS",
@@ -869,6 +1065,26 @@
      "mass_g": 0.3
     },
     {
+     "code": "BUY-NRB-K10x14x10",
+     "qty": 1,
+     "parts": [
+      "cage_rod"
+     ],
+     "kind": "buy",
+     "name": "连杆大头滚针组件 K10×14×10 Needle cage K10×14×10 (rod)",
+     "mass_g": 5.6
+    },
+    {
+     "code": "BUY-NRB-K10x14x8",
+     "qty": 1,
+     "parts": [
+      "cage_lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆滚针组件 K10×14×8 Needle cage K10×14×8 (take-up lever)",
+     "mass_g": 4.5
+    },
+    {
      "code": "BUY-OILPAN-LS",
      "qty": 1,
      "parts": [],
@@ -885,6 +1101,66 @@
      "name": "针板与推板（三维没有画）",
      "extra": "针板与推板（三维没有画）",
      "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLUG-12",
+     "qty": 1,
+     "parts": [
+      "nb_plug"
+     ],
+     "kind": "buy",
+     "name": "机头顶橡胶塞 Ø12 Head-top rubber plug",
+     "mass_g": 7.1
+    },
+    {
+     "code": "BUY-SCR-OIL",
+     "qty": 1,
+     "parts": [
+      "oil_screws"
+     ],
+     "kind": "buy",
+     "name": "油路螺钉 Oil-system screws",
+     "mass_g": 7.5
+    },
+    {
+     "code": "BUY-SCR-SML-9/64x8",
+     "qty": 1,
+     "parts": [
+      "crank_screws"
+     ],
+     "kind": "buy",
+     "name": "曲柄螺钉组 Crank screws",
+     "mass_g": 4.7
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x20",
+     "qty": 2,
+     "parts": [
+      "rail_screws"
+     ],
+     "kind": "buy",
+     "name": "导轨螺钉 SMP 9/64-40 × 20 Rail screws",
+     "mass_g": 4.3
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x5",
+     "qty": 1,
+     "parts": [
+      "clamp_screw"
+     ],
+     "kind": "buy",
+     "name": "紧针螺钉 SMP 9/64-40 × 5 Needle clamp screw",
+     "mass_g": 1.0
+    },
+    {
+     "code": "BUY-SCR-SMS-11/64x4",
+     "qty": 2,
+     "parts": [
+      "link_screws"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块紧定螺钉 SMS 11/64-40 × 4 Connecting-block set screws",
+     "mass_g": 0.9
     },
     {
      "code": "BUY-SCREW-M4",
@@ -905,6 +1181,16 @@
      "mass_g": 0.0
     },
     {
+     "code": "BUY-TUBE-NY2",
+     "qty": 1,
+     "parts": [
+      "oil_line"
+     ],
+     "kind": "buy",
+     "name": "尼龙油管 Ø2 × 0.4 Nylon oil line",
+     "mass_g": 0.7
+    },
+    {
      "code": "HSG-LS",
      "qty": 1,
      "parts": [
@@ -913,7 +1199,7 @@
      ],
      "kind": "make",
      "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
-     "mass_g": 24208.0
+     "mass_g": 23669.0
     },
     {
      "code": "LS-101",
@@ -923,7 +1209,7 @@
      ],
      "kind": "make",
      "name": "上轴 Upper shaft",
-     "mass_g": 621.7
+     "mass_g": 840.3
     },
     {
      "code": "LS-102",
@@ -943,7 +1229,7 @@
      ],
      "kind": "buy",
      "name": "曲柄（带平衡块） Crank with counterweight",
-     "mass_g": 109.8
+     "mass_g": 120.7
     },
     {
      "code": "LS-104",
@@ -953,7 +1239,7 @@
      ],
      "kind": "buy",
      "name": "曲柄销 Crank pin",
-     "mass_g": 7.3
+     "mass_g": 15.0
     },
     {
      "code": "LS-105",
@@ -996,6 +1282,16 @@
      "mass_g": 3.1
     },
     {
+     "code": "LS-109",
+     "qty": 1,
+     "parts": [
+      "bush_mid"
+     ],
+     "kind": "buy",
+     "name": "上轴中间含油轴套 Ø20 × Ø35 × 25 Upper-shaft middle sintered bush",
+     "mass_g": 127.0
+    },
+    {
      "code": "LS-201",
      "qty": 1,
      "parts": [
@@ -1003,7 +1299,7 @@
      ],
      "kind": "make",
      "name": "针杆 Needle bar",
-     "mass_g": 71.0
+     "mass_g": 70.9
     },
     {
      "code": "LS-202",
@@ -1013,7 +1309,7 @@
      ],
      "kind": "buy",
      "name": "针夹 Needle clamp",
-     "mass_g": 3.2
+     "mass_g": 3.4
     },
     {
      "code": "LS-203",
@@ -1023,7 +1319,7 @@
      ],
      "kind": "buy",
      "name": "针杆连接块 Needle-bar connecting block",
-     "mass_g": 17.2
+     "mass_g": 18.0
     },
     {
      "code": "LS-204",
@@ -1033,7 +1329,7 @@
      ],
      "kind": "buy",
      "name": "针杆连杆 Needle-bar connecting rod",
-     "mass_g": 46.2
+     "mass_g": 58.2
     },
     {
      "code": "LS-205",
@@ -1043,7 +1339,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆 Take-up lever",
-     "mass_g": 24.2
+     "mass_g": 32.0
     },
     {
      "code": "LS-206",
@@ -1063,7 +1359,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆销 M Take-up pin M",
-     "mass_g": 2.1
+     "mass_g": 3.2
     },
     {
      "code": "LS-208",
@@ -1084,6 +1380,36 @@
      "kind": "buy",
      "name": "过线环 Thread guide",
      "mass_g": 0.8
+    },
+    {
+     "code": "LS-210",
+     "qty": 1,
+     "parts": [
+      "slide_block"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块 Needle-bar slide block",
+     "mass_g": 9.8
+    },
+    {
+     "code": "LS-211",
+     "qty": 1,
+     "parts": [
+      "slide_rail"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块导轨 Slide-block rail",
+     "mass_g": 122.3
+    },
+    {
+     "code": "LS-212",
+     "qty": 2,
+     "parts": [
+      "nb_bushes"
+     ],
+     "kind": "buy",
+     "name": "针杆上、下导套 Needle-bar bushes (upper wrapped, lower sintered)",
+     "mass_g": 11.1
     },
     {
      "code": "LS-301D",
@@ -1264,6 +1590,56 @@
      "kind": "buy",
      "name": "油泵体 Oil-pump body",
      "mass_g": 18.2
+    },
+    {
+     "code": "LS-414",
+     "qty": 1,
+     "parts": [
+      "oil_block"
+     ],
+     "kind": "buy",
+     "name": "分油块（带溢流孔） Oil distribution block",
+     "mass_g": 10.4
+    },
+    {
+     "code": "LS-415",
+     "qty": 1,
+     "parts": [
+      "oil_tubes"
+     ],
+     "kind": "buy",
+     "name": "上油铜管 Ø4 与溢流铜管 Ø6 Oil riser and return tubes",
+     "mass_g": 154.2
+    },
+    {
+     "code": "LS-416",
+     "qty": 1,
+     "parts": [
+      "oil_box"
+     ],
+     "kind": "buy",
+     "name": "机头油毡盒 Head oil-felt box",
+     "mass_g": 4.0
+    },
+    {
+     "code": "LS-417",
+     "qty": 1,
+     "parts": [
+      "oil_wicks"
+     ],
+     "kind": "buy",
+     "name": "油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头） Oil wicks",
+     "mass_g": 0.7
+    },
+    {
+     "code": "LS-418",
+     "qty": 2,
+     "parts": [
+      "oil_cups"
+     ],
+     "kind": "buy",
+     "name": "针杆油毡杯 Needle-bar oil-felt cups",
+     "mass_g": 0.8
     },
     {
      "code": "LS-501",
@@ -1576,24 +1952,32 @@
     },
     {
      "code": "BUY-BRG-6201",
-     "qty": 3,
+     "qty": 2,
      "parts": [
       "bearings_lower"
      ],
      "kind": "buy",
      "name": "下轴轴承 6201 Lower shaft bearings 6201",
-     "mass_g": 57.6,
-     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+     "mass_g": 57.6
     },
     {
-     "code": "BUY-BRG-6202",
+     "code": "BUY-BRG-6201-2RS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "extra": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6203-2RS",
      "qty": 1,
      "parts": [
       "bearing_front"
      ],
      "kind": "buy",
-     "name": "上轴前轴承 6202 Front bearing 6202",
-     "mass_g": 66.2
+     "name": "上轴前轴承 6203-2RS（终身润滑脂，G8.0 F 版、第 7 步） Front bearing 6203-2RS",
+     "mass_g": 94.8
     },
     {
      "code": "BUY-BTN-E",
@@ -1652,6 +2036,26 @@
      "mass_g": 0.3
     },
     {
+     "code": "BUY-NRB-K10x14x10",
+     "qty": 1,
+     "parts": [
+      "cage_rod"
+     ],
+     "kind": "buy",
+     "name": "连杆大头滚针组件 K10×14×10 Needle cage K10×14×10 (rod)",
+     "mass_g": 5.6
+    },
+    {
+     "code": "BUY-NRB-K10x14x8",
+     "qty": 1,
+     "parts": [
+      "cage_lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆滚针组件 K10×14×8 Needle cage K10×14×8 (take-up lever)",
+     "mass_g": 4.5
+    },
+    {
      "code": "BUY-OILPAN-LS",
      "qty": 1,
      "parts": [],
@@ -1668,6 +2072,66 @@
      "name": "针板与推板（三维没有画）",
      "extra": "针板与推板（三维没有画）",
      "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLUG-12",
+     "qty": 1,
+     "parts": [
+      "nb_plug"
+     ],
+     "kind": "buy",
+     "name": "机头顶橡胶塞 Ø12 Head-top rubber plug",
+     "mass_g": 7.1
+    },
+    {
+     "code": "BUY-SCR-OIL",
+     "qty": 1,
+     "parts": [
+      "oil_screws"
+     ],
+     "kind": "buy",
+     "name": "油路螺钉 Oil-system screws",
+     "mass_g": 7.5
+    },
+    {
+     "code": "BUY-SCR-SML-9/64x8",
+     "qty": 1,
+     "parts": [
+      "crank_screws"
+     ],
+     "kind": "buy",
+     "name": "曲柄螺钉组 Crank screws",
+     "mass_g": 4.7
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x20",
+     "qty": 2,
+     "parts": [
+      "rail_screws"
+     ],
+     "kind": "buy",
+     "name": "导轨螺钉 SMP 9/64-40 × 20 Rail screws",
+     "mass_g": 4.3
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x5",
+     "qty": 1,
+     "parts": [
+      "clamp_screw"
+     ],
+     "kind": "buy",
+     "name": "紧针螺钉 SMP 9/64-40 × 5 Needle clamp screw",
+     "mass_g": 1.0
+    },
+    {
+     "code": "BUY-SCR-SMS-11/64x4",
+     "qty": 2,
+     "parts": [
+      "link_screws"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块紧定螺钉 SMS 11/64-40 × 4 Connecting-block set screws",
+     "mass_g": 0.9
     },
     {
      "code": "BUY-SCREW-M4",
@@ -1698,6 +2162,16 @@
      "mass_g": 819.3
     },
     {
+     "code": "BUY-TUBE-NY2",
+     "qty": 1,
+     "parts": [
+      "oil_line"
+     ],
+     "kind": "buy",
+     "name": "尼龙油管 Ø2 × 0.4 Nylon oil line",
+     "mass_g": 0.7
+    },
+    {
      "code": "HSG-LS",
      "qty": 1,
      "parts": [
@@ -1706,7 +2180,7 @@
      ],
      "kind": "make",
      "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
-     "mass_g": 24208.0
+     "mass_g": 23669.0
     },
     {
      "code": "LS-101",
@@ -1716,7 +2190,7 @@
      ],
      "kind": "make",
      "name": "上轴 Upper shaft",
-     "mass_g": 621.7
+     "mass_g": 840.3
     },
     {
      "code": "LS-102",
@@ -1736,7 +2210,7 @@
      ],
      "kind": "buy",
      "name": "曲柄（带平衡块） Crank with counterweight",
-     "mass_g": 109.8
+     "mass_g": 120.7
     },
     {
      "code": "LS-104",
@@ -1746,7 +2220,7 @@
      ],
      "kind": "buy",
      "name": "曲柄销 Crank pin",
-     "mass_g": 7.3
+     "mass_g": 15.0
     },
     {
      "code": "LS-105",
@@ -1789,6 +2263,16 @@
      "mass_g": 3.1
     },
     {
+     "code": "LS-109",
+     "qty": 1,
+     "parts": [
+      "bush_mid"
+     ],
+     "kind": "buy",
+     "name": "上轴中间含油轴套 Ø20 × Ø35 × 25 Upper-shaft middle sintered bush",
+     "mass_g": 127.0
+    },
+    {
      "code": "LS-201",
      "qty": 1,
      "parts": [
@@ -1796,7 +2280,7 @@
      ],
      "kind": "make",
      "name": "针杆 Needle bar",
-     "mass_g": 71.0
+     "mass_g": 70.9
     },
     {
      "code": "LS-202",
@@ -1806,7 +2290,7 @@
      ],
      "kind": "buy",
      "name": "针夹 Needle clamp",
-     "mass_g": 3.2
+     "mass_g": 3.4
     },
     {
      "code": "LS-203",
@@ -1816,7 +2300,7 @@
      ],
      "kind": "buy",
      "name": "针杆连接块 Needle-bar connecting block",
-     "mass_g": 17.2
+     "mass_g": 18.0
     },
     {
      "code": "LS-204",
@@ -1826,7 +2310,7 @@
      ],
      "kind": "buy",
      "name": "针杆连杆 Needle-bar connecting rod",
-     "mass_g": 46.2
+     "mass_g": 58.2
     },
     {
      "code": "LS-205",
@@ -1836,7 +2320,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆 Take-up lever",
-     "mass_g": 24.2
+     "mass_g": 32.0
     },
     {
      "code": "LS-206",
@@ -1856,7 +2340,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆销 M Take-up pin M",
-     "mass_g": 2.1
+     "mass_g": 3.2
     },
     {
      "code": "LS-208",
@@ -1877,6 +2361,36 @@
      "kind": "buy",
      "name": "过线环 Thread guide",
      "mass_g": 0.8
+    },
+    {
+     "code": "LS-210",
+     "qty": 1,
+     "parts": [
+      "slide_block"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块 Needle-bar slide block",
+     "mass_g": 9.8
+    },
+    {
+     "code": "LS-211",
+     "qty": 1,
+     "parts": [
+      "slide_rail"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块导轨 Slide-block rail",
+     "mass_g": 122.3
+    },
+    {
+     "code": "LS-212",
+     "qty": 2,
+     "parts": [
+      "nb_bushes"
+     ],
+     "kind": "buy",
+     "name": "针杆上、下导套 Needle-bar bushes (upper wrapped, lower sintered)",
+     "mass_g": 11.1
     },
     {
      "code": "LS-301",
@@ -2057,6 +2571,56 @@
      "kind": "buy",
      "name": "油泵体 Oil-pump body",
      "mass_g": 18.2
+    },
+    {
+     "code": "LS-414",
+     "qty": 1,
+     "parts": [
+      "oil_block"
+     ],
+     "kind": "buy",
+     "name": "分油块（带溢流孔） Oil distribution block",
+     "mass_g": 10.4
+    },
+    {
+     "code": "LS-415",
+     "qty": 1,
+     "parts": [
+      "oil_tubes"
+     ],
+     "kind": "buy",
+     "name": "上油铜管 Ø4 与溢流铜管 Ø6 Oil riser and return tubes",
+     "mass_g": 154.2
+    },
+    {
+     "code": "LS-416",
+     "qty": 1,
+     "parts": [
+      "oil_box"
+     ],
+     "kind": "buy",
+     "name": "机头油毡盒 Head oil-felt box",
+     "mass_g": 4.0
+    },
+    {
+     "code": "LS-417",
+     "qty": 1,
+     "parts": [
+      "oil_wicks"
+     ],
+     "kind": "buy",
+     "name": "油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头） Oil wicks",
+     "mass_g": 0.7
+    },
+    {
+     "code": "LS-418",
+     "qty": 2,
+     "parts": [
+      "oil_cups"
+     ],
+     "kind": "buy",
+     "name": "针杆油毡杯 Needle-bar oil-felt cups",
+     "mass_g": 0.8
     },
     {
      "code": "LS-501",
@@ -2359,24 +2923,32 @@
     },
     {
      "code": "BUY-BRG-6201",
-     "qty": 3,
+     "qty": 2,
      "parts": [
       "bearings_lower"
      ],
      "kind": "buy",
      "name": "下轴轴承 6201 Lower shaft bearings 6201",
-     "mass_g": 57.6,
-     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+     "mass_g": 57.6
     },
     {
-     "code": "BUY-BRG-6202",
+     "code": "BUY-BRG-6201-2RS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "extra": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6203-2RS",
      "qty": 1,
      "parts": [
       "bearing_front"
      ],
      "kind": "buy",
-     "name": "上轴前轴承 6202 Front bearing 6202",
-     "mass_g": 66.2
+     "name": "上轴前轴承 6203-2RS（终身润滑脂，G8.0 F 版、第 7 步） Front bearing 6203-2RS",
+     "mass_g": 94.8
     },
     {
      "code": "BUY-BTN-E",
@@ -2435,6 +3007,26 @@
      "mass_g": 0.3
     },
     {
+     "code": "BUY-NRB-K10x14x10",
+     "qty": 1,
+     "parts": [
+      "cage_rod"
+     ],
+     "kind": "buy",
+     "name": "连杆大头滚针组件 K10×14×10 Needle cage K10×14×10 (rod)",
+     "mass_g": 5.6
+    },
+    {
+     "code": "BUY-NRB-K10x14x8",
+     "qty": 1,
+     "parts": [
+      "cage_lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆滚针组件 K10×14×8 Needle cage K10×14×8 (take-up lever)",
+     "mass_g": 4.5
+    },
+    {
      "code": "BUY-OILPAN-LS",
      "qty": 1,
      "parts": [],
@@ -2451,6 +3043,66 @@
      "name": "针板与推板（三维没有画）",
      "extra": "针板与推板（三维没有画）",
      "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLUG-12",
+     "qty": 1,
+     "parts": [
+      "nb_plug"
+     ],
+     "kind": "buy",
+     "name": "机头顶橡胶塞 Ø12 Head-top rubber plug",
+     "mass_g": 7.1
+    },
+    {
+     "code": "BUY-SCR-OIL",
+     "qty": 1,
+     "parts": [
+      "oil_screws"
+     ],
+     "kind": "buy",
+     "name": "油路螺钉 Oil-system screws",
+     "mass_g": 7.5
+    },
+    {
+     "code": "BUY-SCR-SML-9/64x8",
+     "qty": 1,
+     "parts": [
+      "crank_screws"
+     ],
+     "kind": "buy",
+     "name": "曲柄螺钉组 Crank screws",
+     "mass_g": 4.7
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x20",
+     "qty": 2,
+     "parts": [
+      "rail_screws"
+     ],
+     "kind": "buy",
+     "name": "导轨螺钉 SMP 9/64-40 × 20 Rail screws",
+     "mass_g": 4.3
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x5",
+     "qty": 1,
+     "parts": [
+      "clamp_screw"
+     ],
+     "kind": "buy",
+     "name": "紧针螺钉 SMP 9/64-40 × 5 Needle clamp screw",
+     "mass_g": 1.0
+    },
+    {
+     "code": "BUY-SCR-SMS-11/64x4",
+     "qty": 2,
+     "parts": [
+      "link_screws"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块紧定螺钉 SMS 11/64-40 × 4 Connecting-block set screws",
+     "mass_g": 0.9
     },
     {
      "code": "BUY-SCREW-M4",
@@ -2481,6 +3133,16 @@
      "mass_g": 819.3
     },
     {
+     "code": "BUY-TUBE-NY2",
+     "qty": 1,
+     "parts": [
+      "oil_line"
+     ],
+     "kind": "buy",
+     "name": "尼龙油管 Ø2 × 0.4 Nylon oil line",
+     "mass_g": 0.7
+    },
+    {
      "code": "HSG-LS",
      "qty": 1,
      "parts": [
@@ -2489,7 +3151,7 @@
      ],
      "kind": "make",
      "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
-     "mass_g": 24208.0
+     "mass_g": 23669.0
     },
     {
      "code": "LS-101",
@@ -2499,7 +3161,7 @@
      ],
      "kind": "make",
      "name": "上轴 Upper shaft",
-     "mass_g": 621.7
+     "mass_g": 840.3
     },
     {
      "code": "LS-102",
@@ -2519,7 +3181,7 @@
      ],
      "kind": "buy",
      "name": "曲柄（带平衡块） Crank with counterweight",
-     "mass_g": 109.8
+     "mass_g": 120.7
     },
     {
      "code": "LS-104",
@@ -2529,7 +3191,7 @@
      ],
      "kind": "buy",
      "name": "曲柄销 Crank pin",
-     "mass_g": 7.3
+     "mass_g": 15.0
     },
     {
      "code": "LS-105",
@@ -2572,6 +3234,16 @@
      "mass_g": 3.1
     },
     {
+     "code": "LS-109",
+     "qty": 1,
+     "parts": [
+      "bush_mid"
+     ],
+     "kind": "buy",
+     "name": "上轴中间含油轴套 Ø20 × Ø35 × 25 Upper-shaft middle sintered bush",
+     "mass_g": 127.0
+    },
+    {
      "code": "LS-201",
      "qty": 1,
      "parts": [
@@ -2579,7 +3251,7 @@
      ],
      "kind": "make",
      "name": "针杆 Needle bar",
-     "mass_g": 71.0
+     "mass_g": 70.9
     },
     {
      "code": "LS-202",
@@ -2589,7 +3261,7 @@
      ],
      "kind": "buy",
      "name": "针夹 Needle clamp",
-     "mass_g": 3.2
+     "mass_g": 3.4
     },
     {
      "code": "LS-203",
@@ -2599,7 +3271,7 @@
      ],
      "kind": "buy",
      "name": "针杆连接块 Needle-bar connecting block",
-     "mass_g": 17.2
+     "mass_g": 18.0
     },
     {
      "code": "LS-204",
@@ -2609,7 +3281,7 @@
      ],
      "kind": "buy",
      "name": "针杆连杆 Needle-bar connecting rod",
-     "mass_g": 46.2
+     "mass_g": 58.2
     },
     {
      "code": "LS-205",
@@ -2619,7 +3291,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆 Take-up lever",
-     "mass_g": 24.2
+     "mass_g": 32.0
     },
     {
      "code": "LS-206",
@@ -2639,7 +3311,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆销 M Take-up pin M",
-     "mass_g": 2.1
+     "mass_g": 3.2
     },
     {
      "code": "LS-208",
@@ -2660,6 +3332,36 @@
      "kind": "buy",
      "name": "过线环 Thread guide",
      "mass_g": 0.8
+    },
+    {
+     "code": "LS-210",
+     "qty": 1,
+     "parts": [
+      "slide_block"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块 Needle-bar slide block",
+     "mass_g": 9.8
+    },
+    {
+     "code": "LS-211",
+     "qty": 1,
+     "parts": [
+      "slide_rail"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块导轨 Slide-block rail",
+     "mass_g": 122.3
+    },
+    {
+     "code": "LS-212",
+     "qty": 2,
+     "parts": [
+      "nb_bushes"
+     ],
+     "kind": "buy",
+     "name": "针杆上、下导套 Needle-bar bushes (upper wrapped, lower sintered)",
+     "mass_g": 11.1
     },
     {
      "code": "LS-301D",
@@ -2840,6 +3542,56 @@
      "kind": "buy",
      "name": "油泵体 Oil-pump body",
      "mass_g": 18.2
+    },
+    {
+     "code": "LS-414",
+     "qty": 1,
+     "parts": [
+      "oil_block"
+     ],
+     "kind": "buy",
+     "name": "分油块（带溢流孔） Oil distribution block",
+     "mass_g": 10.4
+    },
+    {
+     "code": "LS-415",
+     "qty": 1,
+     "parts": [
+      "oil_tubes"
+     ],
+     "kind": "buy",
+     "name": "上油铜管 Ø4 与溢流铜管 Ø6 Oil riser and return tubes",
+     "mass_g": 154.2
+    },
+    {
+     "code": "LS-416",
+     "qty": 1,
+     "parts": [
+      "oil_box"
+     ],
+     "kind": "buy",
+     "name": "机头油毡盒 Head oil-felt box",
+     "mass_g": 4.0
+    },
+    {
+     "code": "LS-417",
+     "qty": 1,
+     "parts": [
+      "oil_wicks"
+     ],
+     "kind": "buy",
+     "name": "油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头） Oil wicks",
+     "mass_g": 0.7
+    },
+    {
+     "code": "LS-418",
+     "qty": 2,
+     "parts": [
+      "oil_cups"
+     ],
+     "kind": "buy",
+     "name": "针杆油毡杯 Needle-bar oil-felt cups",
+     "mass_g": 0.8
     },
     {
      "code": "LS-501",
@@ -3132,24 +3884,32 @@
     },
     {
      "code": "BUY-BRG-6201",
-     "qty": 3,
+     "qty": 2,
      "parts": [
       "bearings_lower"
      ],
      "kind": "buy",
      "name": "下轴轴承 6201 Lower shaft bearings 6201",
-     "mass_g": 57.6,
-     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+     "mass_g": 57.6
     },
     {
-     "code": "BUY-BRG-6202",
+     "code": "BUY-BRG-6201-2RS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "extra": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6203-2RS",
      "qty": 1,
      "parts": [
       "bearing_front"
      ],
      "kind": "buy",
-     "name": "上轴前轴承 6202 Front bearing 6202",
-     "mass_g": 66.2
+     "name": "上轴前轴承 6203-2RS（终身润滑脂，G8.0 F 版、第 7 步） Front bearing 6203-2RS",
+     "mass_g": 94.8
     },
     {
      "code": "BUY-COVERS-LS",
@@ -3198,6 +3958,26 @@
      "mass_g": 0.3
     },
     {
+     "code": "BUY-NRB-K10x14x10",
+     "qty": 1,
+     "parts": [
+      "cage_rod"
+     ],
+     "kind": "buy",
+     "name": "连杆大头滚针组件 K10×14×10 Needle cage K10×14×10 (rod)",
+     "mass_g": 5.6
+    },
+    {
+     "code": "BUY-NRB-K10x14x8",
+     "qty": 1,
+     "parts": [
+      "cage_lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆滚针组件 K10×14×8 Needle cage K10×14×8 (take-up lever)",
+     "mass_g": 4.5
+    },
+    {
      "code": "BUY-OILPAN-LS",
      "qty": 1,
      "parts": [],
@@ -3214,6 +3994,66 @@
      "name": "针板与推板（三维没有画）",
      "extra": "针板与推板（三维没有画）",
      "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLUG-12",
+     "qty": 1,
+     "parts": [
+      "nb_plug"
+     ],
+     "kind": "buy",
+     "name": "机头顶橡胶塞 Ø12 Head-top rubber plug",
+     "mass_g": 7.1
+    },
+    {
+     "code": "BUY-SCR-OIL",
+     "qty": 1,
+     "parts": [
+      "oil_screws"
+     ],
+     "kind": "buy",
+     "name": "油路螺钉 Oil-system screws",
+     "mass_g": 7.5
+    },
+    {
+     "code": "BUY-SCR-SML-9/64x8",
+     "qty": 1,
+     "parts": [
+      "crank_screws"
+     ],
+     "kind": "buy",
+     "name": "曲柄螺钉组 Crank screws",
+     "mass_g": 4.7
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x20",
+     "qty": 2,
+     "parts": [
+      "rail_screws"
+     ],
+     "kind": "buy",
+     "name": "导轨螺钉 SMP 9/64-40 × 20 Rail screws",
+     "mass_g": 4.3
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x5",
+     "qty": 1,
+     "parts": [
+      "clamp_screw"
+     ],
+     "kind": "buy",
+     "name": "紧针螺钉 SMP 9/64-40 × 5 Needle clamp screw",
+     "mass_g": 1.0
+    },
+    {
+     "code": "BUY-SCR-SMS-11/64x4",
+     "qty": 2,
+     "parts": [
+      "link_screws"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块紧定螺钉 SMS 11/64-40 × 4 Connecting-block set screws",
+     "mass_g": 0.9
     },
     {
      "code": "BUY-SCREW-M4",
@@ -3241,7 +4081,7 @@
      ],
      "kind": "buy",
      "name": "松线电磁铁 Release solenoid",
-     "mass_g": 42.4
+     "mass_g": 39.8
     },
     {
      "code": "BUY-SOL-TRIM",
@@ -3264,6 +4104,16 @@
      "mass_g": 25.4
     },
     {
+     "code": "BUY-TUBE-NY2",
+     "qty": 1,
+     "parts": [
+      "oil_line"
+     ],
+     "kind": "buy",
+     "name": "尼龙油管 Ø2 × 0.4 Nylon oil line",
+     "mass_g": 0.7
+    },
+    {
      "code": "HSG-LS",
      "qty": 1,
      "parts": [
@@ -3272,7 +4122,7 @@
      ],
      "kind": "make",
      "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
-     "mass_g": 24208.0
+     "mass_g": 23669.0
     },
     {
      "code": "LS-101",
@@ -3282,7 +4132,7 @@
      ],
      "kind": "make",
      "name": "上轴 Upper shaft",
-     "mass_g": 621.7
+     "mass_g": 840.3
     },
     {
      "code": "LS-102",
@@ -3302,7 +4152,7 @@
      ],
      "kind": "buy",
      "name": "曲柄（带平衡块） Crank with counterweight",
-     "mass_g": 109.8
+     "mass_g": 120.7
     },
     {
      "code": "LS-104",
@@ -3312,7 +4162,7 @@
      ],
      "kind": "buy",
      "name": "曲柄销 Crank pin",
-     "mass_g": 7.3
+     "mass_g": 15.0
     },
     {
      "code": "LS-105",
@@ -3355,6 +4205,16 @@
      "mass_g": 3.1
     },
     {
+     "code": "LS-109",
+     "qty": 1,
+     "parts": [
+      "bush_mid"
+     ],
+     "kind": "buy",
+     "name": "上轴中间含油轴套 Ø20 × Ø35 × 25 Upper-shaft middle sintered bush",
+     "mass_g": 127.0
+    },
+    {
      "code": "LS-201",
      "qty": 1,
      "parts": [
@@ -3362,7 +4222,7 @@
      ],
      "kind": "make",
      "name": "针杆 Needle bar",
-     "mass_g": 71.0
+     "mass_g": 70.9
     },
     {
      "code": "LS-202",
@@ -3372,7 +4232,7 @@
      ],
      "kind": "buy",
      "name": "针夹 Needle clamp",
-     "mass_g": 3.2
+     "mass_g": 3.4
     },
     {
      "code": "LS-203",
@@ -3382,7 +4242,7 @@
      ],
      "kind": "buy",
      "name": "针杆连接块 Needle-bar connecting block",
-     "mass_g": 17.2
+     "mass_g": 18.0
     },
     {
      "code": "LS-204",
@@ -3392,7 +4252,7 @@
      ],
      "kind": "buy",
      "name": "针杆连杆 Needle-bar connecting rod",
-     "mass_g": 46.2
+     "mass_g": 58.2
     },
     {
      "code": "LS-205",
@@ -3402,7 +4262,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆 Take-up lever",
-     "mass_g": 24.2
+     "mass_g": 32.0
     },
     {
      "code": "LS-206",
@@ -3422,7 +4282,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆销 M Take-up pin M",
-     "mass_g": 2.1
+     "mass_g": 3.2
     },
     {
      "code": "LS-208",
@@ -3443,6 +4303,36 @@
      "kind": "buy",
      "name": "过线环 Thread guide",
      "mass_g": 0.8
+    },
+    {
+     "code": "LS-210",
+     "qty": 1,
+     "parts": [
+      "slide_block"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块 Needle-bar slide block",
+     "mass_g": 9.8
+    },
+    {
+     "code": "LS-211",
+     "qty": 1,
+     "parts": [
+      "slide_rail"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块导轨 Slide-block rail",
+     "mass_g": 122.3
+    },
+    {
+     "code": "LS-212",
+     "qty": 2,
+     "parts": [
+      "nb_bushes"
+     ],
+     "kind": "buy",
+     "name": "针杆上、下导套 Needle-bar bushes (upper wrapped, lower sintered)",
+     "mass_g": 11.1
     },
     {
      "code": "LS-301",
@@ -3623,6 +4513,56 @@
      "kind": "buy",
      "name": "油泵体 Oil-pump body",
      "mass_g": 18.2
+    },
+    {
+     "code": "LS-414",
+     "qty": 1,
+     "parts": [
+      "oil_block"
+     ],
+     "kind": "buy",
+     "name": "分油块（带溢流孔） Oil distribution block",
+     "mass_g": 10.4
+    },
+    {
+     "code": "LS-415",
+     "qty": 1,
+     "parts": [
+      "oil_tubes"
+     ],
+     "kind": "buy",
+     "name": "上油铜管 Ø4 与溢流铜管 Ø6 Oil riser and return tubes",
+     "mass_g": 154.2
+    },
+    {
+     "code": "LS-416",
+     "qty": 1,
+     "parts": [
+      "oil_box"
+     ],
+     "kind": "buy",
+     "name": "机头油毡盒 Head oil-felt box",
+     "mass_g": 4.0
+    },
+    {
+     "code": "LS-417",
+     "qty": 1,
+     "parts": [
+      "oil_wicks"
+     ],
+     "kind": "buy",
+     "name": "油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头） Oil wicks",
+     "mass_g": 0.7
+    },
+    {
+     "code": "LS-418",
+     "qty": 2,
+     "parts": [
+      "oil_cups"
+     ],
+     "kind": "buy",
+     "name": "针杆油毡杯 Needle-bar oil-felt cups",
+     "mass_g": 0.8
     },
     {
      "code": "LS-501",
@@ -4002,7 +4942,7 @@
      ],
      "kind": "buy",
      "name": "松线臂 Release arm",
-     "mass_g": 2.1
+     "mass_g": 2.4
     }
    ]
   },
@@ -4045,24 +4985,32 @@
     },
     {
      "code": "BUY-BRG-6201",
-     "qty": 3,
+     "qty": 2,
      "parts": [
       "bearings_lower"
      ],
      "kind": "buy",
      "name": "下轴轴承 6201 Lower shaft bearings 6201",
-     "mass_g": 57.6,
-     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+     "mass_g": 57.6
     },
     {
-     "code": "BUY-BRG-6202",
+     "code": "BUY-BRG-6201-2RS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "extra": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6203-2RS",
      "qty": 1,
      "parts": [
       "bearing_front"
      ],
      "kind": "buy",
-     "name": "上轴前轴承 6202 Front bearing 6202",
-     "mass_g": 66.2
+     "name": "上轴前轴承 6203-2RS（终身润滑脂，G8.0 F 版、第 7 步） Front bearing 6203-2RS",
+     "mass_g": 94.8
     },
     {
      "code": "BUY-COVERS-LS",
@@ -4111,6 +5059,26 @@
      "mass_g": 0.3
     },
     {
+     "code": "BUY-NRB-K10x14x10",
+     "qty": 1,
+     "parts": [
+      "cage_rod"
+     ],
+     "kind": "buy",
+     "name": "连杆大头滚针组件 K10×14×10 Needle cage K10×14×10 (rod)",
+     "mass_g": 5.6
+    },
+    {
+     "code": "BUY-NRB-K10x14x8",
+     "qty": 1,
+     "parts": [
+      "cage_lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆滚针组件 K10×14×8 Needle cage K10×14×8 (take-up lever)",
+     "mass_g": 4.5
+    },
+    {
      "code": "BUY-OILPAN-LS",
      "qty": 1,
      "parts": [],
@@ -4127,6 +5095,66 @@
      "name": "针板与推板（三维没有画）",
      "extra": "针板与推板（三维没有画）",
      "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLUG-12",
+     "qty": 1,
+     "parts": [
+      "nb_plug"
+     ],
+     "kind": "buy",
+     "name": "机头顶橡胶塞 Ø12 Head-top rubber plug",
+     "mass_g": 7.1
+    },
+    {
+     "code": "BUY-SCR-OIL",
+     "qty": 1,
+     "parts": [
+      "oil_screws"
+     ],
+     "kind": "buy",
+     "name": "油路螺钉 Oil-system screws",
+     "mass_g": 7.5
+    },
+    {
+     "code": "BUY-SCR-SML-9/64x8",
+     "qty": 1,
+     "parts": [
+      "crank_screws"
+     ],
+     "kind": "buy",
+     "name": "曲柄螺钉组 Crank screws",
+     "mass_g": 4.7
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x20",
+     "qty": 2,
+     "parts": [
+      "rail_screws"
+     ],
+     "kind": "buy",
+     "name": "导轨螺钉 SMP 9/64-40 × 20 Rail screws",
+     "mass_g": 4.3
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x5",
+     "qty": 1,
+     "parts": [
+      "clamp_screw"
+     ],
+     "kind": "buy",
+     "name": "紧针螺钉 SMP 9/64-40 × 5 Needle clamp screw",
+     "mass_g": 1.0
+    },
+    {
+     "code": "BUY-SCR-SMS-11/64x4",
+     "qty": 2,
+     "parts": [
+      "link_screws"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块紧定螺钉 SMS 11/64-40 × 4 Connecting-block set screws",
+     "mass_g": 0.9
     },
     {
      "code": "BUY-SCREW-M4",
@@ -4154,7 +5182,7 @@
      ],
      "kind": "buy",
      "name": "松线电磁铁 Release solenoid",
-     "mass_g": 42.4
+     "mass_g": 39.8
     },
     {
      "code": "BUY-SOL-TRIM",
@@ -4177,6 +5205,16 @@
      "mass_g": 25.4
     },
     {
+     "code": "BUY-TUBE-NY2",
+     "qty": 1,
+     "parts": [
+      "oil_line"
+     ],
+     "kind": "buy",
+     "name": "尼龙油管 Ø2 × 0.4 Nylon oil line",
+     "mass_g": 0.7
+    },
+    {
      "code": "HSG-LS",
      "qty": 1,
      "parts": [
@@ -4185,7 +5223,7 @@
      ],
      "kind": "make",
      "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
-     "mass_g": 24208.0
+     "mass_g": 23669.0
     },
     {
      "code": "LS-101",
@@ -4195,7 +5233,7 @@
      ],
      "kind": "make",
      "name": "上轴 Upper shaft",
-     "mass_g": 621.7
+     "mass_g": 840.3
     },
     {
      "code": "LS-102",
@@ -4215,7 +5253,7 @@
      ],
      "kind": "buy",
      "name": "曲柄（带平衡块） Crank with counterweight",
-     "mass_g": 109.8
+     "mass_g": 120.7
     },
     {
      "code": "LS-104",
@@ -4225,7 +5263,7 @@
      ],
      "kind": "buy",
      "name": "曲柄销 Crank pin",
-     "mass_g": 7.3
+     "mass_g": 15.0
     },
     {
      "code": "LS-105",
@@ -4268,6 +5306,16 @@
      "mass_g": 3.1
     },
     {
+     "code": "LS-109",
+     "qty": 1,
+     "parts": [
+      "bush_mid"
+     ],
+     "kind": "buy",
+     "name": "上轴中间含油轴套 Ø20 × Ø35 × 25 Upper-shaft middle sintered bush",
+     "mass_g": 127.0
+    },
+    {
      "code": "LS-201",
      "qty": 1,
      "parts": [
@@ -4275,7 +5323,7 @@
      ],
      "kind": "make",
      "name": "针杆 Needle bar",
-     "mass_g": 71.0
+     "mass_g": 70.9
     },
     {
      "code": "LS-202",
@@ -4285,7 +5333,7 @@
      ],
      "kind": "buy",
      "name": "针夹 Needle clamp",
-     "mass_g": 3.2
+     "mass_g": 3.4
     },
     {
      "code": "LS-203",
@@ -4295,7 +5343,7 @@
      ],
      "kind": "buy",
      "name": "针杆连接块 Needle-bar connecting block",
-     "mass_g": 17.2
+     "mass_g": 18.0
     },
     {
      "code": "LS-204",
@@ -4305,7 +5353,7 @@
      ],
      "kind": "buy",
      "name": "针杆连杆 Needle-bar connecting rod",
-     "mass_g": 46.2
+     "mass_g": 58.2
     },
     {
      "code": "LS-205",
@@ -4315,7 +5363,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆 Take-up lever",
-     "mass_g": 24.2
+     "mass_g": 32.0
     },
     {
      "code": "LS-206",
@@ -4335,7 +5383,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆销 M Take-up pin M",
-     "mass_g": 2.1
+     "mass_g": 3.2
     },
     {
      "code": "LS-208",
@@ -4356,6 +5404,36 @@
      "kind": "buy",
      "name": "过线环 Thread guide",
      "mass_g": 0.8
+    },
+    {
+     "code": "LS-210",
+     "qty": 1,
+     "parts": [
+      "slide_block"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块 Needle-bar slide block",
+     "mass_g": 9.8
+    },
+    {
+     "code": "LS-211",
+     "qty": 1,
+     "parts": [
+      "slide_rail"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块导轨 Slide-block rail",
+     "mass_g": 122.3
+    },
+    {
+     "code": "LS-212",
+     "qty": 2,
+     "parts": [
+      "nb_bushes"
+     ],
+     "kind": "buy",
+     "name": "针杆上、下导套 Needle-bar bushes (upper wrapped, lower sintered)",
+     "mass_g": 11.1
     },
     {
      "code": "LS-301D",
@@ -4538,6 +5616,56 @@
      "mass_g": 18.2
     },
     {
+     "code": "LS-414",
+     "qty": 1,
+     "parts": [
+      "oil_block"
+     ],
+     "kind": "buy",
+     "name": "分油块（带溢流孔） Oil distribution block",
+     "mass_g": 10.4
+    },
+    {
+     "code": "LS-415",
+     "qty": 1,
+     "parts": [
+      "oil_tubes"
+     ],
+     "kind": "buy",
+     "name": "上油铜管 Ø4 与溢流铜管 Ø6 Oil riser and return tubes",
+     "mass_g": 154.2
+    },
+    {
+     "code": "LS-416",
+     "qty": 1,
+     "parts": [
+      "oil_box"
+     ],
+     "kind": "buy",
+     "name": "机头油毡盒 Head oil-felt box",
+     "mass_g": 4.0
+    },
+    {
+     "code": "LS-417",
+     "qty": 1,
+     "parts": [
+      "oil_wicks"
+     ],
+     "kind": "buy",
+     "name": "油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头） Oil wicks",
+     "mass_g": 0.7
+    },
+    {
+     "code": "LS-418",
+     "qty": 2,
+     "parts": [
+      "oil_cups"
+     ],
+     "kind": "buy",
+     "name": "针杆油毡杯 Needle-bar oil-felt cups",
+     "mass_g": 0.8
+    },
+    {
      "code": "LS-501",
      "qty": 1,
      "parts": [
@@ -4915,7 +6043,7 @@
      ],
      "kind": "buy",
      "name": "松线臂 Release arm",
-     "mass_g": 2.1
+     "mass_g": 2.4
     }
    ]
   },
@@ -4968,24 +6096,32 @@
     },
     {
      "code": "BUY-BRG-6201",
-     "qty": 3,
+     "qty": 2,
      "parts": [
       "bearings_lower"
      ],
      "kind": "buy",
      "name": "下轴轴承 6201 Lower shaft bearings 6201",
-     "mass_g": 57.6,
-     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+     "mass_g": 57.6
     },
     {
-     "code": "BUY-BRG-6202",
+     "code": "BUY-BRG-6201-2RS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "extra": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6203-2RS",
      "qty": 1,
      "parts": [
       "bearing_front"
      ],
      "kind": "buy",
-     "name": "上轴前轴承 6202 Front bearing 6202",
-     "mass_g": 66.2
+     "name": "上轴前轴承 6203-2RS（终身润滑脂，G8.0 F 版、第 7 步） Front bearing 6203-2RS",
+     "mass_g": 94.8
     },
     {
      "code": "BUY-BTN-E",
@@ -5044,6 +6180,26 @@
      "mass_g": 0.3
     },
     {
+     "code": "BUY-NRB-K10x14x10",
+     "qty": 1,
+     "parts": [
+      "cage_rod"
+     ],
+     "kind": "buy",
+     "name": "连杆大头滚针组件 K10×14×10 Needle cage K10×14×10 (rod)",
+     "mass_g": 5.6
+    },
+    {
+     "code": "BUY-NRB-K10x14x8",
+     "qty": 1,
+     "parts": [
+      "cage_lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆滚针组件 K10×14×8 Needle cage K10×14×8 (take-up lever)",
+     "mass_g": 4.5
+    },
+    {
      "code": "BUY-OILPAN-LS",
      "qty": 1,
      "parts": [],
@@ -5060,6 +6216,66 @@
      "name": "针板与推板（三维没有画）",
      "extra": "针板与推板（三维没有画）",
      "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLUG-12",
+     "qty": 1,
+     "parts": [
+      "nb_plug"
+     ],
+     "kind": "buy",
+     "name": "机头顶橡胶塞 Ø12 Head-top rubber plug",
+     "mass_g": 7.1
+    },
+    {
+     "code": "BUY-SCR-OIL",
+     "qty": 1,
+     "parts": [
+      "oil_screws"
+     ],
+     "kind": "buy",
+     "name": "油路螺钉 Oil-system screws",
+     "mass_g": 7.5
+    },
+    {
+     "code": "BUY-SCR-SML-9/64x8",
+     "qty": 1,
+     "parts": [
+      "crank_screws"
+     ],
+     "kind": "buy",
+     "name": "曲柄螺钉组 Crank screws",
+     "mass_g": 4.7
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x20",
+     "qty": 2,
+     "parts": [
+      "rail_screws"
+     ],
+     "kind": "buy",
+     "name": "导轨螺钉 SMP 9/64-40 × 20 Rail screws",
+     "mass_g": 4.3
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x5",
+     "qty": 1,
+     "parts": [
+      "clamp_screw"
+     ],
+     "kind": "buy",
+     "name": "紧针螺钉 SMP 9/64-40 × 5 Needle clamp screw",
+     "mass_g": 1.0
+    },
+    {
+     "code": "BUY-SCR-SMS-11/64x4",
+     "qty": 2,
+     "parts": [
+      "link_screws"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块紧定螺钉 SMS 11/64-40 × 4 Connecting-block set screws",
+     "mass_g": 0.9
     },
     {
      "code": "BUY-SCREW-M4",
@@ -5087,7 +6303,7 @@
      ],
      "kind": "buy",
      "name": "松线电磁铁 Release solenoid",
-     "mass_g": 42.4
+     "mass_g": 39.8
     },
     {
      "code": "BUY-SOL-TRIM",
@@ -5120,6 +6336,16 @@
      "mass_g": 819.3
     },
     {
+     "code": "BUY-TUBE-NY2",
+     "qty": 1,
+     "parts": [
+      "oil_line"
+     ],
+     "kind": "buy",
+     "name": "尼龙油管 Ø2 × 0.4 Nylon oil line",
+     "mass_g": 0.7
+    },
+    {
      "code": "HSG-LS",
      "qty": 1,
      "parts": [
@@ -5128,7 +6354,7 @@
      ],
      "kind": "make",
      "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
-     "mass_g": 24208.0
+     "mass_g": 23669.0
     },
     {
      "code": "LS-101",
@@ -5138,7 +6364,7 @@
      ],
      "kind": "make",
      "name": "上轴 Upper shaft",
-     "mass_g": 621.7
+     "mass_g": 840.3
     },
     {
      "code": "LS-102",
@@ -5158,7 +6384,7 @@
      ],
      "kind": "buy",
      "name": "曲柄（带平衡块） Crank with counterweight",
-     "mass_g": 109.8
+     "mass_g": 120.7
     },
     {
      "code": "LS-104",
@@ -5168,7 +6394,7 @@
      ],
      "kind": "buy",
      "name": "曲柄销 Crank pin",
-     "mass_g": 7.3
+     "mass_g": 15.0
     },
     {
      "code": "LS-105",
@@ -5211,6 +6437,16 @@
      "mass_g": 3.1
     },
     {
+     "code": "LS-109",
+     "qty": 1,
+     "parts": [
+      "bush_mid"
+     ],
+     "kind": "buy",
+     "name": "上轴中间含油轴套 Ø20 × Ø35 × 25 Upper-shaft middle sintered bush",
+     "mass_g": 127.0
+    },
+    {
      "code": "LS-201",
      "qty": 1,
      "parts": [
@@ -5218,7 +6454,7 @@
      ],
      "kind": "make",
      "name": "针杆 Needle bar",
-     "mass_g": 71.0
+     "mass_g": 70.9
     },
     {
      "code": "LS-202",
@@ -5228,7 +6464,7 @@
      ],
      "kind": "buy",
      "name": "针夹 Needle clamp",
-     "mass_g": 3.2
+     "mass_g": 3.4
     },
     {
      "code": "LS-203",
@@ -5238,7 +6474,7 @@
      ],
      "kind": "buy",
      "name": "针杆连接块 Needle-bar connecting block",
-     "mass_g": 17.2
+     "mass_g": 18.0
     },
     {
      "code": "LS-204",
@@ -5248,7 +6484,7 @@
      ],
      "kind": "buy",
      "name": "针杆连杆 Needle-bar connecting rod",
-     "mass_g": 46.2
+     "mass_g": 58.2
     },
     {
      "code": "LS-205",
@@ -5258,7 +6494,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆 Take-up lever",
-     "mass_g": 24.2
+     "mass_g": 32.0
     },
     {
      "code": "LS-206",
@@ -5278,7 +6514,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆销 M Take-up pin M",
-     "mass_g": 2.1
+     "mass_g": 3.2
     },
     {
      "code": "LS-208",
@@ -5299,6 +6535,36 @@
      "kind": "buy",
      "name": "过线环 Thread guide",
      "mass_g": 0.8
+    },
+    {
+     "code": "LS-210",
+     "qty": 1,
+     "parts": [
+      "slide_block"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块 Needle-bar slide block",
+     "mass_g": 9.8
+    },
+    {
+     "code": "LS-211",
+     "qty": 1,
+     "parts": [
+      "slide_rail"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块导轨 Slide-block rail",
+     "mass_g": 122.3
+    },
+    {
+     "code": "LS-212",
+     "qty": 2,
+     "parts": [
+      "nb_bushes"
+     ],
+     "kind": "buy",
+     "name": "针杆上、下导套 Needle-bar bushes (upper wrapped, lower sintered)",
+     "mass_g": 11.1
     },
     {
      "code": "LS-301",
@@ -5479,6 +6745,56 @@
      "kind": "buy",
      "name": "油泵体 Oil-pump body",
      "mass_g": 18.2
+    },
+    {
+     "code": "LS-414",
+     "qty": 1,
+     "parts": [
+      "oil_block"
+     ],
+     "kind": "buy",
+     "name": "分油块（带溢流孔） Oil distribution block",
+     "mass_g": 10.4
+    },
+    {
+     "code": "LS-415",
+     "qty": 1,
+     "parts": [
+      "oil_tubes"
+     ],
+     "kind": "buy",
+     "name": "上油铜管 Ø4 与溢流铜管 Ø6 Oil riser and return tubes",
+     "mass_g": 154.2
+    },
+    {
+     "code": "LS-416",
+     "qty": 1,
+     "parts": [
+      "oil_box"
+     ],
+     "kind": "buy",
+     "name": "机头油毡盒 Head oil-felt box",
+     "mass_g": 4.0
+    },
+    {
+     "code": "LS-417",
+     "qty": 1,
+     "parts": [
+      "oil_wicks"
+     ],
+     "kind": "buy",
+     "name": "油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头） Oil wicks",
+     "mass_g": 0.7
+    },
+    {
+     "code": "LS-418",
+     "qty": 2,
+     "parts": [
+      "oil_cups"
+     ],
+     "kind": "buy",
+     "name": "针杆油毡杯 Needle-bar oil-felt cups",
+     "mass_g": 0.8
     },
     {
      "code": "LS-501",
@@ -5818,7 +7134,7 @@
      ],
      "kind": "buy",
      "name": "松线臂 Release arm",
-     "mass_g": 2.1
+     "mass_g": 2.4
     },
     {
      "code": "LS-801",
@@ -5901,24 +7217,32 @@
     },
     {
      "code": "BUY-BRG-6201",
-     "qty": 3,
+     "qty": 2,
      "parts": [
       "bearings_lower"
      ],
      "kind": "buy",
      "name": "下轴轴承 6201 Lower shaft bearings 6201",
-     "mass_g": 57.6,
-     "extra": "上轴后轴承 6201（spec.BRG；三维只画了前轴承 6202）"
+     "mass_g": 57.6
     },
     {
-     "code": "BUY-BRG-6202",
+     "code": "BUY-BRG-6201-2RS",
+     "qty": 1,
+     "parts": [],
+     "kind": "buy",
+     "name": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "extra": "上轴后轴承 6201-2RS（spec.BRG_SEAL，G8.0 第 7 步改终身润滑脂；三维只画了前轴承）",
+     "mass_g": 0.0
+    },
+    {
+     "code": "BUY-BRG-6203-2RS",
      "qty": 1,
      "parts": [
       "bearing_front"
      ],
      "kind": "buy",
-     "name": "上轴前轴承 6202 Front bearing 6202",
-     "mass_g": 66.2
+     "name": "上轴前轴承 6203-2RS（终身润滑脂，G8.0 F 版、第 7 步） Front bearing 6203-2RS",
+     "mass_g": 94.8
     },
     {
      "code": "BUY-BTN-E",
@@ -5977,6 +7301,26 @@
      "mass_g": 0.3
     },
     {
+     "code": "BUY-NRB-K10x14x10",
+     "qty": 1,
+     "parts": [
+      "cage_rod"
+     ],
+     "kind": "buy",
+     "name": "连杆大头滚针组件 K10×14×10 Needle cage K10×14×10 (rod)",
+     "mass_g": 5.6
+    },
+    {
+     "code": "BUY-NRB-K10x14x8",
+     "qty": 1,
+     "parts": [
+      "cage_lever"
+     ],
+     "kind": "buy",
+     "name": "挑线杆滚针组件 K10×14×8 Needle cage K10×14×8 (take-up lever)",
+     "mass_g": 4.5
+    },
+    {
      "code": "BUY-OILPAN-LS",
      "qty": 1,
      "parts": [],
@@ -5993,6 +7337,66 @@
      "name": "针板与推板（三维没有画）",
      "extra": "针板与推板（三维没有画）",
      "mass_g": 0.0
+    },
+    {
+     "code": "BUY-PLUG-12",
+     "qty": 1,
+     "parts": [
+      "nb_plug"
+     ],
+     "kind": "buy",
+     "name": "机头顶橡胶塞 Ø12 Head-top rubber plug",
+     "mass_g": 7.1
+    },
+    {
+     "code": "BUY-SCR-OIL",
+     "qty": 1,
+     "parts": [
+      "oil_screws"
+     ],
+     "kind": "buy",
+     "name": "油路螺钉 Oil-system screws",
+     "mass_g": 7.5
+    },
+    {
+     "code": "BUY-SCR-SML-9/64x8",
+     "qty": 1,
+     "parts": [
+      "crank_screws"
+     ],
+     "kind": "buy",
+     "name": "曲柄螺钉组 Crank screws",
+     "mass_g": 4.7
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x20",
+     "qty": 2,
+     "parts": [
+      "rail_screws"
+     ],
+     "kind": "buy",
+     "name": "导轨螺钉 SMP 9/64-40 × 20 Rail screws",
+     "mass_g": 4.3
+    },
+    {
+     "code": "BUY-SCR-SMP-9/64x5",
+     "qty": 1,
+     "parts": [
+      "clamp_screw"
+     ],
+     "kind": "buy",
+     "name": "紧针螺钉 SMP 9/64-40 × 5 Needle clamp screw",
+     "mass_g": 1.0
+    },
+    {
+     "code": "BUY-SCR-SMS-11/64x4",
+     "qty": 2,
+     "parts": [
+      "link_screws"
+     ],
+     "kind": "buy",
+     "name": "针杆连接块紧定螺钉 SMS 11/64-40 × 4 Connecting-block set screws",
+     "mass_g": 0.9
     },
     {
      "code": "BUY-SCREW-M4",
@@ -6020,7 +7424,7 @@
      ],
      "kind": "buy",
      "name": "松线电磁铁 Release solenoid",
-     "mass_g": 42.4
+     "mass_g": 39.8
     },
     {
      "code": "BUY-SOL-TRIM",
@@ -6053,6 +7457,16 @@
      "mass_g": 819.3
     },
     {
+     "code": "BUY-TUBE-NY2",
+     "qty": 1,
+     "parts": [
+      "oil_line"
+     ],
+     "kind": "buy",
+     "name": "尼龙油管 Ø2 × 0.4 Nylon oil line",
+     "mass_g": 0.7
+    },
+    {
      "code": "HSG-LS",
      "qty": 1,
      "parts": [
@@ -6061,7 +7475,7 @@
      ],
      "kind": "make",
      "name": "机壳合件（上下件合箱后精加工；G5 文档里叫 HSG-LS-P） Housing pair (upper and lower finish-machined together; HSG-LS-P in the G5 documents)",
-     "mass_g": 24208.0
+     "mass_g": 23669.0
     },
     {
      "code": "LS-101",
@@ -6071,7 +7485,7 @@
      ],
      "kind": "make",
      "name": "上轴 Upper shaft",
-     "mass_g": 621.7
+     "mass_g": 840.3
     },
     {
      "code": "LS-102",
@@ -6091,7 +7505,7 @@
      ],
      "kind": "buy",
      "name": "曲柄（带平衡块） Crank with counterweight",
-     "mass_g": 109.8
+     "mass_g": 120.7
     },
     {
      "code": "LS-104",
@@ -6101,7 +7515,7 @@
      ],
      "kind": "buy",
      "name": "曲柄销 Crank pin",
-     "mass_g": 7.3
+     "mass_g": 15.0
     },
     {
      "code": "LS-105",
@@ -6144,6 +7558,16 @@
      "mass_g": 3.1
     },
     {
+     "code": "LS-109",
+     "qty": 1,
+     "parts": [
+      "bush_mid"
+     ],
+     "kind": "buy",
+     "name": "上轴中间含油轴套 Ø20 × Ø35 × 25 Upper-shaft middle sintered bush",
+     "mass_g": 127.0
+    },
+    {
      "code": "LS-201",
      "qty": 1,
      "parts": [
@@ -6151,7 +7575,7 @@
      ],
      "kind": "make",
      "name": "针杆 Needle bar",
-     "mass_g": 71.0
+     "mass_g": 70.9
     },
     {
      "code": "LS-202",
@@ -6161,7 +7585,7 @@
      ],
      "kind": "buy",
      "name": "针夹 Needle clamp",
-     "mass_g": 3.2
+     "mass_g": 3.4
     },
     {
      "code": "LS-203",
@@ -6171,7 +7595,7 @@
      ],
      "kind": "buy",
      "name": "针杆连接块 Needle-bar connecting block",
-     "mass_g": 17.2
+     "mass_g": 18.0
     },
     {
      "code": "LS-204",
@@ -6181,7 +7605,7 @@
      ],
      "kind": "buy",
      "name": "针杆连杆 Needle-bar connecting rod",
-     "mass_g": 46.2
+     "mass_g": 58.2
     },
     {
      "code": "LS-205",
@@ -6191,7 +7615,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆 Take-up lever",
-     "mass_g": 24.2
+     "mass_g": 32.0
     },
     {
      "code": "LS-206",
@@ -6211,7 +7635,7 @@
      ],
      "kind": "buy",
      "name": "挑线杆销 M Take-up pin M",
-     "mass_g": 2.1
+     "mass_g": 3.2
     },
     {
      "code": "LS-208",
@@ -6232,6 +7656,36 @@
      "kind": "buy",
      "name": "过线环 Thread guide",
      "mass_g": 0.8
+    },
+    {
+     "code": "LS-210",
+     "qty": 1,
+     "parts": [
+      "slide_block"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块 Needle-bar slide block",
+     "mass_g": 9.8
+    },
+    {
+     "code": "LS-211",
+     "qty": 1,
+     "parts": [
+      "slide_rail"
+     ],
+     "kind": "buy",
+     "name": "针杆滑块导轨 Slide-block rail",
+     "mass_g": 122.3
+    },
+    {
+     "code": "LS-212",
+     "qty": 2,
+     "parts": [
+      "nb_bushes"
+     ],
+     "kind": "buy",
+     "name": "针杆上、下导套 Needle-bar bushes (upper wrapped, lower sintered)",
+     "mass_g": 11.1
     },
     {
      "code": "LS-301D",
@@ -6412,6 +7866,56 @@
      "kind": "buy",
      "name": "油泵体 Oil-pump body",
      "mass_g": 18.2
+    },
+    {
+     "code": "LS-414",
+     "qty": 1,
+     "parts": [
+      "oil_block"
+     ],
+     "kind": "buy",
+     "name": "分油块（带溢流孔） Oil distribution block",
+     "mass_g": 10.4
+    },
+    {
+     "code": "LS-415",
+     "qty": 1,
+     "parts": [
+      "oil_tubes"
+     ],
+     "kind": "buy",
+     "name": "上油铜管 Ø4 与溢流铜管 Ø6 Oil riser and return tubes",
+     "mass_g": 154.2
+    },
+    {
+     "code": "LS-416",
+     "qty": 1,
+     "parts": [
+      "oil_box"
+     ],
+     "kind": "buy",
+     "name": "机头油毡盒 Head oil-felt box",
+     "mass_g": 4.0
+    },
+    {
+     "code": "LS-417",
+     "qty": 1,
+     "parts": [
+      "oil_wicks"
+     ],
+     "kind": "buy",
+     "name": "油芯组（中间轴套油芯、针杆油芯铜管两根、曲柄油毡头） Oil wicks",
+     "mass_g": 0.7
+    },
+    {
+     "code": "LS-418",
+     "qty": 2,
+     "parts": [
+      "oil_cups"
+     ],
+     "kind": "buy",
+     "name": "针杆油毡杯 Needle-bar oil-felt cups",
+     "mass_g": 0.8
     },
     {
      "code": "LS-501",
@@ -6751,7 +8255,7 @@
      ],
      "kind": "buy",
      "name": "松线臂 Release arm",
-     "mass_g": 2.1
+     "mass_g": 2.4
     },
     {
      "code": "LS-801",
