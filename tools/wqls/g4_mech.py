@@ -156,7 +156,7 @@ def opt_motion(phi):
     return M
 
 
-def frames(step=2):
+def frames(step=2, nd=5):
     C0, B00, lp0 = pose(0.0)
     out = []
     for phi_ in range(0, 360, step):
@@ -178,7 +178,7 @@ def frames(step=2):
         hk = rot_x(-2 * phi, 0.0, S.ZH)
         M.update(pulley_lower=low, lower_shaft=low, gear_lower=low, gear_hook=hk, hook_shaft=hk, hook=hk)
         # G4.6 送布组（g4_feed.py 算的每 2° 位置）
-        i = (phi // 2) % len(FP["E"])
+        i = (phi * len(FP["E"]) // 360) % len(FP["E"])        # FP 每 2°（180 点）或每 1°（360 点，G8.1 运动学）
         g = FD["geo"]
         f0 = {k: FP[k][0] for k in ("E", "P", "C", "T", "D", "EL", "dog")}
         fi = {k: FP[k][i] for k in ("E", "P", "C", "T", "D", "EL", "dog")}
@@ -208,10 +208,13 @@ def frames(step=2):
         nb_bot = Bv + ZU - X["nb_below"]
         # G4.7：从夹线器开始——两片夹线盘之间（绕夹线柱下面）→ 挑线簧的钩 → 过线点 A
         # 过线点 B 之后：机头前面下沿的过线环（z 44，cad/ctrl.py 的 thread_guide）→ 针夹上的线钩 → 顺着机针前面的长槽到针眼
-        thread = TENSION_PATH + [[40.0, Ay, Az], [X["lever"][0] + X["lever"][1] / 2, Ey, Ez], [0.0, By, Bz], [0.0, -51.0, 44.0],
+        # G8.1 第三步：过线点 A、B 放在挑线杆线眼的平面上（x 21.5，前盖板竖槽上下两头）。原来 A 在 x 40、B 在 x 0，
+        # 三维线长里多了 x 方向的固定斜边，挑线量比 G4 端视综合的少 10 mm（83.6 → 73.4），余量变负
+        xe = X["lever"][0] + X["lever"][1] / 2
+        thread = TENSION_PATH + [[xe, Ay, Az], [xe, Ey, Ez], [xe, By, Bz], [0.0, -51.0, 44.0],
                                  [0.0, -6.0, nb_bot + 0.3], [0.0, -0.75, nb_bot - 3.0], [0.0, -0.3, tip + 2.8]]
         own = (["tension", "tension", "check_spring"] if TENSION_PATH else []) + ["A", "lever", "B", "thread_guide", "needle_clamp", "needle", "needle"]
-        out.append(dict(phi=phi_, M={k: [round(v, 5) for v in m.flatten()] for k, m in M.items()}, thread=thread, thread_own=own,
+        out.append(dict(phi=phi_, M={k: [(round(v, nd) if nd else float(v)) for v in m.flatten()] for k, m in M.items()}, thread=thread, thread_own=own,
                         tip_z=round(tip, 3), eye=[round(Ey, 3), round(Ez, 3)]))
     return out
 

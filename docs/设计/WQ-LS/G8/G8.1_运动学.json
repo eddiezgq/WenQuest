@@ -1,0 +1,946 @@
+{
+ "rpm": 5000,
+ "step_deg": 1,
+ "fabric_t_timing": 1.5,
+ "timing": {
+  "needle_tdc": 0.0,
+  "needle_bdc": 180.0,
+  "tip_in_plate": 107.01071428571429,
+  "tip_out_plate": 252.98928571428573,
+  "eye_in_fabric": 108.79359430604983,
+  "hook_catch": 206.1,
+  "takeup_top": 84.0,
+  "takeup_bottom": 313.0,
+  "dog_rise": 305.30537341157634,
+  "dog_drop": 98.64892431108223
+ },
+ "timing_vs_G1": {
+  "hook_catch": {
+   "three_d": 206.1,
+   "design": 206.07,
+   "source": "G1",
+   "diff": 0.03,
+   "g1_ideal": 206.07
+  },
+  "eye_in_fabric": {
+   "three_d": 108.79,
+   "design": 109,
+   "source": "G1",
+   "diff": -0.21,
+   "g1_ideal": 109
+  },
+  "dog_rise": {
+   "three_d": 305.31,
+   "design": 305.3,
+   "source": "G4.6",
+   "diff": 0.01,
+   "g1_ideal": 319.83
+  },
+  "dog_drop": {
+   "three_d": 98.65,
+   "design": 98.6,
+   "source": "G4.6",
+   "diff": 0.05,
+   "g1_ideal": 108.18
+  },
+  "takeup_top": {
+   "three_d": 84.0,
+   "design": 84,
+   "source": "G4",
+   "diff": 0.0,
+   "g1_ideal": 55
+  }
+ },
+ "catch": {
+  "angle": 206.1,
+  "needle_rise": 2.005,
+  "point_gap": 0.08,
+  "point_above_eye": 0.994,
+  "ok": {
+   "rise": true,
+   "gap": true,
+   "above": true
+  }
+ },
+ "feed": [
+  {
+   "s": 1.0,
+   "reverse": false,
+   "net": 0.998,
+   "drag_lining": 0.0,
+   "drag_cotton": 0.0,
+   "drag_light_denim_x4": 0.0014,
+   "ref_drag_denim": 0.0031,
+   "ok": true
+  },
+  {
+   "s": 2.0,
+   "reverse": false,
+   "net": 1.997,
+   "drag_lining": 0.0,
+   "drag_cotton": 0.0,
+   "drag_light_denim_x4": 0.0034,
+   "ref_drag_denim": 0.0136,
+   "ok": true
+  },
+  {
+   "s": 3.0,
+   "reverse": false,
+   "net": 2.994,
+   "drag_lining": 0.0,
+   "drag_cotton": 0.0,
+   "drag_light_denim_x4": 0.006,
+   "ref_drag_denim": 0.0247,
+   "ok": true
+  },
+  {
+   "s": 4.0,
+   "reverse": false,
+   "net": 3.99,
+   "drag_lining": 0.0,
+   "drag_cotton": 0.0,
+   "drag_light_denim_x4": 0.005,
+   "ref_drag_denim": 0.0322,
+   "ok": true
+  },
+  {
+   "s": 5.0,
+   "reverse": false,
+   "net": 4.99,
+   "drag_lining": 0.0,
+   "drag_cotton": 0.0,
+   "drag_light_denim_x4": 0.0,
+   "ref_drag_denim": 0.0357,
+   "ok": true
+  },
+  {
+   "s": 1.0,
+   "reverse": true,
+   "net": -0.999,
+   "drag_lining": 0.0,
+   "drag_cotton": 0.0,
+   "drag_light_denim_x4": 0.0146,
+   "ref_drag_denim": 0.0299,
+   "ok": true
+  },
+  {
+   "s": 2.0,
+   "reverse": true,
+   "net": -1.994,
+   "drag_lining": 0.0,
+   "drag_cotton": 0.0,
+   "drag_light_denim_x4": 0.0208,
+   "ref_drag_denim": 0.0447,
+   "ok": true
+  },
+  {
+   "s": 3.0,
+   "reverse": true,
+   "net": -2.991,
+   "drag_lining": 0.0,
+   "drag_cotton": 0.0,
+   "drag_light_denim_x4": 0.0271,
+   "ref_drag_denim": 0.0597,
+   "ok": true
+  },
+  {
+   "s": 4.0,
+   "reverse": true,
+   "net": -3.996,
+   "drag_lining": 0.0,
+   "drag_cotton": 0.0,
+   "drag_light_denim_x4": 0.0334,
+   "ref_drag_denim": 0.0748,
+   "ok": true
+  },
+  {
+   "s": 5.0,
+   "reverse": true,
+   "net": -4.998,
+   "drag_lining": 0.0,
+   "drag_cotton": 0.0,
+   "drag_light_denim_x4": 0.0399,
+   "ref_drag_denim": 0.0902,
+   "ok": true
+  }
+ ],
+ "takeup": [
+  {
+   "path": "3d",
+   "fabric": "lining",
+   "t": 0.4,
+   "s": 1.0,
+   "takeup": 83.55,
+   "demand_max": 77.52,
+   "consumption": 1.4,
+   "margin": 5.09,
+   "shortfall": 0.0,
+   "ok": true
+  },
+  {
+   "path": "3d",
+   "fabric": "lining",
+   "t": 0.4,
+   "s": 2.0,
+   "takeup": 83.55,
+   "demand_max": 77.52,
+   "consumption": 2.4,
+   "margin": 5.09,
+   "shortfall": 0.0,
+   "ok": true
+  },
+  {
+   "path": "3d",
+   "fabric": "lining",
+   "t": 0.4,
+   "s": 3.0,
+   "takeup": 83.55,
+   "demand_max": 77.52,
+   "consumption": 3.4,
+   "margin": 5.09,
+   "shortfall": 0.0,
+   "ok": true
+  },
+  {
+   "path": "3d",
+   "fabric": "lining",
+   "t": 0.4,
+   "s": 4.0,
+   "takeup": 83.55,
+   "demand_max": 77.52,
+   "consumption": 4.4,
+   "margin": 5.09,
+   "shortfall": 0.0,
+   "ok": true
+  },
+  {
+   "path": "3d",
+   "fabric": "lining",
+   "t": 0.4,
+   "s": 5.0,
+   "takeup": 83.55,
+   "demand_max": 77.52,
+   "consumption": 5.4,
+   "margin": 5.09,
+   "shortfall": 0.0,
+   "ok": true
+  },
+  {
+   "path": "3d",
+   "fabric": "cotton",
+   "t": 1.5,
+   "s": 1.0,
+   "takeup": 83.55,
+   "demand_max": 79.57,
+   "consumption": 2.5,
+   "margin": 3.04,
+   "shortfall": 0.9,
+   "ok": true
+  },
+  {
+   "path": "3d",
+   "fabric": "cotton",
+   "t": 1.5,
+   "s": 2.0,
+   "takeup": 83.55,
+   "demand_max": 79.57,
+   "consumption": 3.5,
+   "margin": 3.04,
+   "shortfall": 0.9,
+   "ok": true
+  },
+  {
+   "path": "3d",
+   "fabric": "cotton",
+   "t": 1.5,
+   "s": 3.0,
+   "takeup": 83.55,
+   "demand_max": 79.57,
+   "consumption": 4.5,
+   "margin": 3.04,
+   "shortfall": 0.9,
+   "ok": true
+  },
+  {
+   "path": "3d",
+   "fabric": "cotton",
+   "t": 1.5,
+   "s": 4.0,
+   "takeup": 83.55,
+   "demand_max": 79.57,
+   "consumption": 5.5,
+   "margin": 3.04,
+   "shortfall": 0.9,
+   "ok": true
+  },
+  {
+   "path": "3d",
+   "fabric": "cotton",
+   "t": 1.5,
+   "s": 5.0,
+   "takeup": 83.55,
+   "demand_max": 79.57,
+   "consumption": 6.5,
+   "margin": 3.04,
+   "shortfall": 0.9,
+   "ok": true
+  },
+  {
+   "path": "3d",
+   "fabric": "light_denim_x4",
+   "t": 3.0,
+   "s": 1.0,
+   "takeup": 83.55,
+   "demand_max": 82.39,
+   "consumption": 4.0,
+   "margin": 0.21,
+   "shortfall": 3.9,
+   "ok": false
+  },
+  {
+   "path": "3d",
+   "fabric": "light_denim_x4",
+   "t": 3.0,
+   "s": 2.0,
+   "takeup": 83.55,
+   "demand_max": 82.39,
+   "consumption": 5.0,
+   "margin": 0.21,
+   "shortfall": 3.9,
+   "ok": false
+  },
+  {
+   "path": "3d",
+   "fabric": "light_denim_x4",
+   "t": 3.0,
+   "s": 3.0,
+   "takeup": 83.55,
+   "demand_max": 82.39,
+   "consumption": 6.0,
+   "margin": 0.21,
+   "shortfall": 3.9,
+   "ok": false
+  },
+  {
+   "path": "3d",
+   "fabric": "light_denim_x4",
+   "t": 3.0,
+   "s": 4.0,
+   "takeup": 83.55,
+   "demand_max": 82.39,
+   "consumption": 7.0,
+   "margin": 0.21,
+   "shortfall": 3.9,
+   "ok": false
+  },
+  {
+   "path": "3d",
+   "fabric": "light_denim_x4",
+   "t": 3.0,
+   "s": 5.0,
+   "takeup": 83.55,
+   "demand_max": 82.39,
+   "consumption": 8.0,
+   "margin": 0.21,
+   "shortfall": 3.9,
+   "ok": false
+  },
+  {
+   "path": "end_view",
+   "fabric": "lining",
+   "t": 0.4,
+   "s": 1.0,
+   "takeup": 83.55,
+   "demand_max": 77.52,
+   "consumption": 1.4,
+   "margin": 5.09,
+   "shortfall": 0.0,
+   "ok": true
+  },
+  {
+   "path": "end_view",
+   "fabric": "lining",
+   "t": 0.4,
+   "s": 2.0,
+   "takeup": 83.55,
+   "demand_max": 77.52,
+   "consumption": 2.4,
+   "margin": 5.09,
+   "shortfall": 0.0,
+   "ok": true
+  },
+  {
+   "path": "end_view",
+   "fabric": "lining",
+   "t": 0.4,
+   "s": 3.0,
+   "takeup": 83.55,
+   "demand_max": 77.52,
+   "consumption": 3.4,
+   "margin": 5.09,
+   "shortfall": 0.0,
+   "ok": true
+  },
+  {
+   "path": "end_view",
+   "fabric": "lining",
+   "t": 0.4,
+   "s": 4.0,
+   "takeup": 83.55,
+   "demand_max": 77.52,
+   "consumption": 4.4,
+   "margin": 5.09,
+   "shortfall": 0.0,
+   "ok": true
+  },
+  {
+   "path": "end_view",
+   "fabric": "lining",
+   "t": 0.4,
+   "s": 5.0,
+   "takeup": 83.55,
+   "demand_max": 77.52,
+   "consumption": 5.4,
+   "margin": 5.09,
+   "shortfall": 0.0,
+   "ok": true
+  },
+  {
+   "path": "end_view",
+   "fabric": "cotton",
+   "t": 1.5,
+   "s": 1.0,
+   "takeup": 83.55,
+   "demand_max": 79.57,
+   "consumption": 2.5,
+   "margin": 3.04,
+   "shortfall": 0.9,
+   "ok": true
+  },
+  {
+   "path": "end_view",
+   "fabric": "cotton",
+   "t": 1.5,
+   "s": 2.0,
+   "takeup": 83.55,
+   "demand_max": 79.57,
+   "consumption": 3.5,
+   "margin": 3.04,
+   "shortfall": 0.9,
+   "ok": true
+  },
+  {
+   "path": "end_view",
+   "fabric": "cotton",
+   "t": 1.5,
+   "s": 3.0,
+   "takeup": 83.55,
+   "demand_max": 79.57,
+   "consumption": 4.5,
+   "margin": 3.04,
+   "shortfall": 0.9,
+   "ok": true
+  },
+  {
+   "path": "end_view",
+   "fabric": "cotton",
+   "t": 1.5,
+   "s": 4.0,
+   "takeup": 83.55,
+   "demand_max": 79.57,
+   "consumption": 5.5,
+   "margin": 3.04,
+   "shortfall": 0.9,
+   "ok": true
+  },
+  {
+   "path": "end_view",
+   "fabric": "cotton",
+   "t": 1.5,
+   "s": 5.0,
+   "takeup": 83.55,
+   "demand_max": 79.57,
+   "consumption": 6.5,
+   "margin": 3.04,
+   "shortfall": 0.9,
+   "ok": true
+  },
+  {
+   "path": "end_view",
+   "fabric": "light_denim_x4",
+   "t": 3.0,
+   "s": 1.0,
+   "takeup": 83.55,
+   "demand_max": 82.39,
+   "consumption": 4.0,
+   "margin": 0.21,
+   "shortfall": 3.9,
+   "ok": false
+  },
+  {
+   "path": "end_view",
+   "fabric": "light_denim_x4",
+   "t": 3.0,
+   "s": 2.0,
+   "takeup": 83.55,
+   "demand_max": 82.39,
+   "consumption": 5.0,
+   "margin": 0.21,
+   "shortfall": 3.9,
+   "ok": false
+  },
+  {
+   "path": "end_view",
+   "fabric": "light_denim_x4",
+   "t": 3.0,
+   "s": 3.0,
+   "takeup": 83.55,
+   "demand_max": 82.39,
+   "consumption": 6.0,
+   "margin": 0.21,
+   "shortfall": 3.9,
+   "ok": false
+  },
+  {
+   "path": "end_view",
+   "fabric": "light_denim_x4",
+   "t": 3.0,
+   "s": 4.0,
+   "takeup": 83.55,
+   "demand_max": 82.39,
+   "consumption": 7.0,
+   "margin": 0.21,
+   "shortfall": 3.9,
+   "ok": false
+  },
+  {
+   "path": "end_view",
+   "fabric": "light_denim_x4",
+   "t": 3.0,
+   "s": 5.0,
+   "takeup": 83.55,
+   "demand_max": 82.39,
+   "consumption": 8.0,
+   "margin": 0.21,
+   "shortfall": 3.9,
+   "ok": false
+  }
+ ],
+ "peaks": [
+  {
+   "part": "needle_bar",
+   "mass_kg": 0.07094,
+   "v_max": 8.433,
+   "a_max": 5446.8,
+   "a_at": 180,
+   "w_max": 0.0,
+   "alpha_max": 0.0,
+   "F_inertia_max": 386.4
+  },
+  {
+   "part": "crank",
+   "mass_kg": 0.1207,
+   "v_max": 6.061,
+   "a_max": 3173.4,
+   "a_at": 188,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 383.0
+  },
+  {
+   "part": "rod",
+   "mass_kg": 0.05825,
+   "v_max": 8.185,
+   "a_max": 4665.7,
+   "a_at": 180,
+   "w_max": 147.6,
+   "alpha_max": 80516.0,
+   "F_inertia_max": 271.8
+  },
+  {
+   "part": "lever",
+   "mass_kg": 0.032,
+   "v_max": 9.913,
+   "a_max": 7586.3,
+   "a_at": 47,
+   "w_max": 345.9,
+   "alpha_max": 275113.0,
+   "F_inertia_max": 242.8
+  },
+  {
+   "part": "nb_link",
+   "mass_kg": 0.01802,
+   "v_max": 8.433,
+   "a_max": 5446.8,
+   "a_at": 180,
+   "w_max": 0.0,
+   "alpha_max": 0.0,
+   "F_inertia_max": 98.2
+  },
+  {
+   "part": "crank_pin",
+   "mass_kg": 0.01501,
+   "v_max": 8.115,
+   "a_max": 4249.3,
+   "a_at": 187,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 63.8
+  },
+  {
+   "part": "slide_block",
+   "mass_kg": 0.0098,
+   "v_max": 8.433,
+   "a_max": 5446.8,
+   "a_at": 180,
+   "w_max": 0.0,
+   "alpha_max": 0.0,
+   "F_inertia_max": 53.4
+  },
+  {
+   "part": "rocker",
+   "mass_kg": 0.01087,
+   "v_max": 5.418,
+   "a_max": 4733.1,
+   "a_at": 46,
+   "w_max": 451.6,
+   "alpha_max": 393071.0,
+   "F_inertia_max": 51.4
+  },
+  {
+   "part": "feed_rod",
+   "mass_kg": 0.04863,
+   "v_max": 1.58,
+   "a_max": 831.3,
+   "a_at": 292,
+   "w_max": 6.4,
+   "alpha_max": 3356.0,
+   "F_inertia_max": 40.4
+  },
+  {
+   "part": "pin_M",
+   "mass_kg": 0.00316,
+   "v_max": 10.572,
+   "a_max": 9235.9,
+   "a_at": 46,
+   "w_max": 0.0,
+   "alpha_max": 0.0,
+   "F_inertia_max": 29.2
+  },
+  {
+   "part": "feed_ecc",
+   "mass_kg": 0.02072,
+   "v_max": 2.528,
+   "a_max": 1323.6,
+   "a_at": 130,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 27.4
+  },
+  {
+   "part": "cage_rod",
+   "mass_kg": 0.00562,
+   "v_max": 8.115,
+   "a_max": 4249.3,
+   "a_at": 187,
+   "w_max": 147.6,
+   "alpha_max": 80516.0,
+   "F_inertia_max": 23.9
+  },
+  {
+   "part": "cage_lever",
+   "mass_kg": 0.0045,
+   "v_max": 8.115,
+   "a_max": 4249.3,
+   "a_at": 7,
+   "w_max": 345.9,
+   "alpha_max": 275113.0,
+   "F_inertia_max": 19.1
+  },
+  {
+   "part": "needle_clamp",
+   "mass_kg": 0.00342,
+   "v_max": 8.433,
+   "a_max": 5446.8,
+   "a_at": 180,
+   "w_max": 0.0,
+   "alpha_max": 0.0,
+   "F_inertia_max": 18.6
+  },
+  {
+   "part": "trim_cam",
+   "mass_kg": 0.14091,
+   "v_max": 0.243,
+   "a_max": 127.2,
+   "a_at": 224,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 17.9
+  },
+  {
+   "part": "feed_bar",
+   "mass_kg": 0.02916,
+   "v_max": 0.846,
+   "a_max": 504.9,
+   "a_at": 105,
+   "w_max": 7.5,
+   "alpha_max": 4494.0,
+   "F_inertia_max": 14.7
+  },
+  {
+   "part": "feed_link",
+   "mass_kg": 0.02834,
+   "v_max": 0.842,
+   "a_max": 446.1,
+   "a_at": 107,
+   "w_max": 20.7,
+   "alpha_max": 11039.0,
+   "F_inertia_max": 12.6
+  },
+  {
+   "part": "lift_ecc",
+   "mass_kg": 0.01263,
+   "v_max": 0.975,
+   "a_max": 510.7,
+   "a_at": 122,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 6.5
+  },
+  {
+   "part": "crank_screws",
+   "mass_kg": 0.00472,
+   "v_max": 2.592,
+   "a_max": 1357.3,
+   "a_at": 203,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 6.4
+  },
+  {
+   "part": "reg_slider",
+   "mass_kg": 0.00716,
+   "v_max": 1.603,
+   "a_max": 846.9,
+   "a_at": 288,
+   "w_max": 0.0,
+   "alpha_max": 0.0,
+   "F_inertia_max": 6.1
+  },
+  {
+   "part": "clamp_screw",
+   "mass_kg": 0.00099,
+   "v_max": 8.433,
+   "a_max": 5446.8,
+   "a_at": 180,
+   "w_max": 0.0,
+   "alpha_max": 0.0,
+   "F_inertia_max": 5.4
+  },
+  {
+   "part": "lift_link",
+   "mass_kg": 0.01585,
+   "v_max": 0.627,
+   "a_max": 332.0,
+   "a_at": 29,
+   "w_max": 8.7,
+   "alpha_max": 4916.0,
+   "F_inertia_max": 5.3
+  },
+  {
+   "part": "link_screws",
+   "mass_kg": 0.00094,
+   "v_max": 8.433,
+   "a_max": 5446.8,
+   "a_at": 180,
+   "w_max": 0.0,
+   "alpha_max": 0.0,
+   "F_inertia_max": 5.1
+  },
+  {
+   "part": "lift_rock",
+   "mass_kg": 0.07621,
+   "v_max": 0.086,
+   "a_max": 46.8,
+   "a_at": 24,
+   "w_max": 52.9,
+   "alpha_max": 28643.0,
+   "F_inertia_max": 3.6
+  },
+  {
+   "part": "needle",
+   "mass_kg": 0.00028,
+   "v_max": 8.433,
+   "a_max": 5446.8,
+   "a_at": 180,
+   "w_max": 0.0,
+   "alpha_max": 0.0,
+   "F_inertia_max": 1.5
+  },
+  {
+   "part": "feed_rock",
+   "mass_kg": 0.19631,
+   "v_max": 0.012,
+   "a_max": 7.5,
+   "a_at": 107,
+   "w_max": 30.5,
+   "alpha_max": 18640.0,
+   "F_inertia_max": 1.5
+  },
+  {
+   "part": "oil_ecc",
+   "mass_kg": 0.00414,
+   "v_max": 0.479,
+   "a_max": 250.6,
+   "a_at": 153,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 1.0
+  },
+  {
+   "part": "hook",
+   "mass_kg": 0.04662,
+   "v_max": 0.003,
+   "a_max": 3.1,
+   "a_at": 95,
+   "w_max": 1047.2,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.1
+  },
+  {
+   "part": "oil_plunger",
+   "mass_kg": 0.00117,
+   "v_max": 0.209,
+   "a_max": 109.7,
+   "a_at": 0,
+   "w_max": 0.0,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.1
+  },
+  {
+   "part": "shaft",
+   "mass_kg": 0.84032,
+   "v_max": 0.0,
+   "a_max": 0.0,
+   "a_at": 135,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "rotor",
+   "mass_kg": 0.39291,
+   "v_max": 0.0,
+   "a_max": 0.0,
+   "a_at": 135,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "rotor_magnets",
+   "mass_kg": 0.06531,
+   "v_max": 0.0,
+   "a_max": 0.0,
+   "a_at": 135,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "encoder_disc",
+   "mass_kg": 0.00505,
+   "v_max": 0.0,
+   "a_max": 0.0,
+   "a_at": 135,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "handwheel",
+   "mass_kg": 0.12523,
+   "v_max": 0.0,
+   "a_max": 0.0,
+   "a_at": 135,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "handwheel_ring",
+   "mass_kg": 0.00314,
+   "v_max": 0.0,
+   "a_max": 0.0,
+   "a_at": 135,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "pulley_upper",
+   "mass_kg": 0.07355,
+   "v_max": 0.0,
+   "a_max": 0.0,
+   "a_at": 135,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "pulley_lower",
+   "mass_kg": 0.08957,
+   "v_max": 0.0,
+   "a_max": 0.1,
+   "a_at": 112,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "lower_shaft",
+   "mass_kg": 0.27877,
+   "v_max": 0.0,
+   "a_max": 0.1,
+   "a_at": 112,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "gear_lower",
+   "mass_kg": 0.08626,
+   "v_max": 0.0,
+   "a_max": 0.1,
+   "a_at": 112,
+   "w_max": 523.6,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "gear_hook",
+   "mass_kg": 0.0216,
+   "v_max": 0.0,
+   "a_max": 0.0,
+   "a_at": 95,
+   "w_max": 1047.2,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  },
+  {
+   "part": "hook_shaft",
+   "mass_kg": 0.0426,
+   "v_max": 0.0,
+   "a_max": 0.0,
+   "a_at": 95,
+   "w_max": 1047.2,
+   "alpha_max": 0.0,
+   "F_inertia_max": 0.0
+  }
+ ],
+ "needle_bar_vs_exact": {
+  "rel_err": 4e-05,
+  "a_max_exact": 5447.0
+ },
+ "all_ok": false
+}
