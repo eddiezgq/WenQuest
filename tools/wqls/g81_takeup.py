@@ -27,6 +27,8 @@ XA = S.MECH_X["lever"][0] + S.MECH_X["lever"][1] + 3.0          # 过线点 A：
 XB = XE
 FABS = dict(lining=0.4, cotton=1.5, light_denim_x4=3.0)
 S_REF = 3.0
+M_TOP = 25.0           # 摇杆—挑线杆铰点 M 走到前壁附近（u ≥ 36）时不得高过 v 25（z 225）：铰点处杆端半径约 6，
+                       # 前盖板窗口上沿 z 234（外观 B）带圆角，第一次综合出来 M 到 v 27.4，挑线杆、摇杆碰窗口上沿（三维干涉 0 / 0.66 mm）
 MU_MAX = 140.0          # G1 判据：挑线四杆传动角 40°–140°（G4 只限了下限；第一次搜出来上限 172°，接近死点）
 OUT8 = T.ROOT / "docs" / "设计" / "WQ-LS" / "G8"
 _M = T.Mech2(r=T.P["r"], l=T.P["l"], mr=T.P["mr"])
@@ -75,7 +77,8 @@ def evaluate(lk: dict) -> dict:
         if R is None:
             return dict(ok=False, why="装不上（四杆不闭合）")
         per[k] = {x: R[x] for x in ("margin", "neg", "pre", "Smax", "top")}
-    base.update(margin=min(v["margin"] for v in per.values()), margin_hi=max(v["margin"] for v in per.values()),
+    mtop = max((p_["M"][1] for p_ in (T.Mech2.link_pose(i, lk) for i in range(0, 360, 2)) if p_["M"][0] >= 36.0), default=-99.0)
+    base.update(m_top=mtop, margin=min(v["margin"] for v in per.values()), margin_hi=max(v["margin"] for v in per.values()),
                 neg=max(v["neg"] for v in per.values()), pre=max(v["pre"] for v in per.values()),
                 Smax=per["cotton"]["Smax"], per_fabric=per, guide_x=dict(A=XA, eye=XE, B=XB))
     return base
@@ -90,13 +93,15 @@ def feasible(r: dict) -> list[str]:
         bad.append("薄料余量太多")
     if r.get("ok") and r["mu"][1] > MU_MAX:
         bad.append("传动角太大")
+    if r.get("ok") and r["m_top"] > M_TOP:
+        bad.append("铰点碰窗口上沿")
     return bad
 
 
 def violation(r: dict) -> float:
     v = _viol2d(r)
     if r.get("ok"):
-        v += max(0, r["margin_hi"] - T.MARGIN_MAX) / 2 + max(0, r["mu"][1] - MU_MAX) / 10
+        v += max(0, r["margin_hi"] - T.MARGIN_MAX) / 2 + max(0, r["mu"][1] - MU_MAX) / 10 + max(0, r["m_top"] - M_TOP) / 2
     return v
 
 
