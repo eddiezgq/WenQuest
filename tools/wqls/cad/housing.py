@@ -62,6 +62,10 @@ _tkj = os.path.join(os.path.dirname(os.path.abspath(__file__)) if "__file__" in 
 TK_JSON = json.load(open(_tkj)) if os.path.exists(_tkj) else None
 
 
+OIL_PAD_FILL = None
+OIL_PAD_Z = 250.5                                  # 分油块平台高度（= cad/oil_geo.py 的 BLOCK z 下沿）
+
+
 def _oil():
     """G8.0 第 7 步：润滑油路的几何（cad/oil.py），机壳上的油孔、座、过管孔按它做"""
     import importlib.util as _iu
@@ -478,8 +482,13 @@ def ctrl_seats(hollow, solid, info):
     # 立柱两道横隔板和机座顶板上过油管的孔 Ø16（铸出）、立柱脚左横筋过管孔 Ø6.5（铸出）
     OL = _oil()
     B_, R_ = OL.BLOCK, OL.RES
-    pad = Part.makeBox(B_["x"][1] - B_["x"][0] + 1, B_["y"][1] - B_["y"][0] + 1, 10, V(B_["x"][0] - 0.5, B_["y"][0] - 0.5, B_["z"][0]))
-    holes.append(pad.makeFillet(6.0, [e for e in pad.Edges if e.BoundBox.ZLength > 9]))                         # 平台四角 R6（立铣刀 Ø10 铣出）
+    pad = Part.makeBox(B_["x"][1] - B_["x"][0] + 1, B_["y"][1] - B_["y"][0] + 1, 12, V(B_["x"][0] - 0.5, B_["y"][0] - 0.5, B_["z"][0]))
+    pad = pad.makeFillet(6.0, [e for e in pad.Edges if e.BoundBox.ZLength > 11])                                  # 平台四角 R6（立铣刀 Ø10 铣出）
+    holes.append(pad)
+    # 平台比铸出的机臂顶面低 1.5…2.9 mm，铣掉的就是铸件表皮，毛坯不再另加余量（加了余量，平台正好在中间横隔板和顶板的 T 形交接处，
+    # 凝固仿真里成了 M 0.39 的热节）。铣掉的那块交给 blank.py 补回毛坯
+    global OIL_PAD_FILL
+    OIL_PAD_FILL = pad.common(solid)
     for x_, y_ in B_["screws"]:
         holes.append(Part.makeCylinder(M4_TAP / 2, 10.0, V(x_, y_, B_["z"][0] - 10.0), V(0, 0, 1)))                   # M4 盲孔，打在中间横隔板上（铸铁 ≥ 1.5d）
     wx, wy, wz = OL.WICK_MID
@@ -620,7 +629,7 @@ def machined_faces(shape):
                 out.append(f)                                                      # 下件螺钉锪平面
             elif abs(n.z) > 0.99 and (abs(c.z + 2.5) < 0.05 or abs(c.z + 1.5) < 0.05) and -33 < c.x < 33 and -59 < c.y < 23:
                 out.append(f)
-            elif abs(n.z) > 0.99 and abs(c.z - 252.0) < 0.05 and 165 < c.x < 205 and abs(c.y) < 12:
+            elif abs(n.z) > 0.99 and abs(c.z - OIL_PAD_Z) < 0.05 and 165 < c.x < 205 and abs(c.y) < 12:
                 out.append(f)                                                      # G8.0 第 7 步：分油块平台
         elif name == "Cylinder":
             r = s.Radius
@@ -1204,6 +1213,8 @@ def parts_visible(cast, hollow=None, info=None):
 def main():
     cast, hollow, info = casting()
     hollow.exportStep(os.path.join(OUT, "housing.step"))
+    if OIL_PAD_FILL is not None:
+        OIL_PAD_FILL.exportStep(os.path.join(OUT, "oil_pad_fill.step"))
     for k_, s_ in SPLIT_PARTS.items():
         s_.exportStep(os.path.join(OUT, f"housing_{k_}.step"))
     g = parts_visible(cast, hollow, info)

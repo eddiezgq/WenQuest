@@ -121,6 +121,13 @@ for f in part.Faces:
             log["bores"].append(dict(d=round(2 * r, 2), allowance=A_BORE, outer=True, at=[round(x, 1) for x in p0]))
     elif name == "Plane" and f.hashCode() in mf_ids:
         n = face_normal(f)
+        if PART == "upper" and n.z > 0.99 and abs(f.CenterOfMass.z - OIL_PAD_Z) < 0.05 and 165 < f.CenterOfMass.x < 205:
+            # G8.0 第 7 步：分油块平台不加余量，毛坯在这里就是铸出的机臂顶面（housing.py 存的 oil_pad_fill.step 补回去）
+            fp = os.path.join(SRC, "oil_pad_fill.step")
+            if os.path.exists(fp):
+                adds.append(Part.read(fp))
+            log["pads"].append(dict(area_cm2=round(f.Area / 100, 1), normal=[0, 0, 1], allowance="铸出顶面（不加余量）"))
+            continue
         a = A_TOP if n.dot(UP) > 0.7 else A_SIDE
         try:
             adds.append(f.extrude(n * a))

@@ -50,7 +50,7 @@ def build():
     P = {}
     blk = box(BLOCK["x"], BLOCK["y"], BLOCK["z"])
     for x_, y_ in BLOCK["screws"]:                                           # M4 通孔 Ø4.5、沉孔 Ø8 × 4.5
-        blk = blk.cut(Part.makeCylinder(2.25, 10, V(x_, y_, 251), V(0, 0, 1))).cut(Part.makeCylinder(4.0, 5, V(x_, y_, 255.5), V(0, 0, 1)))
+        blk = blk.cut(Part.makeCylinder(2.25, 10, V(x_, y_, BLOCK["z"][0] - 1), V(0, 0, 1))).cut(Part.makeCylinder(4.0, 5, V(x_, y_, BLOCK["z"][1] - 4.5), V(0, 0, 1)))
     P["oil_block"] = (blk, "metal", "alu", None)
     P["oil_tubes"] = (pipe(RISER, R_CU).fuse(pipe(RETURN, R_RET)), "metal", "copper", None)
     P["oil_line"] = (pipe(LINE_HEAD, R_NY), "black", "nylon", None)
@@ -60,8 +60,9 @@ def build():
         res = res.cut(Part.makeCylinder(2.95 / 2, 10, V(x_, y_, RES["z"][0] - 1), V(0, 0, 1)))
         s_ = Part.makeCylinder(3.5719 / 2, 12.0, V(x_, y_, HEAD_TOP - 12.0), V(0, 0, 1)).fuse(Part.makeCylinder(3.4, 2.1, V(x_, y_, HEAD_TOP)))
         scr = s_ if scr is None else scr.fuse(s_)
-    for x_, y_ in BLOCK["screws"]:                                           # 内六角圆柱头螺钉 M4 × 10（GB/T 70.1），头沉在分油块里
-        scr = scr.fuse(Part.makeCylinder(2.0, 10.0, V(x_, y_, 245.5), V(0, 0, 1)).fuse(Part.makeCylinder(3.5, 4.0, V(x_, y_, 255.5))))
+    for x_, y_ in BLOCK["screws"]:                                           # 内六角圆柱头螺钉 M4 × 10（GB/T 70.1），头沉在分油块里，拧进中间横隔板 6.5（螺纹深 8）
+        zh = BLOCK["z"][1] - 4.5                                              # 头的支承面（沉孔底）
+        scr = scr.fuse(Part.makeCylinder(2.0, 10.0, V(x_, y_, zh - 10.0), V(0, 0, 1)).fuse(Part.makeCylinder(3.5, 4.0, V(x_, y_, zh))))
     P["oil_screws"] = (scr, "black", "steel", None)
     P["oil_box"] = (res, "metal", "alu", None)
     wk = pipe(W1, R_W).fuse(pipe(W2, R_W))
