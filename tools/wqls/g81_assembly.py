@@ -29,8 +29,9 @@ AUTO = (0, 90, 180, 270)
 # 所以：上轴从面板口（左边）穿进去；轴承、中间轴套、曲柄、挑线杆、连杆都从前窗口（x −38…30、z 120…234）放进来，到 x ≥ 5 再沿轴线推。
 # 每一步：(步骤, 零件, 路径, φ, 允许贴着滑的配合 [(本步零件, 已装零件)], 连杆摆动, 说明)
 SEQ = [
-    ("滑块导轨（针杆组、压脚杆组之前）", ["slide_rail"], [(-14, W, 12), (-14, 0, 12), (0, 0, 12), (0, 0, 0)], 0, [], False,
-     "从前窗口伸进来：先往左 14、抬高 12（避开窗口右下角的圆角），进去后往右推到前轴承座下的竖筋上，再放下"),
+    ("滑块导轨（针杆组、压脚杆组之前）", ["slide_rail"], [(-10, W, 11, 5), (-10, 0, 11, 5), (-5, 0, 11, 5), (-5, 0, 11, 0), (0, 0, 11, 0), (0, 0, 0, 0)], 0, [], False,
+     "从前窗口伸进来：往左 10、抬高 11，并且上端往右斜 5°（窗口右下角圆角和左上方的上导套座之间只有约 25.5 mm，导轨宽 25，平着送只剩半毫米）；"
+     "进去后往右 5 再扶正，推到前轴承座下的竖筋上，再放下"),
     ("导轨螺钉 2 个", ["rail_screws"], [(-160, 0, 0), (0, 0, 0)], 0, [("rail_screws", "casting_upper"), ("rail_screws", "slide_rail")], False,
      "螺丝刀从面板口沿 x 伸进来（针杆、压脚杆还没装）"),
     ("立柱里的同步带轮、送布偏心（等上轴穿过）", ["pulley_upper", "feed_ecc"], [(0, 0, -60), (0, 0, 0)], 0, [], False,
@@ -75,6 +76,14 @@ def rotx(p, deg):
     a = np.radians(deg)
     T = np.eye(4)
     T[1:3, 1:3] = [[np.cos(a), -np.sin(a)], [np.sin(a), np.cos(a)]]
+    T[:3, 3] = np.array(p) - T[:3, :3] @ np.array(p)
+    return T
+
+
+def roty(p, deg):
+    a = np.radians(deg)
+    T = np.eye(4)
+    T[0, 0], T[0, 2], T[2, 0], T[2, 2] = np.cos(a), np.sin(a), -np.sin(a), np.cos(a)
     T[:3, 3] = np.array(p) - T[:3, :3] @ np.array(p)
     return T
 
@@ -128,17 +137,23 @@ def main():
         for k in parts:
             raw.setdefault(k, trimesh.load(d / f"{k}.stl"))
         samp = {k: trimesh.sample.sample_surface(raw[k], NPT, seed=1)[0] for k in parts}
-        offs = []
-        for a_, b_ in zip(path[:-1], path[1:]):
+        path4 = [tuple(p_) + (0,) * (4 - len(p_)) for p_ in path]           # 第 4 个数：绕 y 轴斜多少度（上端往 +x 为正）
+        offs, tilts = [], []
+        for a_, b_ in zip(path4[:-1], path4[1:]):
             a_, b_ = np.array(a_, float), np.array(b_, float)
-            n_ = max(1, int(np.ceil(np.linalg.norm(b_ - a_) / 2.0)))
-            offs += [a_ + (b_ - a_) * j / n_ for j in range(n_)]
+            n_ = max(1, int(np.ceil(max(np.linalg.norm(b_[:3] - a_[:3]), abs(b_[3] - a_[3])) / 2.0)))
+            for j in range(n_):
+                q_ = a_ + (b_ - a_) * j / n_
+                offs.append(q_[:3])
+                tilts.append(q_[3])
         offs.append(np.zeros(3))
+        tilts.append(0.0)
         best = None
         for ph in (AUTO if phi == "auto" else [phi]):
             f = byphi[ph]
             T = {k: (M44(f["M"][k]) if k in f["M"] and f["M"][k] else np.eye(4)) for k in parts}
-            seq = [(o, np.eye(4)) for o in offs]
+            cen = np.mean([(T[k][:3, :3] @ raw[k].bounds.mean(0)) + T[k][:3, 3] for k in parts], axis=0)
+            seq = [(o, roty(cen, t_) if t_ else np.eye(4)) for o, t_ in zip(offs, tilts)]
             if swing:                                           # 连杆：先绕曲柄销转成小头朝前（−y），到位后摆回来
                 pc = (M44(f["M"]["crank_pin"]) @ np.r_[raw["crank_pin"].centroid, 1])[:3]
                 small = (T["rod"] @ np.r_[raw["rod"].centroid, 1])[:3]
