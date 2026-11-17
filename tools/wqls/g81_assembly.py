@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -28,8 +29,8 @@ AUTO = (0, 90, 180, 270)
 # 所以：上轴从面板口（左边）穿进去；轴承、中间轴套、曲柄、挑线杆、连杆都从前窗口（x −38…30、z 120…234）放进来，到 x ≥ 5 再沿轴线推。
 # 每一步：(步骤, 零件, 路径, φ, 允许贴着滑的配合 [(本步零件, 已装零件)], 连杆摆动, 说明)
 SEQ = [
-    ("滑块导轨（针杆组、压脚杆组之前）", ["slide_rail"], [(-9, W, 8), (-9, 0, 8), (0, 0, 8), (0, 0, 0)], 0, [], False,
-     "从前窗口伸进来（低 8 mm 进不了窗口，先抬高 8），往右推到前轴承座下的竖筋上，再放下"),
+    ("滑块导轨（针杆组、压脚杆组之前）", ["slide_rail"], [(-14, W, 12), (-14, 0, 12), (0, 0, 12), (0, 0, 0)], 0, [], False,
+     "从前窗口伸进来：先往左 14、抬高 12（避开窗口右下角的圆角），进去后往右推到前轴承座下的竖筋上，再放下"),
     ("导轨螺钉 2 个", ["rail_screws"], [(-160, 0, 0), (0, 0, 0)], 0, [("rail_screws", "casting_upper"), ("rail_screws", "slide_rail")], False,
      "螺丝刀从面板口沿 x 伸进来（针杆、压脚杆还没装）"),
     ("立柱里的同步带轮、送布偏心（等上轴穿过）", ["pulley_upper", "feed_ecc"], [(0, 0, -60), (0, 0, 0)], 0, [], False,
@@ -56,9 +57,11 @@ SEQ = [
     ("机针", ["needle"], [(0, 0, -40), (0, 0, 0)], "auto", [("needle", "needle_clamp"), ("needle", "needle_bar"), ("needle", "clamp_screw")], False,
      "从下面插进针夹"),
     ("机头顶橡胶塞", ["nb_plug"], [(0, 0, 30), (0, 0, 0)], 0, [("nb_plug", "casting_upper")], False, ""),
-    ("摇杆支点销（压进机头顶吊下来的销座）", ["stud_Q"], [(-25, 0, 0), (0, 0, 0)], "auto", [("stud_Q", "casting_upper")], False, "从前窗口伸进去，沿 x 压进销座"),
-    ("挑线摇杆和销", ["rocker", "pin_M"], [(-12, W, 0), (-12, 0, 0), (0, 0, 0)], "auto",
-     [("rocker", "stud_Q"), ("rocker", "lever"), ("pin_M", "lever"), ("pin_M", "rocker")], False, "从前窗口放进来，套到支点销上，再穿挑线杆销"),
+    ("挑线摇杆和销（支点销之前）", ["rocker", "pin_M"], [(0, W, -8), (0, 0, -8), (0, 0, 0)], "auto",
+     [("pin_M", "lever"), ("pin_M", "rocker"), ("rocker", "lever")], False,
+     "从前窗口在装好的 x 位置伸进来（顶比窗口上沿高，先放低 8），到位后抬起，销穿进挑线杆"),
+    ("摇杆支点销（压进机头顶吊下来的销座，穿过摇杆）", ["stud_Q"], [(-25, 0, 0), (0, 0, 0)], "auto", [("stud_Q", "casting_upper"), ("stud_Q", "rocker")], False,
+     "从前窗口伸进去，沿 x 穿过销座、摇杆孔压到位（摇杆在销座右边，只能先放摇杆再穿销）"),
     ("分油块", ["oil_block", "oil_screws"], [(0, 0, 40), (0, 0, 0)], 0, [("oil_screws", "casting_upper"), ("oil_screws", "oil_block")], False,
      "顶盖拆下后从上面放"),
 ]
@@ -114,7 +117,13 @@ def main():
         return worst
 
     res = []
-    for name, parts, path, phi, slide, swing, note in SEQ:
+    start = int(os.environ.get("WQ_FROM", "0"))                    # 只复查第 start 步以后（前面的直接当作已装好）
+    for n_step, (name, parts, path, phi, slide, swing, note) in enumerate(SEQ):
+        if n_step < start:
+            for k in parts:
+                raw.setdefault(k, trimesh.load(d / f"{k}.stl"))
+            installed.extend(parts)
+            continue
         allow = set(slide)
         for k in parts:
             raw.setdefault(k, trimesh.load(d / f"{k}.stl"))
