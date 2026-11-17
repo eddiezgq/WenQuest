@@ -114,14 +114,20 @@ names = list(parts) + ["casting"]
 ONLY = set(x for x in os.environ.get("WQ_ONLY", "").split(",") if x)    # 只查和这些零件有关的组合（G4.5：只查旋梭组，机头部分 G4.1–4.3 查过）
 # G4.7：某个状态下由控制器联锁排除的组合（例如膝抬 13 mm 时只在针杆上面停针，针夹和压脚不会相遇），用 WQ_SKIP="a|b;c|d" 给出
 SKIP = {frozenset(p.split("|")) for p in os.environ.get("WQ_SKIP", "").split(";") if "|" in p}
+# G8.1：全机检查一次跑不完，按组合编号分片：WQ_SHARD="i/n" 只查编号 % n == i 的组合；结果写到 WQ_CLOUT（默认 <零件目录>/clearance.json）
+SH_I, SH_N = (int(x) for x in os.environ.get("WQ_SHARD", "0/1").split("/"))
 worst = {}
 t0 = time.time()
 first = True
 for f in FR[::max(1, STEP // 2)]:
     sh = {k: placed(k, f) for k in parts}
     sh["casting"] = near
+    pidx = -1
     for i, a in enumerate(names):
         for b in names[i + 1:]:
+            pidx += 1
+            if SH_N > 1 and pidx % SH_N != SH_I:
+                continue
             if frozenset((a, b)) in JOINT or frozenset((a, b)) in SKIP:
                 continue
             if ONLY and a not in ONLY and b not in ONLY:
@@ -142,5 +148,5 @@ for f in FR[::max(1, STEP // 2)]:
 res = sorted(([k, v[0], v[1]] for k, v in worst.items()), key=lambda x: x[1])
 bad = [r for r in res if r[1] < TIGHT.get(frozenset(r[0].split(" | ")), LIMIT)]
 out = dict(limit_mm=LIMIT, step_deg=STEP, frames=len(FR[::max(1, STEP // 2)]), seconds=round(time.time() - t0), pairs=res, too_close=bad)
-json.dump(out, open(os.path.join(D, "clearance.json"), "w"), ensure_ascii=False, indent=1)
+json.dump(out, open(os.environ.get("WQ_CLOUT") or os.path.join(D, "clearance.json"), "w"), ensure_ascii=False, indent=1)
 print(json.dumps(dict(too_close=bad, closest=res[:8], seconds=out["seconds"]), ensure_ascii=False))
