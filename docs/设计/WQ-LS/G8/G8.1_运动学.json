@@ -9,8 +9,8 @@
   "tip_out_plate": 252.98928571428573,
   "eye_in_fabric": 108.79359430604983,
   "hook_catch": 206.1,
-  "takeup_top": 84.0,
-  "takeup_bottom": 318.0,
+  "takeup_top": 79.0,
+  "takeup_bottom": 327.0,
   "dog_rise": 305.30537341157634,
   "dog_drop": 98.64892431108223
  },
@@ -44,8 +44,8 @@
    "g1_ideal": 108.18
   },
   "takeup_top": {
-   "three_d": 84.0,
-   "design": 84,
+   "three_d": 79.0,
+   "design": 79,
    "source": "G4",
    "diff": 0.0,
    "g1_ideal": 55
@@ -170,10 +170,10 @@
    "fabric": "lining",
    "t": 0.4,
    "s": 1.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 77.52,
    "consumption": 1.4,
-   "margin": 2.65,
+   "margin": 5.94,
    "shortfall": 0.0,
    "ok": true
   },
@@ -182,10 +182,10 @@
    "fabric": "lining",
    "t": 0.4,
    "s": 2.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 77.52,
    "consumption": 2.4,
-   "margin": 2.65,
+   "margin": 5.94,
    "shortfall": 0.0,
    "ok": true
   },
@@ -194,10 +194,10 @@
    "fabric": "lining",
    "t": 0.4,
    "s": 3.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 77.52,
    "consumption": 3.4,
-   "margin": 2.65,
+   "margin": 5.94,
    "shortfall": 0.0,
    "ok": true
   },
@@ -206,10 +206,10 @@
    "fabric": "lining",
    "t": 0.4,
    "s": 4.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 77.52,
    "consumption": 4.4,
-   "margin": 2.65,
+   "margin": 5.94,
    "shortfall": 0.0,
    "ok": true
   },
@@ -218,10 +218,10 @@
    "fabric": "lining",
    "t": 0.4,
    "s": 5.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 77.52,
    "consumption": 5.4,
-   "margin": 2.65,
+   "margin": 5.94,
    "shortfall": 0.0,
    "ok": true
   },
@@ -230,130 +230,130 @@
    "fabric": "cotton",
    "t": 1.5,
    "s": 1.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 79.57,
    "consumption": 2.5,
-   "margin": 0.6,
-   "shortfall": 1.05,
-   "ok": false
+   "margin": 3.89,
+   "shortfall": 0.0,
+   "ok": true
   },
   {
    "path": "3d",
    "fabric": "cotton",
    "t": 1.5,
    "s": 2.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 79.57,
    "consumption": 3.5,
-   "margin": 0.6,
-   "shortfall": 1.05,
-   "ok": false
+   "margin": 3.89,
+   "shortfall": 0.0,
+   "ok": true
   },
   {
    "path": "3d",
    "fabric": "cotton",
    "t": 1.5,
    "s": 3.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 79.57,
    "consumption": 4.5,
-   "margin": 0.6,
-   "shortfall": 1.05,
-   "ok": false
+   "margin": 3.89,
+   "shortfall": 0.0,
+   "ok": true
   },
   {
    "path": "3d",
    "fabric": "cotton",
    "t": 1.5,
    "s": 4.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 79.57,
    "consumption": 5.5,
-   "margin": 0.6,
-   "shortfall": 1.05,
-   "ok": false
+   "margin": 3.89,
+   "shortfall": 0.0,
+   "ok": true
   },
   {
    "path": "3d",
    "fabric": "cotton",
    "t": 1.5,
    "s": 5.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 79.57,
    "consumption": 6.5,
-   "margin": 0.6,
-   "shortfall": 1.05,
-   "ok": false
+   "margin": 3.89,
+   "shortfall": 0.0,
+   "ok": true
   },
   {
    "path": "3d",
    "fabric": "light_denim_x4",
    "t": 3.0,
    "s": 1.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 82.39,
    "consumption": 4.0,
-   "margin": -2.22,
-   "shortfall": 4.05,
-   "ok": false
+   "margin": 1.06,
+   "shortfall": 0.8,
+   "ok": true
   },
   {
    "path": "3d",
    "fabric": "light_denim_x4",
    "t": 3.0,
    "s": 2.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 82.39,
    "consumption": 5.0,
-   "margin": -2.22,
-   "shortfall": 4.05,
-   "ok": false
+   "margin": 1.06,
+   "shortfall": 0.8,
+   "ok": true
   },
   {
    "path": "3d",
    "fabric": "light_denim_x4",
    "t": 3.0,
    "s": 3.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 82.39,
    "consumption": 6.0,
-   "margin": -2.22,
-   "shortfall": 4.05,
-   "ok": false
+   "margin": 1.06,
+   "shortfall": 0.8,
+   "ok": true
   },
   {
    "path": "3d",
    "fabric": "light_denim_x4",
    "t": 3.0,
    "s": 4.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 82.39,
    "consumption": 7.0,
-   "margin": -2.22,
-   "shortfall": 4.05,
-   "ok": false
+   "margin": 1.06,
+   "shortfall": 0.8,
+   "ok": true
   },
   {
    "path": "3d",
    "fabric": "light_denim_x4",
    "t": 3.0,
    "s": 5.0,
-   "takeup": 81.92,
+   "takeup": 88.78,
    "demand_max": 82.39,
    "consumption": 8.0,
-   "margin": -2.22,
-   "shortfall": 4.05,
-   "ok": false
+   "margin": 1.06,
+   "shortfall": 0.8,
+   "ok": true
   },
   {
    "path": "end_view",
    "fabric": "lining",
    "t": 0.4,
    "s": 1.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 77.52,
    "consumption": 1.4,
-   "margin": 5.09,
+   "margin": 8.01,
    "shortfall": 0.0,
    "ok": true
   },
@@ -362,10 +362,10 @@
    "fabric": "lining",
    "t": 0.4,
    "s": 2.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 77.52,
    "consumption": 2.4,
-   "margin": 5.09,
+   "margin": 8.01,
    "shortfall": 0.0,
    "ok": true
   },
@@ -374,10 +374,10 @@
    "fabric": "lining",
    "t": 0.4,
    "s": 3.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 77.52,
    "consumption": 3.4,
-   "margin": 5.09,
+   "margin": 8.01,
    "shortfall": 0.0,
    "ok": true
   },
@@ -386,10 +386,10 @@
    "fabric": "lining",
    "t": 0.4,
    "s": 4.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 77.52,
    "consumption": 4.4,
-   "margin": 5.09,
+   "margin": 8.01,
    "shortfall": 0.0,
    "ok": true
   },
@@ -398,10 +398,10 @@
    "fabric": "lining",
    "t": 0.4,
    "s": 5.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 77.52,
    "consumption": 5.4,
-   "margin": 5.09,
+   "margin": 8.01,
    "shortfall": 0.0,
    "ok": true
   },
@@ -410,11 +410,11 @@
    "fabric": "cotton",
    "t": 1.5,
    "s": 1.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 79.57,
    "consumption": 2.5,
-   "margin": 3.04,
-   "shortfall": 0.9,
+   "margin": 5.96,
+   "shortfall": 0.0,
    "ok": true
   },
   {
@@ -422,11 +422,11 @@
    "fabric": "cotton",
    "t": 1.5,
    "s": 2.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 79.57,
    "consumption": 3.5,
-   "margin": 3.04,
-   "shortfall": 0.9,
+   "margin": 5.96,
+   "shortfall": 0.0,
    "ok": true
   },
   {
@@ -434,11 +434,11 @@
    "fabric": "cotton",
    "t": 1.5,
    "s": 3.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 79.57,
    "consumption": 4.5,
-   "margin": 3.04,
-   "shortfall": 0.9,
+   "margin": 5.96,
+   "shortfall": 0.0,
    "ok": true
   },
   {
@@ -446,11 +446,11 @@
    "fabric": "cotton",
    "t": 1.5,
    "s": 4.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 79.57,
    "consumption": 5.5,
-   "margin": 3.04,
-   "shortfall": 0.9,
+   "margin": 5.96,
+   "shortfall": 0.0,
    "ok": true
   },
   {
@@ -458,11 +458,11 @@
    "fabric": "cotton",
    "t": 1.5,
    "s": 5.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 79.57,
    "consumption": 6.5,
-   "margin": 3.04,
-   "shortfall": 0.9,
+   "margin": 5.96,
+   "shortfall": 0.0,
    "ok": true
   },
   {
@@ -470,60 +470,60 @@
    "fabric": "light_denim_x4",
    "t": 3.0,
    "s": 1.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 82.39,
    "consumption": 4.0,
-   "margin": 0.21,
-   "shortfall": 3.9,
-   "ok": false
+   "margin": 3.14,
+   "shortfall": 0.68,
+   "ok": true
   },
   {
    "path": "end_view",
    "fabric": "light_denim_x4",
    "t": 3.0,
    "s": 2.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 82.39,
    "consumption": 5.0,
-   "margin": 0.21,
-   "shortfall": 3.9,
-   "ok": false
+   "margin": 3.14,
+   "shortfall": 0.68,
+   "ok": true
   },
   {
    "path": "end_view",
    "fabric": "light_denim_x4",
    "t": 3.0,
    "s": 3.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 82.39,
    "consumption": 6.0,
-   "margin": 0.21,
-   "shortfall": 3.9,
-   "ok": false
+   "margin": 3.14,
+   "shortfall": 0.68,
+   "ok": true
   },
   {
    "path": "end_view",
    "fabric": "light_denim_x4",
    "t": 3.0,
    "s": 4.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 82.39,
    "consumption": 7.0,
-   "margin": 0.21,
-   "shortfall": 3.9,
-   "ok": false
+   "margin": 3.14,
+   "shortfall": 0.68,
+   "ok": true
   },
   {
    "path": "end_view",
    "fabric": "light_denim_x4",
    "t": 3.0,
    "s": 5.0,
-   "takeup": 83.55,
+   "takeup": 93.04,
    "demand_max": 82.39,
    "consumption": 8.0,
-   "margin": 0.21,
-   "shortfall": 3.9,
-   "ok": false
+   "margin": 3.14,
+   "shortfall": 0.68,
+   "ok": true
   }
  ],
  "peaks": [
@@ -559,13 +559,13 @@
   },
   {
    "part": "lever",
-   "mass_kg": 0.032,
-   "v_max": 9.913,
-   "a_max": 7586.3,
-   "a_at": 47,
-   "w_max": 345.9,
-   "alpha_max": 275113.0,
-   "F_inertia_max": 242.8
+   "mass_kg": 0.03202,
+   "v_max": 9.992,
+   "a_max": 7776.9,
+   "a_at": 43,
+   "w_max": 354.0,
+   "alpha_max": 277150.0,
+   "F_inertia_max": 249.0
   },
   {
    "part": "nb_link",
@@ -588,6 +588,16 @@
    "F_inertia_max": 63.8
   },
   {
+   "part": "rocker",
+   "mass_kg": 0.01076,
+   "v_max": 5.714,
+   "a_max": 5148.3,
+   "a_at": 43,
+   "w_max": 482.2,
+   "alpha_max": 432525.0,
+   "F_inertia_max": 55.4
+  },
+  {
    "part": "slide_block",
    "mass_kg": 0.0098,
    "v_max": 8.433,
@@ -596,16 +606,6 @@
    "w_max": 0.0,
    "alpha_max": 0.0,
    "F_inertia_max": 53.4
-  },
-  {
-   "part": "rocker",
-   "mass_kg": 0.01087,
-   "v_max": 5.418,
-   "a_max": 4733.1,
-   "a_at": 46,
-   "w_max": 451.6,
-   "alpha_max": 393071.0,
-   "F_inertia_max": 51.4
   },
   {
    "part": "feed_rod",
@@ -620,12 +620,12 @@
   {
    "part": "pin_M",
    "mass_kg": 0.00316,
-   "v_max": 10.572,
-   "a_max": 9235.9,
-   "a_at": 46,
+   "v_max": 11.147,
+   "a_max": 10043.6,
+   "a_at": 43,
    "w_max": 0.0,
    "alpha_max": 0.0,
-   "F_inertia_max": 29.2
+   "F_inertia_max": 31.7
   },
   {
    "part": "feed_ecc",
@@ -653,8 +653,8 @@
    "v_max": 8.115,
    "a_max": 4249.3,
    "a_at": 7,
-   "w_max": 345.9,
-   "alpha_max": 275113.0,
+   "w_max": 354.0,
+   "alpha_max": 277150.0,
    "F_inertia_max": 19.1
   },
   {
@@ -942,5 +942,5 @@
   "rel_err": 4e-05,
   "a_max_exact": 5447.0
  },
- "all_ok": false
+ "all_ok": true
 }
