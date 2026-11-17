@@ -18,25 +18,30 @@ import trimesh
 
 PEN = 0.3
 
-# (步骤, 零件, 装入方向（零件往哪个方向移动）, 行程 mm, 主轴转角 φ, 说明)
+# (步骤, 零件, 路径（离装好位置的偏移，依次经过这些点，最后一个是 (0,0,0)）, 主轴转角 φ, 说明)
+# 机头里的上导套座、压脚杆上导套座顶在 z 182，挡住了从面板口沿轴线推 Ø40 轴承、Ø35 轴套的路；
+# 所以轴承、中间轴套、曲柄组件都从前窗口（x −38…30、z 120…234）伸进来，到了 x ≥ 5（上导套座 D 形平面以外）再沿轴线推。
+W = -110.0   # 从前窗口外面进来
 SEQ = [
-    # 针杆上、下导套不在这里推：两个是一个三维零件，上导套从机头顶 Ø12 孔往下压进 Ø10 座，下导套从机头底下往上压进 Ø12 座，都是直孔。
-    # 先当作已经压好（加进已装零件）
-    ("滑块导轨和两个导轨螺钉（针杆组装之前）", ["slide_rail", "rail_screws"], (1, 0, 0), 120, 0,
-     "从机头左端面板口伸进去，贴到前轴承座下的竖筋上"),
-    ("上轴中间含油轴套", ["bush_mid"], (1, 0, 0), 230, 0, "从前轴承孔 Ø40 用长压杆推到中间轴套座 Ø35"),
-    ("曲柄组件（曲柄、曲柄销及左旋螺钉、两个滚针组件、连杆、挑线杆）", ["crank", "crank_pin", "crank_screws", "cage_rod", "cage_lever", "rod", "lever"],
-     (1, 0, 0), 140, 180, "在机外先装成组件；从面板口放进机头，曲柄销转到下面（φ 180）"),
-    ("上轴", ["shaft"], (-1, 0, 0), 460, 180, "从电机端穿过后轴承孔、中间轴套、曲柄孔，到前轴承座"),
-    ("前轴承 6203-2RS", ["bearing_front"], (1, 0, 0), 60, 180, "从面板口压到轴上和轴承座里"),
-    ("滑块、针杆连接块（套在连杆小头的销上）", ["slide_block", "nb_link", "link_screws"], (0, 0, -1), 60, 0,
-     "从导轨上端放进导轨"),
-    ("针杆", ["needle_bar"], (0, 0, -1), 200, 0, "从机头顶 Ø12 孔插下去，穿过上导套、连接块、下导套"),
-    ("针夹和紧针螺钉", ["needle_clamp", "clamp_screw"], (0, 0, 1), 40, 0, "从下面套到针杆下端"),
-    ("机针", ["needle"], (0, 0, 1), 40, 0, "从下面插进针夹"),
-    ("机头顶橡胶塞", ["nb_plug"], (0, 0, -1), 30, 0, ""),
-    ("挑线摇杆、销", ["rocker", "pin_M", "stud_Q"], (-1, 0, 0), 60, 0, "从面板口"),
-    ("分油块", ["oil_block", "oil_screws"], (0, 0, -1), 40, 0, "顶盖拆下后从上面放"),
+    ("滑块导轨（针杆组、压脚杆组之前）", ["slide_rail"], [(-9, W, 8), (-9, 0, 8), (0, 0, 8), (0, 0, 0)], 0,
+     "从前窗口伸进来（低 8 mm 进不了窗口，先抬高 8），再往右推到前轴承座下的竖筋上"),
+    ("导轨螺钉 2 个", ["rail_screws"], [(-160, 0, 0), (0, 0, 0)], 0, "螺丝刀从面板口沿 x 伸进来（针杆、压脚杆还没装）"),
+    ("上轴中间含油轴套", ["bush_mid"], [(-158, W, 0), (-158, 0, 0), (0, 0, 0)], 0,
+     "从前窗口放进来（x 4.5…29.5），再用长压杆沿轴线穿过前轴承孔 Ø40 推到中间轴套座 Ø35"),
+    ("前轴承 6203-2RS", ["bearing_front"], [(-32.5, W, 0), (-32.5, 0, 0), (0, 0, 0)], 0, "从前窗口放进来，沿轴线压进轴承座"),
+    ("曲柄（带曲柄销、左旋螺钉、挑线杆滚针组件）", ["crank", "crank_pin", "crank_screws", "cage_lever"], [(-10, W, 0), (-10, 0, 0), (0, 0, 0)], 270,
+     "机外先装好；曲柄销朝后（φ 270），从前窗口放进来，再往右 10 对准轴线"),
+    ("上轴", ["shaft"], [(460, 0, 0), (0, 0, 0)], 270, "从电机端穿过后轴承孔、中间轴套、前轴承内圈、曲柄孔；然后拧曲柄紧定螺钉"),
+    ("挑线杆", ["lever"], [(-30, W, 0), (-30, 0, 0), (0, 0, 0)], 270, "从前窗口放进来，往右套到曲柄销的滚针上"),
+    ("连杆（带滚针组件）", ["rod", "cage_rod"], [(-20, W, 0), (-20, 0, 0), (0, 0, 0)], 270, "从前窗口放进来，往右套到曲柄销上"),
+    ("滑块", ["slide_block"], [(0, 0, 30), (0, 0, 0)], 0, "曲柄转到 φ 0，从导轨上端放进导轨"),
+    ("针杆连接块（连接销穿过连杆小头、滑块）", ["nb_link"], [(-25, W, 0), (-25, 0, 0), (0, 0, 0)], 0, "从前窗口放进来，往右把销穿过连杆小头和滑块"),
+    ("针杆", ["needle_bar"], [(0, 0, 200), (0, 0, 0)], 0, "从机头顶 Ø12 孔插下去，穿过上导套、连接块、下导套"),
+    ("针夹和紧针螺钉", ["needle_clamp", "clamp_screw"], [(0, 0, -40), (0, 0, 0)], 0, "从下面套到针杆下端"),
+    ("机针", ["needle"], [(0, 0, -40), (0, 0, 0)], 0, "从下面插进针夹"),
+    ("机头顶橡胶塞", ["nb_plug"], [(0, 0, 30), (0, 0, 0)], 0, ""),
+    ("挑线摇杆、销", ["rocker", "pin_M", "stud_Q"], [(0, W, 0), (0, 0, 0)], 0, "从前窗口"),
+    ("分油块", ["oil_block", "oil_screws"], [(0, 0, 40), (0, 0, 0)], 0, "顶盖拆下后从上面放"),
 ]
 
 
@@ -54,30 +59,36 @@ def main():
     base.add_object("casting_lower", trimesh.load(hl))
     base.add_object("nb_bushes", trimesh.load(d / "nb_bushes.stl"))
     res = []
-    for name, parts, u, L, phi, note in SEQ:
+    for name, parts, path, phi, note in SEQ:
         f = byphi[phi]
-        u = np.array(u, float)
+        pts = []
+        for a_, b_ in zip(path[:-1], path[1:]):
+            a_, b_ = np.array(a_, float), np.array(b_, float)
+            n_ = max(1, int(np.ceil(np.linalg.norm(b_ - a_) / 1.0)))
+            pts += [a_ + (b_ - a_) * k / n_ for k in range(n_)]
+        pts = [q for q in pts if np.linalg.norm(q) > 0.4]
         movers = {}
         for k in parts:
             m = trimesh.load(d / f"{k}.stl")
             T = M44(f["M"][k]) if k in f["M"] and f["M"][k] else np.eye(4)
             movers[k] = (m, T)
         worst = (0.0, None, None)
-        for t in np.arange(L, 0.4, -1.0):                       # t = 离装好位置还有多远
+        for q in pts:                                           # q = 离装好位置的偏移
+            t = float(np.linalg.norm(q))
             mm = trimesh.collision.CollisionManager()
             for k, (m, T) in movers.items():
                 S = np.eye(4)
-                S[:3, 3] = -u * t
+                S[:3, 3] = q
                 mm.add_object(k, m, transform=S @ T)
             hit, data = mm.in_collision_other(base, return_data=True)
             if hit:
                 for c in data:
                     dep = c.depth
                     if dep > PEN and dep > worst[0]:
-                        worst = (float(dep), sorted(c.names), float(t))
+                        worst = (float(dep), sorted(c.names), [round(float(v), 1) for v in q], [round(float(v), 1) for v in c.point])
         ok = worst[1] is None
-        res.append(dict(step=name, parts=parts, dir=list(u), travel=L, phi=phi, ok=ok, note=note,
-                        worst=None if ok else dict(depth_mm=round(worst[0], 2), pair=worst[1], at_mm_before_home=worst[2])))
+        res.append(dict(step=name, parts=parts, path=path, phi=phi, ok=ok, note=note,
+                        worst=None if ok else dict(depth_mm=round(worst[0], 2), pair=worst[1], offset=worst[2], point=worst[3])))
         print(name, "OK" if ok else res[-1]["worst"])
         for k, (m, T) in movers.items():                        # 装好，加进已装零件
             base.add_object(k, m, transform=T)
