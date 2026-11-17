@@ -84,7 +84,7 @@ parts:
   nb_plug: {code: BUY-PLUG-12, name: [机头顶橡胶塞 Ø12, Head-top rubber plug], kind: buy, group: needle, doc: "G8a#第 6 步"}
   nb_guide: {code: LS-213, name: [针杆线钩, Needle-bar thread guide], kind: buy, group: needle, doc: "G8a#第 7 步"}
   clamp_screw: {code: BUY-SCR-SMP-9/64x5, name: [紧针螺钉 SMP 9/64-40 × 5, Needle clamp screw], kind: buy, group: needle, doc: "G8a#第 7 步"}
-  guide_screw: {code: BUY-SCR-SMP-3/32x5, name: [线钩螺钉 SMP 3/32-56 × 5, Thread-guide screw], kind: buy, group: needle, doc: "G8a#第 7 步"}
+  guide_screw: {code: BUY-SCR-SMP-3/32x4, name: [线钩螺钉 SMP 3/32-56 × 4, Thread-guide screw], kind: buy, group: needle, doc: "G8a#第 7 步"}
   link_screws: {code: BUY-SCR-SMS-11/64x4, qty: 2, name: [针杆连接块紧定螺钉 SMS 11/64-40 × 4, Connecting-block set screws], kind: buy, group: needle, doc: "G8a#第 7 步"}
   rail_screws: {code: BUY-SCR-SMP-9/64x20, qty: 2, name: [导轨螺钉 SMP 9/64-40 × 20, Rail screws], kind: buy, group: needle, doc: "G8a#第 7 步"}
   crank_screws: {code: BUY-SCR-SML-9/64x8, sub: [曲柄销螺钉（左旋）和两个曲柄紧定螺钉 SMS 15/64-28 × 8, crank-pin screw (LH) and two crank set screws], name: [曲柄螺钉组, Crank screws], kind: buy, group: needle, doc: "G8a#第 7 步"}
