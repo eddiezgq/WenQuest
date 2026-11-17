@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -18,6 +19,7 @@ import trimesh
 # 螺钉：名字 → (所在零件（运动跟它）, 螺钉头支承面中心 (x, y, z)（φ = 0 位置）, 工具往外伸的方向, 工具半径, 说明)
 # 坐标同 cad/mech.py；zb = 针杆下端（φ = 0），zB = 针杆连接销（φ = 0）
 ZB0, ZB_LINK = 42.5 + 0.0, 160.5
+ZH = -21.5                                          # 旋梭轴心高（spec.ZH）
 
 
 def screws(zb, zB, C0, oil):
@@ -29,6 +31,9 @@ def screws(zb, zB, C0, oil):
         "导轨螺钉 SMP 9/64-40（下）": ("slide_rail", (24.4, 0, 125), (-1, 0, 0), 2.5, "装导轨"),
         "分油块 M4（前）": ("oil_block", (175, -6, oil["BLOCK"]["z"][1] - 4.5 + 4), (0, 0, 1), 1.8, "顶盖拆下后拧"),
         "油毡盒 SMP 9/64-40": ("oil_box", (12, 19, oil["HEAD_TOP"] + 2.1), (0, 0, 1), 2.5, "机头顶外面"),
+        # 旋梭尾部轴套 Ø14（x 18.5…22.5）上的紧定螺钉，径向；随旋梭转，按转角扫一圈就把各个径向方向都查到了
+        "旋梭紧定螺钉（内六角）": ("hook", (20.5, 0, ZH - 7.0), (0, 0, -1), 1.3, "换旋梭、调梭尖时拧（梭芯套先取出）"),
+        "旋梭紧定螺钉（一字）": ("hook", (20.5, 0, ZH - 7.0), (0, 0, -1), 2.5, "同上，用螺丝刀"),
     }
     return out
 
@@ -53,6 +58,8 @@ def main():
     meshes = {k: load(d, k) for k in names}
     meshes["casting_upper"], meshes["casting_lower"] = trimesh.load(hu), trimesh.load(hl)
     S = screws(ZB0, ZB_LINK, None, oil)
+    if os.environ.get("WQ_ONLY_SCREW"):
+        S = {k: v for k, v in S.items() if os.environ["WQ_ONLY_SCREW"] in k}
     res = {}
     for nm, (owner, p0, u, r, why) in S.items():
         u = np.array(u, float)
@@ -88,6 +95,7 @@ def main():
 # 螺钉自己（工具从螺钉头上出发）不算挡
 SELF = {"紧针螺钉 SMP 9/64-40": ("clamp_screw",), "针杆连接块紧定 SMS 11/64-40（上）": ("link_screws",),
         "针杆连接块紧定 SMS 11/64-40（下）": ("link_screws",), "导轨螺钉 SMP 9/64-40（上）": ("rail_screws",),
-        "导轨螺钉 SMP 9/64-40（下）": ("rail_screws",), "分油块 M4（前）": ("oil_screws",), "油毡盒 SMP 9/64-40": ("oil_screws",)}
+        "导轨螺钉 SMP 9/64-40（下）": ("rail_screws",), "分油块 M4（前）": ("oil_screws",), "油毡盒 SMP 9/64-40": ("oil_screws",),
+        "旋梭紧定螺钉（内六角）": ("hook_shaft", "bobbin_case"), "旋梭紧定螺钉（一字）": ("hook_shaft", "bobbin_case")}
 if __name__ == "__main__":
     main()
