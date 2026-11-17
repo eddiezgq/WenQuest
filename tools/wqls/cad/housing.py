@@ -63,7 +63,7 @@ TK_JSON = json.load(open(_tkj)) if os.path.exists(_tkj) else None
 
 
 OIL_PAD_FILL = None
-OIL_PAD_Z = 250.5                                  # 分油块平台高度（= cad/oil_geo.py 的 BLOCK z 下沿）
+OIL_PAD_Z = 250.0                                  # 分油块平台高度（= cad/oil_geo.py 的 BLOCK z 下沿）
 
 
 def _oil():
@@ -485,7 +485,7 @@ def ctrl_seats(hollow, solid, info):
     pad = Part.makeBox(B_["x"][1] - B_["x"][0] + 1, B_["y"][1] - B_["y"][0] + 1, 12, V(B_["x"][0] - 0.5, B_["y"][0] - 0.5, B_["z"][0]))
     pad = pad.makeFillet(6.0, [e for e in pad.Edges if e.BoundBox.ZLength > 11])                                  # 平台四角 R6（立铣刀 Ø10 铣出）
     holes.append(pad)
-    # 平台比铸出的机臂顶面低 1.5…2.9 mm，铣掉的就是铸件表皮，毛坯不再另加余量（加了余量，平台正好在中间横隔板和顶板的 T 形交接处，
+    # 平台比铸出的机臂顶面低 2.0…3.4 mm，这层铸件表面就是加工余量（够覆盖铸件顶面 ±1.5 的偏差），毛坯不再另加余量块（加了余量，平台正好在中间横隔板和顶板的 T 形交接处，
     # 凝固仿真里成了 M 0.39 的热节）。铣掉的那块交给 blank.py 补回毛坯
     global OIL_PAD_FILL
     OIL_PAD_FILL = pad.common(solid)

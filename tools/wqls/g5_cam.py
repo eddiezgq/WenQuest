@@ -281,7 +281,7 @@ def ctrl_holes():
     P = [to_frame("TOPARM", (0.0, 0.0, 242.0))[:2]]
     ops.append(op("TOPARM 钻机头顶 Ø12 通孔（橡胶塞孔）", "TOPARM", 52, "钻头 Ø12（直角铣头）", 12, 60,
                   cam.drill(P, 259 - 233, 0, 0.12 * rpm(60, 12), r_plane=-12, safe=8), kind="drill"))
-    # G8.0 第 7 步 润滑油路（cad/oil.py）：直角铣头从上面——分油块平台（z 250.5，四角 R6；比铸出顶面低 1.5…2.9，不另加余量）、2 × M4（打在中间横隔板上）、
+    # G8.0 第 7 步 润滑油路（cad/oil.py）：直角铣头从上面——分油块平台（z 250.0，四角 R6；铸出顶面就是余量 2.0…3.4）、2 × M4（打在中间横隔板上）、
     # 中间轴套油芯孔 Ø3（钻到轴套外圆，深 34.5）、机头顶油毡盒 2 个螺钉过孔 Ø3.9
     import importlib.util as _iu
     _sp = _iu.spec_from_file_location("wq_oil_geo", str(Path(__file__).resolve().parent / "cad" / "oil_geo.py"))
@@ -291,7 +291,7 @@ def ctrl_holes():
     zp = OG.BLOCK["z"][0]
     pad = [to_frame("TOPARM", (x, y, zp))[:2] for x, y in ((bx_[0] - 0.5, by_[0] - 0.5), (bx_[1] + 0.5, by_[0] - 0.5),
                                                               (bx_[1] + 0.5, by_[1] + 0.5), (bx_[0] - 0.5, by_[1] + 0.5))]
-    ops.append(op("TOPARM 铣分油块平台（z 250.5）", "TOPARM", 53, "立铣刀 Ø10（直角铣头）", 10, 120,
+    ops.append(op("TOPARM 铣分油块平台（z 250.0）", "TOPARM", 53, "立铣刀 Ø10（直角铣头）", 10, 120,
                   cam.mill_pocket(pad, 259 - zp, 10, 0.6, 2.0, 0.04 * 4 * rpm(120, 10), 0.02 * 4 * rpm(120, 10), safe=8)))
     P = [to_frame("TOPARM", (x, y, zp))[:2] for x, y in OG.BLOCK["screws"]]
     ops.append(op("TOPARM 钻分油块 M4 底孔 Ø3.3 深 10", "TOPARM", 61, "钻头 Ø3.3（直角铣头）", 3.3, 60,
