@@ -208,10 +208,12 @@ def frames(step=2, nd=5):
         nb_bot = Bv + ZU - X["nb_below"]
         # G4.7：从夹线器开始——两片夹线盘之间（绕夹线柱下面）→ 挑线簧的钩 → 过线点 A
         # 过线点 B 之后：机头前面下沿的过线环（z 44，cad/ctrl.py 的 thread_guide）→ 针夹上的线钩 → 顺着机针前面的长槽到针眼
-        # G8.1 第三步：过线点 A、B 放在挑线杆线眼的平面上（x 21.5，前盖板竖槽上下两头）。原来 A 在 x 40、B 在 x 0，
-        # 三维线长里多了 x 方向的固定斜边，挑线量比 G4 端视综合的少 10 mm（83.6 → 73.4），余量变负
+        # G8.1 第三步：过线点 B 放在挑线杆线眼的平面上（x 21.5），A 紧贴挑线杆右侧（杆 x 17.5…25.5，A 在 x 28.5，让开 3）。
+        # 原来 A 在 x 40、B 在 x 0，三维线长里多了 x 方向的固定斜边，挑线量比 G4 端视综合的少 10 mm（83.6 → 73.4），余量变负；
+        # A 也放到 21.5 时，挑线簧 → A 那段线在 φ 0 穿过挑线杆，所以 A 让到杆外（挑线量 81.9）
         xe = X["lever"][0] + X["lever"][1] / 2
-        thread = TENSION_PATH + [[xe, Ay, Az], [xe, Ey, Ez], [xe, By, Bz], [0.0, -51.0, 44.0],
+        xa = X["lever"][0] + X["lever"][1] + 3.0
+        thread = TENSION_PATH + [[xa, Ay, Az], [xe, Ey, Ez], [xe, By, Bz], [0.0, -51.0, 44.0],
                                  [0.0, -6.0, nb_bot + 0.3], [0.0, -0.75, nb_bot - 3.0], [0.0, -0.3, tip + 2.8]]
         own = (["tension", "tension", "check_spring"] if TENSION_PATH else []) + ["A", "lever", "B", "thread_guide", "needle_clamp", "needle", "needle"]
         out.append(dict(phi=phi_, M={k: [(round(v, nd) if nd else float(v)) for v in m.flatten()] for k, m in M.items()}, thread=thread, thread_own=own,
