@@ -116,11 +116,13 @@ ONLY = set(x for x in os.environ.get("WQ_ONLY", "").split(",") if x)    # 只查
 SKIP = {frozenset(p.split("|")) for p in os.environ.get("WQ_SKIP", "").split(";") if "|" in p}
 # G8.1：全机检查一次跑不完，按组合编号分片：WQ_SHARD="i/n" 只查编号 % n == i 的组合；结果写到 WQ_CLOUT（默认 <零件目录>/clearance.json）
 SLOW = float(os.environ.get("WQ_SLOW", "0"))                         # >0：单对距离计算超过这么多秒就打出来（找拖慢分片的零件对）
+# G8.1：整齿的齿轮对机壳一帧要算 30 s，绕自身轴转、机壳不动，每 k 帧算一次就够（WQ_SPARSE="gear_lower|casting:6;…"）
+SPARSE = {frozenset(p.split(":")[0].split("|")): int(p.split(":")[1]) for p in os.environ.get("WQ_SPARSE", "").split(";") if ":" in p}
 SH_I, SH_N = (int(x) for x in os.environ.get("WQ_SHARD", "0/1").split("/"))
 worst = {}
 t0 = time.time()
 first = True
-for f in FR[::max(1, STEP // 2)]:
+for n_fr, f in enumerate(FR[::max(1, STEP // 2)]:
     sh = {k: placed(k, f) for k in parts}
     sh["casting"] = near
     pidx = -1
@@ -130,6 +132,9 @@ for f in FR[::max(1, STEP // 2)]:
             if SH_N > 1 and pidx % SH_N != SH_I:
                 continue
             if frozenset((a, b)) in JOINT or frozenset((a, b)) in SKIP:
+                continue
+            k_sp = SPARSE.get(frozenset((a, b)))
+            if k_sp and not first and n_fr % k_sp:
                 continue
             if ONLY and a not in ONLY and b not in ONLY:
                 continue
