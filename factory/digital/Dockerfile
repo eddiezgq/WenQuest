@@ -37,6 +37,11 @@ COPY designs/drv-joint/out/ designs/drv-joint/out/
 COPY designs/wq-encif/out/ designs/wq-encif/out/
 COPY designs/drv-joint-b/out/ designs/drv-joint-b/out/
 COPY designs/drv-joint-b/fw/out/ designs/drv-joint-b/fw/out/
+# 第 159 轮：平缝机控制器 CTRL-LS（out、固件、统一报告；159h 打样下单文件包）——159d3 起网页就读它们，镜像里一直漏了（159h 上线检查发现）
+COPY designs/ctrl-ls/out/ designs/ctrl-ls/out/
+COPY designs/ctrl-ls/fw/out/ designs/ctrl-ls/fw/out/
+COPY designs/ctrl-ls/report/ designs/ctrl-ls/report/
+COPY designs/ctrl-ls/order/ designs/ctrl-ls/order/
 COPY digital/wqbus/ digital/wqbus/
 COPY digital/sim/ digital/sim/
 # 虚拟 PLC（第 18 轮第 8 步）：班次在仿真车间里算、回放；PLC 引擎是学习平台实验台的同一份 JS（Debian 自带的 nodejs 运行）
