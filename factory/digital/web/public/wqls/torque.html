@@ -1,0 +1,123 @@
+<!doctype html>
+<!-- 第 172b 轮第二批 · 互动块 4：驱动力矩怎么叠成的、平衡块怎么定的。数据 labs.json torque（tools/wqls/labs_web.py 跑 G2 dyn.py）：
+     一转每 1° 各项力矩；整机振动力、曲柄销力在平衡率 k = 0 的值和 k 每加 1 的增量——两者对 k 线性，网页按 F = F0 + k·dF 当场算。
+     转速：惯性项按 (n/5000)² 缩放，缝纫阻力不变（同 G2）。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 驱动力矩与平衡</title><link rel="stylesheet" href="lab.css"></head>
+<body>
+<div class="wrap">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p>
+  <div class="row" id="chips"></div>
+  <svg id="tq" viewBox="0 0 640 330" aria-label="torque"></svg>
+  <label class="sl"><span id="nL"></span><b id="nV"></b><input type="range" id="n" min="1000" max="5000" step="100" value="5000"></label>
+  <div class="kpi" id="kT"></div><p class="note" id="noteT"></p></div>
+ <div class="card"><h1 id="ttl2"></h1><p class="sub" id="lead2"></p>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px"><svg id="polar" viewBox="-110 -110 220 220" aria-label="shaking force"></svg><svg id="kcurve" viewBox="0 0 300 220" aria-label="k"></svg></div>
+  <label class="sl"><span id="kL"></span><b id="kV"></b><input type="range" id="k" min="0" max="1" step="0.01" value="0.6"></label>
+  <div class="kpi" id="kB"></div><p class="note" id="noteB"></p></div>
+</div>
+<script src="lab.js"></script>
+<script>
+(async function () {
+'use strict';
+const { LANG, S, $ } = WQL;
+const TX = {
+  zh: { ttl: '驱动力矩：一转里怎么叠起来', sm: 'Drive torque', lead: '主轴要给的力矩 = 各运动件的惯性力矩 + 缝纫阻力（穿布、收线、送布、摩擦）。点下面的项看它单独的曲线；拖转速看惯性部分按平方变小。',
+    names: { T: '合计', T_bar: '针杆', T_rod: '连杆', T_tk: '挑线杆', T_fd: '送布组', T_grav: '重力', T_needle: '穿布', T_thread: '收线', T_feed: '送布阻力', T_fric: '摩擦' },
+    n: '转速', peak: '峰值', min: '最小', rms: '均方根', pmean: '平均功率', g2: 'G2 计算书（11-15）',
+    noteT: '曲线是 G2 dyn.py 现在的结果：G8.1 第三步换了挑线四连杆，峰值比 G2 计算书那次小约 2 %（两个数都列在上面）。惯性力矩一正一负、一转平均为 0，平均功率几乎全是缝纫阻力。',
+    ttl2: '平衡块：整机振动力', sm2: 'Balancing', lead2: '左：5000 r/min 一转里整机传给台板的振动力（矢量端点的轨迹，0° 起，点是现在这个转角）。右：平衡率 k 从 0 到 1 时振动力最大值的变化。拖 k 看两边一起变。',
+    k: '平衡率 k', fmax: '振动力最大', fcr: '曲柄销力最大', best: '最小处', design: 'G2 定的 k', h: '水平', v: '铅垂',
+    noteB: '平衡块只能抵消一阶往复惯性力的一部分，加多了水平方向的力又变大，所以有一个最好的 k；二阶惯性力它管不了（G2 第三节）。k 曲线由 k = 0 的结果加 k 的线性增量算出，和 G2 dyn.py 逐个 k 重算一致。轨迹上的毛刺来自送布组惯性力（G4/送布动力.json，每 2° 一点、数值微分），幅度几十牛；G2 取最大值时也包含它，所以最大值偏保守。' },
+  en: { ttl: 'Drive torque: how one turn adds up', sm: '驱动力矩', lead: 'Torque the shaft must deliver = inertia torque of each moving part + sewing resistance (piercing, thread pull, feed, friction). Tap a term below to see it alone; drag the speed and watch the inertia part shrink with its square.',
+    names: { T: 'Total', T_bar: 'Needle bar', T_rod: 'Link', T_tk: 'Take-up', T_fd: 'Feed group', T_grav: 'Gravity', T_needle: 'Piercing', T_thread: 'Thread pull', T_feed: 'Feed resistance', T_fric: 'Friction' },
+    n: 'Speed', peak: 'Peak', min: 'Minimum', rms: 'RMS', pmean: 'Mean power', g2: 'G2 report (11-15)',
+    noteT: 'Curves are the current G2 dyn.py result: G8.1 step 3 replaced the take-up four-bar, and the peak is about 2 % below the G2 report (both figures are listed above). Inertia torque swings both ways and averages zero; mean power is nearly all sewing resistance.',
+    ttl2: 'Balance weight: shaking force', sm2: '平衡块', lead2: 'Left: at 5000 r/min, the force the machine passes to the table over one turn (path of the vector tip, from 0°; the dot is the current angle). Right: its maximum as the balance ratio k goes from 0 to 1. Drag k and both update.',
+    k: 'Balance ratio k', fmax: 'Max shaking force', fcr: 'Max crank-pin force', best: 'Minimum at', design: 'k chosen in G2', h: 'horizontal', v: 'vertical',
+    noteB: 'A balance weight cancels only part of the first-order reciprocating force; too much and the horizontal force grows, so there is a best k. It cannot touch the second order (G2 section 3). The k curve is the k = 0 result plus a linear increment in k, and matches G2 dyn.py recomputed at each k. The jagged edge of the path comes from the feed-group inertia force (G4/送布动力.json, every 2°, numerically differentiated), a few tens of newtons; the G2 maximum includes it, so it errs on the safe side.' },
+};
+const t = k => TX[LANG][k];
+const L = await WQL.labs(), T = L.torque, NM = t('names');
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('noteT').textContent = t('noteT');
+$('ttl2').innerHTML = `${t('ttl2')}<small>${t('sm2')}</small>`; $('lead2').textContent = t('lead2'); $('noteB').textContent = t('noteB');
+$('nL').textContent = t('n'); $('kL').textContent = t('k');
+const COL = { T: 'var(--ink)', T_bar: '#2a5fb8', T_rod: '#7d8590', T_tk: '#6b4fbb', T_fd: '#e0a33b', T_grav: '#9aa6b2', T_needle: '#c4531d', T_thread: '#d2283a', T_feed: '#2a9d8f', T_fric: '#5a6570' };
+const TERMS = ['T_bar', 'T_rod', 'T_tk', 'T_fd', 'T_needle', 'T_thread', 'T_feed', 'T_fric', 'T_grav'];
+let on = new Set(['T_bar', 'T_tk']), n = 5000, k = T.k_design, phi = 0;
+$('k').value = k;
+function series(key) { const s = (n / T.rpm) ** 2; return T.inertial.includes(key) ? T[key].map(v => v * s) : T[key]; }
+function total() { const s = (n / T.rpm) ** 2; return T.T.map((_, i) => T.inertial.reduce((a, key) => a + T[key][i] * (s - 1), T.T[i])); }
+$('chips').innerHTML = `<button class="on" disabled style="opacity:1">${NM.T}</button>` + TERMS.map(x => `<button data-k="${x}" style="border-left:4px solid ${COL[x]}">${NM[x]}</button>`).join('');
+document.querySelectorAll('#chips [data-k]').forEach(b => { b.classList.toggle('on', on.has(b.dataset.k)); b.onclick = () => { on.has(b.dataset.k) ? on.delete(b.dataset.k) : on.add(b.dataset.k); b.classList.toggle('on'); drawT(); }; });
+const W = 640, H = 330, Lm = 40, Rm = 12, Tm = 12, Bm = 28;
+const X = f => Lm + f / 359 * (W - Lm - Rm);
+function drawT() {
+  const ink = WQL.ink(), tot = total(), lines = [['T', tot], ...[...on].map(x => [x, series(x)])];
+  const lim = Math.max(1, Math.ceil(Math.max(...lines.flatMap(([, a]) => a.map(Math.abs))) * 1.1));
+  const Y = v => Tm + (1 - (v + lim) / (2 * lim)) * (H - Tm - Bm);
+  let h = '';
+  const st = lim > 3 ? 1 : 0.5;
+  for (let v = -Math.floor(lim / st) * st; v <= lim; v += st) h += S('line', { x1: Lm, x2: W - Rm, y1: Y(v), y2: Y(v), stroke: ink, opacity: v === 0 ? 0.45 : 0.1 }) + S('text', { x: Lm - 5, y: Y(v) + 3, 'font-size': 10, fill: ink, 'text-anchor': 'end', opacity: 0.7 }, +v.toFixed(1));
+  for (let f = 0; f <= 360; f += 60) h += S('text', { x: X(Math.min(f, 359)), y: H - 10, 'font-size': 10, fill: ink, 'text-anchor': 'middle', opacity: 0.7 }, f + '°');
+  h += S('text', { x: 4, y: 10, 'font-size': 10, fill: ink }, 'N·m');
+  for (const [key, a] of lines.slice(1)) h += S('path', { d: WQL.path(a, X, Y), fill: 'none', stroke: COL[key], 'stroke-width': 1.6, opacity: 0.9 });
+  h += S('path', { d: WQL.path(tot, X, Y), fill: 'none', stroke: ink, 'stroke-width': 2.4 });
+  h += S('line', { id: 'cur', x1: X(phi), x2: X(phi), y1: Tm, y2: H - Bm, stroke: '#e0a33b', 'stroke-width': 1.5 });
+  h += S('rect', { id: 'hit', x: Lm, y: Tm, width: W - Lm - Rm, height: H - Tm - Bm, fill: 'transparent' });
+  $('tq').innerHTML = h;
+  const mx = Math.max(...tot), mn = Math.min(...tot), rms = Math.sqrt(tot.reduce((a, v) => a + v * v, 0) / tot.length), P = tot.reduce((a, v) => a + v, 0) / tot.length * n * Math.PI / 30;
+  const g2 = n === T.rpm ? `<div><span>${t('g2')}</span><b>${T.g2_doc.T_max.toFixed(2)}</b><i>N·m</i></div>` : '';
+  $('kT').innerHTML = `<div><span>${t('peak')}</span><b>${mx.toFixed(2)}</b><i>N·m</i></div><div><span>${t('min')}</span><b>${mn.toFixed(2)}</b><i>N·m</i></div>` +
+    `<div><span>${t('rms')}</span><b>${rms.toFixed(2)}</b><i>N·m</i></div><div><span>${t('pmean')}</span><b>${P.toFixed(0)}</b><i>W</i></div>${g2}`;
+  $('nV').textContent = n + ' r/min';
+}
+const tip = WQL.tipper();
+$('tq').addEventListener('pointermove', e => {
+  const b = $('tq').getBoundingClientRect(), x = (e.clientX - b.left) / b.width * W, f = Math.round((x - Lm) / (W - Lm - Rm) * 359);
+  if (f < 0 || f > 359) { tip.hide(); return; }
+  phi = f; const c = $('cur'); c.setAttribute('x1', X(f)); c.setAttribute('x2', X(f)); drawP();
+  tip.show(e.clientX, e.clientY, `φ ${f}°<br><b>${NM.T} ${total()[f].toFixed(2)}</b>` + [...on].map(x => `<br><span style="color:${COL[x]}">●</span> ${NM[x]} ${series(x)[f].toFixed(2)}`).join('') + ' N·m');
+});
+$('tq').addEventListener('pointerleave', () => tip.hide());
+$('n').oninput = e => { n = +e.target.value; drawT(); };
+// ---------------- 平衡
+const sh = kk => T.shake0[0].map((u, i) => [u + kk * T.dshake[0][i], T.shake0[1][i] + kk * T.dshake[1][i]]);
+const cr = kk => T.crank0[0].map((u, i) => Math.hypot(u + kk * T.dcrank[0][i], T.crank0[1][i] + kk * T.dcrank[1][i]));
+const KS = Array.from({ length: 101 }, (_, i) => i / 100), FM = KS.map(kk => Math.max(...sh(kk).map(p => Math.hypot(...p))));
+const best = KS[FM.indexOf(Math.min(...FM))];
+const RMAX = Math.ceil(Math.max(...FM) / 100) * 100;
+function drawP() {
+  const ink = WQL.ink(), F = sh(k), s = 100 / RMAX;
+  let h = '';
+  for (let r = 100; r <= RMAX; r += 100) h += S('circle', { cx: 0, cy: 0, r: r * s, fill: 'none', stroke: ink, opacity: 0.12 }) + S('text', { x: r * s * 0.71 + 2, y: -r * s * 0.71, 'font-size': 7, fill: ink, opacity: 0.6 }, r + ' N');
+  h += S('line', { x1: -105, x2: 105, y1: 0, y2: 0, stroke: ink, opacity: 0.3 }) + S('line', { x1: 0, x2: 0, y1: -105, y2: 105, stroke: ink, opacity: 0.3 });
+  h += S('text', { x: 104, y: -3, 'font-size': 7, fill: ink, 'text-anchor': 'end', opacity: 0.7 }, t('h')) + S('text', { x: 3, y: -100, 'font-size': 7, fill: ink, opacity: 0.7 }, t('v'));
+  h += S('polyline', { points: F.map(p => `${(p[0] * s).toFixed(1)},${(-p[1] * s).toFixed(1)}`).join(' ') + ` ${(F[0][0] * s).toFixed(1)},${(-F[0][1] * s).toFixed(1)}`, fill: 'rgba(42,95,184,.08)', stroke: 'var(--needle)', 'stroke-width': 1.6 });
+  const p = F[phi];
+  h += S('line', { x1: 0, y1: 0, x2: p[0] * s, y2: -p[1] * s, stroke: '#e0a33b', 'stroke-width': 2 }) + S('circle', { cx: p[0] * s, cy: -p[1] * s, r: 3, fill: '#e0a33b' });
+  h += S('text', { x: -106, y: -98, 'font-size': 8, fill: ink }, `φ ${phi}°  ${Math.hypot(...p).toFixed(0)} N`);
+  $('polar').innerHTML = h;
+  // k 曲线
+  const W2 = 300, H2 = 220, l = 36, r = 10, tp = 10, bt = 26, Xk = kk => l + kk * (W2 - l - r), Yk = v => tp + (1 - v / RMAX) * (H2 - tp - bt);
+  let g = '';
+  for (let v = 0; v <= RMAX; v += 200) g += S('line', { x1: l, x2: W2 - r, y1: Yk(v), y2: Yk(v), stroke: ink, opacity: 0.1 }) + S('text', { x: l - 4, y: Yk(v) + 3, 'font-size': 9, fill: ink, 'text-anchor': 'end', opacity: 0.7 }, v);
+  for (let kk = 0; kk <= 1.001; kk += 0.25) g += S('text', { x: Xk(kk), y: H2 - 10, 'font-size': 9, fill: ink, 'text-anchor': 'middle', opacity: 0.7 }, kk);
+  g += S('path', { d: KS.map((kk, i) => `${i ? 'L' : 'M'}${Xk(kk).toFixed(1)},${Yk(FM[i]).toFixed(1)}`).join(''), fill: 'none', stroke: 'var(--needle)', 'stroke-width': 2 });
+  g += S('line', { x1: Xk(T.k_design), x2: Xk(T.k_design), y1: tp, y2: H2 - bt, stroke: 'var(--good)', 'stroke-dasharray': '3 3' }) + S('text', { x: Xk(T.k_design) + 3, y: tp + 8, 'font-size': 8.5, fill: 'var(--good)' }, `${t('design')} ${T.k_design}`);
+  const fk = Math.max(...F.map(q => Math.hypot(...q)));
+  g += S('circle', { cx: Xk(k), cy: Yk(fk), r: 4, fill: '#e0a33b', stroke: '#fff' });
+  g += S('text', { x: W2 - r, y: H2 - 1, 'font-size': 9, fill: ink, 'text-anchor': 'end' }, 'k') + S('text', { x: 2, y: 8, 'font-size': 9, fill: ink }, 'N');
+  $('kcurve').innerHTML = g;
+  $('kV').textContent = k.toFixed(2);
+  $('kB').innerHTML = `<div><span>${t('fmax')}</span><b>${fk.toFixed(0)}</b><i>N</i></div><div><span>${t('fcr')}</span><b>${Math.max(...cr(k)).toFixed(0)}</b><i>N</i></div>` +
+    `<div><span>${t('best')}</span><b>k ${best.toFixed(2)}</b><i>${Math.min(...FM).toFixed(0)} N</i></div>`;
+}
+$('k').oninput = e => { k = +e.target.value; drawP(); };
+drawT(); drawP();
+let play = true; $('tq').addEventListener('pointerenter', () => { play = false; });
+(function loop() { if (play) { phi = (phi + 2) % 360; const c = $('cur'); if (c) { c.setAttribute('x1', X(phi)); c.setAttribute('x2', X(phi)); } drawP(); } setTimeout(loop, 60); })();
+window.__tq = { setK: v => { k = v; $('k').value = v; drawP(); }, setN: v => { n = v; $('n').value = v; drawT(); }, stop: () => { play = false; } };
+})();
+</script>
+</body></html>

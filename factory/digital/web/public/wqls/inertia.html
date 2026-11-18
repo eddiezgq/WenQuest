@@ -1,0 +1,84 @@
+<!doctype html>
+<!-- 第 172b 轮第二批 · 互动块 13：惯性力。labs.json inertia 是 G8.1 第三步每 1° 运动学（kin_1deg.json，5000 r/min）里各运动件的质心加速度（每 2° 取一个）、
+     实体质量和静止时的质心；惯性力 = −m·a，箭头画在零件质心上（质心跟着零件的运动矩阵走），长短按力的大小。拖转角、转速（按平方缩放）。不到 5 N 的件不画。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 惯性力</title><link rel="stylesheet" href="lab.css"></head>
+<body>
+<div class="wrap">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p><iframe class="m3d" id="m3d" title="WQ-LS 3D" loading="lazy"></iframe>
+  <div class="row"><span class="big" id="phiV">0°</span><button id="play"></button><span id="views"></span></div>
+  <input type="range" id="phi" min="0" max="358" step="2" value="0" aria-label="φ">
+  <label class="sl"><span id="nL"></span><b id="nV"></b><input type="range" id="n" min="1000" max="5000" step="100" value="5000"></label></div>
+ <div class="card"><svg id="ch" viewBox="0 0 560 300" aria-label="forces"></svg><div class="lg" id="lg"></div><div class="scroll" style="max-height:300px"><table id="tb"></table></div><p class="note" id="note"></p></div>
+</div>
+<script src="lab.js"></script>
+<script>
+(async function () {
+'use strict';
+const { LANG, S, $, esc, m3d } = WQL;
+const TX = {
+  zh: { ttl: '惯性力', sm: 'Inertia forces', lead: '高速下每个运动件都要被“推着”加速、减速，它对机器的反作用就是惯性力 −m·a。箭头画在零件质心上、指向惯性力的方向，长短按大小。针杆、连杆、挑线杆最大。',
+    play: '转起来', pause: '暂停', n: '转速', views: { face: '端视', iso: '机头' }, h: ['零件', '质量 g', '最大 N', '在 φ', '现在 N'], f: '惯性力 N',
+    note: '数据：G8.1 第三步整机三维每 1° 的运动学（g81_kin.py），质量是 FreeCAD 实体按材料密度算的。惯性力和转速平方成正比：2500 r/min 时只有四分之一。这些力合起来就是传给机壳和台板的振动力，平衡块（G2）抵消其中一部分。' },
+  en: { ttl: 'Inertia forces', sm: '惯性力', lead: 'At speed every moving part has to be pushed to accelerate and slow down; its reaction on the machine is the inertia force −m·a. Arrows sit at each part’s centre of mass, pointing along the force, scaled to its size. Needle bar, link and take-up lever are the biggest.',
+    play: 'Run', pause: 'Pause', n: 'Speed', views: { face: 'End', iso: 'Head' }, h: ['Part', 'Mass g', 'Max N', 'at φ', 'Now N'], f: 'inertia force, N',
+    note: 'Data: G8.1 step 3 kinematics, measured every 1° on the full 3-D machine (g81_kin.py); masses come from the FreeCAD solids and material densities. Inertia force goes with speed squared: at 2500 r/min it is a quarter. Together these forces are the shaking force passed to the housing and table, part of which the balance weight (G2) cancels.' },
+};
+const t = k => TX[LANG][k];
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('note').textContent = t('note'); $('nL').textContent = t('n');
+const L = await WQL.labs(), IN = L.inertia, KS = Object.keys(IN.parts).sort((a, b) => IN.parts[b].Fmax - IN.parts[a].Fmax), N0 = IN.rpm, ST = IN.step;
+const PAL = ['#2a5fb8', '#c4531d', '#2a9d8f', '#6b4fbb', '#e0a33b', '#d2283a', '#5a8f29', '#b0417a'];
+const TOP = KS.slice(0, 6), COL = Object.fromEntries(TOP.map((k, i) => [k, PAL[i]]));
+let phi = 0, n = 5000, play = true, w3 = null, arrows = {}, vw = 'face';
+const F = (k, f) => { const a = IN.parts[k].a[Math.round(f / ST) % (360 / ST)], m = IN.parts[k].m_g / 1000, s = (n / N0) ** 2; return [-m * a[0] * s, -m * a[1] * s, -m * a[2] * s]; };
+const mag = v => Math.hypot(...v);
+const pname = k => { if (!w3 || !w3.D.parts[k]) return k; const nm = w3.D.parts[k].name; return Array.isArray(nm) ? nm[LANG === 'en' ? 1 : 0] : nm; };
+function chart() {
+  const ink = WQL.ink(), W = 560, H = 300, l = 40, r = 10, tp = 16, bt = 26, s = (n / N0) ** 2, mx = Math.ceil(IN.parts[KS[0]].Fmax * s / 50) * 50 || 50;
+  const X = f => l + f / 358 * (W - l - r), Y = v => tp + (1 - v / mx) * (H - tp - bt);
+  let h = S('text', { x: 2, y: 10, 'font-size': 10, fill: ink }, t('f'));
+  for (let v = 0; v <= mx; v += mx > 200 ? 100 : 50) h += S('line', { x1: l, x2: W - r, y1: Y(v), y2: Y(v), stroke: ink, opacity: 0.1 }) + S('text', { x: l - 4, y: Y(v) + 3, 'font-size': 9, fill: ink, 'text-anchor': 'end', opacity: 0.7 }, v);
+  for (let f = 0; f <= 360; f += 60) h += S('text', { x: X(Math.min(f, 358)), y: H - 10, 'font-size': 9, fill: ink, 'text-anchor': 'middle', opacity: 0.7 }, f + '°');
+  for (const k of TOP) { const arr = IN.parts[k].a.map((_, i) => mag(F(k, i * ST))); h += S('path', { d: arr.map((v, i) => `${i ? 'L' : 'M'}${X(i * ST).toFixed(1)},${Y(v).toFixed(1)}`).join(''), fill: 'none', stroke: COL[k], 'stroke-width': 1.8 }); }
+  h += S('line', { id: 'cur', x1: X(phi), x2: X(phi), y1: tp, y2: H - bt, stroke: '#e0a33b', 'stroke-width': 1.5 });
+  $('ch').innerHTML = h;
+  $('lg').innerHTML = TOP.map(k => `<span><i style="background:${COL[k]}"></i>${esc(pname(k))}</span>`).join('');
+}
+function table() {
+  const H = t('h'), s = (n / N0) ** 2;
+  $('tb').innerHTML = `<tr><th>${H[0]}</th><th class="n">${H[1]}</th><th class="n">${H[2]}</th><th class="n">${H[3]}</th><th class="n">${H[4]}</th></tr>` +
+    KS.map(k => `<tr><td>${COL[k] ? `<span style="color:${COL[k]}">●</span> ` : ''}${esc(pname(k))}</td><td class="n">${IN.parts[k].m_g}</td><td class="n">${(IN.parts[k].Fmax * s).toFixed(0)}</td><td class="n">${IN.parts[k].at}°</td><td class="n">${mag(F(k, phi)).toFixed(0)}</td></tr>`).join('');
+}
+function setPhi(v) {
+  phi = ((Math.round(v / ST) * ST) % 360 + 360) % 360;
+  $('phiV').textContent = phi + '°'; $('phi').value = phi;
+  const c = $('cur'); if (c) { const X = f => 40 + f / 358 * 510; c.setAttribute('x1', X(phi)); c.setAttribute('x2', X(phi)); }
+  table();
+  if (!w3) return;
+  w3.setPhi(phi);
+  const T3 = w3.THREE;
+  for (const k of KS) {
+    const p = w3.P[k], ar = arrows[k]; if (!p || !ar) continue;
+    const c = new T3.Vector3(...IN.parts[k].com).applyMatrix4(p.mesh.matrix), f = F(k, phi), m = mag(f), len = Math.max(1e-3, m * 0.35);
+    ar.position.copy(c); ar.setDirection(new T3.Vector3(...f).normalize()); ar.setLength(len, Math.min(14, 4 + len * 0.18), Math.min(8, 2 + len * 0.1));
+    ar.visible = p.mesh.visible && m > 1;
+  }
+}
+$('phi').oninput = e => { play = false; $('play').textContent = t('play'); setPhi(+e.target.value); };
+$('n').oninput = e => { n = +e.target.value; $('nV').textContent = n + ' r/min'; chart(); setPhi(phi); };
+$('nV').textContent = n + ' r/min';
+$('play').textContent = t('pause'); $('play').onclick = () => { play = !play; $('play').textContent = play ? t('pause') : t('play'); };
+$('views').innerHTML = Object.entries(t('views')).map(([k, nm]) => `<button data-v="${k}">${nm}</button>`).join(' ');
+$('views').querySelectorAll('button').forEach(b => b.onclick = () => { vw = b.dataset.v; if (w3) w3.view(vw); $('views').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); });
+m3d($('m3d'), 'view=face', w => {
+  w3 = w; w3.S.shell = 'glass'; w3.refreshState();
+  for (const k of KS) { if (!w3.P[k]) continue; const ar = new w3.THREE.ArrowHelper(new w3.THREE.Vector3(0, 0, 1), new w3.THREE.Vector3(), 10, new w3.THREE.Color(COL[k] || '#d2283a').getHex()); ar.line.material.depthTest = false; ar.cone.material.depthTest = false; ar.renderOrder = 9; w3.root.add(ar); arrows[k] = ar; }
+  chart(); setPhi(phi);
+});
+chart(); setPhi(0);
+let last = performance.now(), acc = 0;
+(function loop(now) { if (play) { acc += Math.max(0, now - last) / 1000 * 40; if (acc >= ST) { setPhi(phi + Math.floor(acc / ST) * ST); acc %= ST; } } last = now; requestAnimationFrame(loop); })(last);
+window.__in = { setPhi: v => { play = false; setPhi(v); } };
+})();
+</script>
+</body></html>

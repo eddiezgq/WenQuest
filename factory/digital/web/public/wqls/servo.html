@@ -1,0 +1,107 @@
+<!doctype html>
+<!-- 第 172b 轮第二批 · 互动块 14：主轴伺服一个工作周期。数据是 proto.json cycle（第 159 轮控制器固件在 Renode 里跑出的时间序列：转速、轴角、相电流、电机力矩、负载力矩、
+     状态、电磁铁、脚踏电压；tools/wqls/proto_web.py 从 factory/designs/ctrl-ls/fw/out/sim_sew.json 打包，test_wqls_spec.py 核对一致）。慢放播放，状态灯和曲线一起走。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 主轴伺服工作周期</title><link rel="stylesheet" href="lab.css">
+<style>.lights{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}.lights span{font-size:12px;border-radius:12px;padding:2px 9px;background:var(--soft);color:var(--mut);border:1px solid var(--rule)}
+.lights span.on{background:var(--needle);color:#fff;border-color:var(--needle)}.lights.sol span.on{background:var(--bobbin);border-color:var(--bobbin)}</style></head>
+<body>
+<div class="wrap w2">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p>
+  <div class="row"><span id="scs"></span><button id="play"></button><span id="spd"></span></div>
+  <svg id="ch" viewBox="0 0 700 520" class="drag" aria-label="cycle"></svg><p class="sub" id="desc"></p></div>
+ <div class="card"><div style="display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center"><svg id="dial" viewBox="-60 -60 120 120" aria-label="shaft"></svg><div><span class="big" id="tV">0.000 s</span><div class="rd" id="rd" style="margin-top:6px"></div></div></div>
+  <h2 id="stT"></h2><div class="lights" id="lights"></div><h2 id="solT"></h2><div class="lights sol" id="sols"></div>
+  <div class="kpi" id="kpi"></div><p class="note" id="note"></p></div>
+</div>
+<script src="lab.js"></script>
+<script>
+(async function () {
+'use strict';
+const { LANG, S, $, esc } = WQL;
+const TX = {
+  zh: { ttl: '主轴伺服：一个工作周期', sm: 'Spindle servo cycle', lead: '控制器固件（第 159 轮）在 Renode 里真跑出来的一个工作周期：踩脚踏 → 起动到 5000 r/min → 缝 → 后踩 → 减速、转一针剪线 → 停上针位 → 拨线、抬压脚。拖图上的竖线或慢放播放，右边状态灯跟着走。',
+    play: '播放', pause: '暂停', spd: ['1/20', '1/5', '实时'], tr: ['转速 r/min', '相电流 A', '力矩 N·m（实线电机、虚线负载）', '脚踏 V'],
+    rd: ['转速', '主轴转角', '相电流', '电机力矩', '负载力矩', '脚踏'], stT: '状态', solT: '电磁铁',
+    k: ['起动到 5000', '停针角度', '电流峰值', '周期'], note: '数据：proto.json cycle（固件仿真 sim_sew.json）。',
+    states: null, sols: null },
+  en: { ttl: 'Spindle servo: one work cycle', sm: '主轴伺服工作周期', lead: 'One work cycle actually run by the controller firmware (round 159) in Renode: press the pedal → start to 5000 r/min → sew → heel back → slow down, one trimming stitch → stop needle-up → wipe, lift the foot. Drag the line on the chart or play in slow motion; the state lights on the right follow.',
+    play: 'Play', pause: 'Pause', spd: ['1/20', '1/5', 'Real time'], tr: ['Speed r/min', 'Phase current A', 'Torque N·m (solid motor, dashed load)', 'Pedal V'],
+    rd: ['Speed', 'Shaft angle', 'Phase current', 'Motor torque', 'Load torque', 'Pedal'], stT: 'State', solT: 'Solenoids',
+    k: ['Start to 5000', 'Stop angle', 'Peak current', 'Cycle'], note: 'Data: proto.json cycle (firmware simulation sim_sew.json).',
+    states: { '开机': 'Power-on', '待机': 'Idle', '起缝加固·正': 'Start tack fwd', '起缝加固·倒': 'Start tack rev', '缝纫': 'Sewing', '停针中': 'Stopping', '下针位': 'Needle down', '剪线': 'Trimming', '拨线': 'Wiping', '抬压脚': 'Foot lift', '故障': 'Fault' },
+    sols: { '剪线': 'Trim', '拨线': 'Wiper', '抬压脚': 'Foot lift', '倒缝': 'Reverse' } },
+};
+const t = k => TX[LANG][k];
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('stT').textContent = t('stT'); $('solT').textContent = t('solT');
+const PD = await WQL.proto(), CY = PD.cycle, SC = CY.scenarios, STN = CY.states;
+$('note').textContent = t('note') + ' ' + (LANG === 'en' ? 'Example firmware verified in simulation; the motor is not yet selected, so pole pairs, resistance and inductance are example values — not for direct product use.' : CY.disclaimer);
+const sn = s => (t('states') || {})[s] || s, so = s => (t('sols') || {})[s] || s;
+let sc = 'cycle', T = SC.cycle.t[0], play = true, spd = 0.05;
+$('scs').innerHTML = Object.entries(SC).map(([k, v]) => `<button data-s="${k}">${esc(LANG === 'en' ? v.en : v.name)}</button>`).join(' ');
+$('scs').querySelectorAll('button').forEach(b => b.onclick = () => { sc = b.dataset.s; T = SC[sc].t[0]; draw(); });
+$('spd').innerHTML = t('spd').map((s, i) => `<button data-v="${[0.05, 0.2, 1][i]}">${s}</button>`).join(' ');
+$('spd').querySelectorAll('button').forEach(b => b.onclick = () => { spd = +b.dataset.v; $('spd').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); });
+$('spd').querySelector('button').classList.add('on');
+const W = 700, H = 520, l = 46, r = 10, top = 8, lane = 24, gap = 16, nT = 4, th = (H - top - lane - 30 - gap * nT) / nT;
+let X = null, TR = null;
+const SCOL = ['#9aa6b2', '#9aa6b2', '#6b4fbb', '#b0417a', '#2a5fb8', '#2a9d8f', '#3f7f9f', '#c4531d', '#e0a33b', '#5a8f29', '#d33'];
+function draw() {
+  const d = SC[sc], ink = WQL.ink(), tt = d.t, tend = tt[tt.length - 1], t0 = tt[0];
+  $('scs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.s === sc));
+  $('desc').textContent = d.desc;
+  X = v => l + (v - t0) / (tend - t0) * (W - l - r);
+  let h = '';
+  // 状态色带
+  let s0 = 0; for (let i = 1; i <= tt.length; i++) if (i === tt.length || d.state[i] !== d.state[s0]) { h += S('rect', { x: X(tt[s0]), y: top, width: Math.max(0.5, X(tt[Math.min(i, tt.length - 1)]) - X(tt[s0])), height: lane, fill: SCOL[d.state[s0]] || '#888', opacity: 0.85 }); const w = X(tt[Math.min(i, tt.length - 1)]) - X(tt[s0]); if (w > 44) h += S('text', { x: X(tt[s0]) + 4, y: top + 16, 'font-size': 10.5, fill: '#fff' }, esc(sn(STN[d.state[s0]]))); s0 = i; }
+  TR = [{ ys: [d.rpm], lo: 0, hi: 5500, col: ['var(--needle)'] }, { ys: [d.iq], lo: Math.min(0, ...d.iq), hi: Math.max(...d.iq) * 1.1, col: ['var(--bobbin)'] },
+    { ys: [d.tm, d.tl], lo: Math.min(...d.tm, ...d.tl) * 1.1, hi: Math.max(...d.tm, ...d.tl) * 1.1, col: ['#2a9d8f', 'var(--ink)'], dash: [null, '4 3'] }, { ys: [d.pedal], lo: 0, hi: 5, col: ['#6b4fbb'] }];
+  TR.forEach((tr, j) => {
+    const y0 = top + lane + gap + j * (th + gap), Y = v => y0 + (1 - (v - tr.lo) / (tr.hi - tr.lo)) * th; tr.Y = Y;
+    h += S('rect', { x: l, y: y0, width: W - l - r, height: th, fill: 'none', stroke: ink, opacity: 0.15 });
+    h += S('text', { x: l + 4, y: y0 + 11, 'font-size': 10.5, fill: ink, 'font-weight': 600 }, t('tr')[j]);
+    if (tr.lo < 0) h += S('line', { x1: l, x2: W - r, y1: Y(0), y2: Y(0), stroke: ink, opacity: 0.3 });
+    h += S('text', { x: l - 4, y: y0 + 9, 'font-size': 9, fill: ink, 'text-anchor': 'end', opacity: 0.7 }, +tr.hi.toFixed(1)) + S('text', { x: l - 4, y: y0 + th, 'font-size': 9, fill: ink, 'text-anchor': 'end', opacity: 0.7 }, +tr.lo.toFixed(1));
+    tr.ys.forEach((a, k) => { h += S('path', { d: a.map((v, i) => `${i ? 'L' : 'M'}${X(tt[i]).toFixed(1)},${Y(v).toFixed(1)}`).join(''), fill: 'none', stroke: tr.col[k], 'stroke-width': 1.5, ...(tr.dash && tr.dash[k] ? { 'stroke-dasharray': tr.dash[k] } : {}) }); });
+  });
+  for (const e of d.solenoids) if (e.on) h += S('line', { x1: X(e.t), x2: X(e.t), y1: top + lane, y2: H - 30, stroke: 'var(--bobbin)', 'stroke-dasharray': '2 3', opacity: 0.5 });
+  for (let s = Math.ceil(t0 * 2) / 2; s <= tend + 1e-9; s += 0.5) h += S('text', { x: X(s), y: H - 12, 'font-size': 10, fill: ink, 'text-anchor': 'middle', opacity: 0.7 }, s.toFixed(1) + ' s');
+  h += S('line', { id: 'cur', y1: top, y2: H - 28, stroke: '#e0a33b', 'stroke-width': 2 });
+  $('ch').innerHTML = h;
+  // 灯
+  const used = [...new Set(d.state)].sort((a, b) => a - b);
+  $('lights').innerHTML = used.map(s => `<span data-s="${s}">${esc(sn(STN[s]))}</span>`).join('');
+  $('sols').innerHTML = [...new Set(d.solenoids.map(e => e.name))].map(n => `<span data-n="${esc(n)}">${esc(so(n))}</span>`).join('');
+  const i5 = d.rpm.findIndex(v => v >= 4950), K = t('k');
+  $('kpi').innerHTML = (i5 > 0 ? `<div><span>${K[0]}</span><b>${(tt[i5] - tt[d.rpm.findIndex(v => v > 5)]).toFixed(3)}</b><i>s</i></div>` : '') +
+    `<div><span>${K[1]}</span><b>${(d.ang[d.ang.length - 1]).toFixed(1)}</b><i>°</i></div><div><span>${K[2]}</span><b>${Math.max(...d.iq.map(Math.abs)).toFixed(2)}</b><i>A</i></div><div><span>${K[3]}</span><b>${(tend - t0).toFixed(2)}</b><i>s</i></div>`;
+  seek();
+}
+function seek() {
+  const d = SC[sc], tt = d.t; let lo = 0, hi = tt.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (tt[m] < T) lo = m + 1; else hi = m; } const i = lo;
+  const c = $('cur'); c.setAttribute('x1', X(T)); c.setAttribute('x2', X(T));
+  $('tV').textContent = T.toFixed(3) + ' s';
+  const R = t('rd');
+  $('rd').innerHTML = `<span>${R[0]}</span><b>${d.rpm[i].toFixed(0)} r/min</b><span>${R[1]}</span><b>${d.ang[i].toFixed(1)}°</b><span>${R[2]}</span><b>${d.iq[i].toFixed(2)} A</b>` +
+    `<span>${R[3]}</span><b>${d.tm[i].toFixed(2)} N·m</b><span>${R[4]}</span><b>${d.tl[i].toFixed(2)} N·m</b><span>${R[5]}</span><b>${d.pedal[i].toFixed(2)} V</b>`;
+  $('lights').querySelectorAll('span').forEach(s => s.classList.toggle('on', +s.dataset.s === d.state[i]));
+  const onNow = new Set(); for (const e of d.solenoids) if (e.t <= T) { if (e.on) onNow.add(e.name); else onNow.delete(e.name); }
+  $('sols').querySelectorAll('span').forEach(s => s.classList.toggle('on', onNow.has(s.dataset.n)));
+  const a = (d.ang[i] - 90) * Math.PI / 180, ink = WQL.ink();
+  $('dial').innerHTML = S('circle', { cx: 0, cy: 0, r: 50, fill: 'none', stroke: ink, opacity: 0.25, 'stroke-width': 3 }) + [0, 70, 180].map(g => { const b = (g - 90) * Math.PI / 180; return S('line', { x1: 44 * Math.cos(b), y1: 44 * Math.sin(b), x2: 56 * Math.cos(b), y2: 56 * Math.sin(b), stroke: g === 70 ? 'var(--good)' : ink, 'stroke-width': 2 }) + S('text', { x: 36 * Math.cos(b), y: 36 * Math.sin(b) + 3, 'font-size': 8, fill: ink, 'text-anchor': 'middle' }, g + '°'); }).join('') +
+    S('line', { x1: 0, y1: 0, x2: 46 * Math.cos(a), y2: 46 * Math.sin(a), stroke: 'var(--needle)', 'stroke-width': 4, 'stroke-linecap': 'round' }) + S('circle', { cx: 0, cy: 0, r: 4, fill: ink });
+}
+const sv = $('ch');
+const at = e => { const b = sv.getBoundingClientRect(), x = (e.clientX - b.left) / b.width * W, d = SC[sc]; const a = d.t[0], z = d.t[d.t.length - 1]; return Math.max(a, Math.min(z, a + (x - l) / (W - l - r) * (z - a))); };
+let drag = false;
+sv.addEventListener('pointerdown', e => { drag = true; play = false; $('play').textContent = t('play'); sv.setPointerCapture(e.pointerId); T = at(e); seek(); });
+sv.addEventListener('pointermove', e => { if (drag) { T = at(e); seek(); } });
+sv.addEventListener('pointerup', () => { drag = false; });
+$('play').textContent = t('pause'); $('play').onclick = () => { play = !play; $('play').textContent = play ? t('pause') : t('play'); };
+draw();
+let last = performance.now();
+(function loop(now) { if (play) { const d = SC[sc]; T += Math.max(0, now - last) / 1000 * spd; if (T > d.t[d.t.length - 1]) T = d.t[0]; seek(); } last = now; requestAnimationFrame(loop); })(last);
+window.__sv = { at: (s, v) => { sc = s; play = false; T = v; draw(); } };
+})();
+</script>
+</body></html>

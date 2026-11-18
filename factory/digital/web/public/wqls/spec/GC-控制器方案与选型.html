@@ -14,7 +14,7 @@
 <h2 id="s2">一、一块板，主控以母线负端为地<a class="hl" href="#s2" aria-label="本节链接">#</a></h2>
 <p>功率部分和主控做在同一块板上（细则第二节第 1 条）。主控不隔离、直接以母线负端为地，这样三相电流用下桥采样电阻、MCU 片内运放直接采，功率模块的输入也不用隔离。
 人能碰到的只有操作面板和它后面的联网：这一路经数字隔离 ADuM1201 和隔离电源 B0505S。脚踏板、电机编码器、针位传感器、电磁铁、步进电机都在机头和电控箱里，按“不可触及”处理（159d 的安全一节写清楚它们的绝缘要求）。</p>
-<h2 id="s3">二、由规格推出来的额定值（第一遍，159b 的计算书逐项复核）<a class="hl" href="#s3" aria-label="本节链接">#</a></h2>
+<h2 id="s3">二、由规格推出来的额定值（第一遍，159b 的计算书逐项复核）<a class="hl" href="#s3" aria-label="本节链接">#</a></h2><section class="lab" data-src="../servo.html?lang=zh"><div class="lab-head"><span class="lab-kind">动画 · Animation</span><h4>主轴伺服一个工作周期<small>Spindle servo work cycle</small></h4></div><p>固件在 Renode 里跑出的两个周期：转速、相电流、电机和负载力矩、脚踏电压一起走，状态灯、电磁铁灯、主轴角度跟着变。<br><span class="en">Two cycles run by the firmware in Renode: speed, phase current, motor and load torque and pedal voltage move together with the state lights, solenoids and shaft angle.</span></p><div class="lab-frame"></div><div class="lab-actions"><button type="button" class="run">▶ 在本页运行 · Run here</button><button type="button" class="fs">⛶ 全屏 · Full screen</button><a class="open" href="../servo.html?lang=zh" target="_blank" rel="noopener">新窗口打开 ↗</a></div></section>
 <div class="tbl"><table>
 <thead>
 <tr>

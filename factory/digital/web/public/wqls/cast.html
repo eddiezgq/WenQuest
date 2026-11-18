@@ -1,0 +1,102 @@
+<!doctype html>
+<!-- 第 172b 轮第二批 · 互动块 9（上）：机壳铸件凝固过程。cast.bin 是 G5 凝固仿真（上件定案方案、下件定案方案）每个铸件 / 冒口体素的凝固时刻，
+     2×2×2 合并成 5 mm（取最晚的那个），tools/wqls/labs_web.py 打包；labs.json cast 是 G5/凝固仿真_*.json 的结论。拖时间看还没凝固的部分从外往里缩。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 机壳凝固过程</title><link rel="stylesheet" href="lab.css"></head>
+<body>
+<div class="wrap w2">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p><canvas class="gl" id="c"></canvas>
+  <div class="row"><span id="parts"></span><button id="play"></button><span class="big" id="tV" style="margin-left:auto">0 s</span></div>
+  <input type="range" id="t" min="0" max="1" step="0.001" value="0" aria-label="t"></div>
+ <div class="card"><svg id="curve" viewBox="0 0 320 200" aria-label="liquid"></svg><div class="kpi" id="kpi"></div><p class="note" id="note"></p></div>
+</div>
+<script src="three.min.js"></script><script src="lab.js"></script>
+<script>
+(async function () {
+'use strict';
+const { LANG, S, $ } = WQL;
+const TX = {
+  zh: { ttl: '机壳铸件凝固过程', sm: 'Solidification', lead: 'HT250 砂型铸造，浇注 1380 °C。彩色点是这一刻还没凝固的铁水（颜色是它凝固的时刻：蓝 = 早、红 = 铸件里最晚，紫色是浇冒口），灰色是铸件外形。拖时间或点播放：铸件从薄壁、外面先凝固，最后剩在冒口和厚处——冒口最后凝固，才能给铸件补缩。',
+    upper: '上件', lower: '下件', play: '播放', pause: '暂停', liq: '铸件本体还没凝固的体积（不含浇冒口）', time: '时间 s',
+    k: ['全部凝固', '铸件', '浇注', '工艺出品率', '冒口', '冷铁'], s: 's', kg: 'kg', n: '个',
+    note: '数据：G5 凝固仿真（数字工厂 CAE，2.5 mm 体素、有限差分传热），这里每 2×2×2 个体素合成一个点、取最晚凝固的那个。“全部凝固”是铸件本体的时间，冒口更晚。' },
+  en: { ttl: 'Housing solidification', sm: '机壳凝固过程', lead: 'HT250 sand casting, poured at 1380 °C. Coloured points are iron still liquid at this moment (colour = when it freezes: blue early, red last in the casting, purple = gating and risers), grey is the casting outline. Drag the time or press Play: thin walls and the outside freeze first, and what is left ends in the risers and thick spots — the risers must freeze last to feed the casting.',
+    upper: 'Upper', lower: 'Lower', play: 'Play', pause: 'Pause', liq: 'Casting body still liquid (excl. gating and risers)', time: 'time, s',
+    k: ['Fully solid', 'Casting', 'Poured', 'Yield', 'Risers', 'Chills'], s: 's', kg: 'kg', n: '',
+    note: 'Data: G5 solidification simulation (digital-factory CAE, 2.5 mm voxels, finite-difference heat flow); here each 2×2×2 voxel block is one point, taking the latest freezing time. “Fully solid” is the casting body; the risers freeze later.' },
+};
+const t = k => TX[LANG][k];
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('note').textContent = t('note');
+const [L, buf] = await Promise.all([WQL.labs(), fetch('cast.bin').then(r => r.arrayBuffer())]);
+const CA = L.cast;
+const cv = $('c'), r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(2, devicePixelRatio));
+const scene = new THREE.Scene(); scene.background = new THREE.Color(matchMedia('(prefers-color-scheme: dark)').matches ? 0x15181b : 0xdfe3e7);
+const cam = new THREE.PerspectiveCamera(32, 1.2, 10, 5000);
+const sprite = (() => { const c = document.createElement('canvas'); c.width = c.height = 32; const g = c.getContext('2d'); g.fillStyle = '#fff'; g.beginPath(); g.arc(16, 16, 14, 0, 7); g.fill(); return new THREE.CanvasTexture(c); })();
+const P = {};
+// 读一个件：Int16 x3 坐标、Uint16 时刻（0.1 s）、Uint8 冒口标记；按凝固时刻从晚到早排，某一刻还没凝固的 = 前面一段
+let off = 0;
+for (const part of ['upper', 'lower']) {
+  const c = CA[part], n = c.n;
+  const xyz = new Int16Array(buf.slice(off, off + n * 6)); off += n * 6;
+  const ts = new Uint16Array(buf.slice(off, off + n * 2)); off += n * 2;
+  const fl = new Uint8Array(buf.slice(off, off + n)); off += n;
+  const ord = Array.from({ length: n }, (_, i) => i).sort((a, b) => ts[b] - ts[a]);
+  const pos = new Float32Array(n * 3), col = new Float32Array(n * 3), tsort = new Float32Array(n), fsort = new Uint8Array(n);
+  let cx = 0, cy = 0, cz = 0;
+  ord.forEach((i, j) => { const x = xyz[3 * i], y = xyz[3 * i + 1], z = xyz[3 * i + 2]; pos.set([x, z, -y], 3 * j); cx += x; cy += z; cz -= y; tsort[j] = ts[i] / 10; fsort[j] = fl[i]; col.set(fl[i] ? [0.55, 0.3, 0.75] : WQL.heat(ts[i] / 10 / c.t_end), 3 * j); });
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  const liq = new THREE.Points(g, new THREE.PointsMaterial({ size: c.dx * 1.15, vertexColors: true, map: sprite, alphaTest: 0.5 }));
+  const g2 = new THREE.BufferGeometry(); g2.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const shell = new THREE.Points(g2, new THREE.PointsMaterial({ size: c.dx * 0.9, color: 0x8a949e, transparent: true, opacity: 0.07, depthWrite: false, map: sprite }));
+  const grp = new THREE.Group(); grp.add(shell, liq); scene.add(grp);
+  P[part] = { c, liq, grp, tsort, fsort, n, nb: n - fl.reduce((a, v) => a + v, 0), ctr: [cx / n, cy / n, cz / n] };
+}
+let part = 'upper', T = 0, play = true;
+$('parts').innerHTML = ['upper', 'lower'].map(p => `<button data-p="${p}">${t(p)}</button>`).join(' ');
+$('parts').querySelectorAll('button').forEach(b => b.onclick = () => { part = b.dataset.p; T = 0; setup(); });
+const C = { th: 0.7, ph: 0.45, d: 900 };
+function cam_() { const c = P[part].ctr; cam.position.set(c[0] + C.d * Math.cos(C.ph) * Math.sin(C.th), c[1] + C.d * Math.sin(C.ph), c[2] + C.d * Math.cos(C.ph) * Math.cos(C.th)); cam.lookAt(...c); }
+function fit() { const w = cv.clientWidth, h = cv.clientHeight; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+// 液相体积曲线（每一秒还剩多少个点 → 体积）
+const curveOf = p => { const ts = P[p].tsort, fs = P[p].fsort, end = P[p].c.t_end_all, out = []; let j = P[p].n, k = P[p].nb; for (let s = 0; s <= end; s += 1) { while (j > 0 && ts[j - 1] <= s) { j--; if (!fs[j]) k--; } out.push(k); } return out; };
+for (const p of Object.keys(P)) P[p].curve = curveOf(p);
+function setup() {
+  for (const p of Object.keys(P)) P[p].grp.visible = p === part;
+  $('parts').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.p === part));
+  const c = P[part].c, K = t('k');
+  $('kpi').innerHTML = `<div><span>${K[0]}</span><b>${c.t_end.toFixed(0)}</b><i>${t('s')}</i></div><div><span>${K[1]}</span><b>${c.mass_kg}</b><i>${t('kg')}</i></div>` +
+    `<div><span>${K[2]}</span><b>${c.poured_kg}</b><i>${t('kg')}</i></div><div><span>${K[3]}</span><b>${c.yield_pct}</b><i>%</i></div>` +
+    (c.risers != null ? `<div><span>${K[4]}</span><b>${c.risers}</b><i>${t('n')}</i></div>` : '') + (c.chills != null ? `<div><span>${K[5]}</span><b>${c.chills}</b><i>${t('n')}</i></div>` : '');
+  cam_(); draw();
+}
+function draw() {
+  const p = P[part], c = p.c, ts = p.tsort;
+  let lo = 0, hi = p.n; while (lo < hi) { const m = (lo + hi) >> 1; if (ts[m] > T) lo = m + 1; else hi = m; }
+  p.liq.geometry.setDrawRange(0, lo);
+  $('tV').textContent = T.toFixed(0) + ' s'; $('t').value = T / c.t_end_all;
+  const ink = WQL.ink(), W = 320, H = 200, l = 34, rr = 8, tp = 18, bt = 26, cu = p.curve, X = s => l + s / c.t_end_all * (W - l - rr), Y = v => tp + (1 - v / p.nb) * (H - tp - bt);
+  let h = S('text', { x: 2, y: 11, 'font-size': 10, fill: ink }, t('liq'));
+  for (let v = 0; v <= 100; v += 50) h += S('line', { x1: l, x2: W - rr, y1: Y(v / 100 * p.nb), y2: Y(v / 100 * p.nb), stroke: ink, opacity: 0.1 }) + S('text', { x: l - 4, y: Y(v / 100 * p.nb) + 3, 'font-size': 9, fill: ink, 'text-anchor': 'end', opacity: 0.7 }, v + '%');
+  for (let s = 0; s <= c.t_end_all; s += 100) h += S('text', { x: X(s), y: H - 12, 'font-size': 9, fill: ink, 'text-anchor': 'middle', opacity: 0.7 }, s);
+  h += S('text', { x: W - rr, y: H - 1, 'font-size': 9, fill: ink, 'text-anchor': 'end', opacity: 0.7 }, t('time'));
+  h += S('path', { d: cu.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(''), fill: 'none', stroke: 'var(--bobbin)', 'stroke-width': 2 });
+  h += S('line', { x1: X(c.t_end), x2: X(c.t_end), y1: tp, y2: H - bt, stroke: 'var(--good)', 'stroke-dasharray': '3 3' });
+  h += S('circle', { cx: X(Math.min(T, c.t_end_all)), cy: Y(cu[Math.min(cu.length - 1, Math.floor(T))]), r: 4, fill: '#e0a33b', stroke: '#fff' });
+  $('curve').innerHTML = h;
+}
+$('t').oninput = e => { play = false; $('play').textContent = t('play'); T = +e.target.value * P[part].c.t_end_all; draw(); };
+$('play').textContent = t('pause'); $('play').onclick = () => { play = !play; $('play').textContent = play ? t('pause') : t('play'); if (play && T >= P[part].c.t_end_all) T = 0; };
+const ptr = new Map(); let pd = 0;
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]); });
+cv.addEventListener('pointerup', e => { ptr.delete(e.pointerId); pd = 0; });
+cv.addEventListener('pointermove', e => { if (!ptr.has(e.pointerId)) return; const [x0, y0] = ptr.get(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]);
+  if (ptr.size === 2) { const [a, b] = [...ptr.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pd) C.d = Math.max(200, Math.min(2500, C.d * pd / d)); pd = d; } else { C.th -= (e.clientX - x0) * 0.008; C.ph = Math.max(-1.4, Math.min(1.4, C.ph + (e.clientY - y0) * 0.008)); } cam_(); });
+cv.addEventListener('wheel', e => { e.preventDefault(); C.d = Math.max(200, Math.min(2500, C.d * Math.exp(e.deltaY * 0.001))); cam_(); }, { passive: false });
+fit(); addEventListener('resize', fit); setup();
+let last = performance.now();
+r.setAnimationLoop(now => { if (play) { T += Math.max(0, now - last) / 1000 * 25; const e = P[part].c.t_end_all; if (T > e + 20) T = 0; draw(); } last = now; r.render(scene, cam); });
+window.__cast = { at: (p, s) => { part = p; setup(); play = false; T = s; draw(); } };
+})();
+</script>
+</body></html>

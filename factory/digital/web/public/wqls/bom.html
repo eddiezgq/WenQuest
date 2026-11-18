@@ -1,0 +1,86 @@
+<!doctype html>
+<!-- 第 172b 轮第二批 · 互动块 10：物料清单 ↔ 三维。labs.json bom 是 G7/物料清单.json（8 个变型，由设计生成）；点一行，三维整机里这一项的零件亮起来、往外飞出来，
+     别的零件半透明。选变型时三维跟着换选项（T 剪线、E 电子针距、D 少油旋梭）。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 物料清单与三维</title><link rel="stylesheet" href="lab.css"></head>
+<body>
+<div class="wrap">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p>
+  <div class="row"><select id="var" aria-label="variant"></select><input id="flt" type="search" style="flex:1;min-width:120px;font:inherit;font-size:12.5px;padding:4px 8px;border:1px solid var(--rule);border-radius:7px;background:var(--sheet);color:var(--ink)"><span id="kinds"></span></div>
+  <div class="kpi" id="kpi"></div>
+  <div class="scroll" style="max-height:520px"><table id="tb"></table></div></div>
+ <div class="card"><iframe class="m3d" id="m3d" title="WQ-LS 3D" loading="lazy"></iframe><div class="rd" id="rd" style="margin-top:8px"></div><p class="note" id="note"></p></div>
+</div>
+<script src="lab.js"></script>
+<script>
+(async function () {
+'use strict';
+const { LANG, $, esc, m3d } = WQL;
+const TX = {
+  zh: { ttl: '物料清单 ↔ 三维', sm: 'Bill of materials', lead: '选一个变型，点表里一行：三维里这一项的零件亮起来并飞出来。可以按物料号、名称搜。', flt: '搜物料号或名称…',
+    kinds: { all: '全部', make: '自制', buy: '外购' }, h: ['物料号', '名称', '数量', '来源', '质量 g'], k: ['行数', '零件', '质量合计', '示例价'], make: '自制', buy: '外购',
+    rd: ['物料号', '名称', '三维里的零件', '数量'], none: '这一项在三维里没有单独的零件（如润滑油、标签）。', note: '物料清单由设计直接生成（G7）：零件的物料号、数量、质量都来自 FreeCAD 实体；示例价是样机阶段的估算。' },
+  en: { ttl: 'Bill of materials ↔ 3-D', sm: '物料清单', lead: 'Pick a variant and click a row: the parts of that item light up in 3-D and fly out. Search by item number or name.', flt: 'Search item no. or name…',
+    kinds: { all: 'All', make: 'Made', buy: 'Bought' }, h: ['Item no.', 'Name', 'Qty', 'Source', 'Mass g'], k: ['Lines', 'Parts', 'Total mass', 'Example price'], make: 'Made', buy: 'Bought',
+    rd: ['Item no.', 'Name', 'Parts in 3-D', 'Quantity'], none: 'This item has no separate part in the 3-D model (e.g. oil, labels).', note: 'The BOM is generated straight from the design (G7): item numbers, quantities and masses come from the FreeCAD solids; the price is a prototype-stage estimate.' },
+};
+const t = k => TX[LANG][k];
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('note').textContent = t('note'); $('flt').placeholder = t('flt');
+const L = await WQL.labs(), B = L.bom, VS = Object.keys(B);
+let V = VS.includes(WQL.q.get('v')) ? WQL.q.get('v') : 'WQ-LS-TED', kind = 'all', sel = null, w3 = null;
+$('var').innerHTML = VS.map(v => `<option>${v}</option>`).join(''); $('var').value = V;
+$('kinds').innerHTML = Object.entries(t('kinds')).map(([k, n]) => `<button data-k="${k}">${n}</button>`).join(' ');
+$('kinds').querySelectorAll('button').forEach(b => b.onclick = () => { kind = b.dataset.k; table(); });
+const nm = s => {                                   // 名称是“中文 English”：英文是最后一个中文字之后、字母开头的那一段
+  s = String(s); let i = s.length - 1; while (i >= 0 && !/[\u3000-\uffff]/.test(s[i])) i--;
+  const zh = s.slice(0, i + 1).trim(), en = s.slice(i + 1).trim();
+  return /^[A-Za-z0-9]/.test(en) && zh ? (LANG === 'en' ? en : zh) : s;
+};
+function table() {
+  $('kinds').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.k === kind));
+  const f = $('flt').value.trim().toLowerCase(), rows = B[V].lines.filter(x => (kind === 'all' || x.kind === kind) && (!f || (x.code + ' ' + x.name).toLowerCase().includes(f)));
+  const H = t('h');
+  $('tb').innerHTML = `<tr><th>${H[0]}</th><th>${H[1]}</th><th class="n">${H[2]}</th><th>${H[3]}</th><th class="n">${H[4]}</th></tr>` +
+    rows.map(x => `<tr class="pick${x.code === sel ? ' sel' : ''}" data-c="${esc(x.code)}"><td><code>${esc(x.code)}</code></td><td>${esc(nm(x.name))}</td><td class="n">${x.qty}</td><td>${t(x.kind)}</td><td class="n">${x.mass_g == null ? '—' : x.mass_g.toFixed(1)}</td></tr>`).join('');
+  $('tb').querySelectorAll('tr.pick').forEach(tr => tr.onclick = () => pick(tr.dataset.c));
+  const all = B[V].lines, mass = all.reduce((a, x) => a + (x.mass_g || 0) * x.qty, 0), K = t('k');
+  $('kpi').innerHTML = `<div><span>${K[0]}</span><b>${all.length}</b></div><div><span>${K[1]}</span><b>${all.reduce((a, x) => a + x.qty, 0)}</b></div>` +
+    `<div><span>${K[2]}</span><b>${(mass / 1000).toFixed(1)}</b><i>kg</i></div><div><span>${K[3]}</span><b>${B[V].price}</b><i>${LANG === 'en' ? 'CNY' : '元'}</i></div>`;
+}
+$('flt').oninput = table;
+$('var').onchange = e => { V = e.target.value; sel = null; opts(); table(); };
+function opts() { if (!w3) return; const o = B[V].options; w3.S.T = !!o.T; w3.S.E = !!o.E; w3.S.Dd = !!o.D; if (!w3.S.T) w3.S.trim = 'sew'; w3.select(null); fly = []; w3.refreshState(); }
+// 飞出来：每帧先按当前转角摆好，再把选中的零件沿“机器中心 → 零件中心”方向推出去
+let fly = [], k0 = 0, MC = null;
+function pick(code) {
+  sel = code; table();
+  const x = B[V].lines.find(l => l.code === code), R = t('rd');
+  const ks = w3 ? x.parts.filter(k => w3.P[k] && w3.P[k].mesh.visible) : [];
+  $('rd').innerHTML = `<span>${R[0]}</span><b><code>${esc(code)}</code></b><span>${R[1]}</span><b>${esc(nm(x.name))}</b><span>${R[3]}</span><b>${x.qty}</b><span>${R[2]}</span><b>${ks.length || '—'}</b>` + (ks.length ? '' : `<span style="grid-column:1/-1">${t('none')}</span>`);
+  if (!w3) return;
+  w3.select(ks[0] || null);
+  if ($('m3d').clientWidth < 560) { const cd = $('m3d').contentDocument.getElementById('card'); if (cd) cd.hidden = true; }   // 手机上零件卡片会盖住整个三维
+  const hl = ks[0] ? w3.P[ks[0]].mesh.material : null;
+  for (const [k, p] of Object.entries(w3.P)) if (!ks.includes(k)) p.mesh.material = w3.GLASS; else p.mesh.material = hl;
+  fly = ks; k0 = performance.now();
+  w3.root.updateMatrixWorld(true);
+}
+function frame(dt) {
+  if (!w3) return;
+  w3.S.phi = (w3.S.phi + dt * 60) % 360;              // 自己转（index.html 的播放会在这之后再摆一次姿态，把飞出去的零件拉回来）
+  w3.pose();
+  if (!fly.length) return;
+  if (!MC) { const bb = new w3.THREE.Box3(); for (const p of Object.values(w3.P)) if (p.info.group === 'hsg' && p.mesh.geometry) { p.mesh.geometry.computeBoundingBox(); bb.union(p.mesh.geometry.boundingBox); } MC = bb.getCenter(new w3.THREE.Vector3()); }
+  const u = Math.min(1, (performance.now() - k0) / 700), e = 1 - (1 - u) ** 3;
+  const c = new w3.THREE.Vector3(), bb = new w3.THREE.Box3();
+  for (const k of fly) { const g = w3.P[k].mesh.geometry; if (!g) continue; g.computeBoundingBox(); bb.union(g.boundingBox.clone().applyMatrix4(w3.P[k].mesh.matrix)); }
+  bb.getCenter(c);
+  const d = c.clone().sub(MC); d.y = 0; d.normalize().multiplyScalar(90).add(new w3.THREE.Vector3(0, 0, 70)).multiplyScalar(e);
+  for (const k of fly) { const m = w3.P[k].mesh.matrix.elements; m[12] += d.x; m[13] += d.y; m[14] += d.z; }
+}
+m3d($('m3d'), 'view=whole', w => { w3 = w; w3.frame.push(frame); opts(); w3.setPlay(false); if (sel) pick(sel); });
+table();
+window.__bom = { pick };
+})();
+</script>
+</body></html>

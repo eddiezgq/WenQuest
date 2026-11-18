@@ -1,0 +1,103 @@
+<!doctype html>
+<!-- 第 172b 轮第二批 · 互动块 5：上轴有限元三维（G2：Gmsh 二阶四面体、CalculiX，φ = 180° 加全部力和力矩）。
+     fea.bin 是 G2/有限元_表面.npz 的表面网格（tools/wqls/labs_web.py 打包）：顶点、三角形、等效应力（MPa）、位移（mm）；labs.json fea 是 G2/有限元.json 的结论。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 上轴有限元</title><link rel="stylesheet" href="lab.css">
+<style>.stage{position:relative}.legend{position:absolute;right:10px;top:10px;background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:6px 8px;font-size:11.5px}
+.legend .bar{width:14px;height:150px;border-radius:3px;float:left;margin-right:6px}.legend .tk{display:flex;flex-direction:column;justify-content:space-between;height:150px;font-variant-numeric:tabular-nums}</style></head>
+<body>
+<div class="wrap w2">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p>
+  <div class="stage"><canvas class="gl" id="c" style="aspect-ratio:16/8"></canvas><div class="legend"><div class="bar" id="bar"></div><div class="tk" id="tk"></div></div></div>
+  <div class="row"><button id="vAll"></button><button id="vMax"></button><button id="vSec"></button><label style="flex:1;min-width:180px;font-size:12.5px"><span id="exL"></span> <b id="exV"></b><input type="range" id="ex" min="0" max="2000" step="50" value="0"></label></div></div>
+ <div class="card"><div class="kpi" id="kpi"></div><div class="rd" id="hov"></div><p class="note" id="note"></p></div>
+</div>
+<script src="three.min.js"></script><script src="lab.js"></script>
+<script>
+(async function () {
+'use strict';
+const { LANG, $ } = WQL;
+const TX = {
+  zh: { ttl: '上轴有限元', sm: 'Upper shaft FEA', lead: '上轴 LS-101 在截面 I 弯矩最大的转角 φ = 180° 受全部力和力矩时的等效应力。拖动转、滚轮或两指缩放；把鼠标放在轴上读那一点的应力。',
+    all: '整根轴', max: '最危险点', sec: '截面 I 附近', ex: '变形放大', exU: '倍',
+    k: [['最大应力（计算书）', 'MPa'], ['屈服强度', 'MPa'], ['安全系数', ''], ['最大位移', 'µm'], ['网格', '']], els: '万单元',
+    hov: ['这一点 x', '等效应力', '位移'], mk1: '73 MPa：截面 I 的 R0.5 圆角', mk2: '所有节点最大',
+    note: '计算书（G2 第五节）：最大应力 73 MPa 在截面 I 的 R0.5 圆角处，和名义应力乘应力集中系数的估算（约 86 MPa）同一量级；2.5 mm 网格对 0.5 mm 圆角偏粗，所以疲劳校核用细网格算的应力集中系数表，有限元只用来看应力分布、找最危险的位置。色带上限取计算书的最大值，超过的显示成最红。' },
+  en: { ttl: 'Upper shaft FEA', sm: '上轴有限元', lead: 'Von Mises stress in upper shaft LS-101 at φ = 180°, the angle of the largest bending moment at section I, with all forces and torques applied. Drag to turn, wheel or pinch to zoom; hover over the shaft to read the stress there.',
+    all: 'Whole shaft', max: 'Critical point', sec: 'Near section I', ex: 'Deformation ×', exU: '×',
+    k: [['Max stress (report)', 'MPa'], ['Yield strength', 'MPa'], ['Safety factor', ''], ['Max displacement', 'µm'], ['Mesh', '']], els: 'k elements',
+    hov: ['Point x', 'Von Mises', 'Displacement'], mk1: '73 MPa: R0.5 fillet at section I', mk2: 'Highest node value',
+    note: 'Report (G2 section 5): peak 73 MPa at the R0.5 fillet of section I, the same order as nominal stress × concentration factor (about 86 MPa). A 2.5 mm mesh is coarse for a 0.5 mm fillet, so fatigue uses the fine-mesh concentration factors and the FEA is used to see the distribution and find the critical spot. The colour scale tops out at the report maximum; anything above shows as the reddest.' },
+};
+const t = k => TX[LANG][k];
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('note').textContent = t('note');
+$('vAll').textContent = t('all'); $('vMax').textContent = t('max'); $('vSec').textContent = t('sec'); $('exL').textContent = t('ex');
+const [L, buf] = await Promise.all([WQL.labs(), fetch('fea.bin').then(r => r.arrayBuffer())]);
+const F = L.fea, nv = F.nv, nt = F.nt;
+let o = 0;
+const pos = new Float32Array(buf, o, nv * 3); o += nv * 12;
+const tri = new Uint16Array(buf, o, nt * 3); o += nt * 6;                                         // 后面的 Float32 用 slice 拷贝，不要求 4 字节对齐
+const rest = buf.slice(o), vm = new Float32Array(rest, 0, nv), uu = new Float32Array(rest, nv * 4, nv * 3);
+const VMAX = F.vm_max;
+// 色带图例
+$('bar').style.background = `linear-gradient(to top,${[0, .25, .5, .75, 1].map(x => WQL.heatCss(x)).join(',')})`;
+$('tk').innerHTML = [1, .75, .5, .25, 0].map(x => `<span>${(x * VMAX).toFixed(0)}${x === 1 ? '+' : ''}</span>`).join('') ;
+$('tk').firstChild.textContent += ' MPa';
+const K = t('k');
+$('kpi').innerHTML = `<div><span>${K[0][0]}</span><b>${F.vm_max.toFixed(1)}</b><i>${K[0][1]}</i></div><div><span>${K[1][0]}</span><b>${F.strength}</b><i>${K[1][1]}</i></div>` +
+  `<div class="ok"><span>${K[2][0]}</span><b>${F.sf.toFixed(2)}</b></div><div><span>${K[3][0]}</span><b>${(F.u_max_report * 1000).toFixed(0)}</b><i>${K[3][1]}</i></div>` +
+  `<div><span>${K[4][0]}</span><b>${LANG === 'en' ? (F.elements / 1e3).toFixed(0) : (F.elements / 1e4).toFixed(1)}</b><i>${t('els')} · ${F.mesh} mm</i></div>`;
+// three
+const cv = $('c'), r = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+r.setPixelRatio(Math.min(2, devicePixelRatio));
+const scene = new THREE.Scene(), dark = () => matchMedia('(prefers-color-scheme: dark)').matches;
+scene.background = new THREE.Color(dark() ? 0x15181b : 0xdfe3e7);
+const cam = new THREE.PerspectiveCamera(30, 2, 1, 5000);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x445566, 0.75)); const dl = new THREE.DirectionalLight(0xffffff, 0.55); dl.position.set(1, 2, 3); scene.add(dl);
+const g = new THREE.BufferGeometry(), P = new Float32Array(nv * 3), col = new Float32Array(nv * 3);
+for (let i = 0; i < nv; i++) { const c = WQL.heat(vm[i] / VMAX); col.set(c, i * 3); }
+g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.setIndex(new THREE.BufferAttribute(new Uint16Array(tri), 1));
+const mesh = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }));
+scene.add(mesh);
+let ex = 0;
+function deform() { for (let i = 0; i < nv * 3; i++) P[i] = pos[i] + uu[i] * ex; g.attributes.position.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere(); }
+deform();
+const mk = (p, c) => { const s = new THREE.Mesh(new THREE.SphereGeometry(0.7, 16, 12), new THREE.MeshBasicMaterial({ color: c, depthTest: false })); s.position.set(...p); s.renderOrder = 3; scene.add(s); return s; };
+mk(F.vm_max_at, 0xffffff); mk(F.vm_peak_at, 0x111111);
+// 镜头：绕目标点转
+const C = { th: -0.6, ph: 0.35, d: 430, tg: new THREE.Vector3(200, 0, 0) };
+function cam_() { cam.position.set(C.tg.x + C.d * Math.cos(C.ph) * Math.sin(C.th), C.tg.y + C.d * Math.sin(C.ph), C.tg.z + C.d * Math.cos(C.ph) * Math.cos(C.th)); cam.up.set(0, 1, 0); cam.lookAt(C.tg); }
+function fit() { const w = cv.clientWidth, h = cv.clientHeight; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+function go(tg, d) { C.tg.set(...tg); C.d = d; cam_(); }
+$('vAll').onclick = () => go([200, 0, 0], 430); $('vMax').onclick = () => go(F.vm_max_at, 45); $('vSec').onclick = () => go([F.vm_max_at[0] + 10, 0, 0], 110);
+$('ex').oninput = e => { ex = +e.target.value; $('exV').textContent = ex + ' ' + t('exU'); deform(); };
+$('exV').textContent = '0 ' + t('exU');
+const ptr = new Map(); let pd = 0;
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]); });
+cv.addEventListener('pointerup', e => { ptr.delete(e.pointerId); pd = 0; });
+cv.addEventListener('pointermove', e => {
+  if (ptr.has(e.pointerId)) {
+    const [x0, y0] = ptr.get(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]);
+    if (ptr.size === 2) { const [a, b] = [...ptr.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pd) C.d = Math.max(20, Math.min(1500, C.d * pd / d)); pd = d; }
+    else { C.th -= (e.clientX - x0) * 0.008; C.ph = Math.max(-1.5, Math.min(1.5, C.ph + (e.clientY - y0) * 0.008)); }
+    cam_(); return;
+  }
+  hover(e);
+});
+cv.addEventListener('wheel', e => { e.preventDefault(); C.d = Math.max(20, Math.min(1500, C.d * Math.exp(e.deltaY * 0.001))); cam_(); }, { passive: false });
+const rc = new THREE.Raycaster(), H = t('hov');
+function hover(e) {
+  const b = cv.getBoundingClientRect(); rc.setFromCamera({ x: (e.clientX - b.left) / b.width * 2 - 1, y: -(e.clientY - b.top) / b.height * 2 + 1 }, cam);
+  const hit = rc.intersectObject(mesh)[0];
+  if (!hit) return;
+  const f = hit.face, ids = [f.a, f.b, f.c], bc = [0, 0, 0];
+  const v = ids.reduce((a, i) => a + vm[i], 0) / 3, u = ids.reduce((a, i) => a + Math.hypot(uu[3 * i], uu[3 * i + 1], uu[3 * i + 2]), 0) / 3;
+  $('hov').innerHTML = `<span>${H[0]}</span><b>${hit.point.x.toFixed(1)} mm</b><span>${H[1]}</span><b>${v.toFixed(1)} MPa</b><span>${H[2]}</span><b>${(u * 1000).toFixed(1)} µm</b>`;
+}
+$('hov').innerHTML = `<span>⚪ ${t('mk1')}</span><b>x ${F.vm_max_at[0].toFixed(1)}</b><span>⚫ ${t('mk2')} ${F.vm_peak.toFixed(0)} MPa</span><b>x ${F.vm_peak_at[0].toFixed(1)}</b>`;
+fit(); cam_(); addEventListener('resize', fit);
+r.setAnimationLoop(() => r.render(scene, cam));
+window.__fea = { go, setEx: v => { ex = v; deform(); } };
+})();
+</script>
+</body></html>

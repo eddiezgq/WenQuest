@@ -188,7 +188,7 @@
 <li>旋梭摩擦 0.02 N·m；轴承、油封、油泵、同步带合计 0.05 N·m。</li>
 </ul>
 <p>阻力都是估计值，所以做了 0.5 倍和 2 倍的敏感性分析（第二节）。</p>
-<h2 id="s5">二、主轴驱动力矩 · Drive torque　（图 <a class="fl" href="f/G2/1_驱动力矩.png"><code>1_驱动力矩.png</code></a>）<a class="hl" href="#s5" aria-label="本节链接">#</a></h2>
+<h2 id="s5">二、主轴驱动力矩 · Drive torque　（图 <a class="fl" href="f/G2/1_驱动力矩.png"><code>1_驱动力矩.png</code></a>）<a class="hl" href="#s5" aria-label="本节链接">#</a></h2><section class="lab" data-src="../torque.html?lang=zh"><div class="lab-head"><span class="lab-kind">虚拟实验 · Virtual lab</span><h4>驱动力矩与平衡块<small>Drive torque and balance weight</small></h4></div><p>点各项看驱动力矩怎么叠起来，拖转速看惯性部分按平方变；拖平衡率 k，整机振动力的轨迹和最大值当场变。<br><span class="en">Tap each term to see how the drive torque adds up and drag the speed to watch inertia scale with its square; drag the balance ratio k and the shaking-force path and maximum update.</span></p><div class="lab-frame"></div><div class="lab-actions"><button type="button" class="run">▶ 在本页运行 · Run here</button><button type="button" class="fs">⛶ 全屏 · Full screen</button><a class="open" href="../torque.html?lang=zh" target="_blank" rel="noopener">新窗口打开 ↗</a></div></section>
 <div class="tbl"><table>
 <thead>
 <tr>
@@ -350,7 +350,7 @@
 <blockquote>
 <p><strong>G4 修订（2026-11-10）：平衡率改 0.35。</strong> 机壳模态做出来后，最低一阶是机头前后摆（Y 向，约 129 Hz），对它起作用的是水平一阶力。k 从 0.45 降到 0.35：合力最大值 330 → 351 N（+6%），水平一阶 309 → 264 N，机头前后摆振动约降 10%。平衡块折算到曲柄半径处 132 g → <strong>103 g</strong>。G4 装上机构后用谐响应再定一次。</p>
 </blockquote>
-<h2 id="s8">五、上轴 LS-101 B 版 · Upper shaft　（图 <a class="fl" href="f/G2/4_上轴.png"><code>4_上轴.png</code></a>、<a class="fl" href="f/G2/6_上轴有限元.png"><code>6_上轴有限元.png</code></a>）<a class="hl" href="#s8" aria-label="本节链接">#</a></h2>
+<h2 id="s8">五、上轴 LS-101 B 版 · Upper shaft　（图 <a class="fl" href="f/G2/4_上轴.png"><code>4_上轴.png</code></a>、<a class="fl" href="f/G2/6_上轴有限元.png"><code>6_上轴有限元.png</code></a>）<a class="hl" href="#s8" aria-label="本节链接">#</a></h2><section class="lab" data-src="../fea.html?lang=zh"><div class="lab-head"><span class="lab-kind">三维模型 · 3-D model</span><h4>上轴有限元<small>Upper shaft FEA</small></h4></div><p>φ = 180° 加全部力和力矩的等效应力云图，可转、可缩放，鼠标指哪读哪；标出最危险点，变形可放大。<br><span class="en">Von Mises stress at φ = 180° under all loads; turn, zoom and hover to read values; the critical point is marked and deformation can be exaggerated.</span></p><div class="lab-frame"></div><div class="lab-actions"><button type="button" class="run">▶ 在本页运行 · Run here</button><button type="button" class="fs">⛶ 全屏 · Full screen</button><a class="open" href="../fea.html?lang=zh" target="_blank" rel="noopener">新窗口打开 ↗</a></div></section>
 <p><strong>结构</strong>（x 为沿轴位置，机针 x = 0，单位 mm）：</p>
 <div class="tbl"><table>
 <thead>

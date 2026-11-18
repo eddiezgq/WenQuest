@@ -1,0 +1,41 @@
+/* 第 172b 轮第二批：说明书互动块（mech、torque、fea、look、cast、nc、bom、clash、inertia、servo）共用的版面，和 timing.html、takeup.html 同一套颜色 */
+:root{--bg:#f5f6f3;--sheet:#fff;--ink:#1b2430;--mut:#5a6570;--rule:#d8dde1;--needle:#2a5fb8;--bobbin:#c4531d;--good:#2e9e6a;--bad:#d33;--soft:#eceff0;--warn:#e0a33b}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--mut:#9aa6b2;--rule:#2b3540;--needle:#7fa9f2;--bobbin:#f08c58;--soft:#1e2730;--good:#4cc38a;--bad:#ff6b6b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--mut:#9aa6b2;--rule:#2b3540;--needle:#7fa9f2;--bobbin:#f08c58;--soft:#1e2730;--good:#4cc38a;--bad:#ff6b6b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:12px;padding:12px;max-width:1320px;margin:0 auto}
+.wrap.one{grid-template-columns:1fr}
+.wrap.w2{grid-template-columns:minmax(0,1.5fr) minmax(0,.9fr)}
+@media (max-width:900px){.wrap,.wrap.w2{grid-template-columns:1fr;padding:8px}}
+select{max-width:100%}
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:10px 12px;min-width:0}
+h1{font-size:17px;margin:0}h1 small{font-weight:400;color:var(--mut);font-size:12px;margin-left:6px}
+h2{font-size:13.5px;margin:10px 0 4px}
+.sub{color:var(--mut);font-size:12.5px;margin:2px 0 8px}
+.note{color:var(--mut);font-size:12px;margin:8px 0 0}
+iframe.m3d{width:100%;aspect-ratio:4/3.3;border:0;border-radius:8px;background:#dfe3e7;display:block}
+svg{display:block;width:100%;height:auto}
+svg.drag{touch-action:none;cursor:ew-resize}
+canvas.gl{display:block;width:100%;aspect-ratio:4/3.3;border-radius:8px;background:#dfe3e7;touch-action:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) iframe.m3d,:root:not([data-theme="light"]) canvas.gl{background:#15181b}}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}
+button,select{font:inherit;font-size:12.5px;border:1px solid var(--rule);background:var(--soft);color:var(--ink);border-radius:7px;padding:4px 10px;cursor:pointer;min-height:30px}
+button.on{background:var(--needle);border-color:var(--needle);color:#fff}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--needle);outline-offset:2px}
+input[type=range]{width:100%;accent-color:var(--needle)}
+label.sl{display:block;font-size:12.5px;margin:6px 0 0}label.sl b{float:right;font-variant-numeric:tabular-nums}
+.big{font:700 22px/1 ui-monospace,Menlo,monospace;color:var(--needle)}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:6px;margin:8px 0}
+.kpi div{background:var(--soft);border-radius:8px;padding:6px 8px}.kpi span{display:block;font-size:11.5px;color:var(--mut)}.kpi b{font:700 18px/1.2 ui-monospace,Menlo,monospace}.kpi i{font-style:normal;font-size:11px;color:var(--mut);margin-left:3px}
+.kpi .ok b{color:var(--good)}.kpi .no b{color:var(--bad)}
+.rd{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:12.5px;font-variant-numeric:tabular-nums}.rd span{color:var(--mut)}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th,td{padding:4px 6px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}th{color:var(--mut);font-weight:500;font-size:11.5px;position:sticky;top:0;background:var(--sheet)}
+td.n,th.n{text-align:right}
+tr.pick{cursor:pointer}tr.pick:hover{background:var(--soft)}tr.sel{background:color-mix(in srgb,var(--needle) 16%,transparent)}
+.scroll{max-height:440px;overflow:auto;border:1px solid var(--rule);border-radius:8px}
+.lg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;margin:4px 0}.lg span{display:inline-flex;align-items:center;gap:4px}.lg i{display:inline-block;width:14px;height:3px;border-radius:2px}
+.tip{position:fixed;pointer-events:none;background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:4px 7px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:9;display:none;font-variant-numeric:tabular-nums}
+.ok{color:var(--good)}.no{color:var(--bad)}
+.pill{display:inline-block;font-size:11px;border-radius:9px;padding:0 7px;background:var(--soft);color:var(--mut)}

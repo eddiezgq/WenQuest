@@ -1,0 +1,126 @@
+<!doctype html>
+<!-- 第 172b 轮第二批 · 互动块 9（下）：机壳数控程序。labs.json nc 是 G5/数控程序/*.nc 用数字工厂 cae.cam_sim 逐段读出的刀具中心轨迹
+     （快移 / 切削、刀号、卧加转台分度 B、按机床参数算的累计加工时间），和 G5 的仿真核对同一个读法；src 是程序原文。
+     左：刀具沿刀路走（当前分度面）；右上：俯视这一面已经切到的深度（刀具扫过的地方按到过的最低 Z 上色——立铣、钻孔都按平底处理，同 cam_sim）。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 机壳数控刀路</title><link rel="stylesheet" href="lab.css">
+<style>pre{margin:0;font:12px/1.45 ui-monospace,Menlo,monospace;max-height:220px;overflow:auto;background:var(--soft);border-radius:8px;padding:6px 8px}pre .cur{background:#e0a33b;color:#000}
+canvas.hm{display:block;width:100%;aspect-ratio:4/3;border-radius:8px;background:var(--soft)}</style></head>
+<body>
+<div class="wrap w2">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p>
+  <div class="row"><select id="prog" aria-label="program"></select><button id="play"></button><span id="spd"></span></div>
+  <canvas class="gl" id="c"></canvas>
+  <input type="range" id="t" min="0" max="1" step="0.0005" value="0" aria-label="t"><div class="rd" id="rd"></div></div>
+ <div class="card"><h2 id="hmT"></h2><canvas class="hm" id="hm"></canvas><div class="lg" id="hmL"></div><h2 id="srcT"></h2><pre id="src"></pre><p class="note" id="note"></p></div>
+</div>
+<script src="three.min.js"></script><script src="lab.js"></script>
+<script>
+(async function () {
+'use strict';
+const { LANG, $, esc } = WQL;
+const TX = {
+  zh: { ttl: '机壳数控程序', sm: 'NC tool paths', lead: '选一个程序，刀具（按刀具直径画）沿真实刀路走：灰虚线是快移，彩色是切削，颜色分刀具。卧式加工中心的程序按转台分度一面一面换。',
+    play: '播放', pause: '暂停', speed: ['× 1', '× 10', '× 50'], rd: ['程序段', '刀具', '分度 B', '加工时间', '全程序'], rapid: '快移', feed: '切削',
+    hmT: '这一面切到的深度（俯视）', srcT: '程序', deep: '深', shallow: '浅', note: '刀路、时间由数字工厂 G 代码读取程序（cae/cam_sim.py）从程序原文算出，和 G5 机加工工艺的仿真核对是同一个读法；工件坐标系是每个工序自己的（卧加按转台分度 B 换面）。' },
+  en: { ttl: 'Housing NC programs', sm: '机壳数控程序', lead: 'Pick a program and the tool (drawn at its diameter) follows the real path: grey dashes are rapids, coloured lines are cuts, one colour per tool. Horizontal-machining programs turn the table face by face (index B).',
+    play: 'Play', pause: 'Pause', speed: ['× 1', '× 10', '× 50'], rd: ['Block', 'Tool', 'Index B', 'Machining time', 'Whole program'], rapid: 'Rapid', feed: 'Cut',
+    hmT: 'Depth cut on this face (top view)', srcT: 'Program', deep: 'deep', shallow: 'shallow', note: 'Paths and times are computed from the program text by the digital-factory G-code reader (cae/cam_sim.py), the same reader used to check the G5 machining process; each operation has its own work coordinates (the horizontal machine changes face by table index B).' },
+};
+const t = k => TX[LANG][k];
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('note').textContent = t('note'); $('hmT').textContent = t('hmT'); $('srcT').textContent = t('srcT');
+const L = await WQL.labs(), NC = L.nc, names = Object.keys(NC);
+$('prog').innerHTML = names.map(k => `<option value="${k}">${k} · ${esc(NC[k].title)}</option>`).join('');
+let cur = names.includes(WQL.q.get('p')) ? WQL.q.get('p') : 'O1202', T = 0, play = true, spd = 10;
+$('prog').value = cur;
+$('spd').innerHTML = t('speed').map((s, i) => `<button data-s="${[1, 10, 50][i]}">${s}</button>`).join(' ');
+$('spd').querySelectorAll('button').forEach(b => b.onclick = () => { spd = +b.dataset.s; $('spd').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); });
+$('spd').querySelectorAll('button')[1].classList.add('on');
+const PAL = ['#2a5fb8', '#c4531d', '#2a9d8f', '#6b4fbb', '#e0a33b', '#d2283a', '#5a8f29', '#b0417a', '#3f7f9f', '#8a6d3b'];
+// three
+const cv = $('c'), r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(2, devicePixelRatio));
+const scene = new THREE.Scene(); scene.background = new THREE.Color(matchMedia('(prefers-color-scheme: dark)').matches ? 0x15181b : 0xdfe3e7);
+const cam = new THREE.PerspectiveCamera(32, 1.2, 1, 20000);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x445566, 0.9));
+const grp = new THREE.Group(); scene.add(grp);
+const tool = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 24), new THREE.MeshLambertMaterial({ color: 0xe0a33b, transparent: true, opacity: 0.85 }));
+tool.geometry.rotateX(Math.PI / 2); tool.geometry.translate(0, 0, 0.5); scene.add(tool);   // 刀轴沿程序 Z，刀尖在原点
+const tc = new Map(); let ntc = 0; const colOf = n => { if (!tc.has(n)) tc.set(n, PAL[ntc++ % PAL.length]); return tc.get(n); };
+let G = null;                                     // 当前程序：各分度面的线段
+const C = { th: 0.6, ph: 0.6, d: 900, tg: new THREE.Vector3() };
+function cam_() { cam.position.set(C.tg.x + C.d * Math.cos(C.ph) * Math.sin(C.th), C.tg.y - C.d * Math.cos(C.ph) * Math.cos(C.th), C.tg.z + C.d * Math.sin(C.ph)); cam.up.set(0, 0, 1); cam.lookAt(C.tg); }
+function load(name) {
+  cur = name; T = 0; tc.clear(); ntc = 0;
+  grp.clear();
+  const P = NC[name], mv = P.moves, faces = {};
+  let a = P.start;
+  mv.forEach((m, i) => { const b = m[2]; (faces[b] = faces[b] || { segs: [], lo: [1e9, 1e9, 1e9], hi: [-1e9, -1e9, -1e9] }); const f = faces[b];
+    f.segs.push([i, a, [m[3], m[4], m[5]], m[0], m[1]]); if (m[0]) for (const p of [a, [m[3], m[4], m[5]]]) for (let k = 0; k < 3; k++) { f.lo[k] = Math.min(f.lo[k], p[k]); f.hi[k] = Math.max(f.hi[k], p[k]); }
+    a = [m[3], m[4], m[5]]; });
+  for (const [b, f] of Object.entries(faces)) {
+    const mk = (feed, all) => { const pos = [], col = []; for (const s of f.segs) if (s[3] === feed) { pos.push(...s[1], ...s[2]); const c = new THREE.Color(feed ? colOf(s[4]) : '#8a949e'); col.push(c.r, c.g, c.b, c.r, c.g, c.b); }
+      const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+      return new THREE.LineSegments(g, feed ? new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: all ? 0.13 : 1 }) : new THREE.LineDashedMaterial({ vertexColors: true, dashSize: 4, gapSize: 4, transparent: true, opacity: 0.6 })); };
+    f.ghost = mk(1, true); f.cut = mk(1, false); f.rap = mk(0, false); f.rap.computeLineDistances();
+    f.obj = new THREE.Group(); f.obj.add(f.ghost, f.cut, f.rap); grp.add(f.obj);
+    f.idxCut = f.segs.filter(s => s[3] === 1).map(s => s[0]); f.idxRap = f.segs.filter(s => s[3] === 0).map(s => s[0]);
+    f.hm = null;
+  }
+  G = { P, faces, mv };
+  $('src').innerHTML = P.src.map((l, i) => `<span data-l="${i + 1}">${esc(l)}</span>`).join('\n');
+  $('hmL').innerHTML = [...new Set(mv.filter(m => m[0]).map(m => m[1]))].map(n => `<span><i style="background:${colOf(n)}"></i>T${n} ${esc((P.tools[n] || {}).name || '')}</span>`).join('') + `<span><i style="background:#8a949e"></i>${t('rapid')}</span><span>${t('hmT')}: ${t('shallow')} <i style="width:60px;height:8px;background:linear-gradient(90deg,${[0, .5, 1].map(WQL.heatCss).join(',')})"></i> ${t('deep')}</span>`;
+  lastFace = null; lastLine = -1; seek();
+}
+let lastFace = null, lastLine = -1;
+const count = (arr, i) => { let lo = 0, hi = arr.length; while (lo < hi) { const m = (lo + hi) >> 1; if (arr[m] <= i) lo = m + 1; else hi = m; } return lo; };
+function seek() {
+  const mv = G.mv, P = G.P;
+  let i = 0, lo = 0, hi = mv.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (mv[m][6] < T) lo = m + 1; else hi = m; } i = lo;
+  const m = mv[i], prev = i ? mv[i - 1] : [0, 0, 0, ...P.start, 0], t0 = i ? prev[6] : 0, u = m[6] > t0 ? Math.max(0, Math.min(1, (T - t0) / (m[6] - t0))) : 1;
+  const p = [0, 1, 2].map(k => prev[3 + k] + (m[3 + k] - prev[3 + k]) * u), b = m[2], f = G.faces[b], d = (P.tools[m[1]] || {}).d || 10;
+  for (const [bb, ff] of Object.entries(G.faces)) ff.obj.visible = +bb === b;
+  f.cut.geometry.setDrawRange(0, 2 * count(f.idxCut, i - (u < 1 ? 1 : 0))); f.rap.geometry.setDrawRange(0, 2 * count(f.idxRap, i - (u < 1 ? 1 : 0)));
+  tool.position.set(...p); tool.scale.set(d / 2, d / 2, Math.max(30, d * 3));
+  if (lastFace !== b) { const c = f.lo.map((v, k) => (v + f.hi[k]) / 2); C.tg.set(...c); C.d = Math.max(250, 2.2 * Math.max(...f.hi.map((v, k) => v - f.lo[k]))); cam_(); lastFace = b; }
+  heat(f, i, u, p, d);
+  const R = t('rd'), tn = P.tools[m[1]];
+  $('rd').innerHTML = `<span>${R[0]}</span><b>N${m[7]} · ${m[0] ? t('feed') : t('rapid')}</b><span>${R[1]}</span><b>T${m[1]} ${tn ? esc(tn.name) : ''}</b><span>${R[2]}</span><b>${b}°</b>` +
+    `<span>${R[3]}</span><b>${fmt(T)}</b><span>${R[4]}</span><b>${fmt(P.t_total)}</b>`;
+  $('t').value = T / P.t_total;
+  if (m[7] !== lastLine) { const o = $('src').querySelector('.cur'); if (o) o.classList.remove('cur'); const s = $('src').querySelector(`[data-l="${m[7]}"]`); if (s) { s.classList.add('cur'); $('src').scrollTop = s.offsetTop - $('src').offsetTop - 80; } lastLine = m[7]; }
+}
+const fmt = s => `${Math.floor(s / 60)} min ${String(Math.round(s % 60)).padStart(2, '0')} s`;
+// 俯视深度图：这一面切削段扫过的格子，记到过的最低 Z
+const hm = $('hm'), hx = hm.getContext('2d');
+function heat(f, i, u, p, d) {
+  const W = 400, H = 300, lo = f.lo, hi = f.hi, sx = (hi[0] - lo[0]) || 1, sy = (hi[1] - lo[1]) || 1, cell = Math.max(sx / W, sy / H) * 1.0;
+  if (!f.hm || f.hmi > i) { f.hm = new Float32Array(W * H).fill(Infinity); f.hmi = 0; f.hmc = cell; }
+  const mark = (a, b, dd) => { const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / Math.max(0.5, cell))), rr = dd / 2 / cell;
+    for (let s = 0; s <= n; s++) { const x = a[0] + (b[0] - a[0]) * s / n, y = a[1] + (b[1] - a[1]) * s / n, z = a[2] + (b[2] - a[2]) * s / n, cx = (x - lo[0]) / cell, cy = (hi[1] - y) / cell;
+      for (let gy = Math.max(0, Math.floor(cy - rr)); gy <= Math.min(H - 1, Math.ceil(cy + rr)); gy++) for (let gx = Math.max(0, Math.floor(cx - rr)); gx <= Math.min(W - 1, Math.ceil(cx + rr)); gx++)
+        if ((gx - cx) ** 2 + (gy - cy) ** 2 <= rr * rr) { const k = gy * W + gx; if (z < f.hm[k]) f.hm[k] = z; } } };
+  const mv = G.mv;
+  for (; f.hmi < i; f.hmi++) { const m = mv[f.hmi]; if (!m[0] || m[2] !== +Object.keys(G.faces).find(bb => G.faces[bb] === f)) continue; const a = f.hmi ? mv[f.hmi - 1].slice(3, 6) : G.P.start; mark(a, m.slice(3, 6), (G.P.tools[m[1]] || {}).d || 10); }
+  const img = hx.createImageData(W, H), zlo = lo[2], zhi = hi[2], dk = matchMedia('(prefers-color-scheme: dark)').matches;
+  const tmp = mv[i][0] ? (() => { const save = f.hm.slice(); mark(i ? mv[i - 1].slice(3, 6) : G.P.start, p, d); const out = f.hm; f.hm = save; return out; })() : f.hm;
+  for (let k = 0; k < W * H; k++) { const z = tmp[k]; let c = dk ? [30, 39, 48] : [236, 239, 240]; if (z < Infinity) c = WQL.heat(1 - (z - zlo) / ((zhi - zlo) || 1)).map(v => v * 255); img.data.set([c[0], c[1], c[2], 255], k * 4); }
+  hm.width = W; hm.height = H; hx.putImageData(img, 0, 0);
+  hx.fillStyle = '#e0a33b'; hx.beginPath(); hx.arc((p[0] - lo[0]) / cell, (hi[1] - p[1]) / cell, Math.max(2, d / 2 / cell), 0, 7); hx.globalAlpha = 0.5; hx.fill(); hx.globalAlpha = 1;
+}
+$('prog').onchange = e => load(e.target.value);
+$('t').oninput = e => { play = false; $('play').textContent = t('play'); T = +e.target.value * G.P.t_total; seek(); };
+$('play').textContent = t('pause'); $('play').onclick = () => { play = !play; $('play').textContent = play ? t('pause') : t('play'); if (play && T >= G.P.t_total) T = 0; };
+const ptr = new Map(); let pd = 0;
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]); });
+cv.addEventListener('pointerup', e => { ptr.delete(e.pointerId); pd = 0; });
+cv.addEventListener('pointermove', e => { if (!ptr.has(e.pointerId)) return; const [x0, y0] = ptr.get(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]);
+  if (ptr.size === 2) { const [a, b] = [...ptr.values()], dd = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pd) C.d = Math.max(50, Math.min(5000, C.d * pd / dd)); pd = dd; } else { C.th -= (e.clientX - x0) * 0.008; C.ph = Math.max(-1.4, Math.min(1.5, C.ph + (e.clientY - y0) * 0.008)); } cam_(); });
+cv.addEventListener('wheel', e => { e.preventDefault(); C.d = Math.max(50, Math.min(5000, C.d * Math.exp(e.deltaY * 0.001))); cam_(); }, { passive: false });
+function fit() { const w = cv.clientWidth, h = cv.clientHeight; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+fit(); addEventListener('resize', fit); load(cur);
+let last = performance.now(), acc = 0;
+r.setAnimationLoop(now => { if (play) { T += Math.max(0, now - last) / 1000 * spd; if (T > G.P.t_total) { T = G.P.t_total; play = false; $('play').textContent = t('play'); } acc += now - last; if (acc > 50) { seek(); acc = 0; } } last = now; r.render(scene, cam); });
+window.__nc = { at: (p, s) => { if (p !== cur) { $('prog').value = p; load(p); } play = false; T = s; seek(); } };
+})();
+</script>
+</body></html>

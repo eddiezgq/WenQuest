@@ -1,0 +1,77 @@
+<!doctype html>
+<!-- 第 172b 轮第二批 · 互动块 6：外观方案 A / B / C 左右拖动对比（G3 的方案渲染图，spec/f/G3/），机壳三维剖切（三维整机 index.html 的剖切，拖剖面）。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 外观与机壳</title><link rel="stylesheet" href="lab.css">
+<style>.cmp{position:relative;aspect-ratio:16/10;border-radius:8px;overflow:hidden;background:#dfe3e7;touch-action:none;cursor:ew-resize;user-select:none}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}.cmp .r{clip-path:inset(0 0 0 50%)}
+.cmp .bar{position:absolute;top:0;bottom:0;left:50%;width:3px;margin-left:-1.5px;background:#e0a33b}.cmp .knob{position:absolute;top:50%;left:50%;width:30px;height:30px;margin:-15px;border-radius:50%;background:#e0a33b;color:#fff;display:grid;place-items:center;font-size:14px}
+.cmp .tag{position:absolute;top:8px;font-size:12px;background:rgba(0,0,0,.55);color:#fff;border-radius:6px;padding:2px 8px}.cmp .tl{left:8px}.cmp .tr{right:8px}</style></head>
+<body>
+<div class="wrap">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p>
+  <div class="row"><span id="lL"></span><span id="pickL"></span><span style="flex:1"></span><span id="lR"></span><span id="pickR"></span></div>
+  <div class="cmp" id="cmp"><img id="imL" alt=""><img id="imR" class="r" alt=""><div class="bar" id="bar"></div><div class="knob" id="knob">⇔</div><span class="tag tl" id="tgL"></span><span class="tag tr" id="tgR"></span></div>
+  <div class="row" id="views"></div><p class="note" id="note1"></p></div>
+ <div class="card"><h1 id="ttl2"></h1><p class="sub" id="lead2"></p><iframe class="m3d" id="m3d" title="WQ-LS 3D" loading="lazy"></iframe>
+  <div class="row" id="axes"></div><label class="sl"><span id="cpL"></span><b id="cpV"></b><input type="range" id="cp" min="0" max="1" step="0.005" value="0.5"></label>
+  <div class="row" id="shell"></div><p class="note" id="note2"></p></div>
+</div>
+<script src="lab.js"></script>
+<script>
+(function () {
+'use strict';
+const { LANG, $, m3d } = WQL;
+const TX = {
+  zh: { ttl: '外观方案对比', sm: 'Styling options', lead: '三个外观方案（同一套机构，机壳造型不同）。左右各选一个方案，拖中间的竖条对比。',
+    left: '左', right: '右', A: '方案 A', B: '方案 B', C: '方案 C', F: '定案 B · HT250', front: '前视', head: '机头',
+    note1: 'A 稳重（顶面平直、圆角中等）、B 流线（机臂顶面向机头下斜 20 mm、圆角大）、C 硬朗（以倒角为主）。三个方案铸件结构完全相同，只是外形和配色不同，所以选哪个不影响零件设计。11-10 Eddie 定 B，随后减重、按 HT250 铸件出图（G3 外观与机壳铸件）。',
+    ttl2: '机壳三维剖切', sm2: 'Housing section', lead2: '整机三维，剖开机壳看里面：选剖切方向，拖滑块移动剖面；机构照样能转。', axes: { x: '左右', y: '前后', z: '上下', '': '不剖' }, cp: '剖面位置',
+    shell: { solid: '机壳实体', glass: '机壳半透明' }, note2: '机壳分上下两件铸造（HT250），合箱后一起精加工；壁厚、筋按 G3 的模态目标定（机头前后摆 ≥ 125 Hz、铅垂平面内 ≥ 210 Hz）。' },
+  en: { ttl: 'Styling options', sm: '外观方案对比', lead: 'Three styling options for the same mechanisms, with different housings. Pick one for each side and drag the bar in the middle to compare.',
+    left: 'Left', right: 'Right', A: 'Option A', B: 'Option B', C: 'Option C', F: 'Final B · HT250', front: 'Front', head: 'Head',
+    note1: 'A solid (flat top, medium fillets), B streamlined (arm top slopes 20 mm down to the head, large fillets), C crisp (mostly chamfers). The casting structure is identical in all three; only shape and colours differ, so the choice does not affect part design. Eddie chose B on 11-10; it was then lightened and drawn as an HT250 casting (G3 styling and housing casting).',
+    ttl2: 'Housing section', sm2: '机壳三维剖切', lead2: 'The full 3-D machine with the housing cut open: pick a direction and drag the slider to move the plane; the mechanisms still turn.', axes: { x: 'Left–right', y: 'Front–back', z: 'Top–bottom', '': 'No cut' }, cp: 'Plane position',
+    shell: { solid: 'Solid housing', glass: 'See-through housing' }, note2: 'The housing is cast in two pieces (HT250) and finish-machined together; walls and ribs are sized to the G3 modal targets (head fore–aft ≥ 125 Hz, vertical plane ≥ 210 Hz).' },
+};
+const t = k => TX[LANG][k];
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('note1').textContent = t('note1');
+$('ttl2').innerHTML = `${t('ttl2')}<small>${t('sm2')}</small>`; $('lead2').textContent = t('lead2'); $('note2').textContent = t('note2'); $('cpL').textContent = t('cp');
+$('lL').textContent = t('left'); $('lR').textContent = t('right');
+const IMG = (s, v) => s === 'F' ? `spec/f/G3/定案_B_HT250_${v === 'front' ? '前视' : '机头'}.png` : `spec/f/G3/方案${s}_${v === 'front' ? '前视' : '机头'}.png`;
+let L = 'A', R = 'F', V = 'front', x = 0.5;
+const picker = (el, get, set) => { el.innerHTML = ['A', 'B', 'C', 'F'].map(s => `<button data-s="${s}">${t(s)}</button>`).join(' '); el.querySelectorAll('button').forEach(b => b.onclick = () => { set(b.dataset.s); show(); }); };
+picker($('pickL'), () => L, s => { L = s; }); picker($('pickR'), () => R, s => { R = s; });
+$('views').innerHTML = ['front', 'head'].map(v => `<button data-v="${v}">${t(v)}</button>`).join('');
+$('views').querySelectorAll('button').forEach(b => b.onclick = () => { V = b.dataset.v; show(); });
+function show() {
+  $('imL').src = IMG(L, V); $('imR').src = IMG(R, V); $('tgL').textContent = t(L); $('tgR').textContent = t(R);
+  $('pickL').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.s === L));
+  $('pickR').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.s === R));
+  $('views').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === V));
+}
+function split(v) { x = Math.max(0, Math.min(1, v)); $('imR').style.clipPath = `inset(0 0 0 ${x * 100}%)`; $('bar').style.left = $('knob').style.left = x * 100 + '%'; }
+const cmp = $('cmp');
+cmp.addEventListener('pointerdown', e => { cmp.setPointerCapture(e.pointerId); mv(e); });
+cmp.addEventListener('pointermove', e => { if (e.buttons) mv(e); });
+const mv = e => { const b = cmp.getBoundingClientRect(); split((e.clientX - b.left) / b.width); };
+show(); split(0.5);
+// ---------------- 剖切
+let w3 = null, axis = 'y', cp = 0.5, shell = 'solid';
+$('axes').innerHTML = ['x', 'y', 'z', ''].map(a => `<button data-a="${a}">${t('axes')[a]}</button>`).join('');
+$('shell').innerHTML = ['solid', 'glass'].map(a => `<button data-h="${a}">${t('shell')[a]}</button>`).join('');
+function apply() {
+  $('axes').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.a === axis));
+  $('shell').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.h === shell));
+  $('cp').disabled = !axis; $('cpV').textContent = axis ? Math.round(cp * 100) + '%' : '—';
+  if (!w3) return;
+  w3.S.cut = axis; w3.S.cutp = cp; w3.S.shell = shell; w3.refreshState(); w3.cut();
+}
+$('axes').querySelectorAll('button').forEach(b => b.onclick = () => { axis = b.dataset.a; apply(); });
+$('shell').querySelectorAll('button').forEach(b => b.onclick = () => { shell = b.dataset.h; apply(); });
+$('cp').oninput = e => { cp = +e.target.value; apply(); };
+m3d($('m3d'), 'view=iso', w => { w3 = w; w3.setPlay(true); apply(); });
+apply();
+window.__look = { split, set: (a, p) => { axis = a; cp = p; apply(); } };
+})();
+</script>
+</body></html>

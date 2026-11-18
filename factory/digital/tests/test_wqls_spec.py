@@ -130,3 +130,47 @@ console.log(w);"""
     out = subprocess.run(["node", "-e", js, WQLS], capture_output=True, text=True, timeout=60)
     assert out.returncode == 0, out.stderr
     assert float(out.stdout.strip()) <= 0.01
+
+
+def _labs():
+    spec = importlib.util.spec_from_file_location("labs_web", os.path.join(ROOT, "tools", "wqls", "labs_web.py"))
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def test_labs_data_matches_design():
+    """第 172b 轮第二批：互动块数据 labs.json、fea.bin、cast.bin 和设计结果一致（改了设计没重跑 tools/wqls/labs_web.py 就红）"""
+    import json
+    pytest.importorskip("numpy")
+    L = json.load(open(os.path.join(WQLS, "labs.json"), encoding="utf-8"))
+    m = _labs()
+    hint = "重跑 python3 tools/wqls/labs_web.py <整机目录> <凝固仿真目录>"
+    assert L["mech"] == json.loads(json.dumps(m.mech())), hint
+    tq = json.loads(json.dumps(m.torque()))
+    assert all(L["torque"][k] == tq[k] for k in tq), hint                   # 驱动力矩、振动力、曲柄销力都是 G2 dyn.py 现在的结果
+    assert L["bom"] == json.loads(json.dumps(m.bom())) and L["clash"] == json.loads(json.dumps(m.clash())), hint
+    nc = json.loads(json.dumps(m.nc()))
+    assert {k: (v["t_total"], len(v["moves"]), v["src"]) for k, v in L["nc"].items()} == {k: (v["t_total"], len(v["moves"]), v["src"]) for k, v in nc.items()}, hint
+    src = os.path.join(ROOT, "docs", "设计", "WQ-LS")
+    fe = json.load(open(os.path.join(src, "G2", "有限元.json"), encoding="utf-8"))["stats"]
+    assert L["fea"]["vm_max"] == fe["vm_max_mpa"] and L["fea"]["elements"] == fe["elements"], hint
+    f = L["fea"]
+    assert os.path.getsize(os.path.join(WQLS, "fea.bin")) == f["nv"] * 12 + f["nt"] * 6 + f["nv"] * 16
+    for part, zh in (("upper", "上件"), ("lower", "下件")):
+        cj = json.load(open(os.path.join(src, "G5", f"凝固仿真_{zh}.json"), encoding="utf-8"))
+        c = L["cast"][part]
+        assert c["variant"] == cj["variant"] and abs(c["t_end"] - cj["t_solid_total_s"]) < 0.06 and c["mass_kg"] == cj["mass_casting_kg"], hint
+    assert os.path.getsize(os.path.join(WQLS, "cast.bin")) == sum(c["n"] * 9 for c in L["cast"].values())
+    # 平衡：网页按 F = F0 + k·dF 算的最大振动力，和 G2 dyn.py 在这个 k 重算的一样
+    import sys
+
+    import numpy as np
+    sys.path.insert(0, os.path.join(ROOT, "tools", "wqls"))
+    import dyn
+    T = L["torque"]
+    for k in (0.0, 0.35, T["k_design"], 1.0):
+        F = np.array(T["shake0"]).T + k * np.array(T["dshake"]).T
+        ref = dyn.Machine(k=k).run()["F_shake"][::2]
+        assert abs(np.hypot(*F.T).max() - np.hypot(*ref.T).max()) < 0.05
+    assert len(L["inertia"]["parts"]) >= 5 and L["inertia"]["parts"]["needle_bar"]["Fmax"] > 100

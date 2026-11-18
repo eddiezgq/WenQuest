@@ -1,0 +1,84 @@
+<!doctype html>
+<!-- 第 172b 轮第二批 · 互动块 12：全机运动干涉。labs.json clash 是 G8.1_运动干涉.json（mech_check.py 分 20 片跑完的汇总）：
+     285 对零件，每对记一转里的最近距离、在哪个转角、哪种状态（A 正缝 3 mm 压脚放下带 T、E；B 正缝 5 mm；C 倒缝 5 mm 膝抬；D 剪线那一转）。
+     点一行，三维整机换到那个状态、转到那个角度，这两个零件亮起来，其余半透明。检查结果只存了每对的最近值，所以这里没有“距离随转角”的曲线。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 运动干涉</title><link rel="stylesheet" href="lab.css"></head>
+<body>
+<div class="wrap">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p>
+  <svg id="hist" viewBox="0 0 560 150" aria-label="histogram"></svg>
+  <div class="row" id="st"></div>
+  <div class="scroll"><table id="tb"></table></div></div>
+ <div class="card"><iframe class="m3d" id="m3d" title="WQ-LS 3D" loading="lazy"></iframe><div class="rd" id="rd" style="margin-top:8px"></div><p class="note" id="note"></p></div>
+</div>
+<script src="lab.js"></script>
+<script>
+(async function () {
+'use strict';
+const { LANG, S, $, esc, m3d } = WQL;
+const TX = {
+  zh: { ttl: '全机运动干涉', sm: 'Motion clearance', lead: '每一对可能碰到的零件，转一圈（每 2° 或 4°）里的最近距离。上面是分布，下面按距离从小到大；点一行看三维。',
+    st: { all: '全部', A: 'A 正缝 3 mm', B: 'B 正缝 5 mm', C: 'C 倒缝、膝抬', D: 'D 剪线那一转' },
+    h: ['零件', '零件', '最近 mm', '转角', '状态'], cnt: '对数', mm: '最近距离 mm', lim: '要求 ≥ 1.0（剪线动刀 ≥ 0.5）',
+    rd: ['这一对', '最近距离', '转角', '状态', '判定'], ok: '合格', edge: '刚好 1.0，没有余量', bad: '碰——按联锁排除（下面）',
+    note: '要求：运动件之间 ≥ 1.0 mm，油管对运动件 ≥ 3 mm，剪线动刀对旋梭、送布牙 ≥ 0.5。只有膝抬时针杆、针夹、针夹螺钉碰压脚（φ 136°–144°）：控制器只在针杆停在上面时抬压脚，针停在下面时膝抬抬不上去（约 7 mm），不损坏（G4.7 已定）。正好 1.0 mm 的对机壳 7 处在铸造毛面上，第六步工程图标加工面或放大到 2 mm。' },
+  en: { ttl: 'Whole-machine motion clearance', sm: '全机运动干涉', lead: 'For every pair of parts that could touch, the smallest gap over a turn (every 2° or 4°). Top: the distribution; below, sorted from the smallest; click a row to see it in 3-D.',
+    st: { all: 'All', A: 'A forward 3 mm', B: 'B forward 5 mm', C: 'C reverse, knee lift', D: 'D trimming turn' },
+    h: ['Part', 'Part', 'Min mm', 'Angle', 'State'], cnt: 'pairs', mm: 'smallest gap, mm', lim: 'required ≥ 1.0 (trimmer knife ≥ 0.5)',
+    rd: ['Pair', 'Smallest gap', 'Angle', 'State', 'Verdict'], ok: 'pass', edge: 'exactly 1.0, no margin', bad: 'touches — excluded by interlock (below)',
+    note: 'Required: ≥ 1.0 mm between moving parts, ≥ 3 mm from oil lines, ≥ 0.5 for the trimmer knife to hook and feed dog. Only with knee lift do the needle bar, clamp and clamp screw touch the presser foot (φ 136°–144°): the controller lifts the foot only with the needle up; with the needle down the knee lift cannot rise past about 7 mm and nothing is damaged (decided in G4.7). Seven exactly-1.0 mm gaps to the housing are on as-cast surfaces; step 6 drawings will machine them or open them to 2 mm.' },
+};
+const t = k => TX[LANG][k];
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('note').textContent = t('note');
+const L = await WQL.labs(), CL = L.clash.pairs;              // [a, b, 最近 mm, 转角, 状态片]
+let st = 'all', sel = null, w3 = null;
+const lim = r => r[4][0] === 'D' ? 0.5 : 1.0;
+const verdict = r => r[2] < lim(r) - 1e-6 ? 'bad' : r[2] < lim(r) + 0.05 ? 'edge' : 'ok';
+const pname = k => { if (k === 'casting') return LANG === 'en' ? 'Housing' : '机壳'; if (!w3 || !w3.D.parts[k]) return k; const n = w3.D.parts[k].name; return Array.isArray(n) ? n[LANG === 'en' ? 1 : 0] : n; };
+$('st').innerHTML = Object.entries(t('st')).map(([k, n]) => `<button data-s="${k}">${n}</button>`).join(' ');
+$('st').querySelectorAll('button').forEach(b => b.onclick = () => { st = b.dataset.s; table(); hist(); });
+function rows() { return CL.filter(r => st === 'all' || r[4][0] === st); }
+function hist() {
+  const ink = WQL.ink(), R = rows(), W = 560, H = 150, l = 30, rr = 8, tp = 10, bt = 28, bins = Array.from({ length: 16 }, (_, i) => i * 0.5), cnt = bins.map(() => 0);
+  for (const r of R) cnt[Math.min(15, Math.floor(r[2] / 0.5))]++;
+  const mx = Math.max(...cnt, 1), bw = (W - l - rr) / 16, Y = v => tp + (1 - v / mx) * (H - tp - bt);
+  let h = '';
+  cnt.forEach((c, i) => { const bad = bins[i] < 1; h += S('rect', { x: l + i * bw + 1, y: Y(c), width: bw - 2, height: H - bt - Y(c), rx: 2, fill: bad ? 'var(--bobbin)' : 'var(--needle)', opacity: 0.85 }) + (c ? S('text', { x: l + (i + 0.5) * bw, y: Y(c) - 2, 'font-size': 9, fill: ink, 'text-anchor': 'middle' }, c) : ''); });
+  for (let i = 0; i <= 16; i += 2) h += S('text', { x: l + i * bw, y: H - 14, 'font-size': 9, fill: ink, 'text-anchor': 'middle', opacity: 0.7 }, i === 16 ? '8+' : i * 0.5);
+  h += S('line', { x1: l + 2 * bw, x2: l + 2 * bw, y1: tp, y2: H - bt, stroke: 'var(--bad)', 'stroke-dasharray': '3 3' }) + S('text', { x: l + 2 * bw + 3, y: tp + 8, 'font-size': 9, fill: 'var(--bad)' }, t('lim'));
+  h += S('text', { x: W - rr, y: H - 1, 'font-size': 9, fill: ink, 'text-anchor': 'end', opacity: 0.7 }, t('mm')) + S('text', { x: 2, y: 9, 'font-size': 9, fill: ink, opacity: 0.7 }, t('cnt'));
+  $('hist').innerHTML = h;
+}
+function table() {
+  $('st').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.s === st));
+  const H = t('h'), R = rows();
+  $('tb').innerHTML = `<tr><th>${H[0]}</th><th>${H[1]}</th><th class="n">${H[2]}</th><th class="n">${H[3]}</th><th>${H[4]}</th></tr>` +
+    R.map((r, i) => `<tr class="pick${sel === r ? ' sel' : ''}" data-i="${CL.indexOf(r)}"><td>${esc(pname(r[0]))}</td><td>${esc(pname(r[1]))}</td><td class="n ${verdict(r) === 'bad' ? 'no' : verdict(r) === 'edge' ? '' : 'ok'}">${r[2].toFixed(2)}</td><td class="n">${r[3]}°</td><td><span class="pill">${r[4][0]}</span></td></tr>`).join('');
+  $('tb').querySelectorAll('tr.pick').forEach(tr => tr.onclick = () => pick(CL[+tr.dataset.i]));
+}
+// 状态片 → 三维整机的状态（index.html 的 S）
+const STATE = { A: { feed: 's3', press: 'down', trim: 'sew', T: true, E: true }, B: { feed: 's5', press: 'down', trim: 'sew', T: false, E: false }, C: { feed: 'r5', press: 'knee', trim: 'sew', T: false, E: false }, D: { feed: 's3', press: 'down', trim: 'trim', T: true, E: false } };
+function pick(r) {
+  sel = r; table();
+  const R = t('rd'), v = verdict(r);
+  $('rd').innerHTML = `<span>${R[0]}</span><b>${esc(pname(r[0]))} · ${esc(pname(r[1]))}</b><span>${R[1]}</span><b>${r[2].toFixed(2)} mm</b><span>${R[2]}</span><b>φ ${r[3]}°</b>` +
+    `<span>${R[3]}</span><b>${t('st')[r[4][0]]}</b><span>${R[4]}</span><b class="${v === 'bad' ? 'no' : v === 'ok' ? 'ok' : ''}">${t(v)}</b>`;
+  if (!w3) return;
+  Object.assign(w3.S, STATE[r[4][0]], { phi: r[3], shell: 'glass' });
+  w3.refreshState(); w3.setPhi(r[3]);
+  const ks = [r[0], r[1]].filter(k => w3.P[k]);
+  w3.select(ks[0] || null);
+  if ($('m3d').clientWidth < 560) { const cd = $('m3d').contentDocument.getElementById('card'); if (cd) cd.hidden = true; }   // 手机上零件卡片会盖住整个三维
+  const hl = ks[0] ? w3.P[ks[0]].mesh.material : null;
+  const other = hl && hl.clone(); if (other) { other.color && other.color.set(0xe0a33b); if (other.emissive) other.emissive.set(0x5a3a00); }
+  for (const [k, p] of Object.entries(w3.P)) p.mesh.material = k === ks[0] ? hl : k === ks[1] ? other : w3.GLASS;
+  const fr = w3.D.parts[ks[0]] && w3.D.parts[ks[0]].group;
+  w3.view({ needle: 'face', hook: 'hook', feed: 'feed', press: 'press', optT: 'trim', optE: 'iso', main: 'iso', oil: 'iso', hsg: 'iso' }[fr] || 'iso');
+}
+m3d($('m3d'), 'view=iso', w => { w3 = w; table(); pick(sel || CL[0]); });
+table(); hist();
+window.__clash = { pick: i => pick(CL[i]) };
+})();
+</script>
+</body></html>
