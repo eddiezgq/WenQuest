@@ -1,0 +1,55 @@
+标题: ["GPU 实验 21.3 用公开振动数据训一个故障诊断模型，并用三种划分口径验收它", "GPU Lab 21.3 Train a bearing-fault classifier on open vibration data and score it under three split conventions"]
+目的: ["用一套公开的滚动轴承振动数据训一个故障分类模型，然后做一件比训练更重要的事：**用三种划分口径各验收一遍**——按样本随机、按工况（负载/转速）、按时间顺序。三个数会差得很远，而报告里只印一个数的做法，正是现场“实验室里好、上了线就不行”的来源。另外还要亲手确认：故障特征频率是**按几何算出来的**，转速一变它全变。",
+       "Train a bearing-fault classifier on an open vibration dataset, then do something more important than training: score it three ways — random by sample, by operating condition (load and speed), and in time order. The three numbers differ widely, and reporting only one of them is exactly why models that look good in the lab fail on the line. Also confirm by hand that the fault frequencies follow from the bearing geometry and move with the shaft speed."]
+显卡: basic
+结果:
+  - {名: n_samples, 说明: ["切出来的样本数", "number of windows"], 单位: "个"}
+  - {名: win_len, 说明: ["每个样本多少点", "points per window"], 单位: "点"}
+  - {名: acc_random, 说明: ["按样本随机划分的准确率", "accuracy, random split"], 单位: "%"}
+  - {名: acc_load, 说明: ["按工况划分的准确率", "accuracy, split by operating condition"], 单位: "%"}
+  - {名: acc_time, 说明: ["按时间顺序划分的准确率", "accuracy, split in time order"], 单位: "%"}
+  - {名: gap_random_load, 说明: ["随机划分比按工况高多少", "optimism of the random split"], 单位: "个百分点"}
+  - {名: bpfo_hz, 说明: ["按几何算出的外圈故障频率", "computed outer-race fault frequency"], 单位: "Hz"}
+  - {名: bpfo_found_hz, 说明: ["包络谱上找到的峰", "peak found in the envelope spectrum"], 单位: "Hz"}
+  - {名: bpfo_err_pct, 说明: ["两者的相对差", "relative difference"], 单位: "%"}
+  - {名: train_s, 说明: ["训练用时", "training wall time"], 单位: "秒"}
+文件: []
+实际问题:
+  标题: ["这个模型，能不能让它去管车间里的机床", "Can this model be trusted on the shop floor"]
+  内容: ["减速器车间有十几台关键设备，轴承坏在跑合试验台上就是一天的产量。现在有一个在公开数据上训出来的故障分类模型，报出的准确率是 99% 以上。问题只有一个：**这个 99% 是怎么划分数据算出来的**？如果训练集与测试集来自同一段连续采集、同一个负载，那它回答的是“见过的工况里认不认得出来”，而不是“换一台机床、换一个负载、换一个月还准不准”。本实验把三种划分都跑一遍，让这三个数自己说话。",
+         "A gearbox workshop runs a dozen critical machines, and a bearing failure on the run-in test stand costs a day of output. A classifier trained on open data reports better than 99% accuracy. The only question that matters is how the data was split. If training and test windows come from the same continuous recording at the same load, the number answers whether the model recognises conditions it has already seen — not whether it still works on another machine, another load, or next month."]
+原理:
+  - ["滚动轴承的局部故障会产生**等间隔的冲击**，冲击激起结构共振，于是故障信息以**调制**的形式藏在高频振荡里。直接做频谱看不见故障频率，要先取**包络**再做频谱（21.3 节、算例 21.3）。", "A local bearing fault produces evenly spaced impacts that excite structural resonances, so the fault information appears as a modulation of a high-frequency carrier. The fault frequency is not visible in the raw spectrum; the envelope spectrum is what reveals it (Section 21.3)."]
+  - ["四个特征频率由**几何与转速**决定，是算出来的，不是学出来的。转速变，它们全变——所以转速（或归一化成“每转几次”）必须进模型，否则换一个负载就失效。", "The four characteristic frequencies follow from the bearing geometry and the shaft speed. They move with the speed, so the speed must enter the model, or the model fails when the load changes."]
+  - ["**划分口径第四次露面。** 振动数据是成片的：同一次采集切出来的几百个窗口彼此极像。按窗口随机划分，测试集里每一条在训练集里都有近亲；按工况划分回答“换个负载还准不准”；按时间划分回答“拿过去预测未来准不准”。三者必须分开报（21.3 节、算例 21.4）。", "Vibration data comes in blocks: hundreds of windows cut from one recording are nearly identical. A random split leaves a near-twin of every test window in the training set; splitting by operating condition asks whether the model transfers to another load; splitting in time asks whether the past predicts the future. All three must be reported separately."]
+  - ["**本实验不排名算法。** 用的是一个很小的模型，目的在于让三种划分的差别显出来；换成更大的模型，三个数会一起升高，而它们之间的**差距**才是这个实验要量的东西。", "This lab does not rank algorithms. The model is deliberately small; a larger one raises all three numbers, and it is the gap between them that is being measured."]
+  - 式: "BPFO = (n/2)·f_r·(1 − d/D·cosα)；BPFI = (n/2)·f_r·(1 + d/D·cosα)；f_r = 转速/60"
+步骤:
+  - ["运行第 1 节：装环境、确认显卡（任务 1）。", "Run section 1 to install the environment and confirm the GPU (task 1)."]
+  - ["运行第 2 节：下载公开振动数据并切窗口，记下样本数、窗口长度与各类的样本数（任务 2），填表 1。", "Run section 2 to download the open vibration data and cut windows, recording the counts (task 2) in Table 1."]
+  - ["运行第 3 节：按几何算出四个特征频率，并在包络谱上找到外圈故障频率，记下两者相差多少（任务 3），填表 2。", "Run section 3 to compute the four characteristic frequencies and locate the outer-race frequency in the envelope spectrum (task 3)."]
+  - ["运行第 4 节：三种划分各训一遍，记下准确率与训练用时（任务 4），填表 3。", "Run section 4 to train under all three split conventions, recording accuracy and wall time (task 4)."]
+  - ["运行第 5 节：把按工况划分的混淆矩阵打出来，看错的是哪几类（任务 5），写进报告。", "Run section 5 to print the confusion matrix of the condition-wise split and note which classes are confused (task 5)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  数据", "Table 1  The data"]
+    表头: ["类别", "原始记录数", "切出的窗口数", "占比"]
+    表头英文: ["class", "recordings", "windows", "share"]
+    行: [["正常", "", "", ""], ["外圈故障", "", "", ""], ["内圈故障", "", "", ""], ["滚动体故障", "", "", ""]]
+  - 标题: ["表 2  特征频率：算出来的与找出来的", "Table 2  Characteristic frequencies: computed and located"]
+    表头: ["量", "按几何算出", "包络谱上找到", "相对差"]
+    表头英文: ["quantity", "computed", "located", "relative difference"]
+    行: [["轴频 f_r", "", "", ""], ["外圈 BPFO", "", "", ""], ["内圈 BPFI", "", "", ""], ["换一个转速后的 BPFO", "", "", ""]]
+  - 标题: ["表 3  三种划分口径", "Table 3  Three split conventions"]
+    表头: ["划分方式", "准确率", "训练用时", "这个数回答的是什么问题"]
+    表头英文: ["split", "accuracy", "wall time", "which question it answers"]
+    行: [["按窗口随机", "", "", ""], ["按工况（负载/转速）", "", "", ""], ["按时间顺序", "", "", ""]]
+注意:
+  - ["公开数据里的故障是**人为加工**出来的单点缺陷（电火花加工），与现场轴承的分布式剥落不是一回事。凡引这套数据上的准确率，这一句必须带着（见第 21 章资料卡）。", "The faults in this dataset are single points machined by electro-discharge, not the distributed spalling found in service. Any accuracy quoted from it must carry that sentence."]
+  - ["**不要把三个准确率平均。** 它们回答三个不同的问题，平均之后一个问题也答不了。报告里要三行分开写，并在每行后面写清这个数回答什么。", "Do not average the three accuracies: they answer three different questions. Report them as three rows, each with the question it answers."]
+  - ["训练用时与显卡型号、批大小有关，**表 3 的三行必须在同一台机器、同一套超参数下测**。", "Wall time depends on the GPU and the batch size, so all three rows must come from one machine with one set of hyper-parameters."]
+  - ["窗口长度决定了频率分辨率：窗口越短，包络谱上的峰越宽，**找峰的窗口也要跟着放宽**。表 2 里若两者差得多，先检查窗口长度，再怀疑模型。", "The window length sets the frequency resolution: shorter windows give broader peaks, so the search window must widen with them. If Table 2 shows a large gap, check the window length before blaming anything else."]
+思考题:
+  - ["你表 3 里“随机”与“按工况”差了多少个百分点？如果供应商只给你第一个数，你会怎么问第二个数？把这句话写成一条验收条款。", "How large is the gap between your random and condition-wise accuracies? If a supplier quotes only the first, how would you ask for the second — as an acceptance clause?"]
+  - ["把转速从数据里抹掉（不作为输入），三种划分的准确率各会怎么变？动手试一次，并解释为什么“按工况”掉得最多。", "Remove the shaft speed from the inputs and rerun: how does each of the three numbers change, and why does the condition-wise one suffer most?"]
+  - ["本实验的类别是按“哪个零件坏了”分的。车间真正要的往往是“还能用多久”。这两个问题的数据标注有什么不同？第二个问题为什么贵得多？", "This lab classifies which part is damaged, while the shop usually wants to know how long it can still run. How do the labels differ, and why is the second question far more expensive to answer?"]

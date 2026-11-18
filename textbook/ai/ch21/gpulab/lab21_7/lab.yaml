@@ -1,0 +1,56 @@
+标题: ["GPU 实验 21.7 给一个视觉检测模型写验证方案，并把它真的验一遍", "GPU Lab 21.7 Write a validation plan for a vision inspection model and actually execute it"]
+目的: ["把 21.7 节讲的那套东西落到一个真模型上：先写**预期用途**与**验收判据**，再按判据反算**要测多少件**（置信下限怎么算），然后用**按批次留出**的数据实测一遍，最后做一次**变更影响评估**（把模型重训一版，看判据还成不成立）。做完你手里会有一份能照着填的验证记录，而不是一个孤零零的准确率。",
+       "Put Section 21.7 into practice on a real model: write the intended use and the acceptance criteria, work out how many parts must be tested for the criteria to be demonstrable at a stated confidence, run the test on a batch-wise hold-out, and finish with a change-impact assessment by retraining one version. You end with a validation record that can be filled in, not a bare accuracy figure."]
+显卡: basic
+结果:
+  - {名: n_train, 说明: ["训练件数", "training parts"], 单位: "件"}
+  - {名: n_test, 说明: ["验证件数（按批次留出）", "validation parts, batch-wise hold-out"], 单位: "件"}
+  - {名: n_required, 说明: ["按判据反算出的最少验证件数", "sample size required by the criteria"], 单位: "件"}
+  - {名: recall_point, 说明: ["实测查全率", "measured recall"], 单位: "%"}
+  - {名: recall_lcb, 说明: ["查全率的 95% 置信下限", "95% lower confidence bound on recall"], 单位: "%"}
+  - {名: fpr_point, 说明: ["实测误判率", "measured false-positive rate"], 单位: "%"}
+  - {名: fpr_ucb, 说明: ["误判率的 95% 置信上限", "95% upper confidence bound"], 单位: "%"}
+  - {名: pass_criteria, 说明: ["按判据算，这一版通过了吗（1 通过 0 不通过）", "does this version meet the criteria"], 单位: "—"}
+  - {名: drift_gap, 说明: ["换一个批次后查全率掉了多少", "recall drop on another batch"], 单位: "个百分点"}
+  - {名: retrain_gap, 说明: ["重训一版后与原版的查全率差", "recall difference after retraining"], 单位: "个百分点"}
+文件: []
+实际问题:
+  标题: ["模型改了一版，要不要重新验证", "The model changed — does it need revalidating"]
+  内容: ["检测模型上线半年，工程师拿新收的图重训了一版，说“指标更好了”。该不该换？在受监管的行业里，这个问题不靠“指标更好”回答，而是靠一份事先写好的方案：这个模型的**预期用途**是什么、**判据**是什么、**改动属于哪一类**、改完要做哪些验证。本实验把这套流程走一遍——包括最容易被跳过的一步：**按判据反算要测多少件**。",
+         "Six months after a vision model goes live an engineer retrains it on newly collected images and reports better metrics. Should it be deployed? In a regulated industry that question is not answered by better metrics but by a plan written in advance: what the model is for, what the acceptance criteria are, what class of change this is, and what evidence the change requires. This lab walks that path, including the step most often skipped: computing how many parts must be tested."]
+原理:
+  - ["**设计确认要在实际使用条件下、用初始生产件做。** 美国联邦法规 21 CFR 820.30(g) 的原话包括“Design validation shall be performed under defined operating conditions on initial production units”与“shall ensure that devices conform to defined user needs and intended uses”，并明确“Design validation shall include software validation and risk analysis, where appropriate.”（见第 21 章资料卡）。落到模型上：**验证数据必须来自产线，不能是研发阶段攒的那一批**。", "Design validation must be performed under defined operating conditions on initial production units and must show conformity to user needs and intended uses, including software validation and risk analysis. For a model this means the validation data has to come from the line, not from the development pile."]
+  - ["**判据要可证伪、要带置信度。** “查全率 ≥ 95%”这句话单独写出来不能验：测 20 件全对也写得出来。要写成“在不少于 N 件缺陷件上，查全率的 95% 置信下限 ≥ 95%”，而 N 由判据反算出来。本实验用二项分布的精确区间（Clopper–Pearson）算这个 N。", "An acceptance criterion must be falsifiable and carry a confidence statement: 'recall ≥ 95%' can be claimed from twenty parts. Write it as a lower confidence bound over at least N defective parts, and compute N from the criterion using an exact binomial interval."]
+  - ["**模型再训练算不算设计更改**，是这一节最实际的问题。美国食品药品监督管理局 2024 年 12 月的终稿指南给出一条路径：事先写一份**预定变更控制计划**，说明三件事——要改什么、用什么方法开发与验证这些改动、这些改动的影响有多大（联邦公报 89 卷 233 号）。本实验最后一步做的就是第三件事。", "Whether retraining counts as a design change is the practical question. The 2024 final guidance describes a predetermined change control plan that states what will be modified, the methodology to develop and validate the modifications, and an assessment of their impact. The last step of this lab is that assessment."]
+  - ["**本书只写“文件要求什么”，不写“怎么通过审核”。** 本实验产出的是一份技术记录；任何把它当成合规承诺的用法都不在本书范围内。", "This book states what the documents require and does not advise on how to pass a review. The output here is a technical record, not a compliance claim."]
+  - 式: "Clopper–Pearson 下限：p_L = BetaInv(α/2; k, n−k+1)；要让 p_L ≥ p₀，最少件数 n 由 k = n（全对）反算"
+步骤:
+  - ["运行第 1 节：装环境、确认显卡。", "Run section 1 to install the environment and confirm the GPU."]
+  - ["运行第 2 节：写下预期用途与判据（笔记本里已经写成常量，改成你们自己的数），并按判据反算最少验证件数（任务 1），填表 1。", "Run section 2 to state the intended use and criteria (edit the constants to your own numbers) and compute the required sample size (task 1)."]
+  - ["运行第 3 节：造/取数据并**按批次**留出验证集，训练一版模型（任务 2），记下训练与验证件数。", "Run section 3 to build the dataset with a batch-wise hold-out and train one version (task 2)."]
+  - ["运行第 4 节：在验证集上实测查全率与误判率，算出各自的 95% 置信界，判断这一版通过没有（任务 3），填表 2。", "Run section 4 to measure recall and false-positive rate with 95% bounds and decide whether this version passes (task 3)."]
+  - ["运行第 5 节：换一个批次再测一遍（模拟来料变化），记下掉了多少（任务 4），填表 3。", "Run section 5 to repeat on another batch and record the drop (task 4)."]
+  - ["运行第 6 节：重训一版，做变更影响评估（任务 5），把结论写进报告。", "Run section 6 to retrain and perform the change-impact assessment (task 5)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  判据与样本量", "Table 1  Criteria and sample size"]
+    表头: ["项", "写成什么", "反算出的最少件数"]
+    表头英文: ["item", "as written", "required sample size"]
+    行: [["预期用途", "", "—"], ["查全率判据", "", ""], ["误判率判据", "", ""], ["合计验证件数", "—", ""]]
+  - 标题: ["表 2  实测结果", "Table 2  Measured results"]
+    表头: ["指标", "点估计", "95% 置信界", "判据", "通过？"]
+    表头英文: ["metric", "point estimate", "95% bound", "criterion", "pass?"]
+    行: [["查全率", "", "", "", ""], ["误判率", "", "", "", ""], ["按零件算还是按图片算", "", "—", "—", "—"]]
+  - 标题: ["表 3  换一个批次 / 重训一版", "Table 3  Another batch and a retrained version"]
+    表头: ["情形", "查全率", "误判率", "与原版差", "要不要重新验证"]
+    表头英文: ["case", "recall", "false-positive rate", "difference", "revalidation needed?"]
+    行: [["原版、原批次", "", "", "—", "—"], ["原版、新批次", "", "", "", ""], ["重训版、原批次", "", "", "", ""], ["重训版、新批次", "", "", "", ""]]
+注意:
+  - ["**判据要先写、后测。** 先看结果再定判据，这份记录就没有意义。笔记本把判据写在第 2 节、数据在第 3 节，顺序是故意的。", "Write the criteria before measuring. The notebook states them in section 2 and only builds the data in section 3; the order is deliberate."]
+  - ["**样本量算的是“缺陷件”的数量**，不是总件数。不良率千分之三的产线上，要凑够 60 个缺陷件得过两万件——这就是为什么验证常常要专门做缺陷样品。", "The sample size is a count of defective parts, not of parts. At three defects per thousand, sixty defective parts means twenty thousand parts — which is why validation usually needs deliberately made defect samples."]
+  - ["**留出必须按批次**（或按模具、按班次），不能随机。随机留出会把同一批的图分到两边，验证结果偏乐观——与 21.3 节的划分口径是同一件事。", "The hold-out must be by batch, mould or shift, never random: a random hold-out puts images from the same batch on both sides and biases the result optimistically."]
+  - ["本实验的图像是**合成的**（几何图形加噪声与缺陷），目的是让流程跑通且可复现。**换成你们自己的图之前，表 2、表 3 的数一个都不要外引。**", "The images here are synthetic so the workflow runs anywhere and reproducibly. None of the measured numbers should be quoted outside this lab."]
+思考题:
+  - ["把“查全率 ≥ 95%”改成“查全率的 95% 置信下限 ≥ 95%”，要测的件数变成几倍？如果判据改成 99%，又变成几倍？", "How many more parts does a confidence-bound criterion require than a point estimate, and how does that scale if the target rises from 95% to 99%?"]
+  - ["你们厂的来料换一个供应商，按本实验的做法要重新做哪几步？哪几步可以不做，依据是什么？", "If a supplier changes, which steps here must be repeated and which may be skipped, and on what basis?"]
+  - ["重训一版、指标更好，但在新批次上掉得更多——该不该换？把你的理由写成两句话，一句给工程师，一句给质量部门。", "A retrained version scores better overall but degrades more on the new batch. Should it ship? Write your reasoning in two sentences, one for the engineer and one for quality."]

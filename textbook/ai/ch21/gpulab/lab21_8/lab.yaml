@@ -1,0 +1,55 @@
+标题: ["GPU 实验 21.8 剩余寿命预测，以及把它变成维护决策", "GPU Lab 21.8 Remaining useful life, and turning it into a maintenance decision"]
+目的: ["用公开的涡扇发动机退化数据训一个剩余寿命模型，然后做比训练更要紧的一步：**把预测变成决策**。先看均方根误差这类常印的指标，再按 21.8 节的办法算**提前期、漏报数与总代价**，最后扫一遍报警阈值，看同一个模型换个阈值总代价差几倍。做完要能回答：验收一个预测性维护模型，合同里该写哪三个数。",
+       "Train a remaining-useful-life model on open turbofan degradation data, then take the step that matters more than training: turn the prediction into a decision. Look at the usual error metrics first, then compute lead time, missed failures and total cost as in Section 21.8, and finally sweep the alarm threshold to see how much the cost moves for one unchanged model."]
+显卡: basic
+结果:
+  - {名: n_train_units, 说明: ["训练发动机台数", "training units"], 单位: "台"}
+  - {名: n_test_units, 说明: ["测试发动机台数", "test units"], 单位: "台"}
+  - {名: rmse, 说明: ["剩余寿命的均方根误差", "RMSE of the remaining useful life"], 单位: "循环"}
+  - {名: mae, 说明: ["平均绝对误差", "mean absolute error"], 单位: "循环"}
+  - {名: late_share, 说明: ["预测偏晚（比真值大）的比例", "share of predictions that are too optimistic"], 单位: "%"}
+  - {名: best_thr, 说明: ["总代价最低的报警阈值", "cost-optimal alarm threshold"], 单位: "循环"}
+  - {名: cost_best, 说明: ["那时的总代价", "cost at that threshold"], 单位: "—"}
+  - {名: cost_ratio, 说明: ["最贵阈值与最省阈值的代价比", "worst-to-best cost ratio over the sweep"], 单位: "倍"}
+  - {名: lead_min, 说明: ["最省阈值下最短的提前期", "minimum lead time at the cost-optimal threshold"], 单位: "循环"}
+  - {名: missed, 说明: ["最省阈值下漏报几台", "units that failed without warning"], 单位: "台"}
+文件: []
+实际问题:
+  标题: ["均方根误差 20 个循环，好还是不好", "Is an RMSE of twenty cycles good"]
+  内容: ["供应商说模型的剩余寿命误差是 20 个循环。这句话没法验收：误差往早报偏还是往晚报偏，后果完全不同——报早了多换几个好件，报晚了就是意外停机。车间要的是三个数：**最短提前期**（备件来得及吗）、**漏报几台**（会不会真出事）、**总代价**（这套系统值不值）。本实验把常印的误差指标与这三个数放在一起算，让差别自己显出来。",
+         "A supplier quotes a remaining-life error of twenty cycles. That cannot be accepted as is: an error that reads early costs a few good parts, while one that reads late is an unplanned stoppage. The shop needs three numbers — the minimum lead time, how many units failed without warning, and the total cost. This lab computes the usual error metrics beside those three."]
+原理:
+  - ["**剩余寿命数据集常常是仿真生成的，单位是循环不是小时。** 本实验用的公开数据有四个子集，工况数与故障模式数各不相同（一个工况/一种故障到六个工况/两种故障），训练与测试轨迹数也不同（见第 21 章资料卡）。拿它报出的误差，这两条口径必须跟着印。", "Open remaining-life datasets are often simulated, and the unit is cycles rather than hours. The four subsets differ in the number of operating conditions and fault modes, and both facts must accompany any error figure quoted from them."]
+  - ["**误差的方向比误差的大小更要紧。** 预测偏早（保守）与偏晚（乐观）在车间里的代价差几十倍，所以除了均方根误差，必须报**偏晚的比例**，并在代价函数里给两者不同的权重（21.8 节）。", "The direction of the error matters more than its size: optimistic and conservative errors differ in cost by orders of magnitude, so report the share of optimistic predictions and weight the two differently in the cost function."]
+  - ["**把预测变成决策要一个阈值**：剩余寿命预测值低于多少就报警。阈值一变，提前期、漏报数与总代价一起变——同一个模型能差好几倍。所以“模型准不准”这个问题，不连阈值与代价一起问就没有答案（算例 21.7）。", "Turning a prediction into a decision needs a threshold: alarm when the predicted life falls below it. Lead time, missed failures and total cost all move with it, by a large factor for one unchanged model."]
+  - ["**验收条款要写三个数**：最短提前期（不是平均）、漏报台数、总代价。只写均方根误差的条款，验收时双方都说不清算不算通过。", "An acceptance clause needs three numbers: the minimum lead time, not the average; the number of unwarned failures; and the total cost."]
+  - 式: "总代价 = 计划停机数 × c_plan + 漏报数 × c_fail + Σ 提前期 × c_early；提前期 = 真实失效循环 − 首次报警循环"
+步骤:
+  - ["运行第 1 节：装环境、确认显卡。", "Run section 1 to install the environment and confirm the GPU."]
+  - ["运行第 2 节：下载公开退化数据（取不到时自动退回到合成数据并注明），记下训练与测试台数（任务 1），填表 1。", "Run section 2 to download the open degradation data, recording the unit counts (task 1)."]
+  - ["运行第 3 节：训练剩余寿命模型，记下均方根误差、平均绝对误差与**偏晚的比例**（任务 2），填表 2。", "Run section 3 to train the model and record RMSE, MAE and the share of optimistic predictions (task 2)."]
+  - ["运行第 4 节：扫一遍报警阈值，记下每档的提前期、漏报数与总代价（任务 3），填表 3。", "Run section 4 to sweep the alarm threshold, recording lead time, misses and cost (task 3)."]
+  - ["运行第 5 节：加一条验收约束（每台至少提前 N 个循环、不许漏报），看满足约束的最省阈值贵多少（任务 4），写进报告。", "Run section 5 to add an acceptance constraint and find the cheapest compliant threshold (task 4)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  数据", "Table 1  The data"]
+    表头: ["子集", "训练台数", "测试台数", "工况数", "故障模式数"]
+    表头英文: ["subset", "train units", "test units", "operating conditions", "fault modes"]
+    行: [["本次用的子集", "", "", "", ""]]
+  - 标题: ["表 2  常印的误差指标", "Table 2  The usual error metrics"]
+    表头: ["指标", "值", "单位", "这个数能回答什么"]
+    表头英文: ["metric", "value", "unit", "what it answers"]
+    行: [["均方根误差", "", "循环", ""], ["平均绝对误差", "", "循环", ""], ["偏晚（乐观）的比例", "", "%", ""]]
+  - 标题: ["表 3  阈值扫一遍", "Table 3  Sweeping the alarm threshold"]
+    表头: ["阈值（循环）", "平均提前期", "最短提前期", "漏报台数", "总代价"]
+    表头英文: ["threshold (cycles)", "mean lead", "minimum lead", "missed", "total cost"]
+    行: [["10", "", "", "", ""], ["20", "", "", "", ""], ["30", "", "", "", ""], ["40", "", "", "", ""], ["60", "", "", "", ""]]
+注意:
+  - ["**单位是循环，不是小时。** 换算成时间要知道每个循环多长，而这与机队的使用方式有关，本实验不提供换算。", "The unit is cycles, not hours; converting requires knowing how long a cycle is on your fleet."]
+  - ["**代价参数要自己填。** 笔记本里的计划停机、意外失效、提前浪费三个代价是示例值；换成你们自己的数，最优阈值会跟着变——这正是本实验要说明的事。", "The three cost parameters in the notebook are examples. Replace them with your own and the optimum moves, which is the point of the lab."]
+  - ["**不要只报平均提前期。** 备件到货要三天，那就要保证**每一台**都提前三天，而不是平均三天。表 3 把两列并排放着就是为此。", "Never report only the mean lead time: if a spare takes three days, every unit needs three days, not the average."]
+  - ["公开数据是**仿真**产生的，工况与噪声都比真实机队干净。本实验的数只能用来比较不同阈值、不同口径，**不能当成你们设备的预期表现**。", "The data is simulated and cleaner than a real fleet. Use these numbers to compare thresholds and conventions, never as an expectation for your own equipment."]
+思考题:
+  - ["你的模型偏早还是偏晚？如果偏晚，把代价函数里“漏报”的权重调高，最优阈值往哪边移？动手试一次。", "Does your model read early or late? Raise the weight on misses and see which way the optimum moves."]
+  - ["把“每台至少提前 N 个循环”的 N 从 10 调到 30，最省的合规阈值要多花多少？这条曲线就是“备件备多久”的成本曲线。", "Raise the required lead from ten cycles to thirty: how much more does the cheapest compliant threshold cost? That curve prices your spares policy."]
+  - ["本实验按“预测剩余寿命 + 阈值”做决策。另一种常见做法是直接训一个“未来 N 个循环内会不会失效”的分类器。两者各有什么长短？哪一种更容易写进验收条款？", "An alternative is to classify whether failure occurs within the next N cycles. What are the trade-offs, and which is easier to put in an acceptance clause?"]
