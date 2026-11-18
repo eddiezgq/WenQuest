@@ -1,0 +1,258 @@
+{
+ "rpm": 5000.0,
+ "bodies": {
+  "upper": {
+   "name": "上轴组（曲柄、平衡块、转子、手轮）",
+   "mass_g": 1666.7,
+   "parts": [
+    "shaft",
+    "crank",
+    "crank_pin",
+    "crank_screws",
+    "rotor",
+    "rotor_magnets",
+    "encoder_disc",
+    "handwheel",
+    "handwheel_ring",
+    "pulley_upper",
+    "feed_ecc"
+   ]
+  },
+  "rod": {
+   "name": "针杆连杆",
+   "mass_g": 63.9,
+   "parts": [
+    "rod",
+    "cage_rod"
+   ]
+  },
+  "nb": {
+   "name": "针杆组（针杆、连接块、滑块、针夹、机针）",
+   "mass_g": 104.4,
+   "parts": [
+    "needle_bar",
+    "needle_clamp",
+    "needle",
+    "nb_link",
+    "slide_block",
+    "clamp_screw",
+    "link_screws"
+   ]
+  },
+  "lever": {
+   "name": "挑线杆",
+   "mass_g": 38.3,
+   "parts": [
+    "lever",
+    "cage_lever",
+    "pin_M"
+   ]
+  },
+  "rocker": {
+   "name": "挑线摇杆",
+   "mass_g": 11.9,
+   "parts": [
+    "rocker"
+   ]
+  },
+  "lower": {
+   "name": "下轴组",
+   "mass_g": 471.4,
+   "parts": [
+    "pulley_lower",
+    "lower_shaft",
+    "gear_lower",
+    "lift_ecc",
+    "oil_ecc"
+   ]
+  },
+  "hook": {
+   "name": "旋梭轴组",
+   "mass_g": 110.8,
+   "parts": [
+    "gear_hook",
+    "hook_shaft",
+    "hook"
+   ]
+  },
+  "frod": {
+   "name": "送布连杆",
+   "mass_g": 48.6,
+   "parts": [
+    "feed_rod"
+   ]
+  },
+  "rsl": {
+   "name": "调节器滑块",
+   "mass_g": 7.2,
+   "parts": [
+    "reg_slider"
+   ]
+  },
+  "flink": {
+   "name": "送布水平连杆",
+   "mass_g": 28.3,
+   "parts": [
+    "feed_link"
+   ]
+  },
+  "frock": {
+   "name": "送布摆轴",
+   "mass_g": 196.3,
+   "parts": [
+    "feed_rock"
+   ]
+  },
+  "fbar": {
+   "name": "牙架（含送布牙）",
+   "mass_g": 29.2,
+   "parts": [
+    "feed_bar"
+   ]
+  },
+  "llink": {
+   "name": "抬牙连杆",
+   "mass_g": 15.8,
+   "parts": [
+    "lift_link"
+   ]
+  },
+  "lrock": {
+   "name": "抬牙摆轴",
+   "mass_g": 76.2,
+   "parts": [
+    "lift_rock"
+   ]
+  }
+ },
+ "drive": {
+  "T_max": 5.064,
+  "T_min": -5.489,
+  "T_rms": 3.102,
+  "power_T_max": 5.063,
+  "power_T_min": -5.488,
+  "max_abs_diff": 0.0077,
+  "rel_diff": 0.0014,
+  "ok": true,
+  "g2_T_max": 4.618,
+  "g2_T_min": -4.804,
+  "rel_diff_g2": 0.178
+ },
+ "joints": [
+  {
+   "key": "brg_front",
+   "name": "上轴前轴承 6203（两支承分开）",
+   "F_max": 990.6
+  },
+  {
+   "key": "rod",
+   "name": "曲柄销—连杆大头",
+   "F_max": 865.9
+  },
+  {
+   "key": "upper",
+   "name": "上轴轴承（合力）",
+   "F_max": 659.0
+  },
+  {
+   "key": "c_rodnb",
+   "name": "连杆小头—针杆连接销",
+   "F_max": 569.6
+  },
+  {
+   "key": "lever",
+   "name": "曲柄销—挑线杆",
+   "F_max": 500.3
+  },
+  {
+   "key": "brg_rear",
+   "name": "上轴后轴承 6201（两支承分开）",
+   "F_max": 352.9
+  },
+  {
+   "key": "c_levrck",
+   "name": "挑线杆—摇杆铰点 M",
+   "F_max": 315.1
+  },
+  {
+   "key": "rocker",
+   "name": "摇杆支点销 Q",
+   "F_max": 306.8
+  },
+  {
+   "key": "nb",
+   "name": "针杆—导套（侧向力）",
+   "F_max": 93.4
+  },
+  {
+   "key": "frock",
+   "name": "送布摆轴轴承",
+   "F_max": 66.4
+  },
+  {
+   "key": "frod",
+   "name": "送布偏心—送布连杆",
+   "F_max": 65.9
+  },
+  {
+   "key": "rsl",
+   "name": "调节器滑槽（侧向力）",
+   "F_max": 59.8
+  },
+  {
+   "key": "flink",
+   "name": "调节器滑块—送布水平连杆",
+   "F_max": 55.9
+  },
+  {
+   "key": "c_flinkC",
+   "name": "送布水平连杆—摆轴曲柄销 C",
+   "F_max": 50.3
+  },
+  {
+   "key": "lower",
+   "name": "下轴轴承（合力）",
+   "F_max": 27.6
+  },
+  {
+   "key": "c_frodP",
+   "name": "送布连杆—调节器滑块 P",
+   "F_max": 26.7
+  },
+  {
+   "key": "llink",
+   "name": "抬牙偏心—抬牙连杆",
+   "F_max": 20.3
+  },
+  {
+   "key": "c_llinkD",
+   "name": "抬牙连杆—抬牙摆轴曲柄销 D",
+   "F_max": 15.1
+  },
+  {
+   "key": "fbar",
+   "name": "送布摆杆销 T—牙架",
+   "F_max": 14.7
+  },
+  {
+   "key": "lrock",
+   "name": "抬牙摆轴轴承",
+   "F_max": 12.6
+  },
+  {
+   "key": "c_fork",
+   "name": "牙架—抬牙叉子 K",
+   "F_max": 6.2
+  },
+  {
+   "key": "hook",
+   "name": "旋梭轴轴承（合力）",
+   "F_max": 1.3
+  }
+ ],
+ "belt_torque_max": 0.011,
+ "gear_torque_max": 0.0,
+ "constraint_violation_max_m": 0.020943951401900307,
+ "points": 359,
+ "omitted": "压脚组（没有布时被送布牙顶起，4.3 按弹簧压在布上算）、油泵柱塞、同步带质量"
+}
