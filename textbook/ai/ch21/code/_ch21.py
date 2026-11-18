@@ -332,14 +332,20 @@ def maintenance_cost(fleet: list[np.ndarray], thr: float, fail_at: float = 1.0,
     * 没报警就失效（或报警太晚）：花 `cost_fail`（含意外停机与连带损失）；
     * 报得太早：每提前一个周期浪费 `cost_early`（剩余寿命白扔）。
     """
-    plan = fail = 0
+    plan = fail = survived = 0
     waste = 0.0
     leads = []
     for x in fleet:
         t_fail = first_cross(x, fail_at)
         t_alarm = first_cross(x, thr)
-        if t_fail is None:
-            t_fail = len(x) - 1
+        if t_fail is None:                       # 到期还没坏：既没停机也没失效
+            if t_alarm is not None:              # 但报过警就得按计划停一次（而且是白停）
+                plan += 1
+                waste += cost_early * (len(x) - 1 - t_alarm)
+                leads.append(len(x) - 1 - t_alarm)
+            else:
+                survived += 1
+            continue
         if t_alarm is None or t_alarm >= t_fail:
             fail += 1
             leads.append(0)
@@ -349,7 +355,7 @@ def maintenance_cost(fleet: list[np.ndarray], thr: float, fail_at: float = 1.0,
             leads.append(lead)
             waste += cost_early * lead
     total = plan * cost_plan + fail * cost_fail + waste
-    return {"n": len(fleet), "planned": plan, "failed": fail,
+    return {"n": len(fleet), "planned": plan, "failed": fail, "survived": survived,
             "early_waste": float(waste), "total": float(total),
             "lead_mean": float(np.mean(leads)) if leads else 0.0,
             "lead_min": int(np.min(leads)) if leads else 0}
@@ -403,3 +409,110 @@ def alarms(groups: np.ndarray, lim: dict) -> np.ndarray:
     """哪些子组报警（只用最基本的一条判据：均值出界）。"""
     means = groups.mean(axis=1)
     return (means > lim["ucl"]) | (means < lim["lcl"])
+
+
+# ================================================================ 七、工艺参数优化（21.4 节）
+#
+# 与 20.5 节的闭环同一套想法，换到切削参数上，但**多了产线的三条约束**：
+# 一次只能动一点点（工人要跟得上、设备要稳得住）、试出来的废品是真花钱的、
+# 一个班只有有限次试验。
+
+
+def cut_rate(speed: float, feed: float) -> float:
+    """产出速度（越大越好，归一化到 0—1 附近）。切得快、进给大，产出就高。"""
+    return float(speed * feed)
+
+
+def cut_quality(speed: float, feed: float) -> float:
+    """表面质量（越大越好，1 是满分）。切削速度有一个最舒服的区间，进给越大越差。
+
+    这是个**造出来的玩具曲面**，不代表任何真实材料或刀具。
+    """
+    s = math.exp(-((speed - 0.62) / 0.26) ** 2)
+    f = math.exp(-((feed - 0.28) / 0.30) ** 2)
+    return float(0.5 + 0.5 * s * f)
+
+
+def cut_scrap(speed: float, feed: float) -> bool:
+    """这一组参数会不会直接做出废品（质量低于合格线）。"""
+    return cut_quality(speed, feed) < 0.72
+
+
+def cut_objective(speed: float, feed: float) -> float:
+    """车间真正要的：在不出废品的前提下产出最大。出废品的点按 0 计。"""
+    return 0.0 if cut_scrap(speed, feed) else cut_rate(speed, feed)
+
+
+def search_parameters(method: str, budget: int, seed: int = 0, step: float = 0.08,
+                      start=(0.45, 0.18)) -> dict:
+    """在切削参数上试 `budget` 次。三种办法：
+
+    * ``free``：不管约束，在整个参数空间里随机试（研究所的做法）；
+    * ``ofat``：一次只动一个因素、走一小步（车间几十年的做法）；
+    * ``trust``：代理模型 + **信赖域**——只在当前点附近 `step` 的范围里提议（本章推荐）。
+
+    返回找到的最好点、试坏了多少件、以及每一步的轨迹。
+    """
+    g = np.random.default_rng(seed)
+    cur = np.array(start, dtype=float)
+    best, best_val = cur.copy(), cut_objective(*cur)
+    scrap = 0
+    traj = [cur.copy()]
+    tried: list[np.ndarray] = []
+    vals: list[float] = []
+
+    for t in range(budget):
+        if method == "free":
+            nxt = g.uniform(0.05, 0.95, 2)
+        elif method == "ofat":
+            k = t % 2
+            nxt = cur.copy()
+            nxt[k] = float(np.clip(cur[k] + (step if (t // 2) % 2 == 0 else -step), 0.05, 0.95))
+        elif method == "trust":
+            if len(tried) < 4:
+                nxt = np.clip(cur + g.normal(0.0, step, 2), 0.05, 0.95)
+            else:
+                cand = np.clip(cur + g.normal(0.0, step, (24, 2)), 0.05, 0.95)
+                X = np.array(tried)
+                y = np.array(vals)
+                mean, sigma = kernel_mean_sigma(X, y, cand, ls=0.18)
+                nxt = cand[int(np.argmax(mean + 1.0 * sigma))]
+        else:
+            raise ValueError(method)
+        val = cut_objective(*nxt)
+        if cut_scrap(*nxt):
+            scrap += 1
+        tried.append(np.asarray(nxt, dtype=float))
+        vals.append(val)
+        if val > best_val:
+            best, best_val = np.asarray(nxt, dtype=float).copy(), val
+        if method in ("ofat", "trust") and val >= cut_objective(*cur):
+            cur = np.asarray(nxt, dtype=float).copy()      # 只往不变差的方向挪
+        traj.append(cur.copy())
+    return {"best": best, "best_val": float(best_val), "scrap": scrap,
+            "traj": np.array(traj), "tried": np.array(tried), "vals": np.array(vals)}
+
+
+def kernel_mean_sigma(X: np.ndarray, y: np.ndarray, Q: np.ndarray, ls: float = 0.18,
+                      lam: float = 1e-3) -> tuple[np.ndarray, np.ndarray]:
+    """高斯核岭回归的均值，外加"离已测点有多远"当不确定度（与 20.5 节同一套）。"""
+    def k(A, B):
+        d2 = ((A[:, None, :] - B[None, :, :]) ** 2).sum(-1)
+        return np.exp(-d2 / (2 * ls ** 2))
+
+    K = k(X, X) + lam * np.eye(len(X))
+    alpha = np.linalg.solve(K, y)
+    Kq = k(Q, X)
+    return Kq @ alpha, np.sqrt(np.maximum(1.0 - Kq.max(axis=1) ** 2, 0.0))
+
+
+def best_feasible(grid: int = 201) -> tuple[float, float, float]:
+    """网格扫出"不出废品的前提下产出最大"的那个点（用来当真值）。"""
+    ax = np.linspace(0.05, 0.95, grid)
+    best, bs, bf = -1.0, 0.0, 0.0
+    for s in ax:
+        for f in ax:
+            val = cut_objective(float(s), float(f))
+            if val > best:
+                best, bs, bf = val, float(s), float(f)
+    return bs, bf, best
