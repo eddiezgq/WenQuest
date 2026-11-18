@@ -68,8 +68,8 @@ jobs:
             docker top "$h" 2>&1 | head -8
             docker stats --no-stream --format "{{.MemUsage}} {{.Name}} {{.CPUPerc}}" 2>/dev/null | sort -h -r | head -70
             d=$(docker ps --format "{{.Names}}" | grep -E "^wq-factory-db-1$" | head -1); echo "db=$d"
-            docker exec "$d" sh -c "psql -U \"\$POSTGRES_USER\" -d \"\${POSTGRES_DB:-\$POSTGRES_USER}\" -c \"select pid, usename, application_name, state, wait_event_type, wait_event, now()-query_start as dur, left(query,140) as q from pg_stat_activity order by query_start\"" 2>&1 | grep -v "| idle " | head -40
-            docker exec "$d" sh -c "psql -U \"\$POSTGRES_USER\" -d \"\${POSTGRES_DB:-\$POSTGRES_USER}\" -c \"select l.pid, l.locktype, l.mode, l.granted, c.relname from pg_locks l left join pg_class c on c.oid=l.relation where not l.granted\"" 2>&1 | head -30' 2>&1 | sed 's/^/hub: /'
+            docker exec "$d" sh -c "for db in \$(psql -U \"\$POSTGRES_USER\" -d postgres -Atc \"select datname from pg_database where not datistemplate\"); do echo \"== \$db\"; psql -U \"\$POSTGRES_USER\" -d \$db -Atc \"select relname, seq_scan, seq_tup_read, idx_scan, n_tup_ins, n_tup_upd, n_tup_del, n_live_tup, pg_total_relation_size(relid) from pg_stat_user_tables order by seq_tup_read desc limit 8\"; psql -U \"\$POSTGRES_USER\" -d \$db -Atc \"select state, count(*) from pg_stat_activity where datname = current_database() group by state\"; done" 2>&1 | head -150
+            docker exec "$d" sh -c "psql -U \"\$POSTGRES_USER\" -d postgres -Atc \"select datname, xact_commit, tup_inserted, tup_updated, tup_fetched, blks_read from pg_stat_database order by tup_fetched desc limit 15\"" 2>&1' 2>&1 | sed 's/^/hub: /'
       - uses: actions/checkout@v4
       - name: Try the real copy (dry) — 和部署同样的打包，解到临时目录
         run: |
