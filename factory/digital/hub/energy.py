@@ -40,6 +40,7 @@ create table if not exists energy_read (
     primary key (mode, meter, ts)
 );
 create index if not exists energy_read_ts on energy_read (mode, ts);
+create index if not exists energy_read_meter_ts on energy_read (mode, meter, ts);   -- 第 173 轮：按表计查
 create table if not exists env_read (
     mode    text not null,
     point   text not null,

@@ -39,8 +39,15 @@ set_images() {
     envset EDA_IMAGE "${1/\/engine:/\/eda:}"
 }
 
+# 凸轮、轴承、问渠电子（compose 里的 tools 一组）：国内服务器在本机跑；美国只在企业服务器 app. 上跑一份（第 173 轮）。
+tools_here() {
+    [ "$(envval WQ_REGION)" = cn ] || [ "$(envval WQ_TOOLS_HERE)" = 1 ]
+}
+
 dc() {
-    docker compose -f docker-compose.yml -f docker-compose.prod.yml "$@"
+    local p=""
+    tools_here && p=tools
+    COMPOSE_PROFILES="$p" docker compose -f docker-compose.yml -f docker-compose.prod.yml "$@"
 }
 
 log() {

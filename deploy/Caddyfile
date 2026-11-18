@@ -55,21 +55,9 @@
 	handle /api/v1/public/* {
 		reverse_proxy web:80
 	}
-	# 问渠凸轮（第 39 轮）：凸轮设计网页版，容器 cam 自己出页面和接口
-	redir /cam /cam/ 308
-	handle_path /cam/* {
-		reverse_proxy cam:8000
-	}
-	# 问渠轴承（第 64 轮）：轴承设计网页版，容器 bearing 自己出页面和接口
-	redir /bearing /bearing/ 308
-	handle_path /bearing/* {
-		reverse_proxy bearing:8000
-	}
-	# 问渠电子（第 105 轮）：起草台，容器 eda 自己出页面和接口；AI 起草经网关
-	redir /eda /eda/ 308
-	handle_path /eda/* {
-		reverse_proxy eda:8000
-	}
+	# 凸轮、轴承、问渠电子（第 39、64、105 轮）：美国只在企业服务器 app. 上跑一份，这里跳过去（第 173 轮）；
+	# 国内仍在本机容器里，见 tools-handle/
+	import tools-handle/{$WQ_REGION:us}.caddy
 	# 网页：美国版 site/，国内版 site/cn/（第 48 轮，按 WQ_REGION 选，见 site-handle/）
 	import site-handle/{$WQ_REGION:us}.caddy
 }

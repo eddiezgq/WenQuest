@@ -14,6 +14,15 @@
 name: Enterprise server 企业服务器
 
 on:
+  # 第 173 轮 D-1b：学习平台部署（deploy.yml）成功后调用 task=deploy
+  workflow_call:
+    inputs:
+      task:
+        type: string
+        default: deploy
+      host:
+        type: string
+        default: "161.35.185.35"
   workflow_dispatch:
     inputs:
       task:
@@ -116,12 +125,13 @@ jobs:
           acme=$(ssh "deploy@$EDU" "grep -E '^ACME_EMAIL=' /opt/wenquest/.env | tail -n1 | cut -d= -f2-")
           [ -n "$site" ] && [ -n "$acme" ] || { echo "::error::教育服务器 .env 里没有 SITE_DOMAIN 或 ACME_EMAIL"; exit 1; }
           echo "SITE_DOMAIN=$site  keys=$(grep -c . "$RUNNER_TEMP/keys")"
-          # 工业软件：照教育服务器正在跑的镜像（同一份程序两处部署，第 146 轮二.2）
-          imgs=$(ssh "deploy@$EDU" "docker ps --format '{{.Names}} {{.Image}}'")
-          img() { printf '%s\n' "$imgs" | awk -v n="-$1-1" 'index($1, n) == length($1) - length(n) + 1 {print $2; exit}'; }
-          CAM=$(img cam); BEARING=$(img bearing); EDA=$(img eda)
+          # 工业软件：和教育服务器上线的是同一版本（第 146 轮二.2）。第 173 轮起教育服务器不再跑这三个容器，
+          # 版本读它 .env 里 deploy/update.sh 写的 CAM_IMAGE、BEARING_IMAGE、EDA_IMAGE
+          imgs=$(ssh "deploy@$EDU" "grep -E '^(CAM|BEARING|EDA)_IMAGE=' /opt/wenquest/.env")
+          img() { printf '%s\n' "$imgs" | grep -E "^$1_IMAGE=" | tail -n1 | cut -d= -f2-; }
+          CAM=$(img CAM); BEARING=$(img BEARING); EDA=$(img EDA)
           echo "cam=$CAM bearing=$BEARING eda=$EDA"
-          [ -n "$CAM" ] && [ -n "$BEARING" ] && [ -n "$EDA" ] || { echo "::error::教育服务器上没找到凸轮、轴承或问渠电子的容器"; exit 1; }
+          [ -n "$CAM" ] && [ -n "$BEARING" ] && [ -n "$EDA" ] || { echo "::error::教育服务器 .env 里没有 CAM_IMAGE、BEARING_IMAGE 或 EDA_IMAGE"; exit 1; }
           # 凸轮的 CAE 走数字工厂：网址和钥匙照教育服务器 .env（钥匙经标准输入传，不上命令行、不进日志）
           ssh "deploy@$EDU" "grep -E '^(WQ_FACTORY_URL|WQ_FACTORY_CAE_KEY)=' /opt/wenquest/.env" > "$RUNNER_TEMP/fx" || true
           ssh "deploy@$HOST" 'mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys'
@@ -159,7 +169,12 @@ jobs:
         run: |
           site=$(ssh "deploy@$HOST" "grep -E '^SITE_DOMAIN=' /opt/wenquest/edge/.env | cut -d= -f2-")
           sleep 20
-          for p in cam/ bearing/ eda/; do echo "app.$site/$p -> $(curl -s -o /dev/null -m 60 -w '%{http_code}' "https://app.$site/$p" || true)"; done
+          bad=""
+          for p in cam/api/health bearing/api/health eda/api/health; do
+            c=""; for i in $(seq 1 12); do c=$(curl -s -o /dev/null -m 60 -w '%{http_code}' "https://app.$site/$p" || true); [ "$c" = 200 ] && break; sleep 5; done
+            echo "app.$site/$p -> $c"; [ "$c" = 200 ] || bad="$bad $p=$c"
+          done
+          [ -z "$bad" ] || echo "::warning title=企业服务器工业软件::$bad"
           for h in app qms; do
             echo "$h.$site -> $(curl -s -o /dev/null -m 30 -w '%{http_code}' --resolve "$h.$site:80:$HOST" "http://$h.$site/" || true) (http)"
           done

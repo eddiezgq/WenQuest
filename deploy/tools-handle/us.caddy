@@ -1,0 +1,4 @@
+# 美国：凸轮、轴承、问渠电子只在企业服务器 app.<主域名> 上跑一份（第 173 轮 D-1）。
+# 旧网址永久跳过去，子路径和参数原样带上；308 保留请求方法。
+@tools path /cam /cam/* /bearing /bearing/* /eda /eda/*
+redir @tools https://app.{$SITE_DOMAIN}{uri} 308

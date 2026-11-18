@@ -144,7 +144,10 @@ def test_lifecycle_dedup_escalate_autoresolve_reopen(db):
     assert len(D._apply("teach", r, [f], t0)) == 1                       # 新开，发提醒
     assert D._apply("teach", r, [f], t0) == []                            # 再报：不重复
     a = db.one("select * from anomaly where rule='P1' and fkey='x-01'")
-    assert a["hits"] == 2 and a["status"] == "open"
+    # 第 173 轮：没变的异常一分钟内不再写库，命中先记在内存里，下次写库一起加上
+    assert a["hits"] + D._pend_hits.get(a["id"], 0) == 2 and a["status"] == "open"
+    D._apply("teach", r, [f], t0 + dt.timedelta(seconds=61))             # 过了一分钟：写库，三次命中都在
+    assert db.one("select hits from anomaly where id=%s", (a["id"],))["hits"] == 3 and not D._pend_hits.get(a["id"])
     f2 = Finding("x-01", "X-01 故障", severity="critical", subject=("Machine", "x-01"))
     assert len(D._apply("teach", r, [f2], t0)) == 1                       # 升级：再发
     D._apply("teach", r, [], t0)                                          # 消失一轮：还开着

@@ -302,6 +302,7 @@ class Hub:
             log.exception("载入情景失败")
         while not self.stop.wait(float(os.environ.get("WQ_AI_EVERY_S", "20"))):
             self._prune()
+            self._prune_ont_events()
             for mode in self.active_modes():
                 try:
                     new = self.ai.evaluate(mode)
@@ -428,6 +429,19 @@ class Hub:
             log.info("历史库已清理 %s 天以前的记录", int(days))
         except Exception:  # noqa: BLE001
             log.exception("清理历史库失败")
+
+    _ont_pruned_day = None
+
+    def _prune_ont_events(self):
+        """第 173 轮：本体事件明细只留 WQ_ONT_EVENT_DAYS 天（默认 30；更早的已汇总在 ont_metric_daily）。
+        每天一次，在 UTC 6–10 点（美东夜里 1–5 点，避开 3:30 的备份）另开线程分批删：按主键找到截止处，每批 2 万条。"""
+        days = float(os.environ.get("WQ_ONT_EVENT_DAYS", "30"))
+        now = dt.datetime.now(dt.timezone.utc)
+        if days <= 0 or self._ont_pruned_day == now.date() or not (6 <= now.hour < 10):
+            return
+        self._ont_pruned_day = now.date()
+        from hub.db import prune_ont_events
+        threading.Thread(target=prune_ont_events, args=(self.db, days), daemon=True, name="ont-prune").start()
 
     def active_modes(self):
         rows = self.db.q("select distinct mode from bus_message where ts > now() - interval '1 day' and mode is not null")

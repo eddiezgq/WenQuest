@@ -37,6 +37,9 @@ create table if not exists maint_inspection (
     status     text not null default 'ok',          -- ok 正常 / open 异常待处理 / handled 已开维修单 / watch 观察
     note       text
 );
+create index if not exists maint_inspection_status on maint_inspection (mode, status);   -- 第 173 轮
+create index if not exists maint_inspection_unit on maint_inspection (mode, unit, id);
+create index if not exists maint_inspection_at on maint_inspection (mode, at);
 create table if not exists maint_failure (
     id        bigserial primary key,
     mode      text not null,

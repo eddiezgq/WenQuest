@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """历史库（PostgreSQL）。bus_message 存总线上的每一条消息；其余几张小表存状态变化、
 AI 提议、教学任务得分和 FreeCAD 上传的文件。"""
+import datetime as dt
 import json
+import logging
 import os
+import re
 import threading
+import time
 
 import psycopg
 from psycopg.rows import dict_row
@@ -28,6 +32,12 @@ create table if not exists bus_message (
 create index if not exists bus_message_type_ts on bus_message (type, ts);
 create index if not exists bus_message_topic_ts on bus_message (topic, ts);
 create index if not exists bus_message_corr on bus_message (corr);
+-- 第 173 轮：轮询用得上的索引（以前按 mode、seq、ts、corr/source 前缀查都全表扫，教育服务器的数据库一直占 1.4 个核）
+create index if not exists bus_message_mode_seq on bus_message (mode, seq);
+create index if not exists bus_message_type_mode_seq on bus_message (type, mode, seq);
+create index if not exists bus_message_ts on bus_message (ts);
+create index if not exists bus_message_mode_type_corr on bus_message (mode, type, corr text_pattern_ops);
+create index if not exists bus_message_mode_source on bus_message (mode, source text_pattern_ops);
 
 -- 设备状态变化（从 machine.status 提取，只记变化点），算 OEE 用
 create table if not exists machine_state_log (
@@ -235,6 +245,42 @@ create table if not exists enterprise_member (
 """
 
 
+_DDL = re.compile(r"\s*(?:--[^\n]*\n\s*)*(create\s+(?:unique\s+)?(?:table|index)|alter\s+table|drop\s+index)", re.I)
+
+
+def _split_sql(sql):
+    """按分号把一段 SQL 拆成句子；单引号字符串、$$ 函数体、-- 注释里的分号不算（第 173 轮）"""
+    out, cur, i, n = [], [], 0, len(sql)
+    while i < n:
+        c = sql[i]
+        if c == "-" and sql.startswith("--", i):
+            j = sql.find("\n", i)
+            j = n if j < 0 else j
+            cur.append(sql[i:j]); i = j
+        elif c == "'":
+            j = i + 1
+            while j < n:
+                if sql[j] == "'" and not sql.startswith("''", j):
+                    break
+                j += 2 if sql.startswith("''", j) else 1
+            cur.append(sql[i:j + 1]); i = j + 1
+        elif c == "$":
+            m = re.match(r"\$[A-Za-z_]*\$", sql[i:])
+            if m:
+                tag = m.group(0)
+                j = sql.find(tag, i + len(tag))
+                j = n if j < 0 else j + len(tag)
+                cur.append(sql[i:j]); i = j
+            else:
+                cur.append(c); i += 1
+        elif c == ";":
+            out.append("".join(cur)); cur = []; i += 1
+        else:
+            cur.append(c); i += 1
+    out.append("".join(cur))
+    return out
+
+
 class DB:
     def __init__(self, dsn=DSN):
         self.dsn = dsn
@@ -248,8 +294,33 @@ class DB:
         return c
 
     def init(self):
+        self.ddl(SCHEMA)
+
+    # 第 173 轮：建表、加索引、改表限时。11-17 枢纽启动时 alter table 等每天备份（pg_dump 对所有表持共享锁）放锁，等了 35 分钟，
+    # 网站 502。现在每一句最多等 DDL_WAIT；等不到就跳过这一句（下次启动再做），之后的改表句只等一下，不再卡住启动。
+    DDL_WAIT, DDL_WAIT_AFTER = "5s", "200ms"
+    _ddl_blocked = False
+
+    def ddl(self, sql):
+        """执行一段建表 / 改表语句（可含多句）；拿不到锁的句子跳过并记日志，返回跳过的句数"""
+        skipped = 0
+        stmts = []
+        for s_ in _split_sql(sql):
+            body = "\n".join(ln for ln in s_.strip().splitlines() if not ln.strip().startswith("--")).strip()
+            if body:
+                stmts.append(body)
         with self.conn().cursor() as cur:
-            cur.execute(SCHEMA)
+            for st in stmts:
+                try:
+                    cur.execute("set lock_timeout = '{}'".format(self.DDL_WAIT_AFTER if DB._ddl_blocked else self.DDL_WAIT))
+                    cur.execute(st)
+                except psycopg.errors.LockNotAvailable:
+                    DB._ddl_blocked = True
+                    skipped += 1
+                    logging.getLogger("wq.db").warning("表正被占用（多半是每天的备份），先跳过，下次启动再做：%s", st.split("\n")[0][:120])
+                finally:
+                    cur.execute("set lock_timeout = 0")
+        return skipped
 
     def q(self, sql, args=None):
         with self.conn().cursor() as cur:
@@ -261,6 +332,8 @@ class DB:
         return rows[0] if rows else None
 
     def x(self, sql, args=None):
+        if args is None and _DDL.match(sql):                 # 各模块的建表、改表语句都走限时
+            return self.ddl(sql)
         with self.conn().cursor() as cur:
             cur.execute(sql, args)
             return cur.rowcount
@@ -334,3 +407,30 @@ class DB:
         sql = ("select distinct on (payload->'data'->>'name') payload from bus_message where {} "
                "order by payload->'data'->>'name', ts desc, seq desc").format(" and ".join(where))
         return [r["payload"] for r in self.q(sql, args)]
+
+
+def prune_ont_events(db, days, batch=20000, pause=0.2):
+    """删 ts 早于 days 天的本体事件。ont_event 只有按对象的索引，按时间删会全表扫（主厂 3880 万行）：
+    事件按时间先后写入，主键大致随时间增长，先在主键上二分找截止处，再按主键分批删（每批再核对 ts，保险）。返回删掉的条数。"""
+    cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=days)
+    r = db.one("select min(id) as lo, max(id) as hi from ont_event")
+    if not r or r["lo"] is None:
+        return 0
+    lo, hi = r["lo"], r["hi"]
+    first = db.one("select ts from ont_event where id >= %s order by id limit 1", (lo,))
+    if not first or first["ts"] >= cutoff:
+        return 0
+    while hi - lo > batch:                       # 找最后一个早于截止时间的大致位置
+        mid = (lo + hi) // 2
+        m = db.one("select ts from ont_event where id >= %s order by id limit 1", (mid,))
+        if m and m["ts"] < cutoff:
+            lo = mid
+        else:
+            hi = mid
+    end, start, n = hi, r["lo"], 0
+    while start <= end:
+        n += db.x("delete from ont_event where id >= %s and id < %s and ts < %s", (start, start + batch, cutoff))
+        start += batch
+        time.sleep(pause)
+    logging.getLogger("wq.db").info("本体事件已清理 %s 天以前的 %s 条", int(days), n)
+    return n

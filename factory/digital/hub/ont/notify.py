@@ -40,6 +40,7 @@ create table if not exists notification (
     sent       jsonb
 );
 create index if not exists notification_ts on notification (mode, created_at);
+create index if not exists notification_ref on notification (mode, kind, ref);   -- 第 173 轮：查有没有发过升级提醒
 create table if not exists notify_read (
     "user"  text not null,
     id      bigint not null,

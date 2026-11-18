@@ -639,29 +639,14 @@ jobs:
           ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for u in "$D/vendor/VERSION" "$D/vendor/fonts/noto-sans-sc.css" "learn.$D/vendor/three/r128/three.min.js" "learn.$D/vendor/katex/0.16.9/katex.min.js" "$D/"; do h=${u%%/*}; c=$(curl -s -o /dev/null -w "%{http_code}" --resolve "$h:443:127.0.0.1" "https://$u"); echo "$c https://$u"; done' | tee /tmp/vendor.log
           if grep -qv '^200 ' /tmp/vendor.log; then echo "::warning title=Fonts and libraries::$(grep -v '^200 ' /tmp/vendor.log | tr '\n' ' ')"; fi
 
-      - name: Cam design site answers (问渠凸轮 /cam/；不通时把容器状态和日志作为注释发出来)
+      - name: Cam, bearing and electronics jump to the enterprise server (第 173 轮：美国只在 app. 上跑一份)
         if: env.SKIP != '1'
         continue-on-error: true
         run: |
-          ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for i in $(seq 1 12); do c=$(curl -s -o /dev/null -w "%{http_code}" --resolve "$D:443:127.0.0.1" "https://$D/cam/api/health"); [ "$c" = 200 ] && break; sleep 5; done; echo "cam $c"; if [ "$c" != 200 ]; then . deploy/lib.sh; dc ps -a cam; dc logs --tail 80 cam; fi' > /tmp/cam.log 2>&1 || true
-          cat /tmp/cam.log
-          if ! grep -q '^cam 200$' /tmp/cam.log; then python3 factory/deploy/ci_annotate.py "Cam site /cam/" /tmp/cam.log 120; exit 1; fi
-
-      - name: Bearing design site answers (问渠轴承 /bearing/；不通时把容器状态和日志作为注释发出来)
-        if: env.SKIP != '1'
-        continue-on-error: true
-        run: |
-          ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for i in $(seq 1 12); do c=$(curl -s -o /dev/null -w "%{http_code}" --resolve "$D:443:127.0.0.1" "https://$D/bearing/api/health"); [ "$c" = 200 ] && break; sleep 5; done; echo "bearing $c"; if [ "$c" != 200 ]; then . deploy/lib.sh; dc ps -a bearing; dc logs --tail 80 bearing; fi' > /tmp/bearing.log 2>&1 || true
-          cat /tmp/bearing.log
-          if ! grep -q '^bearing 200$' /tmp/bearing.log; then python3 factory/deploy/ci_annotate.py "Bearing site /bearing/" /tmp/bearing.log 120; exit 1; fi
-
-      - name: Electronics drafting desk answers (问渠电子 /eda/；不通时把容器状态和日志作为注释发出来)
-        if: env.SKIP != '1'
-        continue-on-error: true
-        run: |
-          ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for i in $(seq 1 12); do c=$(curl -s -o /dev/null -w "%{http_code}" --resolve "$D:443:127.0.0.1" "https://$D/eda/api/health"); [ "$c" = 200 ] && break; sleep 5; done; echo "eda $c"; if [ "$c" != 200 ]; then . deploy/lib.sh; dc ps -a eda; dc logs --tail 80 eda; fi' > /tmp/eda.log 2>&1 || true
-          cat /tmp/eda.log
-          if ! grep -q '^eda 200$' /tmp/eda.log; then python3 factory/deploy/ci_annotate.py "Electronics desk /eda/" /tmp/eda.log 120; exit 1; fi
+          ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for p in cam/api/health "bearing/?a=1" eda/; do echo "$p $(curl -s -o /dev/null -w "%{http_code} %{redirect_url}" --resolve "$D:443:127.0.0.1" "https://$D/$p")"; done; echo "left: $(docker ps --format "{{.Names}}" | grep -cE -- "-(cam|bearing|eda)-[0-9]+$" || true)"' > /tmp/tools.log 2>&1 || true
+          cat /tmp/tools.log
+          ok=$(grep -cE '^(cam|bearing|eda)[^ ]* 308 https://app\.' /tmp/tools.log || true)
+          if [ "$ok" != 3 ] || ! grep -q '^left: 0$' /tmp/tools.log; then python3 factory/deploy/ci_annotate.py "Cam / bearing / eda redirect" /tmp/tools.log 40; exit 1; fi
 
       - name: Online documents answer (第 121 轮 OnlyOffice /docs/；不通时把容器状态和日志作为注释发出来)
         if: env.SKIP != '1'
@@ -690,6 +675,16 @@ jobs:
         run: |
           ssh "deploy@$HOST" '/opt/wenquest/deploy/textbook-media.sh 600' 2>&1 | tee /tmp/media.log
           grep '^FAILED' /tmp/media.log | head -n 9 | while read -r l; do echo "::warning title=Textbook animation::${l:0:1500}"; done || true
+
+  # 第 173 轮 D-1b：学习平台上线成功后，企业服务器上的凸轮、轴承、问渠电子跟着换到同一版本
+  # （做的事和手动跑 Enterprise server · deploy 一样；镜像名读教育服务器 .env 里的 CAM_IMAGE 等）
+  enterprise:
+    needs: [deploy]
+    if: always() && !cancelled() && needs.deploy.result == 'success'
+    uses: ./.github/workflows/ent-server.yml
+    with:
+      task: deploy
+    secrets: inherit
 
   # ===== 国内部署（第 34 轮；第 53 轮加“自带仓库”）：没有设置 CN_REGISTRY 时两个任务都跳过；美国的 build、deploy 不受影响 =====
   # 仓库变量（Settings → Secrets and variables → Actions → Variables）CN_REGISTRY：

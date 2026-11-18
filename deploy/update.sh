@@ -33,7 +33,8 @@ fi
 
 log "Pulling images..."
 dc pull --quiet --ignore-buildable
-dc pull --quiet moodle gateway web animator labcheck voice micro-synth blender cam bearing eda
+dc pull --quiet moodle gateway web animator labcheck voice micro-synth blender
+tools_here && dc pull --quiet cam bearing eda
 
 # The web server also serves the digital factory (factory./erp.), reached over this network; create it
 # if the factory has not been installed yet, so the web server can start either way.
@@ -76,6 +77,13 @@ fi
 
 log "Starting services..."
 dc up -d --no-build --remove-orphans
+# 第 173 轮：美国服务器上不再跑凸轮、轴承、问渠电子（只留企业服务器那一份）；以前起过的容器删掉，数据卷不动
+if ! tools_here; then
+    for s in cam bearing eda; do
+        ids=$(docker ps -aq --filter "label=com.docker.compose.project.working_dir=$WQ_DIR" --filter "label=com.docker.compose.service=$s")
+        [ -z "$ids" ] || { docker rm -f $ids >/dev/null; log "Removed the $s container (it runs on the enterprise server now)."; }
+    done
+fi
 
 # Caddy keeps running with its old settings when only the Caddyfile changed: check the new file and
 # load it; a broken file is reported and the running settings are kept, so the site stays up.

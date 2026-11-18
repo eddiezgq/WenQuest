@@ -238,6 +238,7 @@ services:
   # 问渠凸轮（第 39 轮）：凸轮设计网页版与计算内核 camkit，网址 <主域名>/cam/。自己只计算；第 4 步起，已开通企业的
   # CAE 计算经数字工厂枢纽的设计软件接口提交（钥匙 WQ_FACTORY_CAE_KEY，从数字工厂的 .env 复制过来）。
   cam:
+    profiles: [tools]   # 第 173 轮：美国只在企业服务器上跑；国内（WQ_REGION=cn）deploy/lib.sh 打开这一组
     build:
       context: .
       dockerfile: services/cam/Dockerfile
@@ -260,6 +261,7 @@ services:
 
   # 问渠轴承（第 64 轮）：轴承设计网页版与计算内核 bearingkit，网址 <主域名>/bearing/。只计算，不联网、不调 AI。
   bearing:
+    profiles: [tools]   # 第 173 轮：美国只在企业服务器上跑；国内（WQ_REGION=cn）deploy/lib.sh 打开这一组
     build:
       context: .
       dockerfile: services/bearing/Dockerfile
@@ -279,6 +281,7 @@ services:
 
   # 问渠电子（第 105 轮）：起草台，网址 <主域名>/eda/。AI 起草经网关；校验、展开、判定、仿真在容器里由 wqeda 做，不存草稿。
   eda:
+    profiles: [tools]   # 第 173 轮：美国只在企业服务器上跑；国内（WQ_REGION=cn）deploy/lib.sh 打开这一组
     build:
       context: .
       dockerfile: services/eda/Dockerfile

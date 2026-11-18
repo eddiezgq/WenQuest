@@ -27,6 +27,7 @@ OPEN = ("open", "ack", "doing")
 ROLES = ("planner", "engineer", "operator", "quality", "manager", "sales", "lead")      # lead 班组长：第 18 轮 E4
 MISS_TO_RESOLVE = 2
 REOPEN_H = 24
+WRITE_EVERY_S = 60            # 第 173 轮：开着、没变的异常最多每分钟写一次库
 CHAIN_EVERY_S = 300           # 开着的异常每 5 分钟重算一次链条
 
 SCHEMA = """
@@ -180,6 +181,7 @@ class Detector:
         self.lock = threading.RLock()
         self.stats = {}          # 规则 → {runs, fired, last_fired, error, ms}
         self.last_round = {}     # 模式 → {ts, ms, findings}
+        self._pend_hits = {}     # 第 173 轮：没写库的命中次数（异常 id → 次数）
         self._ready = False
 
     _init_lock = threading.Lock()
@@ -326,10 +328,18 @@ class Detector:
             a = cur.get(f.fkey)
             if a:
                 up = LEVELS[f.severity] > LEVELS[a["severity"]]
+                # 第 173 轮：还在的异常不必每一轮都写库（以前 20 秒一轮把每条开着的异常都重写一遍，试点厂 7 天改了 8400 万次）。
+                # 标题、级别没变、上一轮也看到了，且距上次写不到 WRITE_EVERY_S 秒，就只在内存里记一次命中，下次写库时一起加上。
+                same = (a["title"] == f.title and a["severity"] == (f.severity if up or LEVELS[f.severity] < LEVELS[a["severity"]] else a["severity"])
+                        and not a["misses"] and a["last_seen"] is not None and (now - a["last_seen"]).total_seconds() < WRITE_EVERY_S)
+                if same:
+                    self._pend_hits[a["id"]] = self._pend_hits.get(a["id"], 0) + 1
+                    continue
+                pend = self._pend_hits.pop(a["id"], 0)
                 # 标题变了（例如停机原因、时长变了）就清掉旧的因果链，下次打开立即重算，不让链条说法和标题对不上
-                db.x("update anomaly set last_seen=%s, hits=hits+1, misses=0, chain=case when title is distinct from %s then null else chain end, "
+                db.x("update anomaly set last_seen=%s, hits=hits+1+%s, misses=0, chain=case when title is distinct from %s then null else chain end, "
                      "title=%s, detail=%s, severity=%s where id=%s",
-                     (now, f.title, f.title, Jsonb(detail), f.severity if up or LEVELS[f.severity] < LEVELS[a["severity"]] else a["severity"],
+                     (now, pend, f.title, f.title, Jsonb(detail), f.severity if up or LEVELS[f.severity] < LEVELS[a["severity"]] else a["severity"],
                       a["id"]))
                 if up:
                     self.note(a["id"], "system", "escalate", "严重度升为“{}”：{}".format(LEVEL_LABEL[f.severity], f.title))
