@@ -856,6 +856,18 @@ jobs:
           fi
           printf 'Host cn\n  HostName %s\n  User deploy\n  ServerAliveInterval 30\n  ServerAliveCountMax 6\n' "$HOST" > ~/.ssh/config
           ssh cn 'echo connected; free -m | head -2; df -h / | tail -1'
+      # 2026-11-18：国内仓库里有内容不对的层（以前传到一半断了留下的），“只传缺的层”不会换掉它们，拉取时报 short read / unexpected EOF，
+      # 国内工厂一直停在旧版本。每次复制前按文件名（sha256）核对每一层，对不上的删掉，重启仓库清缓存，下一步就会重传。
+      - name: 国内仓库：核对每一层，坏的删掉重传
+        if: env.SKIP != '1'
+        run: |
+          set -euo pipefail
+          out=$(ssh cn 'docker exec wq-registry sh -c '"'"'n=0; bad=0; for f in $(find /var/lib/registry/docker/registry/v2/blobs -name data -type f); do d=$(dirname "$f"); want=$(basename "$d"); n=$((n+1)); got=$(sha256sum "$f" | cut -d" " -f1); if [ "$got" != "$want" ]; then echo "bad $want $(stat -c %s "$f")"; rm -rf "$d"; bad=$((bad+1)); fi; done; echo "checked $n bad $bad"'"'"'')
+          echo "$out"
+          if echo "$out" | grep -q "^bad "; then
+            echo "::warning::国内仓库删掉了 $(echo "$out" | grep -c '^bad ') 个坏层，接下来重传"
+            ssh cn 'docker restart wq-registry >/dev/null && for i in $(seq 1 30); do curl -sf http://127.0.0.1:5000/v2/ >/dev/null && exit 0; sleep 2; done; exit 1'
+          fi
       - name: 复制镜像进国内服务器的仓库（经 SSH 隧道，只传缺的层）
         if: env.SKIP != '1'
         run: |
