@@ -1,0 +1,108 @@
+<!doctype html>
+<!-- 第 172b 轮：整机时序图，和三维整机同步。曲线是整机三维每 1° 量出来的（proto.json 的 curves、dog、timing，tools/wqls/proto_web.py 生成，
+     算法同 tools/wqls/g81_kin.py）。拖时序图上的竖线，三维里的机器转到同一个角度。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 整机时序图</title>
+<style>
+:root{--bg:#f5f6f3;--sheet:#fff;--ink:#1b2430;--mut:#5a6570;--rule:#d8dde1;--needle:#2a5fb8;--bobbin:#c4531d;--soft:#eceff0}
+@media (prefers-color-scheme: dark){:root{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--mut:#9aa6b2;--rule:#2b3540;--needle:#7fa9f2;--bobbin:#f08c58;--soft:#1e2730}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);gap:12px;padding:12px;max-width:1320px;margin:0 auto}
+@media (max-width:900px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:10px 12px;min-width:0}
+h1{font-size:17px;margin:0}h1 small{font-weight:400;color:var(--mut);font-size:12px;margin-left:6px}.sub{color:var(--mut);font-size:12.5px;margin:2px 0 8px}
+iframe{width:100%;aspect-ratio:4/3.4;border:0;border-radius:8px;background:#dfe3e7;display:block}
+svg{display:block;width:100%;height:auto;touch-action:none;cursor:ew-resize}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}
+button{font:inherit;font-size:12.5px;border:1px solid var(--rule);background:var(--soft);color:var(--ink);border-radius:7px;padding:4px 10px;cursor:pointer}
+.big{font:700 22px/1 ui-monospace,Menlo,monospace;color:var(--needle)}
+.rd{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:12.5px;font-variant-numeric:tabular-nums}.rd span{color:var(--mut)}
+</style></head>
+<body>
+<div class="wrap">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p><iframe id="m3d" title="WQ-LS 3D" loading="lazy"></iframe>
+  <div class="row"><span class="big" id="phiV">0°</span><button id="play"></button></div><div class="rd" id="rd"></div></div>
+ <div class="card"><svg id="tc" viewBox="0 0 760 560"></svg><p class="sub" id="note"></p></div>
+</div>
+<script>
+(async function () {
+'use strict';
+const q = new URLSearchParams(location.search);
+const LANG = (q.get('lang') || (navigator.language || 'zh')).startsWith('en') ? 'en' : 'zh';
+const TX = {
+  zh: { ttl: '整机时序图', sm: 'Timing diagram', lead: '一转之内四大机构的动作。拖右边的竖线（或点“转起来”），左边三维里的整机转到同一个角度。3 mm 正缝、棉布 1.5。', play: '转起来', pause: '暂停',
+    tr: ['针尖、针眼高出针板 mm', '挑线杆放出的线 mm', '梭尖离针的前后距离 mm（0 = 经过针）', '送布牙齿顶高出针板 mm / 前后位置 mm'],
+    ev: { needle_tdc: '针杆最高', needle_bdc: '针杆最低', tip_in_plate: '针尖入针板', tip_out_plate: '针尖出针板', eye_in_fabric: '针眼入布', hook_catch: '梭尖钩线', takeup_top: '挑线杆最高', dog_rise: '送布牙出针板', dog_drop: '送布牙落下' },
+    rd: { tip: '针尖高度', supply: '挑线放线', hook: '梭尖离针', dog: '送布牙高度' }, fab: '布面', note: '数据：整机三维每 1° 量出（tools/wqls/g81_kin.py 同一算法），和设计值相差 ≤ 0.2°；线迹形成的四个时刻（针眼入布、钩线、挑线收紧、送布）一目了然。' },
+  en: { ttl: 'Timing diagram', sm: '整机时序图', lead: 'What the four mechanisms do in one turn. Drag the vertical line on the right (or press Run) and the 3-D machine on the left turns to the same angle. 3 mm forward, cotton 1.5.', play: 'Run', pause: 'Pause',
+    tr: ['Needle tip and eye above the plate, mm', 'Thread released by the take-up, mm', 'Hook point fore–aft from the needle, mm (0 = passing)', 'Feed dog above the plate, mm / fore–aft, mm'],
+    ev: { needle_tdc: 'Needle bar top', needle_bdc: 'Needle bar bottom', tip_in_plate: 'Tip enters plate', tip_out_plate: 'Tip leaves plate', eye_in_fabric: 'Eye enters fabric', hook_catch: 'Hook catches', takeup_top: 'Take-up top', dog_rise: 'Dog rises', dog_drop: 'Dog drops' },
+    rd: { tip: 'Needle tip', supply: 'Take-up release', hook: 'Hook point to needle', dog: 'Feed dog height' }, fab: 'fabric', note: 'Data: measured on the full 3-D machine every 1° (same algorithm as tools/wqls/g81_kin.py), within 0.2° of the design values.' },
+};
+const t = k => TX[LANG][k];
+const PD = await fetch('proto.json').then(r => r.json()), C = PD.curves, DG = PD.dog.s3, TM = PD.timing;
+const $ = id => document.getElementById(id);
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('note').textContent = t('note');
+$('m3d').src = `index.html?embed=1&view=face&lang=${LANG}`;
+let phi = 0, play = true, w3 = null;
+$('m3d').addEventListener('load', () => { const tryHook = () => { const w = $('m3d').contentWindow; if (w && w.__wq) { w3 = w.__wq; w3.setPlay(false); w3.setPhi(phi); } else setTimeout(tryHook, 300); }; tryHook(); });
+const W = 760, L = 54, R = 14, TOP = 78, GAP = 24, H = (560 - TOP - 30 - 3 * GAP) / 4;
+const X = f => L + f / 360 * (W - L - R);
+const tracks = [
+  { k: 'tip', ys: [C.tip, C.eye_top], cols: ['var(--needle)', 'var(--needle)'], dash: [null, '4 3'], lo: -15, hi: 20, band: [0, PD.fabric_t.cotton] },
+  { k: 'supply', ys: [C.supply], cols: ['var(--ink)'], lo: 0, hi: 95 },
+  { k: 'hook', ys: [C.hook_y], cols: ['#2a9d8f'], lo: -16, hi: 16, zero: true },
+  { k: 'dog', ys: [DG.z, DG.y.map(v => v / 2)], cols: ['#e0a33b', '#c4531d'], dash: [null, '4 3'], lo: -4, hi: 4, zero: true },
+];
+const S = (tag, a, txt) => `<${tag} ${Object.entries(a).map(([k, v]) => `${k}="${v}"`).join(' ')}>${txt || ''}</${tag}>`;
+function drawAll() {
+  let h = '';
+  const evs = Object.entries(TX[LANG].ev).filter(([k]) => TM[k] !== undefined).sort((a, b) => TM[a[0]] - TM[b[0]]);
+  evs.forEach(([k, name], i) => {
+    const x = X(TM[k]);
+    const yy = 12 + (i % 4) * 13;
+    h += S('line', { x1: x, x2: x, y1: yy + 3, y2: 560 - 30, stroke: 'var(--mut)', 'stroke-dasharray': '2 3', opacity: 0.55 });
+    h += S('text', { x: Math.min(W - 60, Math.max(60, x)), y: yy, 'font-size': 9.5, fill: 'var(--mut)', 'text-anchor': 'middle' }, `${name} ${Math.round(TM[k])}°`);
+  });
+  tracks.forEach((tr, j) => {
+    const y0 = TOP + j * (H + GAP), Y = v => y0 + (1 - (v - tr.lo) / (tr.hi - tr.lo)) * H;
+    tr.Y = Y;
+    h += S('rect', { x: L, y: y0, width: W - L - R, height: H, fill: 'none', stroke: 'var(--rule)' });
+    h += S('text', { x: L + 4, y: y0 - 4, 'font-size': 11, fill: 'var(--ink)', 'font-weight': 600 }, TX[LANG].tr[j]);
+    if (tr.band) h += S('rect', { x: L, y: Y(tr.band[1]), width: W - L - R, height: Y(tr.band[0]) - Y(tr.band[1]), fill: '#e0a33b', opacity: 0.18 }) + S('text', { x: W - R - 4, y: Y(tr.band[1]) - 2, 'font-size': 9, fill: 'var(--mut)', 'text-anchor': 'end' }, t('fab'));
+    if (tr.zero || tr.band) h += S('line', { x1: L, x2: W - R, y1: Y(0), y2: Y(0), stroke: 'var(--mut)', opacity: 0.5 });
+    h += S('text', { x: L - 4, y: y0 + 9, 'font-size': 9, fill: 'var(--mut)', 'text-anchor': 'end' }, tr.hi) + S('text', { x: L - 4, y: y0 + H, 'font-size': 9, fill: 'var(--mut)', 'text-anchor': 'end' }, tr.lo);
+    tr.ys.forEach((arr, k) => {
+      const d = arr.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(Math.max(tr.lo, Math.min(tr.hi, v))).toFixed(1)}`).join('');
+      h += S('path', { d, fill: 'none', stroke: tr.cols[k], 'stroke-width': 1.8, ...(tr.dash && tr.dash[k] ? { 'stroke-dasharray': tr.dash[k] } : {}) });
+    });
+    h += S('circle', { id: 'dot' + j, r: 4, fill: tr.cols[0], stroke: '#fff', 'stroke-width': 1.5 });
+  });
+  for (let f = 0; f <= 360; f += 30) h += S('text', { x: X(f), y: 560 - 14, 'font-size': 9.5, fill: 'var(--mut)', 'text-anchor': 'middle' }, f + '°');
+  h += S('line', { id: 'cur', y1: TOP - 14, y2: 560 - 30, stroke: '#e0a33b', 'stroke-width': 2 });
+  $('tc').innerHTML = h;
+}
+function setPhi(v) {
+  phi = ((Math.round(v) % 360) + 360) % 360;
+  const c = $('cur'); c.setAttribute('x1', X(phi)); c.setAttribute('x2', X(phi));
+  tracks.forEach((tr, j) => { const d = $('dot' + j); d.setAttribute('cx', X(phi)); d.setAttribute('cy', tr.Y(Math.max(tr.lo, Math.min(tr.hi, tr.ys[0][phi])))); });
+  $('phiV').textContent = phi + '°';
+  const r = TX[LANG].rd;
+  $('rd').innerHTML = `<span>${r.tip}</span><b>${C.tip[phi].toFixed(1)} mm</b><span>${r.supply}</span><b>${C.supply[phi].toFixed(1)} mm</b><span>${r.hook}</span><b>${C.hook_y[phi].toFixed(1)} mm</b><span>${r.dog}</span><b>${DG.z[phi].toFixed(2)} mm</b>`;
+  if (w3) w3.setPhi(phi);
+}
+drawAll(); setPhi(0);
+const sv = $('tc');
+const at = e => { const b = sv.getBoundingClientRect(), x = (e.clientX - b.left) / b.width * W; return (x - L) / (W - L - R) * 360; };
+let drag = false;
+sv.addEventListener('pointerdown', e => { drag = true; play = false; $('play').textContent = t('play'); sv.setPointerCapture(e.pointerId); setPhi(at(e)); });
+sv.addEventListener('pointermove', e => { if (drag) setPhi(at(e)); });
+sv.addEventListener('pointerup', () => { drag = false; });
+$('play').textContent = t('pause');
+$('play').onclick = () => { play = !play; $('play').textContent = play ? t('pause') : t('play'); };
+let last = performance.now();
+(function loop(now) { if (play) setPhi(phi + Math.max(1, Math.round((now - last) / 1000 * 40))); last = now; requestAnimationFrame(loop); })(last);
+window.__tm = { setPhi };
+})();
+</script>
+</body></html>

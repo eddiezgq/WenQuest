@@ -30,6 +30,8 @@ SRC = ROOT / "docs" / "设计" / "WQ-LS"
 PUB = ROOT / "factory" / "digital" / "web" / "public" / "wqls"
 OUT = PUB / "spec"
 SCRIPT = Path(__file__).resolve()
+sys.path[:0] = [str(Path(__file__).resolve().parent)]
+import spec_web_ui as UI  # noqa: E402
 
 # 关的次序与名字；篇的次序（没列的按文件名排在后面）
 GROUPS = [
@@ -57,7 +59,8 @@ def sha1(p: Path) -> str:
 def manifest_now() -> dict:
     """原文（全部文件）和本脚本的指纹：生成结果里记一份，测试拿它核对"""
     files = {str(p.relative_to(SRC)): sha1(p) for p in sorted(SRC.rglob("*")) if p.is_file()}
-    return dict(script=sha1(SCRIPT), files=files)
+    data = {str(p.relative_to(ROOT)): sha1(p) for p in UI.DATA_FILES}
+    return dict(script=sha1(SCRIPT), ui=sha1(Path(UI.__file__)), data=data, files=files)
 
 
 def check() -> list[str]:
@@ -66,8 +69,11 @@ def check() -> list[str]:
         return ["没有 spec/manifest.json：还没生成"]
     old, now = json.loads(m.read_text(encoding="utf-8")), manifest_now()
     bad = []
-    if old.get("script") != now["script"]:
-        bad.append("spec_web.py 改过")
+    if old.get("script") != now["script"] or old.get("ui") != now["ui"]:
+        bad.append("spec_web.py / spec_web_ui.py 改过")
+    for k in sorted(set(old.get("data", {})) | set(now["data"])):
+        if old.get("data", {}).get(k) != now["data"].get(k):
+            bad.append(f"{k} 改过（章首数字、首页读它）")
     for k in sorted(set(old["files"]) | set(now["files"])):
         if old["files"].get(k) != now["files"].get(k):
             bad.append(f"docs/设计/WQ-LS/{k} 改过（或新增、删除）")
@@ -216,6 +222,8 @@ class Site:
         # 图：点开看原图；表：可横向滚动
         h = re.sub(r'<img ([^>]*?)src="([^"]+)"([^>]*)>', r'<a class="im" href="\2" target="_blank"><img loading="lazy" \1src="\2"\3></a>', h)
         h = h.replace("<table>", '<div class="tbl"><table>').replace("</table>", "</table></div>")
+        h = UI.videos(h)                                  # 原文写到的视频：放播放器
+        h = UI.insert_labs(rel, h, heads)                 # 动画、虚拟实验、三维模型块
         title = heads[0]["t"] if heads else rel
         self.pages.append(dict(rel=rel, url=slug_page(rel), title=title, group=group, heads=heads, html=h,
                                desc=describe(src), date=git_date(p), src="docs/设计/WQ-LS/" + rel))
@@ -335,121 +343,7 @@ def describe(md: str) -> str:
     return ""
 
 
-CSS = r"""
-:root{--bg:#fbfbfa;--panel:#f3f4f2;--ink:#1d2329;--mut:#5b6670;--line:#dde1e5;--acc:#0b4fae;--acc-bg:#e6eefb;--hl:#fff3c4;--code:rgba(127,127,127,.12)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15181b;--panel:#1b1f23;--ink:#e6e9ec;--mut:#9aa5ae;--line:#323a42;--acc:#7cb2ff;--acc-bg:#1d2b40;--hl:#4a3f12}}
-:root[data-theme="dark"]{--bg:#15181b;--panel:#1b1f23;--ink:#e6e9ec;--mut:#9aa5ae;--line:#323a42;--acc:#7cb2ff;--acc-bg:#1d2b40;--hl:#4a3f12}
-*{box-sizing:border-box}
-html{scroll-padding-top:64px}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif}
-a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
-header.top{position:sticky;top:0;z-index:20;height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--panel);border-bottom:1px solid var(--line)}
-header.top .brand{font-weight:650;color:var(--ink);white-space:nowrap}
-header.top .brand small{font-weight:400;color:var(--mut);margin-left:6px}
-header.top .sp{flex:1}
-header.top a.ext{white-space:nowrap;font-size:14px}
-#q{width:min(320px,40vw);height:34px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--bg);color:var(--ink);font:inherit;font-size:14px}
-#menu{display:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;height:34px;padding:0 10px;font:inherit;font-size:14px;cursor:pointer}
-.wrap{display:grid;grid-template-columns:290px minmax(0,1fr) 230px}
-nav.side{position:sticky;top:52px;height:calc(100vh - 52px);overflow:auto;border-right:1px solid var(--line);padding:12px 8px 40px;font-size:14px;line-height:1.45;background:var(--bg)}
-nav.side .g{margin:14px 8px 4px;font-size:12px;font-weight:650;color:var(--mut);letter-spacing:.02em}
-nav.side a{display:block;color:var(--ink);padding:4px 8px;border-radius:6px}
-nav.side a:hover{background:var(--acc-bg);text-decoration:none}
-nav.side a.cur{background:var(--acc-bg);color:var(--acc);font-weight:600}
-nav.side ul{list-style:none;margin:2px 0 6px 10px;padding:0 0 0 8px;border-left:1px solid var(--line)}
-nav.side ul a{font-size:13px;color:var(--mut);padding:3px 8px}
-nav.side ul ul{margin-left:6px}
-nav.side ul a.on,aside.toc a.on{color:var(--acc);font-weight:600}
-main{min-width:0;padding:20px 32px 80px;max-width:900px}
-.crumb{font-size:13px;color:var(--mut);margin-bottom:4px}
-.crumb a{color:var(--mut)}
-.meta{font-size:12.5px;color:var(--mut);border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:8px}
-.meta code{font-size:12px}
-article h1{font-size:25px;line-height:1.35;margin:.3em 0 .5em}
-article h2{font-size:20px;margin:2em 0 .6em;padding-bottom:4px;border-bottom:1px solid var(--line)}
-article h3{font-size:17px;margin:1.6em 0 .5em}article h4{font-size:15px;margin:1.3em 0 .4em}
-article h1:target,article h2:target,article h3:target,article h4:target{background:var(--hl);border-radius:4px}
-.hl{margin-left:6px;color:var(--mut);opacity:0;font-weight:400;font-size:.8em}
-h1:hover .hl,h2:hover .hl,h3:hover .hl,h4:hover .hl{opacity:1}
-.tbl{overflow-x:auto;margin:1em 0}
-table{border-collapse:collapse;font-size:13.5px;line-height:1.5}
-td,th{border:1px solid var(--line);padding:5px 9px;vertical-align:top}th{background:var(--panel);text-align:left;white-space:nowrap}
-code{font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--code);padding:1px 4px;border-radius:4px}
-pre{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px}pre code{background:none;padding:0}
-a.fl code{color:var(--acc)}
-img{max-width:100%;height:auto;border-radius:4px}a.im{display:inline-block}
-video{max-width:100%;border-radius:6px;background:#000}
-blockquote{margin:1em 0;padding:2px 14px;border-left:3px solid var(--line);color:var(--mut)}
-.math{overflow-x:auto;margin:1em 0}math{font-size:1.08em}
-.mut{color:var(--mut);font-size:13px}
-.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
-figure{margin:0 0 14px}figcaption{font-size:12.5px;color:var(--mut);margin-top:4px;word-break:break-all}
-ul.files li{margin:3px 0}
-.pn{display:flex;gap:12px;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
-.pn a{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--ink)}
-.pn a:hover{border-color:var(--acc);text-decoration:none}
-.pn a span{display:block;font-size:12px;color:var(--mut)}.pn a.nx{text-align:right}
-aside.toc{position:sticky;top:52px;height:calc(100vh - 52px);overflow:auto;padding:20px 14px 40px 8px;font-size:13px;line-height:1.45}
-aside.toc b{display:block;font-size:12px;color:var(--mut);margin-bottom:6px}
-aside.toc a{display:block;color:var(--mut);padding:3px 0 3px 10px;border-left:2px solid transparent}
-aside.toc a.l3{padding-left:22px;font-size:12.5px}
-aside.toc a.on{border-left-color:var(--acc)}
-#totop{position:fixed;right:18px;bottom:18px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:18px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s;z-index:15}
-#totop.show{opacity:1;pointer-events:auto}
-#res{display:none}
-body.searching #res{display:block}body.searching article,body.searching .pn{display:none}
-#res .r{display:block;border-bottom:1px solid var(--line);padding:10px 0;color:var(--ink)}
-#res .r b{color:var(--acc);font-weight:600}#res .r span{display:block;font-size:13px;color:var(--mut)}
-#res mark{background:var(--hl);color:inherit;border-radius:2px}
-.groups .grp{margin:18px 0 6px;font-weight:650}
-.groups .doc{display:block;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;color:var(--ink)}
-.groups .doc:hover{border-color:var(--acc);text-decoration:none}
-.groups .doc b{color:var(--acc)}.groups .doc span{display:block;font-size:13px;color:var(--mut);margin-top:2px}
-.notice{background:var(--acc-bg);border-radius:10px;padding:10px 14px;font-size:14px;margin:12px 0}
-@media (max-width:1280px){.wrap{grid-template-columns:270px minmax(0,1fr)}aside.toc{display:none}}
-@media (max-width:860px){
- .wrap{display:block}#menu{display:inline-block}
- nav.side{position:fixed;left:0;top:52px;width:min(320px,86vw);z-index:30;transform:translateX(-105%);transition:transform .2s;box-shadow:0 8px 30px rgba(0,0,0,.25)}
- body.nav nav.side{transform:none}
- main{padding:14px 16px 72px}header.top .brand small,header.top a.ext{display:none}#q{width:auto;flex:1;min-width:0}header.top .sp{display:none}
- article h1{font-size:21px}
-}
-@media print{header.top,nav.side,aside.toc,.pn,#totop{display:none}.wrap{display:block}main{max-width:none;padding:0}}
-"""
-
-JS = r"""
-(function(){
-var b=document.body,side=document.querySelector('nav.side');
-document.getElementById('menu').onclick=function(){b.classList.toggle('nav')};
-side.addEventListener('click',function(e){if(e.target.closest('a'))b.classList.remove('nav')});
-var cur=side.querySelector('a.cur');if(cur)cur.scrollIntoView({block:'center'});
-// 读到哪一节，左右两个目录跟着高亮
-var hs=[].slice.call(document.querySelectorAll('article h1[id],article h2[id],article h3[id]'));
-var links={};[].forEach.call(document.querySelectorAll('nav.side ul a,aside.toc a'),function(a){var h=a.getAttribute('href').split('#')[1];(links[h]=links[h]||[]).push(a)});
-var last=null;
-function spy(){var y=window.scrollY+90,id=hs.length?hs[0].id:null;for(var i=0;i<hs.length;i++){if(hs[i].offsetTop<=y)id=hs[i].id;else break}
- if(id===last)return;if(last&&links[last])links[last].forEach(function(a){a.classList.remove('on')});last=id;
- if(id&&links[id])links[id].forEach(function(a){a.classList.add('on');var box=a.closest('nav.side,aside.toc');var r=a.getBoundingClientRect(),rb=box.getBoundingClientRect();if(r.top<rb.top+40||r.bottom>rb.bottom-40)box.scrollTop+=r.top-rb.top-rb.height/2});
- document.getElementById('totop').classList.toggle('show',window.scrollY>600)}
-window.addEventListener('scroll',spy,{passive:true});spy();
-document.getElementById('totop').onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
-// 全文搜索
-var q=document.getElementById('q'),res=document.getElementById('res'),idx=null,t=null;
-function esc(s){return s.replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function run(){var s=q.value.trim();if(!s){b.classList.remove('searching');return}
- if(!idx){fetch('search.json').then(function(r){return r.json()}).then(function(d){idx=d;run()});return}
- var ws=s.toLowerCase().split(/\s+/),out=[],n=0;
- idx.forEach(function(e){var x=e.x.toLowerCase(),tt=e.t.toLowerCase();if(!ws.every(function(w){return x.indexOf(w)>=0||tt.indexOf(w)>=0}))return;
-  var p=x.indexOf(ws[0]),a=Math.max(0,p-40),snip=(a?'…':'')+e.x.substr(a,140)+'…';
-  var hl=esc(snip);ws.forEach(function(w){hl=hl.replace(new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),function(m){return'<mark>'+m+'</mark>'})});
-  if(n++<200)out.push('<a class="r" href="'+e.u+'#'+e.id+'"><b>'+esc(e.t)+'</b><span>'+esc(e.p)+'</span><span>'+hl+'</span></a>')});
- res.innerHTML='<p class="mut">“'+esc(s)+'”：'+n+' 处'+(n>200?'（只列前 200 处）':'')+'。按 Esc 清除。</p>'+out.join('');b.classList.add('searching');window.scrollTo(0,0)}
-q.addEventListener('input',function(){clearTimeout(t);t=setTimeout(run,180)});
-q.addEventListener('keydown',function(e){if(e.key==='Escape'){q.value='';run()}});
-document.addEventListener('keydown',function(e){if(e.key==='/'&&document.activeElement!==q){e.preventDefault();q.focus()}});
-var m=location.search.match(/[?&]q=([^&]+)/);if(m){q.value=decodeURIComponent(m[1]);run()}
-})();
-"""
+CSS, JS = UI.CSS, UI.JS
 
 
 def nav_html(site: Site, page: dict) -> str:
@@ -494,30 +388,35 @@ def short_title(p: dict) -> str:
 
 
 def page_html(site: Site, page: dict, i: int) -> str:
+    e = html.escape
     gname = next((g[1] for g in GROUPS if g[0] == page["group"]), "")
-    crumb = '<a href="index.html">总览</a>' + (f" › {html.escape(gname)} › {html.escape(short_title(page))}" if page["group"] else "")
-    meta = f'原文：<code>{html.escape(page["src"])}</code>' + (f' · 最后修改 {page["date"]}' if page["date"] else "")
-    toc = "".join(f'<a class="l{h["l"]}" href="#{h["id"]}">{html.escape(h["t"])}</a>' for h in page["heads"] if h["l"] in (2, 3))
+    head_end = """<link rel="stylesheet" href="spec.css"></head>\n<body>\n""" + UI.bar_html(page["url"] != "index.html")
+    title = e(short_title(page) if page["group"] else "WQ-LS 设计说明书 · 工业直驱平缝机")
+    top = f"""<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title}</title>
+<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计）：整机虚拟样机、十关设计文档、计算书、工程图 · Design documentation with a virtual prototype">
+{head_end}"""
+    if page["url"] == "index.html":
+        body = UI.home_html(site, site.nums, page["html"], GROUPS)
+        return top + f"""<div class="home" style="padding:0 16px"><div id="res"></div></div>{body}
+<button id="totop" aria-label="回到顶部">↑</button><script src="spec.js"></script></body></html>
+"""
+    crumb = '<a href="index.html">总览</a>' + (f" › {e(gname)} › {e(short_title(page))}" if page["group"] else "")
+    meta = f'原文：<code>{e(page["src"])}</code>' + (f' · 最后修改 {page["date"]}' if page["date"] else "")
+    toc = "".join(f'<a class="l{h["l"]}" href="#{h["id"]}">{e(h["t"])}</a>' for h in page["heads"] if h["l"] in (2, 3))
     pv = site.pages[i - 1] if i > 0 else None
     nx = site.pages[i + 1] if i + 1 < len(site.pages) else None
-    pn = '<div class="pn">' + (f'<a href="{pv["url"]}"><span>← 上一篇</span>{html.escape(short_title(pv))}</a>' if pv else "<span></span>") \
-        + (f'<a class="nx" href="{nx["url"]}"><span>下一篇 →</span>{html.escape(short_title(nx))}</a>' if nx else "") + "</div>"
-    body = page["html"]
-    if page["url"] == "index.html":
-        body = overview(site, body)
-    return f"""<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(short_title(page) if page['group'] else 'WQ-LS 设计说明书')}</title>
-<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计） · Design documentation (Chinese original)">
-<link rel="stylesheet" href="spec.css"></head>
-<body>
-<header class="top"><button id="menu" aria-label="目录">☰ 目录</button><a class="brand" href="index.html">WQ-LS 设计说明书<small>Design documentation (Chinese original)</small></a>
-<span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文"><a class="ext" href="../index.html" target="_blank">三维整机 ↗</a></header>
-<div class="wrap">
+    pn = '<div class="pn">' + (f'<a href="{pv["url"]}"><span>← 上一篇</span>{e(short_title(pv))}</a>' if pv else "<span></span>") \
+        + (f'<a class="nx" href="{nx["url"]}"><span>下一篇 →</span>{e(short_title(nx))}</a>' if nx else "") + "</div>"
+    first = next((p for p in site.pages if p["group"] == page["group"]), None) is page
+    gidx = [g[0] for g in GROUPS].index(page["group"]) + 1 if page["group"] in [g[0] for g in GROUPS] else 0
+    gate = UI.head_html(page["group"], gname, site.nums.get(page["group"], []), gidx) if first else ""
+    return top + f"""<div class="wrap">
 <nav class="side" aria-label="总目录">{nav_html(site, page)}</nav>
-<main><div class="crumb">{crumb}</div><div class="meta">{meta}</div>
-<div id="res"></div><article>{body}</article>{pn}</main>
-<aside class="toc" aria-label="本篇目录">{('<b>本篇目录</b>' + toc) if toc else ''}</aside>
+<main><div class="crumb">{crumb}</div><div class="meta">{meta}</div>{gate}
+<div id="res"></div><article>{page["html"]}</article>{pn}</main>
+<aside class="toc" aria-label="本篇目录">{('<b>本篇目录 · ON THIS PAGE</b>' + toc) if toc else ''}</aside>
 </div>
 <button id="totop" aria-label="回到顶部">↑</button>
 <script src="spec.js"></script>
@@ -525,27 +424,12 @@ def page_html(site: Site, page: dict, i: int) -> str:
 """
 
 
-def overview(site: Site, readme: str) -> str:
-    # README 里的旧表（只写到 G4）换成按关的全部篇目
-    readme = re.sub(r'<div class="tbl"><table>.*?</table></div>', "", readme, count=1, flags=re.S)
-    out = [readme, '<div class="notice">问渠示例设计：经计算和三维校核，<b>没有实物试制</b>，所有数值是示例值。左边是总目录，右上角可搜索全文。</div>',
-           '<h2 id="all">全部篇目</h2><div class="groups">']
-    for gid, gname, _ in GROUPS:
-        ps = [p for p in site.pages if p["group"] == gid]
-        if not ps:
-            continue
-        out.append(f'<div class="grp">{html.escape(gname)}</div>')
-        for p in ps:
-            out.append(f'<a class="doc" href="{p["url"]}"><b>{html.escape(short_title(p))}</b><span>{html.escape(p["desc"])}</span></a>')
-    out.append("</div>")
-    return "".join(out)
-
-
 def build():
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir(parents=True)
     site = Site()
+    site.nums = UI.head_numbers()
     site.render("README.md", "")
     site.pages[0]["heads"].append(dict(l=2, id="all", t="全部篇目"))
     site.pages[0]["title"] = "总览"

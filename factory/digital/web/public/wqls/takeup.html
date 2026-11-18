@@ -1,0 +1,163 @@
+<!doctype html>
+<!-- 第 172b 轮：挑线四连杆虚拟实验。机构和判据见 takeup-calc.js（和 tools/wqls/g81_takeup.py 同一套公式，测试逐项核对）；
+     数据 proto.json 的 takeup（tools/wqls/proto_web.py 生成）。?lang=en  ?embed=1 -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>挑线四连杆虚拟实验</title>
+<style>
+:root{--bg:#f5f6f3;--sheet:#fff;--ink:#1b2430;--mut:#5a6570;--rule:#d8dde1;--needle:#2a5fb8;--bobbin:#c4531d;--good:#2e9e6a;--bad:#d33;--soft:#eceff0}
+@media (prefers-color-scheme: dark){:root{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--mut:#9aa6b2;--rule:#2b3540;--needle:#7fa9f2;--bobbin:#f08c58;--soft:#1e2730}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:12px;padding:12px;max-width:1280px;margin:0 auto}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:10px 12px}
+h1{font-size:17px;margin:0 0 2px}h1 small{font-weight:400;color:var(--mut);font-size:12px;margin-left:6px}.sub{color:var(--mut);font-size:12.5px;margin:0 0 8px}
+svg{display:block;width:100%;height:auto;touch-action:none}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}
+button{font:inherit;font-size:12.5px;border:1px solid var(--rule);background:var(--soft);color:var(--ink);border-radius:7px;padding:4px 10px;cursor:pointer}
+button.on{background:var(--needle);border-color:var(--needle);color:#fff}
+input[type=range]{width:100%;accent-color:var(--needle)}
+.sl{display:grid;grid-template-columns:7.5em 1fr 4.2em;gap:6px;align-items:center;font-size:12.5px}.sl span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}td,th{border-bottom:1px solid var(--rule);padding:4px 6px;text-align:right}td:first-child,th:first-child{text-align:left}
+.ok{color:var(--good);font-weight:600}.no{color:var(--bad);font-weight:600}.mut{color:var(--mut)}
+.verdict{font-weight:700;margin:6px 0 0}
+</style></head>
+<body>
+<div class="wrap">
+ <div class="card">
+  <h1 id="ttl"></h1><p class="sub" id="lead"></p>
+  <svg id="mech" viewBox="-80 -80 160 150"></svg>
+  <div class="row"><button id="play" class="on"></button><span class="mut" id="phiT"></span></div>
+  <input id="phi" type="range" min="0" max="359" step="1" value="0">
+  <div class="row" id="lkRow"></div>
+  <div id="sliders"></div>
+  <div class="row"><button id="reset"></button></div>
+ </div>
+ <div class="card">
+  <div class="row" id="fabRow"></div>
+  <svg id="chart" viewBox="0 0 640 300"></svg>
+  <p class="sub" id="legend"></p>
+  <table id="tbl"></table>
+  <p class="verdict" id="verdict"></p>
+  <p class="sub" id="note"></p>
+ </div>
+</div>
+<script src="takeup-calc.js"></script>
+<script>
+(async function () {
+'use strict';
+const q = new URLSearchParams(location.search);
+const LANG = (q.get('lang') || (navigator.language || 'zh')).startsWith('en') ? 'en' : 'zh';
+const TX = {
+  zh: { ttl: '挑线四连杆虚拟实验', sm: 'Take-up linkage lab', lead: '端视（从机头左端看）。曲柄销 P 带挑线杆 P–M–E，摇杆 Q–M 摆动；面线从过线点 A 经挑线杆线眼 E 到过线点 B。拖曲柄转角，或拖下面的滑块改尺寸，右边的供线、耗线和三项判据当场重算。',
+    play: '暂停', resume: '转起来', phi: '主轴转角 φ', new: 'G8.1 新机构', old: 'G4 原机构', reset: '恢复设计值', fab: '高亮布料',
+    a: '挑线杆 PM a', b: '摇杆 QM b', c: '线眼 PE c', al: '线眼偏角 α', Qz: '摇杆支点 u', Qy: '摇杆支点 v',
+    lining: '衬里 0.4', cotton: '棉布 1.5', light_denim_x4: '轻牛仔四层 3.0',
+    leg: '黑实线：挑线杆放出的线（供线，三维线路）；虚线：一针要用的线（耗线，三种布厚）；竖线：梭尖钩线 206°。供线在虚线上面＝线够。',
+    hdr: ['布料', '余量（1–6）', '入布后欠线（≤ 1）', '入布前多余（≤ 10）'], mu: '传动角（40°–140°）', smax: '挑线量', mtop: '铰点 M 离窗口上沿（v ≤ 25）',
+    ok: '三种布厚全部合格', no: '不合格：', dead: '这组尺寸装不上（四杆不闭合），换一组', note: '公式与 tools/wqls/g81_takeup.py 相同，设计值的结果和 Python 逐项核对（相差 ≤ 0.01 mm）。过线点 A 在挑线杆右侧 3 mm（x 28.5），线眼和过线点 B 在挑线杆平面（x 21.5）。', mm: 'mm' },
+  en: { ttl: 'Take-up linkage lab', sm: '挑线四连杆虚拟实验', lead: 'End view (from the left end of the head). The crank pin P drives the take-up lever P–M–E, the rocker Q–M swings; the needle thread runs from guide A through the lever eye E to guide B. Drag the shaft angle, or the sliders to change the sizes: supply, demand and the three criteria are recomputed on the spot.',
+    play: 'Pause', resume: 'Run', phi: 'Shaft angle φ', new: 'G8.1 new linkage', old: 'G4 original', reset: 'Back to design values', fab: 'Highlight fabric',
+    a: 'Lever PM a', b: 'Rocker QM b', c: 'Eye PE c', al: 'Eye offset α', Qz: 'Rocker pivot u', Qy: 'Rocker pivot v',
+    lining: 'Lining 0.4', cotton: 'Cotton 1.5', light_denim_x4: 'Light denim ×4 3.0',
+    leg: 'Solid black: thread released by the lever (supply, 3-D path); dashed: thread one stitch needs (demand, three fabrics); vertical line: hook catch at 206°. Supply above the dashed line = enough thread.',
+    hdr: ['Fabric', 'Margin (1–6)', 'Shortfall after entry (≤ 1)', 'Spare before entry (≤ 10)'], mu: 'Transmission angle (40°–140°)', smax: 'Take-up stroke', mtop: 'Joint M below window edge (v ≤ 25)',
+    ok: 'All three fabrics pass', no: 'Fails: ', dead: 'These sizes do not assemble (the four-bar does not close); try others', note: 'Same formulas as tools/wqls/g81_takeup.py; the design values are checked against Python item by item (within 0.01 mm). Guide A sits 3 mm right of the lever (x 28.5); the eye and guide B are in the lever plane (x 21.5).', mm: 'mm' },
+};
+const t = k => TX[LANG][k];
+const PD = await fetch('proto.json').then(r => r.json()), TK = PD.takeup, C = window.WQTakeup;
+const FABS = Object.keys(TK.fabrics), COL = { lining: '#2e9e6a', cotton: '#2a5fb8', light_denim_x4: '#c4531d' };
+const $ = id => document.getElementById(id);
+let which = 'new', lk = { ...TK.new }, phi = 0, play = true, hi = 'light_denim_x4';
+const RANGE = { a: [24, 44, 0.1], b: [18, 36, 0.1], c: [50, 85, 0.1], al: [-30, 0, 0.1], Qz: [10, 30, 0.1], Qy: [24, 42, 0.1] };
+function sliders() {
+  $('sliders').innerHTML = Object.keys(RANGE).map(k => `<div class="sl"><span>${t(k)}</span><input type="range" data-k="${k}" min="${RANGE[k][0]}" max="${RANGE[k][1]}" step="${RANGE[k][2]}" value="${lk[k]}"><span id="v_${k}">${(+lk[k]).toFixed(2)}</span></div>`).join('');
+  document.querySelectorAll('[data-k]').forEach(e => e.oninput = () => { lk[e.dataset.k] = +e.value; $('v_' + e.dataset.k).textContent = (+e.value).toFixed(2); calc(); });
+}
+let R = {};
+function calc() { R = {}; for (const f of FABS) R[f] = C.takeup3d(lk, TK, f); chart(); table(); draw(); }
+const S = (tag, a, txt) => `<${tag} ${Object.entries(a).map(([k, v]) => `${k}="${v}"`).join(' ')}>${txt || ''}</${tag}>`;
+function draw() {
+  const p = C.linkPose(phi, lk), svg = $('mech'), ink = getComputedStyle(document.body).color;
+  if (!p) { svg.innerHTML = S('text', { x: -70, y: 0, fill: '#d33', 'font-size': 6 }, t('dead')); return; }
+  const Y = v => -v;           // 端视 v 向上
+  const pt = (q, r, c) => S('circle', { cx: q[0], cy: Y(q[1]), r, fill: c || 'none', stroke: ink, 'stroke-width': 0.6 });
+  const ln = (a, b, w, c, d) => S('line', { x1: a[0], y1: Y(a[1]), x2: b[0], y2: Y(b[1]), stroke: c || ink, 'stroke-width': w, 'stroke-linecap': 'round', ...(d ? { 'stroke-dasharray': d } : {}) });
+  const lab = (q, s, dx, dy) => S('text', { x: q[0] + (dx || 2), y: Y(q[1]) + (dy || -2), 'font-size': 5, fill: ink }, s);
+  let h = S('rect', { x: -80, y: -80, width: 160, height: 150, fill: 'none' });
+  // 机头内腔（端视）和窗口上沿限制线
+  h += ln([TK.m_top > 0 ? 36 : 36, TK.m_top], [70, TK.m_top], 0.5, '#d33', '2 1.5') + lab([52, TK.m_top], 'v 25', 0, -1.5);
+  h += S('circle', { cx: 0, cy: 0, r: lk.r, fill: 'none', stroke: ink, 'stroke-width': 0.4, 'stroke-dasharray': '1.5 1.5' });
+  const eye = R.cotton ? R.cotton.poses.map(q => `${q.E[0].toFixed(2)},${Y(q.E[1]).toFixed(2)}`).join(' ') : '';
+  if (eye) h += S('polyline', { points: eye, fill: 'none', stroke: '#2a5fb8', 'stroke-width': 0.5, opacity: 0.6 });
+  h += ln([0, 0], p.P, 2.2, '#7d8590');                                   // 曲柄
+  h += S('polygon', { points: [p.P, p.M, p.E].map(q => `${q[0]},${Y(q[1])}`).join(' '), fill: 'rgba(42,95,184,.18)', stroke: '#2a5fb8', 'stroke-width': 1.2 });
+  h += ln(p.Q, p.M, 1.8, '#c4531d');                                      // 摇杆
+  h += ln(lk.A, p.E, 0.7, '#d2283a') + ln(p.E, lk.B, 0.7, '#d2283a');   // 面线
+  h += pt([0, 0], 1.6, ink) + pt(p.P, 1.4, '#fff') + pt(p.M, 1.4, '#fff') + pt(p.Q, 1.6, ink) + pt(p.E, 1.3, '#d2283a') + pt(lk.A, 1.3, '#555') + pt(lk.B, 1.3, '#555');
+  h += lab([0, 0], 'O') + lab(p.P, 'P') + lab(p.M, 'M') + lab(p.Q, 'Q') + lab(p.E, 'E') + lab(lk.A, 'A') + lab(lk.B, 'B');
+  h += S('text', { x: -78, y: 66, 'font-size': 5, fill: ink }, `μ = ${p.mu.toFixed(1)}°`);
+  $('mech').innerHTML = h;
+  $('phiT').textContent = `${t('phi')} ${phi}°`;
+  $('phi').value = phi;
+  cursor();
+}
+const CW = 640, CH = 300, L = 40, Rr = 10, T0 = 12, B0 = 30;
+const X = f => L + f / 359 * (CW - L - Rr);
+let yMax = 95;
+const Yc = v => T0 + (1 - v / yMax) * (CH - T0 - B0);
+function chart() {
+  const ink = getComputedStyle(document.body).color, any = R[FABS[0]];
+  if (!any) { $('chart').innerHTML = ''; return; }
+  yMax = Math.max(90, Math.ceil(Math.max(...any.Sp, ...FABS.map(f => Math.max(...R[f].D))) / 10) * 10);
+  let h = '';
+  for (let v = 0; v <= yMax; v += 20) h += S('line', { x1: L, x2: CW - Rr, y1: Yc(v), y2: Yc(v), stroke: ink, opacity: 0.12 }) + S('text', { x: L - 4, y: Yc(v) + 3, 'font-size': 10, fill: ink, 'text-anchor': 'end' }, v);
+  for (let f = 0; f <= 360; f += 60) h += S('text', { x: X(Math.min(f, 359)), y: CH - 12, 'font-size': 10, fill: ink, 'text-anchor': 'middle' }, f + '°');
+  h += S('line', { x1: X(TK.phc), x2: X(TK.phc), y1: T0, y2: CH - B0, stroke: ink, 'stroke-dasharray': '2 3', opacity: 0.6 });
+  const path = arr => arr.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Yc(v).toFixed(1)}`).join('');
+  for (const f of FABS) h += S('path', { d: path(R[f].D), fill: 'none', stroke: COL[f], 'stroke-width': f === hi ? 2.2 : 1.2, 'stroke-dasharray': '5 3', opacity: f === hi ? 1 : 0.55 });
+  h += S('path', { d: path(any.Sp), fill: 'none', stroke: ink, 'stroke-width': 2 });
+  h += S('line', { id: 'cur', x1: X(phi), x2: X(phi), y1: T0, y2: CH - B0, stroke: '#e0a33b', 'stroke-width': 1.5 });
+  h += S('text', { x: CW - Rr, y: CH - 2, 'font-size': 10, fill: ink, 'text-anchor': 'end' }, 'φ') + S('text', { x: 4, y: 10, 'font-size': 10, fill: ink }, 'mm');
+  $('chart').innerHTML = h;
+}
+function cursor() { const c = document.querySelector('#chart #cur'); if (c) { c.setAttribute('x1', X(phi)); c.setAttribute('x2', X(phi)); } }
+function table() {
+  const any = R[FABS[0]];
+  if (!any) { $('tbl').innerHTML = ''; $('verdict').innerHTML = `<span class="no">${t('dead')}</span>`; return; }
+  const H = t('hdr'), bad = [];
+  const cell = (v, ok) => `<td class="${ok ? 'ok' : 'no'}">${v.toFixed(2)}</td>`;
+  let h = `<tr>${H.map(x => `<th>${x}</th>`).join('')}</tr>`;
+  for (const f of FABS) {
+    const r = R[f], okM = r.margin >= TK.margin_min && r.margin <= TK.margin_max, okN = r.neg <= TK.neg_max, okP = r.pre <= TK.pre_max;
+    if (!okM || !okN || !okP) bad.push(t(f));
+    h += `<tr><td><span style="color:${COL[f]}">●</span> ${t(f)}</td>${cell(r.margin, okM)}${cell(r.neg, okN)}${cell(r.pre, okP)}</tr>`;
+  }
+  const okMu = any.mu[0] >= TK.mu_lim[0] && any.mu[1] <= TK.mu_lim[1], okT = any.mTop <= TK.m_top;
+  if (!okMu) bad.push(t('mu')); if (!okT) bad.push(t('mtop'));
+  h += `<tr><td>${t('mu')}</td><td colspan="3" class="${okMu ? 'ok' : 'no'}">${any.mu[0].toFixed(1)}° – ${any.mu[1].toFixed(1)}°</td></tr>`;
+  h += `<tr><td>${t('mtop')}</td><td colspan="3" class="${okT ? 'ok' : 'no'}">v ${any.mTop.toFixed(1)}</td></tr>`;
+  h += `<tr><td>${t('smax')}</td><td colspan="3">${any.Smax.toFixed(1)} ${t('mm')}</td></tr>`;
+  $('tbl').innerHTML = h;
+  $('verdict').innerHTML = bad.length ? `<span class="no">${t('no')}${bad.join('、')}</span>` : `<span class="ok">✓ ${t('ok')}</span>`;
+}
+function ui() {
+  $('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead');
+  $('play').textContent = play ? t('play') : t('resume'); $('reset').textContent = t('reset');
+  $('lkRow').innerHTML = ['new', 'old'].map(w => `<button data-w="${w}" class="${which === w ? 'on' : ''}">${t(w)}</button>`).join('');
+  $('fabRow').innerHTML = `<span class="mut">${t('fab')}</span>` + FABS.map(f => `<button data-f="${f}" class="${hi === f ? 'on' : ''}">${t(f)}</button>`).join('');
+  $('legend').textContent = t('leg'); $('note').textContent = t('note');
+  document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => { which = b.dataset.w; lk = { ...TK[which] }; sliders(); ui(); calc(); });
+  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { hi = b.dataset.f; ui(); chart(); });
+}
+$('play').onclick = () => { play = !play; ui(); };
+$('reset').onclick = () => { lk = { ...TK[which] }; sliders(); calc(); };
+$('phi').oninput = e => { phi = +e.target.value; play = false; ui(); draw(); };
+const svgC = $('chart');
+svgC.addEventListener('pointerdown', e => { const r = svgC.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * CW; phi = Math.round(Math.max(0, Math.min(359, (x - L) / (CW - L - Rr) * 359))); play = false; ui(); draw(); });
+ui(); sliders(); calc();
+let last = performance.now();
+(function loop(now) { if (play) { phi = (phi + Math.max(1, Math.round((now - last) / 1000 * 90))) % 360; draw(); } last = now; requestAnimationFrame(loop); })(last);
+window.__tk = { R: () => R, lk: () => lk };
+})();
+</script>
+</body></html>

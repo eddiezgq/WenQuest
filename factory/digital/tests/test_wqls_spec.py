@@ -43,11 +43,11 @@ def test_every_doc_has_a_page_and_links_resolve():
     bad = []
     for f in (x for x in pages if x.endswith(".html")):
         s = open(os.path.join(SPEC, f), encoding="utf-8").read()
-        assert 'class="side"' in s and 'id="q"' in s                       # 总目录、搜索框
+        assert 'id="q"' in s and (f == "index.html" or 'class="side"' in s)   # 搜索框；除首页外都有总目录
         for u in re.findall(r'(?:href|src)="([^"#]*)', s):
             if not u or u.startswith(("http:", "https:", "mailto:")):
                 continue
-            if not os.path.exists(os.path.normpath(os.path.join(SPEC, urllib.parse.unquote(u)))):
+            if not os.path.exists(os.path.normpath(os.path.join(SPEC, urllib.parse.unquote(u.split("?")[0])))):
                 bad.append((f, u))
     assert bad == []
 
@@ -78,3 +78,52 @@ def test_hub_serves_spec_directory(monkeypatch, tmp_path):
     finally:
         monkeypatch.delenv("WQ_WEB_DIST")
         importlib.reload(app_mod)
+
+
+WQLS = os.path.dirname(SPEC)
+
+
+def test_lab_blocks_point_to_existing_pages():
+    """说明书里的动画、虚拟实验、三维模型块（data-src）都指向存在的页面"""
+    bad = []
+    for f in (x for x in os.listdir(SPEC) if x.endswith(".html")):
+        s = open(os.path.join(SPEC, f), encoding="utf-8").read()
+        for u in re.findall(r'data-src="([^"]+)"', s):
+            p = os.path.normpath(os.path.join(SPEC, u.split("?")[0]))
+            if not os.path.exists(p):
+                bad.append((f, u))
+    assert bad == []
+    home = open(os.path.join(SPEC, "index.html"), encoding="utf-8").read()
+    assert 'class="hero"' in home and "proto=1" in home                 # 首页是整机虚拟样机
+
+
+def test_proto_data_matches_design():
+    """虚拟样机数据 proto.json 和设计一致：挑线机构是 G4/挑线机构.json 现在的，固件工作周期是 sim_sew.json 现在的"""
+    import json
+    pd = json.load(open(os.path.join(WQLS, "proto.json"), encoding="utf-8"))
+    tk = json.load(open(os.path.join(ROOT, "docs", "设计", "WQ-LS", "G4", "挑线机构.json"), encoding="utf-8"))
+    assert pd["takeup"]["new"] == json.loads(json.dumps(tk["lk"])) and pd["takeup"]["old"] == tk["previous_G4"], "重跑 tools/wqls/proto_web.py"
+    sim = json.load(open(os.path.join(ROOT, "factory", "designs", "ctrl-ls", "fw", "out", "sim_sew.json"), encoding="utf-8"))
+    for sc in sim["scenarios"]:
+        if sc["id"] in pd["cycle"]["scenarios"]:
+            a, b = pd["cycle"]["scenarios"][sc["id"]], sc["series"]
+            assert a["state"] == b["state"] and all(abs(x - y) < 0.06 for x, y in zip(a["rpm"], b["rpm"])), "重跑 tools/wqls/proto_web.py"
+    assert len(pd["assembly"]) >= 19 and all(s["ok"] for s in pd["assembly"])
+
+
+def test_takeup_lab_matches_python():
+    """挑线虚拟实验的网页算法（takeup-calc.js）和 Python（g81_takeup.takeup3d）逐项一致"""
+    import shutil
+    import subprocess
+    if not shutil.which("node"):
+        pytest.skip("没有 node")
+    js = r"""
+const fs=require('fs'),vm=require('vm'),path=require('path'),dir=process.argv[1];
+const ctx={};vm.runInNewContext(fs.readFileSync(path.join(dir,'takeup-calc.js'),'utf8'),ctx);
+const C=ctx.WQTakeup,TK=JSON.parse(fs.readFileSync(path.join(dir,'proto.json'),'utf8')).takeup;let w=0;
+for(const n of ['new','old'])for(const f of Object.keys(TK.fabrics)){const r=C.takeup3d(TK[n],TK,f),p=TK.python[n][f];
+ for(const k of ['margin','neg','pre','Smax'])w=Math.max(w,Math.abs(r[k]-p[k]));if(r.top!==p.top)w=99;}
+console.log(w);"""
+    out = subprocess.run(["node", "-e", js, WQLS], capture_output=True, text=True, timeout=60)
+    assert out.returncode == 0, out.stderr
+    assert float(out.stdout.strip()) <= 0.01

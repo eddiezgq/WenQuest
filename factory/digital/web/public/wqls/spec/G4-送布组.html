@@ -1,12 +1,10 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）</title>
-<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计） · Design documentation (Chinese original)">
+<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计）：整机虚拟样机、十关设计文档、计算书、工程图 · Design documentation with a virtual prototype">
 <link rel="stylesheet" href="spec.css"></head>
 <body>
-<header class="top"><button id="menu" aria-label="目录">☰ 目录</button><a class="brand" href="index.html">WQ-LS 设计说明书<small>Design documentation (Chinese original)</small></a>
-<span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文"><a class="ext" href="../index.html" target="_blank">三维整机 ↗</a></header>
-<div class="wrap">
+<header class="bar"><button id="menu" aria-label="目录">☰ 目录</button><a class="brand" href="index.html"><span class="stitch-mark"></span>WQ-LS 设计说明书<small>Design documentation</small></a><nav><a href="index.html">总览</a><a href="../index.html?proto=1&lang=zh" target="_blank">虚拟样机 ↗</a><a href="../index.html?lang=zh" target="_blank">三维整机 ↗</a></nav><span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文"><button class="theme" id="theme" aria-label="深浅色">◐</button></header><div class="wrap">
 <nav class="side" aria-label="总目录"><a href="index.html">总览</a><div class="g">G1 设计任务书与总体方案</div><a href="G1-设计任务书.html">设计任务书与总体方案（G1）</a><a href="G1-附图与附件.html">附图与附件</a><div class="g">G2 动力学、强度与仿真</div><a href="G2-设计计算书.html">动力学、强度与仿真</a><a href="G2-附图与附件.html">附图与附件</a><div class="g">G3 外观与机壳铸件</div><a href="G3-外观与机壳铸件.html">外观方案与机壳铸件（中期）</a><a href="G3-附图与附件.html">附图与附件</a><div class="g">G4 零件与机构</div><a href="G4-刺布与挑线机构.html">G4.1 刺布与挑线机构</a><a href="G4-旋梭组.html">旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</a><a href="G4-送布组.html" class=cur>送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）</a><ul><li><a href="#s2">一、布置</a></li><li><a href="#s3">二、尺寸综合与轨迹</a></li><li><a href="#s4">三、针距调节和倒缝</a></li><li><a href="#s5">四、一转干涉</a></li><li><a href="#s6">五、动力学（5000 r/min）</a></li><li><a href="#s7">六、强度（5000 r/min、5 mm 针距；正缝、倒缝取大的）</a></li><li><a href="#s8">七、油泵与润滑</a></li><li><a href="#s9">八、机壳的改动（下件机座）</a></li><li><a href="#s10">九、加工（合件工序 70 加的孔）</a></li><li><a href="#s11">十、图和三维</a></li><li><a href="#s12">十一、验收结果</a></li></ul><a href="G4-压脚与操纵件.html">压脚与操纵件：压脚、手抬和膝抬压脚、松线、夹线器、针距旋钮和倒缝扳手（G4.7，2026-11-12）</a><a href="G4-剪线与电子针距.html">选配件：自动剪线 T、电子针距 E（G4.8，2026-11-13）</a><a href="G4-附图与附件.html">附图与附件</a><div class="g">G5 机壳工艺</div><a href="G5-机壳铸造工艺.html">机壳铸造工艺（G5.1 第 1、2 步，2026-11-11）</a><a href="G5-机壳机加工工艺.html">机壳机加工工艺（G5.1 第 3–6 步；G5.2 改版，2026-11-11）</a><a href="G5-附图与附件.html">附图与附件</a><div class="g">G6 网页三维整机</div><a href="G6-网页三维整机.html">G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）</a><a href="G6-附图与附件.html">附图与附件</a><div class="g">G7 工程图与物料清单</div><a href="G7-工程图与物料清单.html">工程图与物料清单（G7）</a><div class="g">G8 整机补全与虚拟样机</div><a href="G8-G8.0-1_总体布置与刺布机构复查.html">G8.0 第 1 步：总体布置复查、刺布机构设计依据</a><a href="G8-G8.0-2_刺布机构依据与改动清单.html">G8.0 第 2 步：刺布机构依据与改动清单（待 Eddie 定）</a><a href="G8-G8.1_虚拟样机验证方案.html">虚拟样机：三维、装配、运动学、动力学、验证（方案，2026-11-16，施工前先定）</a><a href="G8-G8.1_配合表.html">配合表（G8.1 第二步）</a><a href="G8-附图与附件.html">附图与附件</a><div class="g">GC 控制器</div><a href="GC-控制器方案与选型.html">平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</a><a href="GC-打样-上电调试步骤书.html">上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</a><a href="GC-附图与附件.html">附图与附件</a><div class="g">企业标准</div><a href="标准-Q-WQ-001_缝纫机螺纹与螺钉.html">Q/WQ 001—2026 缝纫机螺纹与螺钉</a></nav>
 <main><div class="crumb"><a href="index.html">总览</a> › G4 零件与机构 › 送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）</div><div class="meta">原文：<code>docs/设计/WQ-LS/G4/送布组.md</code> · 最后修改 2026-11-12</div>
 <div id="res"></div><article><h1 id="s1">WQ-LS 送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）<a class="hl" href="#s1" aria-label="本节链接">#</a></h1>
@@ -20,7 +18,7 @@
 <li>油泵：<code>tools/wqls/g4_oil.py</code> → <a class="fl" href="f/G4/油泵.json"><code>油泵.json</code></a>。</li>
 <li>机座里的支承：<code>cad/housing.py</code> 的 <code>feed_seats()</code>；毛坯铸孔 <code>cad/blank.py</code>。</li>
 </ul>
-<h2 id="s2">一、布置<a class="hl" href="#s2" aria-label="本节链接">#</a></h2>
+<h2 id="s2">一、布置<a class="hl" href="#s2" aria-label="本节链接">#</a></h2><section class="lab" data-src="../index.html?embed=1&amp;view=feed&amp;focus=feed&amp;lang=zh"><div class="lab-head"><span class="lab-kind">三维模型 · 3-D model</span><h4>送布组<small>Feed group</small></h4></div><p>送布偏心、调节器、摆轴、牙架和抬牙；送布牙走椭圆轨迹。<br><span class="en">Feed eccentric, regulator, rock shafts, dog carrier and lift; the dog traces its ellipse.</span></p><div class="lab-frame"></div><div class="lab-actions"><button type="button" class="run">▶ 在本页运行 · Run here</button><button type="button" class="fs">⛶ 全屏 · Full screen</button><a class="open" href="../index.html?embed=1&amp;view=feed&amp;focus=feed&amp;lang=zh" target="_blank" rel="noopener">新窗口打开 ↗</a></div></section>
 <p>坐标同整机：x 沿上轴（机头在左），y 前后（往后为正，送布方向），z 上下（机座顶面 z 0）。所有运动件都在垂直于 x 的平面里动，x 是“层”。</p>
 <div class="tbl"><table>
 <thead>
@@ -443,11 +441,11 @@
 <li>剖视 <a class="fl" href="f/G4/送布组_剖视.png"><code>送布组_剖视.png</code></a>：垂直于上轴的三个剖面（x 25.5 牙架和送布牙、x 316 调节器和摆轴曲柄、x 331 送布偏心和连杆），φ 34°。</li>
 <li>一转视频 <a class="fl" href="f/G4/送布组_一转.mp4"><code>送布组_一转.mp4</code></a>（18 s）：送布组全貌（3 mm 正缝）；送布牙（3 mm 正缝往后送、5 mm 倒缝往前送）。</li>
 <li>三维网页 <code>tools/wqls/render/mech.html</code> 加了“送布”“送布牙”两个视角，送布组的运动件上蓝色。</li>
-</ul>
+</ul><figure class="vid"><video src="f/G4/送布组_一转.mp4" controls muted loop playsinline preload="metadata"></video><figcaption>▶ 送布组_一转</figcaption></figure>
 <p><a class="im" href="f/G4/送布组_剖视.png" target="_blank"><img loading="lazy" alt="送布组剖视" src="f/G4/送布组_剖视.png" /></a></p>
 <h2 id="s12">十一、验收结果<a class="hl" href="#s12" aria-label="本节链接">#</a></h2>
 <p>（见细则第 138 轮 G4.6 验收表。）</p></article><div class="pn"><a href="G4-旋梭组.html"><span>← 上一篇</span>旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</a><a class="nx" href="G4-压脚与操纵件.html"><span>下一篇 →</span>压脚与操纵件：压脚、手抬和膝抬压脚、松线、夹线器、针距旋钮和倒缝扳手（G4.7，2026-11-12）</a></div></main>
-<aside class="toc" aria-label="本篇目录"><b>本篇目录</b><a class="l2" href="#s2">一、布置</a><a class="l2" href="#s3">二、尺寸综合与轨迹</a><a class="l2" href="#s4">三、针距调节和倒缝</a><a class="l2" href="#s5">四、一转干涉</a><a class="l2" href="#s6">五、动力学（5000 r/min）</a><a class="l2" href="#s7">六、强度（5000 r/min、5 mm 针距；正缝、倒缝取大的）</a><a class="l2" href="#s8">七、油泵与润滑</a><a class="l2" href="#s9">八、机壳的改动（下件机座）</a><a class="l2" href="#s10">九、加工（合件工序 70 加的孔）</a><a class="l2" href="#s11">十、图和三维</a><a class="l2" href="#s12">十一、验收结果</a></aside>
+<aside class="toc" aria-label="本篇目录"><b>本篇目录 · ON THIS PAGE</b><a class="l2" href="#s2">一、布置</a><a class="l2" href="#s3">二、尺寸综合与轨迹</a><a class="l2" href="#s4">三、针距调节和倒缝</a><a class="l2" href="#s5">四、一转干涉</a><a class="l2" href="#s6">五、动力学（5000 r/min）</a><a class="l2" href="#s7">六、强度（5000 r/min、5 mm 针距；正缝、倒缝取大的）</a><a class="l2" href="#s8">七、油泵与润滑</a><a class="l2" href="#s9">八、机壳的改动（下件机座）</a><a class="l2" href="#s10">九、加工（合件工序 70 加的孔）</a><a class="l2" href="#s11">十、图和三维</a><a class="l2" href="#s12">十一、验收结果</a></aside>
 </div>
 <button id="totop" aria-label="回到顶部">↑</button>
 <script src="spec.js"></script>

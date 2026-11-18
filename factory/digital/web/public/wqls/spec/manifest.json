@@ -1,5 +1,11 @@
 {
-"script": "e57128a1624301f490ad9739c4a816f349c19e10",
+"script": "4cfc367be86013925cbf2a10c7dcceca84ed3a7a",
+"ui": "76085376b9a83329df073004164b0ad5939b0156",
+"data": {
+"factory/digital/web/public/wqls/proto.json": "35bd41957885de2bb87c6eb455da058fe3066bba",
+"factory/digital/web/public/wqls/machine.json": "50c7a52605d26a45b7e5a66d08d612a7a80e79b1",
+"factory/designs/ctrl-ls/fw/out/sim_sew.json": "399195ff975430d56b86a5cba6b031a4ea3182ed"
+},
 "files": {
 "G1/总体布置图.png": "d5a2687f7da2a2fab503350f8df3c05180283d42",
 "G1/总体布置图.svg": "32bc69faf2ba2f1a670fac36eaba0f01bb43b9cd",

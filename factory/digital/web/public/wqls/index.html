@@ -39,6 +39,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .fps{position:fixed;left:50%;top:8px;transform:translateX(-50%);font:12px ui-monospace,monospace;background:var(--card);padding:2px 8px;border-radius:6px;border:1px solid var(--line)}
 .warn{color:var(--warn)}
 body.shot .panel,body.shot .top,body.shot .card{display:none!important}
+/* 第 172b 轮：?proto=1 整机虚拟样机（proto.js 接管面板）；?embed=1 嵌在说明书里，只留画面 */
+body.proto .panel,body.embed .panel,body.embed .top{display:none!important}
 @media (max-width:640px){
   .panel{top:auto;bottom:0;left:0;width:100vw;max-height:52vh;border-radius:12px 12px 0 0;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
   .panel.closed .body{display:none}
@@ -496,7 +498,7 @@ document.querySelectorAll('[data-sp]').forEach(b => b.onclick = () => { speed = 
 document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => view(b.dataset.v));
 function fit() {                                       // 桌面上左边有面板：把画面中心往右挪半个面板宽
   r.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight;
-  const pw = innerWidth > 640 && !q.has('shot') ? $('panel').offsetWidth + 24 : 0;
+  const pw = innerWidth > 640 && !q.has('shot') && $('panel').offsetWidth ? $('panel').offsetWidth + 24 : (window.__wqPad || 0);
   if (pw) cam.setViewOffset(innerWidth + pw, innerHeight, 0, 0, innerWidth, innerHeight); else cam.clearViewOffset();
   cam.updateProjectionMatrix();
 }
@@ -508,20 +510,31 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
 READY = true;
 refreshState();
 view(q.get('view') || 'whole');
+// 第 172b 轮：?focus=<部件,部件>（说明书里的机构局部：别的部件半透明）；?embed=1（嵌入，没有面板）；?proto=1（整机虚拟样机）；?spin=1（镜头慢慢绕）
+if (q.get('focus')) {
+  const fg = q.get('focus').split(',');
+  const paint0 = paint;
+  paint = () => { paint0(); for (const p of Object.values(P)) if (!fg.includes(p.info.group) && p.mesh.userData.k !== sel) p.mesh.material = GLASS; };
+  paint();
+}
+if (q.has('embed')) { document.body.classList.add('embed'); fit(); }
 const want = q.get('part');
 if (want) {
   const k = D.parts[want] ? want : Object.keys(D.parts).find(x => D.parts[x].code === want || D.parts[x].of === want);
   if (k) { if (D.parts[k].need === 'T') S.T = true; if (D.parts[k].need === 'E') S.E = true; refreshState(); select(k); }
 }
 $('load').remove();
+if (q.has('spin')) window.__wq.frame.push(dt => { if (mode === null) { ctl.sph.theta += dt * 0.12; camApply(); } });
 if (q.has('shot')) {                                  // 出图：?shot=<φ> 只渲染一帧
   S.phi = +q.get('shot') || 0; pose(); camApply(); r.render(scene, cam); document.body.classList.add('shot'); document.title = 'done'; return;
 }
 const fpsEl = $('fps'); if (q.has('fps')) fpsEl.hidden = false;
 let tl = performance.now(), acc = 0, nfps = 0, tf = tl;
-window.__wq = { S, P, pose, refreshState, view, select, cut, setPhi: v => { S.phi = v; pose(); } }; window.__cam = cam; window.__hit = (x, y) => { const h = hit(x, y); return h && h.object.userData.k; };   // 截图、录屏脚本用
+window.__wq = { S, P, pose, refreshState, view, select, cut, setPhi: v => { S.phi = v; pose(); }, THREE, scene, root, cam, ctl, camApply, D, LANG, t, frame: [], thr, setPlay: v => { play = v; }, fit, GLASS, GMAT, SHOW, paint, present, center }; window.__cam = cam; window.__hit = (x, y) => { const h = hit(x, y); return h && h.object.userData.k; };   // 截图、录屏脚本用
+for (const [k, js] of [['proto', 'proto.js'], ['asm', 'asm.js']]) if (q.has(k)) { play = false; document.body.classList.add('proto'); fit(); const sc = document.createElement('script'); sc.src = js; document.body.appendChild(sc); }
 r.setAnimationLoop(now => {
   const dt = Math.max(0, Math.min(0.1, (now - tl) / 1000)); tl = now;
+  for (const f of window.__wq.frame) f(dt);
   if (play && mode !== 'wheel') {
     if (S.trim === 'wipe') { S.wipe += dt * speed * 30; if (S.wipe > NF - 1) S.wipe = 0; }
     else S.phi = (S.phi + dt * speed * 120) % 360;
