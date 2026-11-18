@@ -532,5 +532,5 @@ r.setAnimationLoop(now => {
 });
 })();
 // 第 172 轮：设计说明书只在数字工厂有（教材里复制的这份没有 spec/），有才显示入口
-fetch('spec/manifest.json', { method: 'HEAD' }).then(r => { if (r.ok && (r.headers.get('content-type') || '').includes('json')) document.getElementById('specL').hidden = false; }).catch(() => {});
+fetch('spec/manifest.json').then(r => { if (r.ok && (r.headers.get('content-type') || '').includes('json')) document.getElementById('specL').hidden = false; }).catch(() => {});
 </script></body></html>
