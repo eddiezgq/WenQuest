@@ -485,3 +485,25 @@ M4,梯度裁剪,gradient clipping,
 19,切入风速,cut-in wind speed,以下不发电
 19,额定风速,rated wind speed,以上恒定输出额定功率
 19,切出风速,cut-out wind speed,以上停机保护
+20,截断半径,cutoff radius,
+20,同距结构,homometric structures,所有原子对距离相同的不同结构
+20,晶体结构预测,crystal structure prediction,
+20,自主实验室,autonomous laboratory,提议—合成—表征—回填的闭环
+20,第一性原理,first-principles calculation,本书多指密度泛函理论计算
+20,下凸包,lower convex hull,形成能的下凸包
+20,主动学习,active learning,
+20,候选数,candidate count,与“发现数”相对
+20,可分辨性,distinguishability,描述子能否分开两个不同结构
+20,吞吐量,throughput,与“收益”相对
+20,不变性,invariance,
+20,等变性,equivariance,
+20,机器学习势,machine-learning interatomic potential,
+20,形成能,formation energy,
+20,亚稳,metastable,
+20,描述子,descriptor,
+20,分子动力学,molecular dynamics,
+20,声子,phonon,
+20,密度泛函理论,density functional theory (DFT),
+20,贝叶斯优化,Bayesian optimization,
+20,系统偏差,systematic bias,不随重复测量消失
+20,径向分布函数,radial distribution function,
