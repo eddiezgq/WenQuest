@@ -1,0 +1,109 @@
+<!doctype html>
+<!-- 第 172b 轮：G8.1 第四步 4.1 整机多体动力学结果（tools/wqls/g81_dyn.py：MuJoCo，14 个刚体，5000 r/min）。
+     数据 proto.json 的 dyn41（tools/wqls/proto_web.py）。力按转速平方缩放（惯性力为主，重力项很小）。?lang=en -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>整机多体动力学</title>
+<style>
+:root{--bg:#f5f6f3;--sheet:#fff;--ink:#1b2430;--mut:#5a6570;--rule:#d8dde1;--needle:#2a5fb8;--bobbin:#c4531d;--soft:#eceff0}
+@media (prefers-color-scheme: dark){:root{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--mut:#9aa6b2;--rule:#2b3540;--needle:#7fa9f2;--bobbin:#f08c58;--soft:#1e2730}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:12px;padding:12px;max-width:1300px;margin:0 auto}
+@media (max-width:880px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:10px 12px;min-width:0}
+h1{font-size:17px;margin:0}h1 small{font-weight:400;color:var(--mut);font-size:12px;margin-left:6px}.sub{color:var(--mut);font-size:12.5px;margin:2px 0 8px}
+svg{display:block;width:100%;height:auto;touch-action:none}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0}
+button{font:inherit;font-size:12.5px;border:1px solid var(--rule);background:var(--soft);color:var(--ink);border-radius:7px;padding:4px 10px;cursor:pointer}
+input[type=range]{flex:1;accent-color:var(--needle)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}td,th{border-bottom:1px solid var(--rule);padding:3px 6px;text-align:right}td:first-child,th:first-child{text-align:left}
+.big{font:700 20px/1 ui-monospace,Menlo,monospace;color:var(--needle)}
+</style></head>
+<body>
+<div class="wrap">
+ <div class="card"><h1 id="ttl"></h1><p class="sub" id="lead"></p>
+  <svg id="mech" viewBox="-45 -290 140 195"></svg>
+  <div class="row"><span class="big" id="phiV"></span><button id="play"></button></div>
+  <div class="row"><span id="rpmL"></span><input id="rpm" type="range" min="1000" max="5500" step="100" value="5000"><b id="rpmV"></b></div>
+ </div>
+ <div class="card"><svg id="tc" viewBox="0 0 640 250"></svg><p class="sub" id="leg"></p><table id="tbl"></table><p class="sub" id="note"></p></div>
+</div>
+<script>
+(async function () {
+'use strict';
+const q = new URLSearchParams(location.search);
+const LANG = (q.get('lang') || (navigator.language || 'zh')).startsWith('en') ? 'en' : 'zh';
+const TX = {
+  zh: { ttl: '整机多体动力学', sm: 'Multibody dynamics', lead: '端视（从机头左端看）刺布挑线这一段：曲柄、连杆、针杆、挑线杆、摇杆。箭头是各运动副此刻的约束力（作用在杆上），长短按力的大小。拖转速，力按转速平方变。',
+    play: '暂停', resume: '转起来', rpm: '转速', leg: '蓝实线：MuJoCo 整机（14 个刚体）；橙虚线：同一质量的功率法（相差 ≤ 0.2 %）；灰点线：G2 解析法（估计质量）。竖线：此刻。',
+    hdr: ['运动副', '此刻 N', '一转最大 N'], note: '数据：tools/wqls/g81_dyn.py（MuJoCo 两转、取第二转每 1°，5000 r/min，惯性 + 重力，不含缝纫阻力；其他转速按平方缩放）。', nm: 'N·m', T: '驱动力矩' },
+  en: { ttl: 'Multibody dynamics', sm: '整机多体动力学', lead: 'End view of the needle and take-up train: crank, rod, needle bar, take-up lever, rocker. Arrows are the constraint forces at each joint right now (acting on the link), scaled by size. Drag the speed: forces scale with speed squared.',
+    play: 'Pause', resume: 'Run', rpm: 'Speed', leg: 'Blue: MuJoCo whole machine (14 rigid bodies); orange dashed: power method with the same masses (within 0.2 %); grey dotted: G2 analytic (estimated masses). Line: now.',
+    hdr: ['Joint', 'Now N', 'Max over a turn N'], note: 'Data: tools/wqls/g81_dyn.py (MuJoCo, two turns, second turn every 1°, 5000 r/min, inertia + gravity, no sewing resistance; other speeds scaled by speed squared).', nm: 'N·m', T: 'Drive torque' },
+};
+const t = k => TX[LANG][k];
+const D = (await fetch('proto.json').then(r => r.json())).dyn41;
+const $ = id => document.getElementById(id);
+const N = D.drive.length;
+let i = 0, play = true, rpm = 5000;
+$('ttl').innerHTML = `${t('ttl')}<small>${t('sm')}</small>`; $('lead').textContent = t('lead'); $('leg').textContent = t('leg'); $('note').textContent = t('note');
+$('rpmL').textContent = t('rpm');
+const S = (tag, a, txt) => `<${tag} ${Object.entries(a).map(([k, v]) => `${k}="${v}"`).join(' ')}>${txt || ''}</${tag}>`;
+const ZU = D.zu, P = D.pts, Y = v => -v;
+// 端视：u = −y（向左看），v = z
+const at = (k, j) => [-P[k][0][j], P[k][1][j]];
+const ARROW = { rod: ['C', '#2a5fb8'], c_rodnb: ['B', '#7a5cc9'], lever: ['C', '#c4531d'], c_levrck: ['M', '#e0a33b'], rocker: ['Q', '#2e9e6a'], nb: ['B', '#888'] };
+function arrow(p, f, col, s) {
+  const x2 = p[0] - f[0] * s, y2 = p[1] + f[1] * s;   // f 是 (y, z)：端视 u = −y
+  const ang = Math.atan2(Y(y2) - Y(p[1]), x2 - p[0]), h = 3;
+  return S('line', { x1: p[0], y1: Y(p[1]), x2, y2: Y(y2), stroke: col, 'stroke-width': 1.4 }) +
+    S('polygon', { points: `${x2},${Y(y2)} ${x2 - h * Math.cos(ang - 0.4)},${Y(y2) - h * Math.sin(ang - 0.4)} ${x2 - h * Math.cos(ang + 0.4)},${Y(y2) - h * Math.sin(ang + 0.4)}`, fill: col });
+}
+function draw() {
+  const j = Math.min(i, N - 1), k2 = (rpm / 5000) ** 2, ink = getComputedStyle(document.body).color;
+  const C = at('C', j), B = at('B', j), M = at('M', j), Qp = at('Q', j), E = at('E', j);
+  let h = S('circle', { cx: 0, cy: Y(ZU), r: 15.5, fill: 'none', stroke: ink, 'stroke-dasharray': '1.5 1.5', 'stroke-width': 0.4 });
+  h += S('line', { x1: 0, y1: Y(ZU), x2: C[0], y2: Y(C[1]), stroke: '#7d8590', 'stroke-width': 3, 'stroke-linecap': 'round' });
+  h += S('line', { x1: C[0], y1: Y(C[1]), x2: B[0], y2: Y(B[1]), stroke: '#2a5fb8', 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0.85 });
+  h += S('rect', { x: B[0] - 2.2, y: Y(B[1] + 20), width: 4.4, height: 80, fill: '#aab3bd', opacity: 0.8 });
+  h += S('polygon', { points: [C, M, E].map(p => `${p[0]},${Y(p[1])}`).join(' '), fill: 'rgba(196,83,29,.15)', stroke: '#c4531d', 'stroke-width': 1.2 });
+  h += S('line', { x1: Qp[0], y1: Y(Qp[1]), x2: M[0], y2: Y(M[1]), stroke: '#2e9e6a', 'stroke-width': 2.2 });
+  for (const p of [[0, ZU], C, B, M, Qp]) h += S('circle', { cx: p[0], cy: Y(p[1]), r: 1.3, fill: '#fff', stroke: ink, 'stroke-width': 0.5 });
+  const sc = 0.035;
+  for (const [k, [pt, col]] of Object.entries(ARROW)) { const f = D.F[k][j]; h += arrow(at(pt, j), [f[0] * k2, f[1] * k2], col, sc); }
+  $('mech').innerHTML = h;
+  $('phiV').textContent = `φ ${j}° · ${t('T')} ${(D.drive[j] * k2).toFixed(2)} ${t('nm')}`;
+  $('rpmV').textContent = `${rpm} r/min`;
+  const c = $('cur'); if (c) { c.setAttribute('x1', X(j)); c.setAttribute('x2', X(j)); }
+  $('tbl').innerHTML = `<tr>${t('hdr').map(x => `<th>${x}</th>`).join('')}</tr>` + Object.keys(D.F).map(k => {
+    const f = D.F[k][j], mx = Math.max(...D.F[k].map(v => Math.hypot(v[0], v[1])));
+    const col = ARROW[k] ? ARROW[k][1] : '#999';
+    return `<tr><td><span style="color:${col}">●</span> ${D.names[k]}</td><td>${(Math.hypot(f[0], f[1]) * k2).toFixed(0)}</td><td>${(mx * k2).toFixed(0)}</td></tr>`; }).join('');
+}
+const W = 640, H = 250, L = 40, R = 10, T0 = 12, B0 = 26;
+const X = j => L + j / 359 * (W - L - R);
+function chart() {
+  const k2 = (rpm / 5000) ** 2, ink = getComputedStyle(document.body).color;
+  const all = [...D.drive, ...D.g2].map(v => v * k2), lo = Math.floor(Math.min(...all)), hi = Math.ceil(Math.max(...all));
+  const Yc = v => T0 + (1 - (v - lo) / (hi - lo)) * (H - T0 - B0);
+  let h = '';
+  for (let v = lo; v <= hi; v++) h += S('line', { x1: L, x2: W - R, y1: Yc(v), y2: Yc(v), stroke: ink, opacity: v === 0 ? 0.4 : 0.1 }) + S('text', { x: L - 4, y: Yc(v) + 3, 'font-size': 10, fill: ink, 'text-anchor': 'end' }, v);
+  for (let f = 0; f <= 360; f += 60) h += S('text', { x: X(Math.min(f, 359)), y: H - 8, 'font-size': 10, fill: ink, 'text-anchor': 'middle' }, f + '°');
+  const path = arr => arr.map((v, j) => `${j ? 'L' : 'M'}${X(j).toFixed(1)},${Yc(v * k2).toFixed(1)}`).join('');
+  h += S('path', { d: path(D.g2), fill: 'none', stroke: '#7a8794', 'stroke-width': 1.2, 'stroke-dasharray': '2 3' });
+  h += S('path', { d: path(D.power), fill: 'none', stroke: '#e0a33b', 'stroke-width': 1.2, 'stroke-dasharray': '5 3' });
+  h += S('path', { d: path(D.drive), fill: 'none', stroke: '#2a5fb8', 'stroke-width': 2 });
+  h += S('line', { id: 'cur', y1: T0, y2: H - B0, stroke: '#e0a33b', 'stroke-width': 1.5 }) + S('text', { x: 4, y: 10, 'font-size': 10, fill: ink }, 'N·m');
+  $('tc').innerHTML = h;
+}
+$('rpm').oninput = e => { rpm = +e.target.value; chart(); draw(); };
+$('play').onclick = () => { play = !play; $('play').textContent = play ? t('play') : t('resume'); };
+$('play').textContent = t('play');
+const sv = $('tc');
+sv.addEventListener('pointerdown', e => { const b = sv.getBoundingClientRect(), x = (e.clientX - b.left) / b.width * W; i = Math.max(0, Math.min(N - 1, Math.round((x - L) / (W - L - R) * 359))); play = false; $('play').textContent = t('resume'); draw(); });
+chart(); draw();
+let last = performance.now();
+(function loop(now) { if (play) { i = (i + Math.max(1, Math.round((now - last) / 1000 * 45))) % N; draw(); } last = now; requestAnimationFrame(loop); })(last);
+window.__dyn = { set: v => { i = v; draw(); } };
+})();
+</script>
+</body></html>

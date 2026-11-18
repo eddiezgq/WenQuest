@@ -105,13 +105,29 @@ def assembly(asm_json: Path | None):
     return out
 
 
+def dyn41(bdir: Path):
+    """G8.1 4.1 整机多体动力学（g81_dyn.py 的每 1° 结果）：驱动力矩三种算法、刺布挑线这一段各运动副的力和铰点位置"""
+    p = bdir / "dyn_1deg.json"
+    if not p.exists():
+        return None
+    import g81_dyn as GD
+    d = json.loads(p.read_text())
+    _, _, pts, _ = GD.kinematics()
+    keys = ["brg_front", "brg_rear", "rod", "c_rodnb", "lever", "c_levrck", "rocker", "nb"]
+    lps = [GD.GM.MK.link_pose(f, GD.GM.MK.LK0) for f in range(360)]
+    eye = np.array([GD.GM.w(q["E"]) for q in lps])
+    P = {k: [r1(v[:, 0], 2), r1(v[:, 1], 2)] for k, v in dict(C=pts["C"], B=pts["B"], M=pts["M"], Q=pts["Q"], E=eye).items()}
+    return dict(rpm=5000, drive=r1(d["drive"], 4), power=r1(d["power"], 4), g2=r1(d["dyn"], 4), F={k: d["F"][k] for k in keys},
+                names={k: d["names"][k] for k in keys}, pts=P, zu=S.ZU, summary=json.loads((K.OUT / "G8.1_动力学.json").read_text()))
+
+
 def main():
     bdir = Path(sys.argv[1])
     kj = json.loads((K.OUT / "G8.1_运动学.json").read_text())
     c, dogs = curves()
     res = dict(note="WQ-LS 整机虚拟样机的数据，tools/wqls/proto_web.py 由设计计算生成，不手写", rpm=5000, curves=c, dog=dogs,
                timing=kj["timing"], catch=kj["catch"], peaks=kj["peaks"][:8], takeup=takeup(), dyn=dynamics(bdir), cycle=cycle(),
-               fabric_t=TU.FABS, assembly=assembly(Path(sys.argv[2]) if len(sys.argv) > 2 else None))
+               fabric_t=TU.FABS, assembly=assembly(Path(sys.argv[2]) if len(sys.argv) > 2 else None), dyn41=dyn41(bdir))
     OUT.write_text(json.dumps(res, ensure_ascii=False, separators=(",", ":")))
     print(f"{OUT.relative_to(ROOT)}  {OUT.stat().st_size / 1e3:.0f} KB")
 

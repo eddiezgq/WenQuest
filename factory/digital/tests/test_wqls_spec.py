@@ -109,6 +109,9 @@ def test_proto_data_matches_design():
             a, b = pd["cycle"]["scenarios"][sc["id"]], sc["series"]
             assert a["state"] == b["state"] and all(abs(x - y) < 0.06 for x, y in zip(a["rpm"], b["rpm"])), "重跑 tools/wqls/proto_web.py"
     assert len(pd["assembly"]) >= 19 and all(s["ok"] for s in pd["assembly"])
+    dyn = os.path.join(ROOT, "docs", "设计", "WQ-LS", "G8", "G8.1_动力学.json")
+    if os.path.exists(dyn):                                              # 4.1 多体动力学：说明书里的数据是现在的结果
+        assert pd.get("dyn41") and pd["dyn41"]["summary"] == json.load(open(dyn, encoding="utf-8")), "重跑 tools/wqls/proto_web.py"
 
 
 def test_takeup_lab_matches_python():

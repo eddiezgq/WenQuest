@@ -62,6 +62,10 @@ LABS = {
             "零件按总装顺序沿真实装入路线一个个装进机壳；每一步都用三维逐 2 mm 查过不碰。",
             "Parts go into the housing one by one along their real insertion paths, in assembly order; each step was checked for clearance every 2 mm in 3-D.",
             "../index.html?asm=1&lang=zh"),
+    "dyn": ("虚拟实验", "Virtual lab", "整机多体动力学（4.1）", "Multibody dynamics (4.1)",
+            "MuJoCo 整机 14 个刚体：驱动力矩和功率法、G2 对照；刺布挑线这一段各运动副的力画成箭头，跟着转角变；拖转速看力按平方涨。",
+            "MuJoCo whole machine, 14 rigid bodies: drive torque against the power method and G2; joint forces of the needle and take-up train as arrows over the turn; drag the speed to see them grow with its square.",
+            "../dyn.html?lang=zh"),
     "m3d": ("三维模型", "3-D model", "整机三维", "The complete machine in 3-D",
             "转、爆炸、剖开，点零件看物料号、材料、质量、图纸和计算书那一节。", "Turn, explode and section it; click a part for item number, material, mass, drawing and calculation.",
             "../index.html?lang=zh"),
@@ -86,7 +90,7 @@ INSERTS = {
     "G4/送布组.md": [("一、", "v_feed")],
     "G4/压脚与操纵件.md": [("一、", "v_press")],
     "G4/剪线与电子针距.md": [("一、", "v_trim")],
-    "G8/G8.1_虚拟样机验证方案.md": [("第二步 装配", "asm"), ("第三步 运动学", "timing"), ("第三步 运动学", "takeup")],
+    "G8/G8.1_虚拟样机验证方案.md": [("第二步 装配", "asm"), ("第三步 运动学", "timing"), ("第三步 运动学", "takeup"), ("第四步 动力学", "dyn")],
 }
 HEAD_LAB = {"G1": "timing", "G2": "proto_man", "G3": "spin", "G4": "v_needle", "G6": "m3d", "G8": "asm", "GC": "proto"}
 
