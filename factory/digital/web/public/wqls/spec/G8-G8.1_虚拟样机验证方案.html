@@ -638,6 +638,7 @@
 <li>轻牛仔四层是紧的（余量 1.12，入布后欠线 0.78，离限值都只差 0.2 左右）。第五步虚拟样机缝纫时重点看这一档。</li>
 <li>挑线杆、摇杆尺寸变了：第六步工程图、物料表、网页三维（g6_web）要跟着改；过线点 A（x 28.5）、B（x 21.5）第六步建成零件。</li>
 <li>第四步动力学（<code>dyn.py</code>、<code>g4_ctrl</code>）直接读新的 <a class="fl" href="f/G4/挑线机构.json"><code>G4/挑线机构.json</code></a>。</li>
+<li>控制器 CTRL-LS 固件仿真用的一转负载表也由 <code>dyn.py</code> 算（第 159 轮），挑线机构换了以后重出（<code>gen_load.py</code>、<code>ref_159c.py</code>，Renode 四个场景重跑全部通过；剪线转速平均 295.09 → 295.07 r/min）。</li>
 </ul></article><div class="pn"><a href="G8-G8.0-2_刺布机构依据与改动清单.html"><span>← 上一篇</span>G8.0 第 2 步：刺布机构依据与改动清单（待 Eddie 定）</a><a class="nx" href="G8-G8.1_配合表.html"><span>下一篇 →</span>配合表（G8.1 第二步）</a></div></main>
 <aside class="toc" aria-label="本篇目录"><b>本篇目录</b><a class="l2" href="#s2">一、三维整机</a><a class="l2" href="#s3">二、装配</a><a class="l2" href="#s4">三、运动学</a><a class="l2" href="#s5">四、动力学（重点）</a><a class="l2" href="#s6">四′、有限元强度与疲劳寿命（Eddie 11-16 22:09 加）</a><a class="l2" href="#s7">五、虚拟样机验证</a><a class="l2" href="#s8">六、工程图（最后）</a><a class="l2" href="#s9">七、顺序与每步怎么交</a><a class="l2" href="#s10">施工记录</a><a class="l3" href="#s11">第一步 三维整机（2026-11-16 晚）</a><a class="l3" href="#s12">第二步 装配（完成，2026-11-17）</a><a class="l3" href="#s13">第三步 运动学（完成，2026-11-17）</a></aside>
 </div>
