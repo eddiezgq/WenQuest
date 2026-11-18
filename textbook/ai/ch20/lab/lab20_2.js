@@ -93,7 +93,7 @@ WQ.lab({
       const rc = +q.rc.toFixed(1), which = Math.round(q.which), st = this.sites(which);
       const e = this.edges(st, rc), wrap = e.filter((x) => x.wrap).length;
       const kinds = new Set(e.map((x) => x.d)).size;
-      if (rc <= 2.01) s.small = { n: e.length, deg: 2 * e.length / st.length };
+      if (rc <= 2.01) { s.small = { n: e.length, deg: 2 * e.length / st.length }; api.done("small"); }
       if (rc >= 7.99 && s.small) api.done("small");
       if (rc >= 7.99 && wrap > 0) api.done("big");
       return [[["看的是哪个结构", "which structure"], which ? "乙 / B" : "甲 / A"],

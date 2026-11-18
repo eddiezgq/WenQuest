@@ -176,8 +176,8 @@ WQ.lab({
                api.T("不一样", "no")]];
     }
     const r = this.run(st, bud, noise, bias, seed);
-    if (st === 0 && bud >= 24 && noise === 0 && bias === 0) s.gridReg = r.regret;
-    if (st === 2 && bud >= 24 && noise === 0 && bias === 0) { if (s.gridReg !== undefined) api.done("grid24"); api.done("bayes24"); }
+    if (st === 0 && bud >= 24 && noise === 0 && bias === 0) { s.gridReg = r.regret; api.done("grid24"); }
+    if (st === 2 && bud >= 24 && noise === 0 && bias === 0) { api.done("grid24"); api.done("bayes24"); }
     if (st === 2 && noise >= 0.19 && Math.abs(bias) < 0.05) api.done("noisy");
     if (Math.abs(bias) >= 0.95) api.done("biased");
     return [[["做了多少次实验", "experiments done"], String(bud)],
