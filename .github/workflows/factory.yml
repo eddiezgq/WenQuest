@@ -740,7 +740,7 @@ jobs:
 
   deploy:
     name: 部署到服务器
-    needs: [build, design]                  # 2026-11-08 Eddie：ERP 演练不卡上线——演练照跑、出错标红，但部署不等它
+    needs: [build]                          # 2026-11-08 ERP 演练不卡上线；2026-11-18 Eddie：电路板（KiCad）检查也不卡上线——照跑、出错标红，部署不等它
     runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     environment: production
     env:
@@ -828,7 +828,7 @@ jobs:
   # 再在服务器上跑同一个 deploy/update.sh。.env 里基础镜像指向本机仓库，WQ_TZ=Asia/Shanghai（AI 只用 DeepSeek，界面按国内域名默认中文）。
   deploy-cn:
     name: 部署到国内服务器
-    needs: [build, design]
+    needs: [build]                          # 同上：不等电路板检查
     runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     environment: production
     timeout-minutes: 240          # 第一次要跨境传几 GB；以后只传变化的层
