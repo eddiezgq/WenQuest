@@ -134,7 +134,7 @@ WQ.lab({
     const at = this.accThr(good, bad);
     const atCost = this.cost(this.conf(good, bad, at), miss, fals);
     if (miss >= 900) api.done("cost");
-    if (Math.abs(q.thr - at) < 0.12 && miss >= 50) api.done("penalty");
+    if (miss >= 50 && q.thr >= best.thr + 0.8) api.done("penalty");   // 阈值明显偏向“准确率那一侧”
     return [[["漏检:误判", "miss:false ratio"], `${miss}:${fals}`],
             [["当前阈值的总代价", "cost at the current threshold"], here.toFixed(0)],
             [["代价最低的阈值", "cost-optimal threshold"], best.thr.toFixed(2)],
