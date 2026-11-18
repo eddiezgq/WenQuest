@@ -1,0 +1,31 @@
+# 实验 20.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab20_2.js。
+原理:
+  - ["把晶体喂给图神经网络，第一步是建图：原子当节点，距离小于**截断半径**的一对连成边。截断半径是**人选的超参数**，不是材料的属性——选小了远处的相互作用看不见，选大了邻居数与算一次的代价一起涨（20.2 节）。", "To feed a crystal to a graph network you first build the graph: atoms are nodes, and pairs closer than the cutoff radius become edges. The cutoff is a hyperparameter chosen by a person, not a property of the material: too small and distant interactions are invisible, too large and both the neighbour count and the cost per evaluation grow (Section 20.2)."]
+  - ["晶体是周期的，所以建图必须用**周期最短像**：最右边那个原子与最左边那个原子可能是近邻。按非周期的办法建图，丢掉的正是绕过边界的那些边。", "A crystal is periodic, so the graph must use the minimum image convention: the rightmost atom may well be a near neighbour of the leftmost. Building the graph without periodicity loses exactly the edges that wrap around the cell."]
+  - ["**存在两个不同的结构，它们所有原子对的距离完全相同**（同距结构）。于是任何只用两体距离的描述子，对这两者给出一模一样的输入。这不是模型不够大、训练不够久的问题——**要分辨的那条信息根本没进到输入里**。把直方图分得再细也没用，因为两条直方图处处重合。", "There exist pairs of different structures whose complete sets of pair distances agree exactly. Any descriptor built only on pair distances therefore gives both the same input. This is not a matter of model size or training length: the distinguishing information never entered. Finer histogram bins do not help, because the two histograms coincide everywhere."]
+  - ["补上**三体信息**（在一维里就是相邻两段的长短搭配，在三维里是键角），两者立刻分开。所以现代势与图网络里的三体、等变项不是装饰——它们是让某些结构**可分辨**的必要条件。", "Adding three-body information — in one dimension the pairing of consecutive segment lengths, in three dimensions bond angles — separates them at once. The three-body and equivariant terms in modern potentials and graph networks are therefore not decoration: they are what makes certain structures distinguishable at all."]
+  - ["这与 19.4 节“同一个粗场配两个细场”、18.5 节“序列相似就看不出新折叠”是同一个形状的论证：**先问信息在不在输入里，再谈算法好坏**。", "This is the same shape of argument as the coarse field with two different fine fields in Section 19.4: ask first whether the information is in the input, and only then whether the algorithm is any good."]
+  - 式: "边 (i, j) ∈ E ⟺ d(i, j) ≤ r_cut，其中 d 取周期最短像；平均配位数 = 2|E| / N"
+步骤:
+  - ["“截断半径定出一张图”场景，结构甲：截断半径取 2，记下边数、平均配位数、边长种类数（任务 1），填表 1 第一行。", "In the first scene with structure A, set the cutoff to 2 and record the edge count, mean coordination and number of distinct edge lengths (task 1); fill the first row of Table 1."]
+  - ["把截断半径依次拖到 3、4、6、8，每一档记同样三个数，并记下其中**绕过周期边界**的边有几条（任务 2），填满表 1。", "Raise the cutoff to 3, 4, 6 and 8, recording the same three numbers at each, plus how many edges wrap around the cell (task 2). Complete Table 1."]
+  - ["把“看哪个结构”切到乙，重复截断半径 4 与 8 两档：图一样吗？边长种类一样吗？记在表 1 末两行。", "Switch to structure B and repeat the cutoff values 4 and 8: are the graphs the same, and are the edge lengths the same? Record these in the last two rows of Table 1."]
+  - ["切到“描述子看不见的差别”，把“分几格”从 9 拖到 72，每一档记下两条直方图的最大差（任务 3），填表 2。", "Switch to the second scene and drag the bin count from 9 to 72, recording at each the largest difference between the two histograms (task 3); fill Table 2."]
+  - ["把“补上三体”打开，记下两者特征的最大差（任务 4），写进表 2 最后一行，并在报告里用一句话说明：这个差为什么说明“信息进来了”。", "Turn on the three-body features, record the largest gap (task 4) in the last row of Table 2, and state in one sentence why that gap shows the information has entered."]
+数据表:
+  - 标题: ["表 1  截断半径怎样改变同一个晶体的图", "Table 1  How the cutoff changes the graph of one crystal"]
+    表头: ["结构", "截断半径", "边数", "平均配位数", "边长种类", "绕过边界的边"]
+    表头英文: ["structure", "cutoff", "edges", "mean coordination", "distinct edge lengths", "wrapped edges"]
+    行: [["甲", "2", "", "", "", ""], ["甲", "3", "", "", "", ""], ["甲", "4", "", "", "", ""], ["甲", "6", "", "", "", ""], ["甲", "8", "", "", "", ""], ["乙", "4", "", "", "", ""], ["乙", "8", "", "", "", ""]]
+  - 标题: ["表 2  分得再细也分不开", "Table 2  Finer bins do not separate them"]
+    表头: ["直方图格数", "两条直方图的最大差", "能分开吗"]
+    表头英文: ["bins", "largest histogram difference", "separable?"]
+    行: [["9", "", ""], ["18", "", ""], ["36", "", ""], ["72", "", ""], ["补上三体之后", "", ""]]
+注意:
+  - ["本实验是**一维**的，六个原子、周期 18。真实晶体是三维的，邻居数随截断半径大致按三次方涨，而不是这里的线性。表 1 要记的是**趋势与机理**，不要把这里的边数搬到三维上去。", "This lab is one-dimensional: six atoms with a period of 18. In a real three-dimensional crystal the neighbour count grows roughly as the cube of the cutoff, not linearly as here. Record the trend and the mechanism, not the absolute edge counts."]
+  - ["“两条直方图完全重合”这件事，是这一对结构被**特意构造**出来的性质，不是所有结构都这样。它要说明的是：这种情形**存在**，所以“只用两体距离”这个选择本身就有上限。", "The exact coincidence of the two histograms is a property of this deliberately constructed pair, not of structures in general. The point is that such cases exist, so a descriptor restricted to pair distances has a ceiling."]
+  - ["任务 4 的“差”是三体特征向量逐项差的最大值，没有物理单位。要记的是它**从 0 变成了正数**这件事。", "The gap in task 4 is the largest element-wise difference of the three-body feature vectors and has no physical unit. What matters is that it changes from zero to something positive."]
+思考题:
+  - ["如果把截断半径加到比半个周期还大，每一对原子都成了邻居。这时的“图”还带有结构信息吗？代价又是多少？", "If the cutoff exceeds half the period, every pair becomes a neighbour. Does such a graph still carry structural information, and what does it cost?"]
+  - ["真实材料里把截断半径从 5 Å 加到 8 Å，每个原子的邻居数大致涨几倍？按这个倍数，一次推理的代价涨多少？（提示：边数与邻居数成正比。）", "In a real material, by what factor does the neighbour count grow when the cutoff goes from 5 Å to 8 Å, and what does that do to the cost of one inference? (Hint: the number of edges is proportional to the neighbour count.)"]
+  - ["有人说“同距结构是人造的特例，实践中遇不到”。就算这句话成立，本实验的结论要不要改？换个说法：你会怎样**检验**自己的描述子对手上这批材料够不够用？", "Someone objects that homometric structures are artificial. Even granting that, does the conclusion change? Put differently: how would you test whether your descriptor is expressive enough for the materials actually in front of you?"]

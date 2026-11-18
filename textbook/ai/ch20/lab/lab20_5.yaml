@@ -1,0 +1,36 @@
+# 实验 20.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab20_5.js。
+原理:
+  - ["自主实验室的闭环是：提议 → 合成 → 表征 → 回填 → 再提议。真实实验一次要几个小时到几天，所以**“要试多少次”就是全部的成本**。三种提议策略：网格挨个试、随机试、用代理模型挑（这里是高斯核岭回归 + 上置信界，即“要么看着好、要么没人去过”）（20.5 节）。", "The loop in an autonomous lab is propose, synthesise, characterise, feed back, propose again. A real experiment takes hours to days, so the number of experiments is the whole cost. Three proposal strategies appear here: a grid, random sampling, and a surrogate model (kernel ridge regression with an upper confidence bound, that is, points that either look good or have never been tried) (Section 20.5)."]
+  - ["**成绩必须按真值算。** 闭环只能看见自己测到的数；用测到的数当成绩，等于让它自己给自己打分。本实验把两个数并排放着：闭环自己报的分数，与那一点的真值。", "The score must be computed against the truth. The loop only ever sees its own measurements, and scoring it by those is letting it mark its own work. This lab shows both numbers side by side: what the loop believes it found, and the truth at that point."]
+  - ["**随机噪声与系统偏差是两回事。** 噪声多测几次就抹平了，代价是多做几次实验；偏差抹不平——它把整张响应面**拧歪**，于是闭环一路爬到错的地方，而且自报的分数越来越高。", "Random noise and systematic bias are different things. Noise averages out if you measure more, at the cost of extra experiments. A bias does not average out: it tilts the whole response surface, so the loop climbs to the wrong place while its self-reported score keeps rising."]
+  - ["偏差的要害是**门槛与方向**，不是“越大越坏”这种线性印象：小偏差几乎不影响结果，过了某个大小整段跑偏；而同样大小、方向相反的偏差，后果可以完全不同——因为它把哪个峰抬起来，取决于那个峰在成分空间的哪一侧。", "What matters about a bias is its threshold and its direction, not a linear sense that bigger is worse: a small bias barely matters, beyond a certain size the run goes badly wrong, and a bias of the same size with the opposite sign can behave quite differently — which peak it lifts depends on where that peak sits in composition space."]
+  - ["**提升吞吐 ≠ 提升收益。** 一天做多少个实验（吞吐）与找到好材料要少试几次（收益）是两件事，报成绩时必须分开写，而且都要有基线（20.5 节的口径 5）。", "Throughput is not yield. How many experiments per day and how many fewer experiments are needed to find something good are two different quantities; report them separately, each against a baseline."]
+  - 式: "遗憾 = 真正的最优值 − 所选点的真值；测量值 = 真值 + 噪声 × 随机数 + 偏差 × (a − 0.5)"
+步骤:
+  - ["“闭环跑一遍”场景，噪声与偏差都为 0、预算 24：三种策略各跑一次，记下遗憾（任务 1），填表 1。", "In the first scene with no noise and no bias and a budget of 24, run each of the three strategies once and record the regret (task 1); fill Table 1."]
+  - ["保持代理模型与预算 24，把“第几次重复”从 0 拖到 7，记下八次的遗憾最小值、最大值与大致中位数（任务 2），填表 1 最后一行。只跑一次能不能下结论，看这一行。", "Keep the surrogate strategy and the budget of 24, drag the repeat number from 0 to 7 and record the smallest, largest and approximate median regret (task 2) in the last row of Table 1."]
+  - ["把随机噪声依次调到 0.05、0.1、0.2（偏差仍为 0），每档记遗憾；再把预算从 24 提到 48 各记一次（任务 3），填表 2。这一步回答：噪声能不能靠多做实验压下去。", "Raise the noise to 0.05, 0.1 and 0.2 with no bias, recording the regret at each, then repeat with the budget raised from 24 to 48 (task 3); fill Table 2."]
+  - ["噪声调回 0.02，把系统偏差依次取 −1.0、−0.6、−0.3、0、+0.3、+0.6、+1.0，每档记下闭环挑的点、它自己报的分数与那一点的真值（任务 4），填表 3。", "Set the noise back to 0.02 and step the bias through −1.0, −0.6, −0.3, 0, +0.3, +0.6 and +1.0, recording at each the pick, the self-reported score and the truth there (task 4); fill Table 3."]
+  - ["切到“偏差扫一遍”，读出正负两个方向的门槛（任务 5），写进报告，并回答：同样大小、方向相反的偏差，后果为什么不一样。", "Switch to the sweep scene, read off the thresholds in both directions (task 5) and explain why two biases of the same size but opposite sign do not behave alike."]
+数据表:
+  - 标题: ["表 1  干净测量下，三种策略花同样的预算", "Table 1  Three strategies on the same clean budget"]
+    表头: ["策略", "预算", "挑出来的成分", "遗憾"]
+    表头英文: ["strategy", "budget", "the pick", "regret"]
+    行: [["网格", "24", "", ""], ["随机", "24", "", ""], ["代理模型", "24", "", ""], ["代理模型（8 次重复：最小/中位/最大）", "24", "", ""]]
+  - 标题: ["表 2  噪声能不能靠多做实验压下去", "Table 2  Can more experiments absorb noise"]
+    表头: ["噪声", "预算 24 的遗憾", "预算 48 的遗憾", "多做一倍换来多少"]
+    表头英文: ["noise", "regret at budget 24", "regret at budget 48", "what doubling bought"]
+    行: [["0", "", "", ""], ["0.05", "", "", ""], ["0.1", "", "", ""], ["0.2", "", "", ""]]
+  - 标题: ["表 3  偏差把闭环带到哪里去", "Table 3  Where a bias takes the loop"]
+    表头: ["偏差", "挑出来的成分", "闭环自己报的分数", "那一点的真值", "遗憾"]
+    表头英文: ["bias", "the pick", "self-reported score", "truth at that point", "regret"]
+    行: [["−1.0", "", "", "", ""], ["−0.6", "", "", "", ""], ["−0.3", "", "", "", ""], ["0", "", "", "", ""], ["+0.3", "", "", "", ""], ["+0.6", "", "", "", ""], ["+1.0", "", "", "", ""]]
+注意:
+  - ["这张响应面是**造出来的玩具**：两个峰，一个全局一个陪衬。它说明的是机理（探索与利用、噪声与偏差的区别），不要把这里的“做 24 次就够了”搬到真实体系上——真实体系的维数高得多，而且很多成分根本做不出来。", "The response surface here is a toy with two peaks, one global and one decoy. It illustrates the mechanism — exploration versus exploitation, noise versus bias — and the number of experiments needed here does not transfer to real systems, which have far more dimensions and many compositions that cannot be made at all."]
+  - ["**一次运行说明不了问题。** 代理模型带随机初始点，同样的设置换个重复编号，遗憾能差好几倍。任务 2 要求跑八次正是为此；报告里凡写遗憾，都要写清是哪一次、或者写范围。", "A single run settles nothing: the surrogate starts from random points, and the same settings with another repeat number can give several times the regret. That is what task 2 is for; whenever the report quotes a regret, say which run it came from or give the range."]
+  - ["表 3 里“闭环自己报的分数”随偏差一路升高，而真值一路降低。**这两列必须并排填**，只填一列就看不出本实验最要紧的那件事。", "In Table 3 the self-reported score rises with the bias while the truth falls. Both columns must be filled: either one alone hides the main point of the lab."]
+  - ["本实验的偏差写成“越靠右测得越高”。真实的系统偏差未必是这个形状（可能与温度、批次、仪器漂移有关）。要记住的是**它不随重复测量消失**这一条性质。", "The bias here reads high towards one end of the composition range. Real systematic errors need not have this shape — they may follow temperature, batch or instrument drift. What carries over is that they do not vanish with repeated measurement."]
+思考题:
+  - ["偏差在这里是“越靠右测得越高”。如果你的表征设备有这种毛病，光看闭环自己报的分数，能不能发现？要加一道什么样的检查才发现得了——想一个花得起的办法。", "If your characterisation setup read high towards one end, could you detect it from the loop's own scores? What affordable check would reveal it?"]
+  - ["把本实验的“遗憾—预算”曲线与 20.4 节的筛选漏斗放在一起看：如果上游筛选把候选范围缩小了十倍，闭环的预算能省多少？这个省法有没有风险？", "Put the regret-versus-budget curve beside the screening funnel of Section 20.4: if upstream screening narrowed the candidate range tenfold, how much budget would the loop save, and what risk comes with that saving?"]
+  - ["吞吐与收益要分开报。设想一台机器把“一天做多少个实验”提高了十倍，而提议策略没变——按本实验的曲线，找到同样好的材料，时间能缩短多少倍？什么情况下它一点也不缩短？", "Throughput and yield must be reported separately. Suppose a machine raises the experiments per day tenfold with the proposal strategy unchanged: by the curves here, how much sooner is an equally good material found, and when would it not help at all?"]

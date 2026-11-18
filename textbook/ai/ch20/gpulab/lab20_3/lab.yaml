@@ -1,0 +1,56 @@
+标题: ["GPU 实验 20.3 用公开的机器学习势跑一段分子动力学，和经典力场比一比", "GPU Lab 20.3 Run molecular dynamics with an open machine-learning potential and compare it with a classical force field"]
+目的: ["用公开权重的通用机器学习势（MACE-MP-0 系列）在一个小的铜超胞上跑一段分子动力学，和同一个体系上的经典力场（ASE 自带的 EMT）逐项比：单步耗时、随原子数怎么涨、能量守不守得住、径向分布函数像不像。再把超胞依次放大，亲手量出代价随体系大小怎么涨。全程守住一条口径：**机器学习势的误差是对第一性原理说的，不是对实验说的**。",
+       "Run molecular dynamics on a small copper supercell with an open-weights universal machine-learning potential (the MACE-MP-0 family) and compare it item by item with a classical force field on the same system (ASE's built-in EMT): time per step, how that scales with the number of atoms, how well energy is conserved, and how similar the radial distribution functions are. Then enlarge the supercell step by step to measure how the cost grows with system size. One caliper holds throughout: the error of a machine-learning potential is measured against first-principles calculations, not against experiment."]
+显卡: basic
+结果:
+  - {名: n_atoms, 说明: ["超胞里有多少个原子", "atoms in the supercell"], 单位: "个"}
+  - {名: ms_per_step_mlip, 说明: ["机器学习势每步耗时", "milliseconds per step, machine-learning potential"], 单位: "毫秒"}
+  - {名: ms_per_step_classic, 说明: ["经典力场每步耗时", "milliseconds per step, classical force field"], 单位: "毫秒"}
+  - {名: speed_ratio, 说明: ["机器学习势比经典力场慢几倍", "how many times slower the machine-learning potential is"], 单位: "倍"}
+  - {名: scale_exponent, 说明: ["耗时随原子数增长的幂次（拟合值）", "fitted exponent of time versus atom count"], 单位: "—"}
+  - {名: drift_mlip, 说明: ["机器学习势的总能量漂移（每原子）", "energy drift per atom, machine-learning potential"], 单位: "meV/atom"}
+  - {名: drift_classic, 说明: ["经典力场的总能量漂移（每原子）", "energy drift per atom, classical force field"], 单位: "meV/atom"}
+  - {名: rdf_peak_mlip, 说明: ["机器学习势给出的第一近邻峰位", "first-neighbour peak, machine-learning potential"], 单位: "Å"}
+  - {名: rdf_peak_classic, 说明: ["经典力场给出的第一近邻峰位", "first-neighbour peak, classical force field"], 单位: "Å"}
+  - {名: force_rms_gap, 说明: ["两者在同一批构型上的力的均方根差", "RMS difference of forces on the same configurations"], 单位: "eV/Å"}
+文件: []
+实际问题:
+  标题: ["这段模拟，用哪一种势算得起", "Which potential can you afford for this simulation"]
+  内容: ["你要判断一个候选材料在 500 K 下结构稳不稳。办法是跑分子动力学：原子动起来，看它散不散架。摆在面前的有三条路——第一性原理（准，但这个体系算一纳秒要几十万核时，算不起）、经典力场（快得多，可它的参数是为别的体系拟的，换个成分就不知道还准不准）、机器学习势（号称两头都占）。这个实验把第三条路真的跑一遍，量出它比经典力场慢几倍、随体系大小怎么涨，以及两者给出的结构到底一样不一样。",
+         "You need to know whether a candidate material keeps its structure at 500 K. The way to find out is molecular dynamics: let the atoms move and see whether the structure survives. Three routes are open — first principles (accurate, but a nanosecond of this system would take hundreds of thousands of core-hours), a classical force field (far faster, but its parameters were fitted for other systems and may not transfer), and a machine-learning potential (said to offer both). This lab actually runs the third one, measuring how much slower it is, how that grows with system size, and whether the two give the same structure at all."]
+原理:
+  - ["机器学习势学的是**势能面**：输入一组原子位置，输出能量，力由能量对位置求导得到。它不直接预测性质——性质是拿这个势跑模拟再算出来的。所以“能量误差小”与“性质算得对”是两件事（20.3 节、算例 20.4）。", "A machine-learning potential learns the potential energy surface: positions in, energy out, with forces as the derivative of the energy. It predicts no property directly — properties come from running simulations with it. A small energy error and a correct property are therefore two different claims (Section 20.3)."]
+  - ["**误差的参照系必须写清楚。** 通用机器学习势是在第一性原理计算的数据上训练的，它的 meV/atom 是对那一套计算说的。第一性原理本身有自己的系统误差，换一个泛函，稳定性排序都可能变——所以不能把这个误差当成“离实验有多远”（20.3 节口径 2）。", "The reference frame of the error must be stated. A universal machine-learning potential is trained on first-principles data, and its meV/atom figures are relative to that level of theory. First principles carries its own systematic error, and a different functional can even change the stability ordering, so this error is not a distance from experiment."]
+  - ["官方自己写明的局限要照记：MACE-MP-0 的论文明确说这一组模型**不包含磁性或自旋自由度**；CHGNet 把磁矩显式纳入，报告磁矩平均绝对误差 0.032 µB，同时承认对**无磁矩离子**推断电荷不准；两者共用的训练数据 MPtrj **混用 GGA 与 GGA+U**。本书只印这三条，不写“机器学习势对强关联体系不准”这种没核到原话的概括。", "Record the limitations the developers state: the MACE-MP-0 paper says plainly that these models contain no magnetic or spin degrees of freedom; CHGNet includes magnetic moments explicitly and reports a magnetic-moment MAE of 0.032 µB while noting that charge inference is unreliable for ions without a moment; and MPtrj, the training set behind both, mixes GGA and GGA+U. This book prints those three statements and no sweeping claim about strongly correlated systems, for which no source could be verified."]
+  - ["经典力场（这里用 ASE 自带的 EMT）快几个数量级，因为它的函数形式是手写的、只有几个参数。它的问题不是慢，是**可迁移性**：参数为哪些元素、哪些环境拟的，离开那个范围就不知道还准不准。这与 20.3 节“外推到没见过的构型会崩”说的是同一件事，只是机器学习势的“见过的范围”是由训练集划定的。", "A classical force field (here ASE's EMT) is orders of magnitude faster because its functional form is handwritten with a handful of parameters. Its weakness is transferability: the parameters were fitted for particular elements and environments, and outside those nothing is guaranteed. The same applies to a machine-learning potential, whose covered range is set by its training set."]
+  - ["**能量守恒是一把免费的尺子。** 微正则系综（NVE）里总能量应当守恒；它守不住的程度，就是这个势“不像个势”（力不是能量的梯度，或者步长太大）的程度。这不需要任何参考数据，所以是上手就能做的第一项检查（算例 20.3）。", "Energy conservation is a free diagnostic. In the microcanonical ensemble the total energy should be conserved, and the extent to which it is not measures how far the model departs from being a true potential — forces that are not the gradient of the energy, or too large a timestep. It needs no reference data, so it is the first check to run."]
+  - 式: "F = −∂E/∂r；NVE 下 E_tot = E_pot + E_kin 应为常数；漂移按 (E_tot(t) − E_tot(0)) / N 计，单位 meV/atom"
+步骤:
+  - ["运行第 1 节：装环境、确认显卡型号与显存（任务 1）。", "Run section 1 to install the environment and confirm the GPU model and memory (task 1)."]
+  - ["运行第 2 节：下载公开权重并建一个小的铜超胞，记下原子数与晶格常数（任务 2），填表 1 的第一行。", "Run section 2 to download the open weights and build a small copper supercell, recording the atom count and lattice constant (task 2) in the first row of Table 1."]
+  - ["运行第 3 节：两种势各跑同样步数的 NVE，记下每步耗时与总能量漂移（任务 3），填表 1。", "Run section 3 to run the same number of NVE steps with each potential, recording the time per step and the energy drift (task 3); fill Table 1."]
+  - ["运行第 4 节：把超胞依次放大，记录耗时随原子数怎么涨，拟出幂次（任务 4），填表 2。", "Run section 4 to enlarge the supercell step by step, recording how the time per step grows and fitting the exponent (task 4); fill Table 2."]
+  - ["运行第 5 节：在同一批构型上比两者的力，并各自算径向分布函数，记下第一近邻峰位（任务 5），填表 3。", "Run section 5 to compare forces on the same configurations and compute the radial distribution function for each, recording the first-neighbour peak (task 5); fill Table 3."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  同一个体系，两种势", "Table 1  One system, two potentials"]
+    表头: ["用的是哪种势", "原子数", "每步耗时（毫秒）", "跑 1 皮秒要多久", "总能量漂移（meV/atom）"]
+    表头英文: ["potential", "atoms", "ms per step", "time for 1 ps", "energy drift (meV/atom)"]
+    行: [["经典力场 EMT", "", "", "", ""], ["机器学习势", "", "", "", ""]]
+  - 标题: ["表 2  体系一大，代价怎么涨", "Table 2  How the cost grows with system size"]
+    表头: ["超胞", "原子数", "机器学习势每步（毫秒）", "经典力场每步（毫秒）", "慢几倍"]
+    表头英文: ["supercell", "atoms", "ms per step (MLIP)", "ms per step (classical)", "ratio"]
+    行: [["2×2×2", "", "", "", ""], ["3×3×3", "", "", "", ""], ["4×4×4", "", "", "", ""]]
+  - 标题: ["表 3  两者给出的结构一样吗", "Table 3  Do the two give the same structure"]
+    表头: ["指标", "机器学习势", "经典力场", "差多少"]
+    表头英文: ["quantity", "MLIP", "classical", "difference"]
+    行: [["第一近邻峰位（Å）", "", "", ""], ["峰高", "", "", ""], ["力的均方根（eV/Å）", "", "", ""], ["两者力的均方根差（eV/Å）", "", "—", "—"]]
+注意:
+  - ["**这个实验比的不是“谁更准”。** 两种势都没有和第一性原理或实验对照——要那样比，得另外跑第一性原理，而这正是算不起的那一步。能比的是：耗时、随体系大小的增长、能量守恒，以及两者给出的结构差多少。谁更接近真实，本实验回答不了，报告里不要写。", "This lab does not rank the two for accuracy. Neither is compared with first principles or experiment — that would require the very calculation that is too expensive. What is comparable here is cost, scaling, energy conservation and how far the two structures differ. Which is closer to reality cannot be answered here, and should not be claimed in the report."]
+  - ["铜是**金属、无磁**，选它正是为了避开官方写明的局限（不含自旋自由度）。换成含磁性元素的体系重做之前，先把那条局限读一遍。", "Copper is a non-magnetic metal, chosen precisely to stay clear of the stated limitation that these models carry no spin degrees of freedom. Read that limitation again before repeating this on a magnetic system."]
+  - ["每步耗时与显卡型号、批大小、是否编译都有关。表 1、表 2 的各行必须在**同一块卡、同一套设置**下测，跨机器的数不能互相比。首次运行包含权重下载与编译，**计时要跳过前若干步**（笔记本里已经这么做）。", "Time per step depends on the GPU, the batch size and whether the model was compiled. All rows must be measured on one card with one set of settings; numbers from different machines are not comparable. The first run includes downloading and warm-up, so the timing skips the first steps, as the notebook does."]
+  - ["能量漂移与**步长**强相关。两种势必须用同一个步长比较；想单独看步长的影响，就固定势、只改步长，别两样一起改。", "Energy drift depends strongly on the timestep. Compare the two potentials at the same timestep, and if you want to study the timestep itself, hold the potential fixed."]
+思考题:
+  - ["按你表 2 拟出来的幂次，把体系放大到 10 万个原子，机器学习势跑 1 纳秒要多久？经典力场呢？这个差距会改变你对“用哪条路”的判断吗？", "Using the exponent you fitted in Table 2, how long would a nanosecond of a hundred-thousand-atom system take with each potential, and does that gap change which route you would choose?"]
+  - ["你量到的能量漂移是多少？如果把步长加倍，你预期漂移怎么变（提示：速度 Verlet 的局部误差是步长的几次方）？动手验证一次。", "What drift did you measure, and how would you expect it to change if the timestep doubled? (Hint: what is the local error order of velocity Verlet?) Verify it."]
+  - ["两种势给出的第一近邻峰位差了多少？这个差落在“同一个结构、热涨落不同”的范围里，还是已经大到说明它们描述的不是同一件事？你用什么判据回答这个问题——本实验里有没有现成的量能当这个判据？", "How far apart are the first-neighbour peaks? Is that within what thermal fluctuation would explain, or large enough to mean the two describe different physics? What criterion settles this, and is any quantity measured here usable as that criterion?"]
