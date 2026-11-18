@@ -194,7 +194,7 @@ def copy_labs(lang):
     # 原样复制一份到 labs/wqls/；英文版用同一份（?lang=en），不再复制
     src = os.path.join(ROOT, '..', '..', '..', 'factory', 'digital', 'web', 'public', 'wqls')
     if lang == 'zh' and os.path.isdir(src):
-        shutil.copytree(src, os.path.join(d, 'wqls'), dirs_exist_ok=True)
+        shutil.copytree(src, os.path.join(d, 'wqls'), dirs_exist_ok=True, ignore=shutil.ignore_patterns('spec'))  # 第 172 轮：设计说明书只放数字工厂，教材里链到那边
 
 if __name__ == '__main__':
     import sys

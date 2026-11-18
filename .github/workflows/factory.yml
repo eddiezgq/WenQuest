@@ -37,6 +37,9 @@ on:
       - "docs/帮助/数字工厂课程接口.md"
       # 帮助里嵌的虚拟实验（第 30 轮 §八）：工作台 web/public/labs/ 是这些原件的副本（tools/sync_help_labs.py 同步，tests/test_help.py 核对一致）
       - "textbook/web-editions/dfactory/src/zh/labs/**"
+      # 第 172 轮：WQ-LS 设计说明书网页版（public/wqls/spec/ 由 tools/wqls/spec_web.py 从这些原文生成，tests/test_wqls_spec.py 核对一致）
+      - "docs/设计/WQ-LS/**"
+      - "tools/wqls/spec_web.py"
   workflow_dispatch:
 
 permissions:

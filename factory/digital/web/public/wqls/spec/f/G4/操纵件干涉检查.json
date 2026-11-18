@@ -1,0 +1,209 @@
+{
+ "note": "G4.7 一转干涉检查（机壳 g69），每 2°，除设计的配合（mech_check.py 的 JOINT）外最小距离 ≥ 1.0 mm。膝抬状态按联锁排除针夹、针杆、机针对压脚三对（针在上方才能膝抬到 13 mm，见细则偏差 4）。",
+ "states": {
+  "s3_down": {
+   "name": "压脚放下 + 3 mm 正缝",
+   "step_deg": 2,
+   "frames": 180,
+   "too_close": [],
+   "closest": [
+    [
+     "regulator | casting",
+     1.0,
+     0
+    ],
+    [
+     "presser_collar | presser_bushes",
+     1.0,
+     100
+    ],
+    [
+     "pull_rod | casting",
+     1.0,
+     0
+    ],
+    [
+     "regulator | feed_link",
+     1.199,
+     340
+    ],
+    [
+     "needle | presser_foot",
+     1.95,
+     256
+    ],
+    [
+     "presser_bar | presser_spring",
+     2.1,
+     358
+    ],
+    [
+     "tension_discs | check_spring",
+     2.15,
+     0
+    ],
+    [
+     "crank | knee_rod",
+     2.413,
+     106
+    ],
+    [
+     "release_lever | tension_post",
+     2.5,
+     0
+    ],
+    [
+     "nb_link | lift_bracket",
+     3.0,
+     48
+    ],
+    [
+     "bearings_lower | knee_push",
+     3.284,
+     0
+    ],
+    [
+     "release_pin | tension_spring",
+     3.643,
+     0
+    ]
+   ]
+  },
+  "s5_hand": {
+   "name": "手抬 5.5 mm + 5 mm 正缝",
+   "step_deg": 2,
+   "frames": 180,
+   "too_close": [],
+   "closest": [
+    [
+     "regulator | casting",
+     1.0,
+     0
+    ],
+    [
+     "pull_rod | casting",
+     1.0,
+     0
+    ],
+    [
+     "regulator | feed_link",
+     1.199,
+     298
+    ],
+    [
+     "release_lever | tension_post",
+     1.4,
+     0
+    ],
+    [
+     "needle_clamp | presser_foot",
+     1.5,
+     180
+    ],
+    [
+     "needle | presser_foot",
+     1.95,
+     276
+    ],
+    [
+     "nb_link | release_shaft",
+     2.061,
+     0
+    ],
+    [
+     "presser_bar | presser_spring",
+     2.1,
+     358
+    ],
+    [
+     "crank | knee_rod",
+     2.413,
+     106
+    ],
+    [
+     "nb_link | lift_bracket",
+     3.0,
+     0
+    ],
+    [
+     "needle_bar | presser_foot",
+     3.0,
+     180
+    ],
+    [
+     "tension_discs | check_spring",
+     3.098,
+     0
+    ]
+   ]
+  },
+  "r5_knee": {
+   "name": "膝抬 13 mm + 5 mm 倒缝",
+   "step_deg": 2,
+   "frames": 180,
+   "too_close": [],
+   "closest": [
+    [
+     "regulator | casting",
+     1.0,
+     0
+    ],
+    [
+     "pull_rod | casting",
+     1.0,
+     0
+    ],
+    [
+     "regulator | feed_link",
+     1.199,
+     324
+    ],
+    [
+     "release_lever | tension_post",
+     1.4,
+     0
+    ],
+    [
+     "nb_link | release_shaft",
+     2.061,
+     0
+    ],
+    [
+     "presser_bar | presser_spring",
+     2.1,
+     358
+    ],
+    [
+     "crank | knee_rod",
+     2.413,
+     106
+    ],
+    [
+     "nb_link | lift_bracket",
+     3.0,
+     0
+    ],
+    [
+     "presser_foot | presser_bushes",
+     3.0,
+     0
+    ],
+    [
+     "tension_discs | check_spring",
+     3.098,
+     0
+    ],
+    [
+     "bearings_lower | knee_push",
+     3.284,
+     0
+    ],
+    [
+     "release_pin | tension_spring",
+     3.643,
+     0
+    ]
+   ]
+  }
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "servo": {
+  "t_peak_limit_nm": 3.0,
+  "t_reach_5000_s": 0.09730000000000001,
+  "stop_error_deg": -0.038,
+  "t_settle_s": 1.0211000000000001,
+  "t_from_release_s": 0.5211,
+  "torque_peak_nm": 3.0,
+  "torque_rms_nm": 1.19,
+  "i_phase_peak_a": 6.046,
+  "i_trip_a": 7.5,
+  "p_ipm_cycle_avg_w": 9.52,
+  "p_ipm_cycle_max_w": 36.95,
+  "v_emf_phase_peak_max_v": 175.8,
+  "v_phase_avail_v": 225.2
+ },
+ "ebox": {
+  "worst_90v_550w": {
+   "params": {
+    "L": 260.0,
+    "W": 160.0,
+    "H": 90.0,
+    "wall": 3.0,
+    "fins": 8,
+    "fin_h": 20.0,
+    "h_out": 10.0,
+    "t_air": 40.0
+   },
+   "p_heatsink_w": 41.26,
+   "p_aux_w": 9.49,
+   "t_max_c": 77.395,
+   "t_surface_mean_c": 63.931,
+   "formula_t_case_c": 72.0,
+   "heat_out_w": 50.75,
+   "nodes": 139144
+  },
+  "typical_230v_sewing": {
+   "params": {
+    "L": 260.0,
+    "W": 160.0,
+    "H": 90.0,
+    "wall": 3.0,
+    "fins": 8,
+    "fin_h": 20.0,
+    "h_out": 10.0,
+    "t_air": 40.0
+   },
+   "p_heatsink_w": 9.82,
+   "p_aux_w": 9.49,
+   "t_max_c": 51.752,
+   "t_surface_mean_c": 49.19,
+   "formula_t_case_c": 52.2,
+   "heat_out_w": 19.31,
+   "nodes": 139144
+  }
+ },
+ "losses": {
+  "worst_90v_550w": {
+   "heatsink_w": 41.26,
+   "by_part": {
+    "整流桥 GBU1006": 15.68,
+    "升压开关管 IPW60R060P7": 8.52,
+    "升压二极管 C3D06060A": 4.12,
+    "智能功率模块 STGIPS14K60T": 12.94
+   },
+   "aux_loss_w": 5.74,
+   "aux_in_box_w": 9.49,
+   "r_sa_need": 1.0549772042389667,
+   "ts_allow_c": 93.53146661174026
+  },
+  "typical_230v_sewing": {
+   "heatsink_w": 9.82,
+   "by_part": {
+    "整流桥 GBU1006": 1.04,
+    "升压开关管 IPW60R060P7": 0.95,
+    "升压二极管 C3D06060A": 0.7,
+    "智能功率模块 STGIPS14K60T": 7.14
+   },
+   "aux_loss_w": 5.74,
+   "aux_in_box_w": 9.49,
+   "r_sa_need": 4.726314667034381,
+   "ts_allow_c": 96.42834295642633
+  }
+ }
+}

@@ -1,0 +1,334 @@
+{
+ "O1201": {
+  "title": "上件 工序 10 粗、半精铣接合面、钻铰工艺孔、攻 M10",
+  "machine": "VMC-01",
+  "lines": 138,
+  "tools": [
+   1,
+   8,
+   9,
+   12,
+   17,
+   19
+  ],
+  "b_indexes": 0,
+  "time_min": 3.95,
+  "cut_min": 3.43,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "C_UP",
+    "steps": 7,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 2.0
+   }
+  ]
+ },
+ "O1202": {
+  "title": "上件 工序 20 卧加粗加工",
+  "machine": "HMC-01",
+  "lines": 334,
+  "tools": [
+   2,
+   3,
+   5,
+   7,
+   14,
+   18,
+   39,
+   41
+  ],
+  "b_indexes": 2,
+  "time_min": 5.32,
+  "cut_min": 4.13,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "B0",
+    "steps": 1,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 2.5
+   },
+   {
+    "frame": "B180",
+    "steps": 3,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 8.0
+   },
+   {
+    "frame": "DOWN_HEAD",
+    "steps": 4,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   }
+  ]
+ },
+ "O1205": {
+  "title": "上件 工序 50 精铣接合面、扩铰针杆孔",
+  "machine": "VMC-01",
+  "lines": 116,
+  "tools": [
+   1,
+   7,
+   20,
+   42,
+   43
+  ],
+  "b_indexes": 0,
+  "time_min": 14.04,
+  "cut_min": 13.49,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "C_UP",
+    "steps": 7,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": -0.0,
+    "ap_max": 3.0
+   }
+  ]
+ },
+ "O1301": {
+  "title": "下件 工序 10 铣底面 A、工艺孔",
+  "machine": "VMC-01",
+  "lines": 70,
+  "tools": [
+   1,
+   3
+  ],
+  "b_indexes": 0,
+  "time_min": 5.64,
+  "cut_min": 5.39,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "A_UP",
+    "steps": 3,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 2.2
+   }
+  ]
+ },
+ "O1302": {
+  "title": "下件 工序 20 粗铣顶面、过孔",
+  "machine": "VMC-01",
+  "lines": 63,
+  "tools": [
+   1,
+   4
+  ],
+  "b_indexes": 0,
+  "time_min": 4.73,
+  "cut_min": 4.5,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "TOP",
+    "steps": 2,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 1.75
+   }
+  ]
+ },
+ "O1303": {
+  "title": "下件 工序 30 卧加粗镗（左端壁过孔、旋梭轴孔、下轴两孔）",
+  "machine": "HMC-01",
+  "lines": 517,
+  "tools": [
+   2,
+   9,
+   10
+  ],
+  "b_indexes": 1,
+  "time_min": 1.08,
+  "cut_min": 0.68,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "LB0",
+    "steps": 2,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 2.5
+   }
+  ]
+ },
+ "O1305": {
+  "title": "下件 工序 50 精铣底面、顶面、针板座、M3",
+  "machine": "VMC-01",
+  "lines": 164,
+  "tools": [
+   1,
+   2,
+   6,
+   18
+  ],
+  "b_indexes": 0,
+  "time_min": 11.67,
+  "cut_min": 11.27,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "A_UP",
+    "steps": 1,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 3.0
+   },
+   {
+    "frame": "TOP",
+    "steps": 5,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": -0.0,
+    "ap_max": 4.0
+   }
+  ]
+ },
+ "O1401": {
+  "title": "合件 工序 70、80 锥销、测针杆轴线、精加工、钻攻",
+  "machine": "HMC-01",
+  "lines": 1330,
+  "tools": [
+   2,
+   4,
+   5,
+   10,
+   11,
+   13,
+   15,
+   16,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47,
+   48,
+   49,
+   50,
+   51,
+   52,
+   53,
+   54,
+   55,
+   61,
+   62,
+   63,
+   64,
+   65,
+   66,
+   67,
+   68,
+   69
+  ],
+  "b_indexes": 8,
+  "time_min": 28.71,
+  "cut_min": 21.0,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "ARMUP",
+    "steps": 2,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   },
+   {
+    "frame": "B0",
+    "steps": 5,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": -0.01,
+    "ap_max": 3.0
+   },
+   {
+    "frame": "B180",
+    "steps": 5,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 8.0
+   },
+   {
+    "frame": "B270",
+    "steps": 10,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   },
+   {
+    "frame": "B90",
+    "steps": 6,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   },
+   {
+    "frame": "HEADUP",
+    "steps": 4,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   },
+   {
+    "frame": "TOPARM",
+    "steps": 10,
+    "issues": [
+     "过切：1 格比目标低，最多 11.991 mm"
+    ],
+    "over_cells": 1,
+    "dev_min": -11.991,
+    "ap_max": 1.8
+   },
+   {
+    "frame": "UNDER",
+    "steps": 8,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   }
+  ]
+ },
+ "linebar": {
+  "min_clearance_mm": 0.85,
+  "at_x": 374.0
+ }
+}

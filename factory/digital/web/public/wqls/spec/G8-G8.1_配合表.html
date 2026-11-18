@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>配合表（G8.1 第二步）</title>
+<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计） · Design documentation (Chinese original)">
+<link rel="stylesheet" href="spec.css"></head>
+<body>
+<header class="top"><button id="menu" aria-label="目录">☰ 目录</button><a class="brand" href="index.html">WQ-LS 设计说明书<small>Design documentation (Chinese original)</small></a>
+<span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文"><a class="ext" href="../index.html" target="_blank">三维整机 ↗</a></header>
+<div class="wrap">
+<nav class="side" aria-label="总目录"><a href="index.html">总览</a><div class="g">G1 设计任务书与总体方案</div><a href="G1-设计任务书.html">设计任务书与总体方案（G1）</a><a href="G1-附图与附件.html">附图与附件</a><div class="g">G2 动力学、强度与仿真</div><a href="G2-设计计算书.html">动力学、强度与仿真</a><a href="G2-附图与附件.html">附图与附件</a><div class="g">G3 外观与机壳铸件</div><a href="G3-外观与机壳铸件.html">外观方案与机壳铸件（中期）</a><a href="G3-附图与附件.html">附图与附件</a><div class="g">G4 零件与机构</div><a href="G4-刺布与挑线机构.html">G4.1 刺布与挑线机构</a><a href="G4-旋梭组.html">旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</a><a href="G4-送布组.html">送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）</a><a href="G4-压脚与操纵件.html">压脚与操纵件：压脚、手抬和膝抬压脚、松线、夹线器、针距旋钮和倒缝扳手（G4.7，2026-11-12）</a><a href="G4-剪线与电子针距.html">选配件：自动剪线 T、电子针距 E（G4.8，2026-11-13）</a><a href="G4-附图与附件.html">附图与附件</a><div class="g">G5 机壳工艺</div><a href="G5-机壳铸造工艺.html">机壳铸造工艺（G5.1 第 1、2 步，2026-11-11）</a><a href="G5-机壳机加工工艺.html">机壳机加工工艺（G5.1 第 3–6 步；G5.2 改版，2026-11-11）</a><a href="G5-附图与附件.html">附图与附件</a><div class="g">G6 网页三维整机</div><a href="G6-网页三维整机.html">G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）</a><a href="G6-附图与附件.html">附图与附件</a><div class="g">G7 工程图与物料清单</div><a href="G7-工程图与物料清单.html">工程图与物料清单（G7）</a><div class="g">G8 整机补全与虚拟样机</div><a href="G8-G8.0-1_总体布置与刺布机构复查.html">G8.0 第 1 步：总体布置复查、刺布机构设计依据</a><a href="G8-G8.0-2_刺布机构依据与改动清单.html">G8.0 第 2 步：刺布机构依据与改动清单（待 Eddie 定）</a><a href="G8-G8.1_虚拟样机验证方案.html">虚拟样机：三维、装配、运动学、动力学、验证（方案，2026-11-16，施工前先定）</a><a href="G8-G8.1_配合表.html" class=cur>配合表（G8.1 第二步）</a><a href="G8-附图与附件.html">附图与附件</a><div class="g">GC 控制器</div><a href="GC-控制器方案与选型.html">平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</a><a href="GC-打样-上电调试步骤书.html">上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</a><a href="GC-附图与附件.html">附图与附件</a><div class="g">企业标准</div><a href="标准-Q-WQ-001_缝纫机螺纹与螺钉.html">Q/WQ 001—2026 缝纫机螺纹与螺钉</a></nav>
+<main><div class="crumb"><a href="index.html">总览</a> › G8 整机补全与虚拟样机 › 配合表（G8.1 第二步）</div><div class="meta">原文：<code>docs/设计/WQ-LS/G8/G8.1_配合表.md</code> · 最后修改 2026-11-17</div>
+<div id="res"></div><article><h1 id="s1">WQ-LS 配合表（G8.1 第二步）<a class="hl" href="#s1" aria-label="本节链接">#</a></h1>
+<p>按 GB/T 1800（ISO 286）算；滚动轴承按普通级（P0）。间隙为正、过盈为负，单位 μm。由 <code>tools/wqls/g81_fits.py</code> 生成，改配合改那个文件再重出。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>组</th>
+<th>配合处</th>
+<th>公称</th>
+<th>孔</th>
+<th>轴 / 外件</th>
+<th>极限（μm）</th>
+<th>性质</th>
+<th>来源</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上轴</td>
+<td>前轴承 6203 外圈 / 机壳前轴承孔</td>
+<td>Ø40</td>
+<td>H7</td>
+<td>轴承外径 P0</td>
+<td>0 … +36</td>
+<td>间隙</td>
+<td>G5 机加工 〇′</td>
+<td>外圈不转、轻载，允许游动；同轴度 Ø0.02 见 G5 精度分析（73%）</td>
+</tr>
+<tr>
+<td>上轴</td>
+<td>前轴承 6203 内圈 / 上轴前端</td>
+<td>Ø17</td>
+<td>轴承内径 P0</td>
+<td>k5</td>
+<td>-17 … -1</td>
+<td>过盈</td>
+<td>G8.1 定</td>
+<td>内圈随轴转，k5 是轻载转动内圈的常用配合</td>
+</tr>
+<tr>
+<td>上轴</td>
+<td>后轴承 6201 外圈 / 机壳后轴承孔</td>
+<td>Ø32</td>
+<td>H7</td>
+<td>轴承外径 P0</td>
+<td>0 … +36</td>
+<td>间隙</td>
+<td>G3 外观与机壳铸件</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>上轴</td>
+<td>后轴承 6201 内圈 / 上轴后端</td>
+<td>Ø12</td>
+<td>轴承内径 P0</td>
+<td>k5</td>
+<td>-17 … -1</td>
+<td>过盈</td>
+<td>G8.1 定</td>
+<td>同前轴承内圈</td>
+</tr>
+<tr>
+<td>上轴</td>
+<td>中间含油轴套外圆 / 机壳中间孔</td>
+<td>Ø35</td>
+<td>H7</td>
+<td>r6</td>
+<td>-50 … -9</td>
+<td>过盈</td>
+<td>孔 G5 〇′；套 G8.1 定</td>
+<td>压入，与针杆下导套同一做法</td>
+</tr>
+<tr>
+<td>上轴</td>
+<td>中间含油轴套内孔 / 上轴轴身</td>
+<td>Ø20</td>
+<td>F7</td>
+<td>h6</td>
+<td>+20 … +54</td>
+<td>间隙</td>
+<td>G8.1 定</td>
+<td>内孔压入后按 F7 验收（与针杆导套同）</td>
+</tr>
+<tr>
+<td>上轴</td>
+<td>曲柄孔 / 上轴前端</td>
+<td>Ø17</td>
+<td>H7</td>
+<td>k5</td>
+<td>-9 … +17</td>
+<td>过渡</td>
+<td>G8.1 定</td>
+<td>轴端与轴承档同一 k5；两颗定位螺钉（左旋螺钉）锁紧，拆曲柄不用拉马</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>曲柄销 / 曲柄销孔</td>
+<td>Ø10</td>
+<td>R7</td>
+<td>h5</td>
+<td>-28 … -7</td>
+<td>过盈</td>
+<td>G8.1 定</td>
+<td>压入；销兼作滚针内滚道，按 h5 磨、淬硬 HRC ≥ 58</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>连杆大头孔 / 滚针 K10×14×10</td>
+<td>Ø14</td>
+<td>G6</td>
+<td>h5</td>
+<td>+6 … +25</td>
+<td>间隙</td>
+<td>G8.1 定</td>
+<td>滚针保持架组件按样本：座孔 G6、轴 h5，得正常游隙。表中按孔 Ø14 G6 对外包络 Ø14 h5 列，只作参考</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>挑线杆毂孔 / 滚针 K10×14×8</td>
+<td>Ø14</td>
+<td>G6</td>
+<td>h5</td>
+<td>+6 … +25</td>
+<td>间隙</td>
+<td>G8.1 定</td>
+<td>同连杆大头</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>针杆 / 下导套内孔</td>
+<td>Ø8</td>
+<td>F7</td>
+<td>h6</td>
+<td>+13 … +37</td>
+<td>间隙</td>
+<td>G8.0-2 第 6 步</td>
+<td>针杆平均速度约 5.2 m/s，间隙按 F7/h6，油芯补油</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>下导套外圆 / 机壳下导套孔</td>
+<td>Ø12</td>
+<td>H7</td>
+<td>r6</td>
+<td>-34 … -5</td>
+<td>过盈</td>
+<td>G8.0-2 第 6 步</td>
+<td>压入</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>针杆 / 上导套（卷制）内孔</td>
+<td>Ø8</td>
+<td>H9</td>
+<td>h6</td>
+<td>0 … +45</td>
+<td>间隙</td>
+<td>孔 G8.0-2；轴 G8.1 定</td>
+<td>卷制轴套压进 Ø10 H7 座孔后内孔约 H9（按卷制轴套样本）</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>针杆连接块孔 / 针杆</td>
+<td>Ø8</td>
+<td>H7</td>
+<td>h6</td>
+<td>0 … +24</td>
+<td>间隙</td>
+<td>G8.1 定</td>
+<td>调针杆高度时要能推动，两颗紧定螺钉锁紧</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>连接销 / 针杆连接块孔</td>
+<td>Ø6</td>
+<td>R7</td>
+<td>h6</td>
+<td>-23 … -3</td>
+<td>过盈</td>
+<td>G8.1 定</td>
+<td>压入</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>连杆小头孔 / 连接销</td>
+<td>Ø6</td>
+<td>F7</td>
+<td>h6</td>
+<td>+10 … +30</td>
+<td>间隙</td>
+<td>G8.1 定</td>
+<td>连杆绕销摆动</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>滑块孔 / 连接销外端</td>
+<td>Ø6</td>
+<td>F7</td>
+<td>h6</td>
+<td>+10 … +30</td>
+<td>间隙</td>
+<td>G8.1 定</td>
+<td>滑块绕销转，连杆斜了滑块仍平贴导轨</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>导轨槽宽 / 滑块厚（y 向）</td>
+<td>10</td>
+<td>H7</td>
+<td>h6</td>
+<td>0 … +24</td>
+<td>间隙</td>
+<td>G8.1 定</td>
+<td>滑块在导轨两面之间滑；导轨淬火后磨槽</td>
+</tr>
+<tr>
+<td>挑线</td>
+<td>挑线杆 M 孔 / 销 M</td>
+<td>Ø5</td>
+<td>R7</td>
+<td>h6</td>
+<td>-23 … -3</td>
+<td>过盈</td>
+<td>G8.1 定</td>
+<td>销压在挑线杆上</td>
+</tr>
+<tr>
+<td>挑线</td>
+<td>摇杆 M 孔 / 销 M</td>
+<td>Ø5</td>
+<td>F7</td>
+<td>h6</td>
+<td>+10 … +30</td>
+<td>间隙</td>
+<td>G8.1 定</td>
+<td>摇杆绕销摆</td>
+</tr>
+<tr>
+<td>挑线</td>
+<td>机壳销座 / 摇杆支点销 Q</td>
+<td>Ø6</td>
+<td>R7</td>
+<td>h6</td>
+<td>-23 … -3</td>
+<td>过盈</td>
+<td>G8.1 定</td>
+<td>从前窗口压入（装配第 18 步）</td>
+</tr>
+<tr>
+<td>挑线</td>
+<td>摇杆 Q 孔 / 支点销 Q</td>
+<td>Ø6</td>
+<td>F7</td>
+<td>h6</td>
+<td>+10 … +30</td>
+<td>间隙</td>
+<td>G8.1 定</td>
+<td>摇杆绕销摆</td>
+</tr>
+<tr>
+<td>压脚</td>
+<td>压脚杆 / 上、下导套</td>
+<td>Ø8</td>
+<td>F7</td>
+<td>h6</td>
+<td>+13 … +37</td>
+<td>间隙</td>
+<td>G8.1 定</td>
+<td>与针杆导套同一做法</td>
+</tr>
+<tr>
+<td>压脚</td>
+<td>手抬扳手轴 / 机壳轴座</td>
+<td>Ø8</td>
+<td>H7</td>
+<td>g6</td>
+<td>+5 … +29</td>
+<td>间隙</td>
+<td>孔 G4 压脚与操纵件；轴 G8.1 定</td>
+<td>慢速转动</td>
+</tr>
+<tr>
+<td>压脚</td>
+<td>膝抬 C1、C2 轴 / 机壳轴座</td>
+<td>Ø6</td>
+<td>H7</td>
+<td>g6</td>
+<td>+4 … +24</td>
+<td>间隙</td>
+<td>同上</td>
+<td>慢速转动</td>
+</tr>
+<tr>
+<td>送布</td>
+<td>送布摆轴 / 两轴座</td>
+<td>Ø14</td>
+<td>H7</td>
+<td>g6</td>
+<td>+6 … +35</td>
+<td>间隙</td>
+<td>孔 G4 送布组；轴 G8.1 定</td>
+<td>同轴度 Ø0.04 见 G5 精度分析（58%）</td>
+</tr>
+<tr>
+<td>送布</td>
+<td>抬牙摆轴前段 / 前轴座</td>
+<td>Ø16</td>
+<td>H7</td>
+<td>g6</td>
+<td>+6 … +35</td>
+<td>间隙</td>
+<td>同上</td>
+<td>前孔大一档，方便镗后孔</td>
+</tr>
+<tr>
+<td>送布</td>
+<td>抬牙摆轴后段 / 后轴座</td>
+<td>Ø14</td>
+<td>H7</td>
+<td>g6</td>
+<td>+6 … +35</td>
+<td>间隙</td>
+<td>同上</td>
+<td>同轴度 Ø0.03 见 G5 精度分析（60%）</td>
+</tr>
+<tr>
+<td>送布</td>
+<td>调节器轴 / 轴座</td>
+<td>Ø10</td>
+<td>H7</td>
+<td>g6</td>
+<td>+5 … +29</td>
+<td>间隙</td>
+<td>同上</td>
+<td>只在调针距时转</td>
+</tr>
+<tr>
+<td>旋梭</td>
+<td>旋梭轴铜套外圆 / 机壳旋梭轴孔</td>
+<td>Ø14</td>
+<td>H7</td>
+<td>r6</td>
+<td>-34 … -5</td>
+<td>过盈</td>
+<td>孔 G4 旋梭组；套 G8.1 定</td>
+<td>两只铜套压入；针杆孔对旋梭轴孔位置度 Ø0.05 见 G5 精度分析（30%）</td>
+</tr>
+<tr>
+<td>旋梭</td>
+<td>下轴左轴承 6201 外圈 / 机壳孔</td>
+<td>Ø32</td>
+<td>H7</td>
+<td>轴承外径 P0</td>
+<td>0 … +36</td>
+<td>间隙</td>
+<td>G4 旋梭组</td>
+<td>同上轴后轴承</td>
+</tr>
+<tr>
+<td>剪线</td>
+<td>拨线竖轴 / 机头底板轴座</td>
+<td>Ø4</td>
+<td>H7</td>
+<td>g6</td>
+<td>+4 … +24</td>
+<td>间隙</td>
+<td>孔 G4 剪线与电子针距；轴 G8.1 定</td>
+<td>电磁铁带动摆 115°</td>
+</tr>
+</tbody>
+</table></div>
+<p>共 32 处；其中 23 处这次补定了轴或套的公差（前面只定了孔）。</p></article><div class="pn"><a href="G8-G8.1_虚拟样机验证方案.html"><span>← 上一篇</span>虚拟样机：三维、装配、运动学、动力学、验证（方案，2026-11-16，施工前先定）</a><a class="nx" href="G8-附图与附件.html"><span>下一篇 →</span>附图与附件</a></div></main>
+<aside class="toc" aria-label="本篇目录"></aside>
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<script src="spec.js"></script>
+</body></html>

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</title>
+<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计） · Design documentation (Chinese original)">
+<link rel="stylesheet" href="spec.css"></head>
+<body>
+<header class="top"><button id="menu" aria-label="目录">☰ 目录</button><a class="brand" href="index.html">WQ-LS 设计说明书<small>Design documentation (Chinese original)</small></a>
+<span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文"><a class="ext" href="../index.html" target="_blank">三维整机 ↗</a></header>
+<div class="wrap">
+<nav class="side" aria-label="总目录"><a href="index.html">总览</a><div class="g">G1 设计任务书与总体方案</div><a href="G1-设计任务书.html">设计任务书与总体方案（G1）</a><a href="G1-附图与附件.html">附图与附件</a><div class="g">G2 动力学、强度与仿真</div><a href="G2-设计计算书.html">动力学、强度与仿真</a><a href="G2-附图与附件.html">附图与附件</a><div class="g">G3 外观与机壳铸件</div><a href="G3-外观与机壳铸件.html">外观方案与机壳铸件（中期）</a><a href="G3-附图与附件.html">附图与附件</a><div class="g">G4 零件与机构</div><a href="G4-刺布与挑线机构.html">G4.1 刺布与挑线机构</a><a href="G4-旋梭组.html">旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</a><a href="G4-送布组.html">送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）</a><a href="G4-压脚与操纵件.html">压脚与操纵件：压脚、手抬和膝抬压脚、松线、夹线器、针距旋钮和倒缝扳手（G4.7，2026-11-12）</a><a href="G4-剪线与电子针距.html">选配件：自动剪线 T、电子针距 E（G4.8，2026-11-13）</a><a href="G4-附图与附件.html">附图与附件</a><div class="g">G5 机壳工艺</div><a href="G5-机壳铸造工艺.html">机壳铸造工艺（G5.1 第 1、2 步，2026-11-11）</a><a href="G5-机壳机加工工艺.html">机壳机加工工艺（G5.1 第 3–6 步；G5.2 改版，2026-11-11）</a><a href="G5-附图与附件.html">附图与附件</a><div class="g">G6 网页三维整机</div><a href="G6-网页三维整机.html">G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）</a><a href="G6-附图与附件.html">附图与附件</a><div class="g">G7 工程图与物料清单</div><a href="G7-工程图与物料清单.html">工程图与物料清单（G7）</a><div class="g">G8 整机补全与虚拟样机</div><a href="G8-G8.0-1_总体布置与刺布机构复查.html">G8.0 第 1 步：总体布置复查、刺布机构设计依据</a><a href="G8-G8.0-2_刺布机构依据与改动清单.html">G8.0 第 2 步：刺布机构依据与改动清单（待 Eddie 定）</a><a href="G8-G8.1_虚拟样机验证方案.html">虚拟样机：三维、装配、运动学、动力学、验证（方案，2026-11-16，施工前先定）</a><a href="G8-G8.1_配合表.html">配合表（G8.1 第二步）</a><a href="G8-附图与附件.html">附图与附件</a><div class="g">GC 控制器</div><a href="GC-控制器方案与选型.html">平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</a><a href="GC-打样-上电调试步骤书.html" class=cur>上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</a><ul><li><a href="#s2">要的仪器</a></li><li><a href="#s3">第 1 步：目检（不上电）</a></li><li><a href="#s4">第 2 步：不上电量阻值</a></li><li><a href="#s5">第 3 步：只上低压辅助电源（外接，不接交流）</a></li><li><a href="#s6">第 4 步：主控烧录、读传感器</a></li><li><a href="#s7">第 5 步：低压直流当母线（48 V），调电流环、电机慢转</a></li><li><a href="#s8">第 6 步：交流经隔离变压器 + 调压器，校正起来</a></li><li><a href="#s9">第 7 步：380 V 母线满压带电机</a></li><li><a href="#s10">第 8 步：接机头缝一段</a></li><li><a href="#s11">每一步的记录</a></li></ul><a href="GC-附图与附件.html">附图与附件</a><div class="g">企业标准</div><a href="标准-Q-WQ-001_缝纫机螺纹与螺钉.html">Q/WQ 001—2026 缝纫机螺纹与螺钉</a></nav>
+<main><div class="crumb"><a href="index.html">总览</a> › GC 控制器 › 上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</div><div class="meta">原文：<code>docs/设计/WQ-LS/GC/打样/上电调试步骤书.md</code> · 最后修改 2026-11-16</div>
+<div id="res"></div><article><h1 id="s1">上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）<a class="hl" href="#s1" aria-label="本节链接">#</a></h1>
+<p>第 159 轮 159h。示例设计，未经硬件验证：这份步骤书就是用来验证设计的。期望值都取自计算书 <code>factory/designs/ctrl-ls/calc/calc.md</code>
+和器件规格书（括号里注出处），不对时先停下查，别往下一步走。</p>
+<blockquote>
+<p><strong>安全</strong>：这块板整块以母线负端为地，<strong>主控、示波器地线都带电网电压</strong>。第 6 步起交流一律经 <strong>1:1 隔离变压器 + 调压器</strong> 进来，
+示波器用差分探头或隔离通道；母线电容 990 µF 充到 390 V 储能约 75 J，断电后等母线测点降到 36 V 以下再碰板子（放电电阻 3 MΩ，
+自放电要几分钟，可用 2 kΩ / 50 W 电阻手动放）。两个人在场，一人只管电源开关。</p>
+</blockquote>
+<h2 id="s2">要的仪器<a class="hl" href="#s2" aria-label="本节链接">#</a></h2>
+<p>万用表、可调直流电源 2 台（0–30 V / 3 A 限流；0–60 V / 5 A 限流）、1:1 隔离变压器（≥ 1 kVA）、调压器（0–250 V）、
+四通道示波器 + 高压差分探头 1 支、电流探头 1 支、LCR 表、ST-Link 烧录器、平缝机头（带电机、编码器）或电机 + 惯量盘。</p>
+<h2 id="s3">第 1 步：目检（不上电）<a class="hl" href="#s3" aria-label="本节链接">#</a></h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>看什么</th>
+<th>期望</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>有极性的器件方向：整流桥 BR101（斜角是 + 脚）、D201（1 脚阴极）、电解电容、二极管</td>
+<td>与丝印一致（核对表第 8、9 项）</td>
+</tr>
+<tr>
+<td>散热器上的四个器件：BR101、Q201、D201、U401</td>
+<td>先上散热器、拧紧螺丝再焊脚；Q201、D201 下面垫了导热绝缘片（散热面带电）</td>
+</tr>
+<tr>
+<td>保险丝 F101</td>
+<td>先<strong>不装</strong>（第 3–5 步不用交流）</td>
+</tr>
+<tr>
+<td>磁性件 L201、T301</td>
+<td>绕制厂实测记录在：L201 ≥ 451 µH；T301 初级 ≤ 753 µH（《磁性件绕制规格单》）</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s4">第 2 步：不上电量阻值<a class="hl" href="#s4" aria-label="本节链接">#</a></h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>两点之间</th>
+<th>期望</th>
+<th>不对先查</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VBUS – GND（母线）</td>
+<td>先很小、慢慢升到 MΩ 级（电容在充表笔电）</td>
+<td>一直是几 Ω：Q201、D201、功率模块 U401 短路</td>
+</tr>
+<tr>
+<td>+15V – GND、+24V – GND、+5V – GND、+3V3 – GND</td>
+<td>都不是 0 Ω</td>
+<td>是 0：对应稳压、电容装反或焊锡连锡</td>
+</tr>
+<tr>
+<td>L_IN – N_IN（交流两线，装保险丝前量 L_F – N_IN）</td>
+<td>≈ 2 MΩ（X 电容放电电阻 R101 + R102）</td>
+<td>—</td>
+</tr>
+<tr>
+<td>安装孔 H1 – 任何网络</td>
+<td>开路</td>
+<td>不是开路：保护地碰到了带电部分</td>
+</tr>
+<tr>
+<td>继电器 K101 线圈（2–5 脚）</td>
+<td>≈ 360 Ω（G5LE-E 规格书 p.2）</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s5">第 3 步：只上低压辅助电源（外接，不接交流）<a class="hl" href="#s5" aria-label="本节链接">#</a></h2>
+<p>辅助反激电源从母线取电，这一步先不用它：用直流电源从输出电容两端往里送。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>接线</th>
+<th>限流</th>
+<th>期望</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+15V 接到 C306 两端</td>
+<td>0.2 A</td>
+<td>电流 &lt; 50 mA；校正控制器 VCC 15 V &gt; 开启门限 12.9 V（ICE3PCS01G p.16），功率模块 VCC 在 13.5–18 V 推荐范围（STGIPS14K60T p.14 表 14）</td>
+</tr>
+<tr>
+<td>+5V 接到 C307 两端</td>
+<td>0.3 A</td>
+<td>+3V3（C310）= 3.3 V ± 2 %（LDO）</td>
+</tr>
+<tr>
+<td>+24V 接到 C304 两端</td>
+<td>0.5 A</td>
+<td>步进驱动、电磁铁回路不动作（主控还没程序），电流 &lt; 50 mA</td>
+</tr>
+</tbody>
+</table></div>
+<p>不对先查：电流顶到限流——对应网络短路；+3V3 不对——LDO 方向、输入。</p>
+<h2 id="s6">第 4 步：主控烧录、读传感器<a class="hl" href="#s6" aria-label="本节链接">#</a></h2>
+<ol>
+<li>ST-Link 接 TP1（SWDIO）、TP2（SWCLK）、TP3（NRST）、TP4（+3V3）、TP5（GND），烧 <code>fw/build/fw.bin</code>。</li>
+<li>晶振 Y1：示波器在 OSC_OUT 看到 8 MHz 正弦；频率差 &gt; ±20 ppm 时按负载电容式子调 C47、C48（核对表第 16 项）。</li>
+<li>编码器接 J701，手转电机：主控遥测里的计数每转 10 000（2500 线 × 4，<code>motor.h</code> CNT_PER_REV），Z 相每转一次。</li>
+<li>脚踏接 J702：踩到底、回中、后踩三档，遥测里的脚踏电压按 10 k / 20 k 分压换算对得上（<code>motor.c</code> 注释）。</li>
+<li>面板口 J601：从隔离侧收发一帧（数字隔离器 + RS-485），隔离侧 +5V_ISO 由 U602 供（4.75–5.25 V 级，YLPTEC p.1）。</li>
+</ol>
+<h2 id="s7">第 5 步：低压直流当母线（48 V），调电流环、电机慢转<a class="hl" href="#s7" aria-label="本节链接">#</a></h2>
+<p>功率模块、校正都不用交流。<strong>用调试版固件</strong>：<code>motor.h</code> 的 <code>VBUS_MIN</code> 由 300 V 改 40 V（只改这一行，<code>make</code> 编译），否则主控按欠压不出 PWM。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>接线 / 操作</th>
+<th>期望</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0–60 V 电源接 VBUS（+）与 GND（−），限流 2 A，从 0 慢升到 48 V</td>
+<td>空载电流 &lt; 50 mA；VBUS_SNS 读数 48 V ± 2 %（分压 3 MΩ / 22 kΩ）</td>
+<td>固件 V_PER_CODE</td>
+</tr>
+<tr>
+<td>主控使能（IPM_SD 拉高），PWM 50 %</td>
+<td>三相 OUT 对 GND 都是 16 kHz 方波；同一相上、下桥之间有 1 µs 死区；<strong>下桥 LIN 脚是低电平导通</strong>（LIN 低有效）</td>
+<td>核对表第 11 项；<code>motor.c</code> TIM1</td>
+</tr>
+<tr>
+<td>对零（ALIGN 2 A）</td>
+<td>相电流约 2 A，电机转到一个电角度停住</td>
+<td><code>motor.h</code> ALIGN_A</td>
+</tr>
+<tr>
+<td>电流环阶跃（iq 0 → 1 A）</td>
+<td>上升约 0.16 ms（带宽 1 kHz）、无振荡</td>
+<td>固件 KP_I、KI_I</td>
+</tr>
+<tr>
+<td>速度 300 r/min</td>
+<td>平稳；电流峰值远低于过流 7.5 A</td>
+<td><code>motor.h</code> I_TRIP</td>
+</tr>
+</tbody>
+</table></div>
+<p>不对先查：电机抖、转向反——编码器 A/B 或相序；有一相没电流——那一相的自举电容（C401–C403）、采样电阻 R411–R416。
+做完把固件改回 <code>VBUS_MIN 300</code>。</p>
+<h2 id="s8">第 6 步：交流经隔离变压器 + 调压器，校正起来<a class="hl" href="#s8" aria-label="本节链接">#</a></h2>
+<p>装上保险丝 F101。交流：电网 → 隔离变压器 → 调压器（先放 0 V）→ J101。示波器差分探头量 VBUS–GND。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>调压器</th>
+<th>期望</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 → 60 V</td>
+<td>母线 ≈ √2 × 交流（整流），校正不动（欠压保护）；热敏电阻 TH101 限浪涌</td>
+<td>ICE3PCS01G BOP（p.18）；计算书“交流输入”</td>
+</tr>
+<tr>
+<td>继续升到 90 V 以上</td>
+<td>校正起来：母线升到 <strong>390 V</strong>（385–395 V：VSENSE 基准 2.5 V ± 1.2 %）</td>
+<td>计算书 bus_voltage_v；ICE3PCS01G p.20</td>
+</tr>
+<tr>
+<td>母线过 95 %（约 370 V）</td>
+<td>VB_OK 出 5 V → K101 吸合（听到“嗒”一声），热敏电阻被短接；K101 线圈电压约 12.2 V（串 82 Ω）</td>
+<td>ICE3PCS01G p.19；计算书“继电器线圈电压”</td>
+</tr>
+<tr>
+<td>升到 220 V，空载</td>
+<td>母线 390 V，纹波很小；辅助反激起来：+24V、+15V、+5V 由反激供（撤掉第 3 步的外接电源<strong>之前</strong>先断开它们）</td>
+<td>—</td>
+</tr>
+<tr>
+<td>有功功率表看输入</td>
+<td>带载后功率因数接近 1（计算书假设 0.99）</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>不对先查：母线冲过 421 V——过压保护该动作（OVP1 108 %，规格书 p.18），立即断电查 VSENSE 分压；继电器不吸合——Q101、R103、VB_OK。
+主控里的“校正关断”（PFC_OFF 拉高 → VBTHL_EN &lt; 0.5 V）此时试一次：母线应回落到整流值。</p>
+<h2 id="s9">第 7 步：380 V 母线满压带电机<a class="hl" href="#s9" aria-label="本节链接">#</a></h2>
+<p>正式固件（<code>VBUS_MIN 300</code>）。脚踏控制：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>期望</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>起动到 5000 r/min</td>
+<td>约 0.1 s 到速，转速波动 ±3 % 以内</td>
+<td>固件仿真场景 ①（<code>fw/out/sim_sew.json</code>）</td>
+</tr>
+<tr>
+<td>后踩：减到 300 r/min、剪线、停上针位</td>
+<td>停针误差 ≤ 1°，剪线电磁铁在 200°–330° 窗口吸合</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>散热器温度（满载 10 分钟）</td>
+<td>散热器表面 ≤ 93 ℃（功率模块壳温限）；实测温升 ÷ 总损耗 41 W = 实测热阻，填回 <code>eda/parts/SK47-150-SA.yaml</code></td>
+<td>计算书“散热器”</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s10">第 8 步：接机头缝一段<a class="hl" href="#s10" aria-label="本节链接">#</a></h2>
+<p>按固件仿真场景 ②：起缝加固、半踩、停下针位、剪线、抬压脚，针数与主轴转的圈数一致。
+再做一次过流（拿手轮卡住）和堵转，期望 5 ms 内关输出、报故障（场景 ③、④）。</p>
+<h2 id="s11">每一步的记录<a class="hl" href="#s11" aria-label="本节链接">#</a></h2>
+<p>量到的值、示波器截图存在 <code>docs/设计/WQ-LS/GC/打样/记录/</code>，和期望值不一样的写进问题单（<code>wqeda.issues</code> 格式），改设计后重出板子。</p></article><div class="pn"><a href="GC-控制器方案与选型.html"><span>← 上一篇</span>平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</a><a class="nx" href="GC-附图与附件.html"><span>下一篇 →</span>附图与附件</a></div></main>
+<aside class="toc" aria-label="本篇目录"><b>本篇目录</b><a class="l2" href="#s2">要的仪器</a><a class="l2" href="#s3">第 1 步：目检（不上电）</a><a class="l2" href="#s4">第 2 步：不上电量阻值</a><a class="l2" href="#s5">第 3 步：只上低压辅助电源（外接，不接交流）</a><a class="l2" href="#s6">第 4 步：主控烧录、读传感器</a><a class="l2" href="#s7">第 5 步：低压直流当母线（48 V），调电流环、电机慢转</a><a class="l2" href="#s8">第 6 步：交流经隔离变压器 + 调压器，校正起来</a><a class="l2" href="#s9">第 7 步：380 V 母线满压带电机</a><a class="l2" href="#s10">第 8 步：接机头缝一段</a><a class="l2" href="#s11">每一步的记录</a></aside>
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<script src="spec.js"></script>
+</body></html>

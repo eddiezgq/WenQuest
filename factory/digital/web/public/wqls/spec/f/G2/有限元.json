@@ -1,0 +1,51 @@
+{
+ "phi": 180.0,
+ "M_I": 4120.856624867186,
+ "stats": {
+  "nodes": 117292,
+  "elements": 70228,
+  "mesh_size_mm": 2.5,
+  "seconds": 206.1,
+  "vm_max_mpa": 72.822,
+  "vm_max_at": [
+   10.725,
+   0.314,
+   -5.044
+  ],
+  "vm_max_faces": [
+   2
+  ],
+  "vm_peak_all_mpa": 99.979,
+  "vm_peak_all_at": [
+   15.818,
+   -0.619,
+   5.968
+  ],
+  "u_max_mm": 0.060717,
+  "u_max_at": [
+   139.0,
+   -7.989,
+   -0.428
+  ],
+  "applied_force_n": [
+   0.0,
+   -49.826,
+   -423.952
+  ],
+  "strength_mpa": 355,
+  "safety_factor": 4.875
+ },
+ "solid": {
+  "bbox_mm": [
+   -11.0,
+   -8.0,
+   -8.0,
+   410.0,
+   8.0,
+   8.0
+  ],
+  "volume_mm3": 71623.3,
+  "faces": 23,
+  "solids": 1
+ }
+}

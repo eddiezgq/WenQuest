@@ -24,7 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.dirname(HERE), os.path.dirname(os.path.dirname(HERE))]
 
 from fastapi import Body, Depends, FastAPI, File, Form, Header, HTTPException, Request, UploadFile  # noqa: E402
-from fastapi.responses import FileResponse, JSONResponse, Response  # noqa: E402
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 
 import wqbus  # noqa: E402
@@ -3187,6 +3187,10 @@ if os.path.isdir(WEB_DIST):
         f = os.path.join(WEB_DIST, path)
         if path and os.path.isfile(f):
             return FileResponse(f)
+        if path and os.path.isfile(os.path.join(f, "index.html")):     # 第 172 轮：/wqls/spec/ 这类静态网站的目录
+            if not path.endswith("/"):
+                return RedirectResponse("/" + path + "/", 308)
+            return FileResponse(os.path.join(f, "index.html"))
         if path.startswith("embed/"):            # 嵌入式 3D 车间（第 4 轮 C8）：只许学习平台和本站嵌入
             anc = " ".join(["'self'"] + [o for o in os.environ.get("WQ_EMBED_ORIGINS", os.environ.get(
                 "WQ_LIBRARY_ORIGINS", "")).split(",") if o.strip()] + ["http://localhost:*", "http://127.0.0.1:*"])

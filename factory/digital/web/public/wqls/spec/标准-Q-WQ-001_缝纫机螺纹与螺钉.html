@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q/WQ 001—2026 缝纫机螺纹与螺钉</title>
+<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计） · Design documentation (Chinese original)">
+<link rel="stylesheet" href="spec.css"></head>
+<body>
+<header class="top"><button id="menu" aria-label="目录">☰ 目录</button><a class="brand" href="index.html">WQ-LS 设计说明书<small>Design documentation (Chinese original)</small></a>
+<span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文"><a class="ext" href="../index.html" target="_blank">三维整机 ↗</a></header>
+<div class="wrap">
+<nav class="side" aria-label="总目录"><a href="index.html">总览</a><div class="g">G1 设计任务书与总体方案</div><a href="G1-设计任务书.html">设计任务书与总体方案（G1）</a><a href="G1-附图与附件.html">附图与附件</a><div class="g">G2 动力学、强度与仿真</div><a href="G2-设计计算书.html">动力学、强度与仿真</a><a href="G2-附图与附件.html">附图与附件</a><div class="g">G3 外观与机壳铸件</div><a href="G3-外观与机壳铸件.html">外观方案与机壳铸件（中期）</a><a href="G3-附图与附件.html">附图与附件</a><div class="g">G4 零件与机构</div><a href="G4-刺布与挑线机构.html">G4.1 刺布与挑线机构</a><a href="G4-旋梭组.html">旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</a><a href="G4-送布组.html">送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）</a><a href="G4-压脚与操纵件.html">压脚与操纵件：压脚、手抬和膝抬压脚、松线、夹线器、针距旋钮和倒缝扳手（G4.7，2026-11-12）</a><a href="G4-剪线与电子针距.html">选配件：自动剪线 T、电子针距 E（G4.8，2026-11-13）</a><a href="G4-附图与附件.html">附图与附件</a><div class="g">G5 机壳工艺</div><a href="G5-机壳铸造工艺.html">机壳铸造工艺（G5.1 第 1、2 步，2026-11-11）</a><a href="G5-机壳机加工工艺.html">机壳机加工工艺（G5.1 第 3–6 步；G5.2 改版，2026-11-11）</a><a href="G5-附图与附件.html">附图与附件</a><div class="g">G6 网页三维整机</div><a href="G6-网页三维整机.html">G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）</a><a href="G6-附图与附件.html">附图与附件</a><div class="g">G7 工程图与物料清单</div><a href="G7-工程图与物料清单.html">工程图与物料清单（G7）</a><div class="g">G8 整机补全与虚拟样机</div><a href="G8-G8.0-1_总体布置与刺布机构复查.html">G8.0 第 1 步：总体布置复查、刺布机构设计依据</a><a href="G8-G8.0-2_刺布机构依据与改动清单.html">G8.0 第 2 步：刺布机构依据与改动清单（待 Eddie 定）</a><a href="G8-G8.1_虚拟样机验证方案.html">虚拟样机：三维、装配、运动学、动力学、验证（方案，2026-11-16，施工前先定）</a><a href="G8-G8.1_配合表.html">配合表（G8.1 第二步）</a><a href="G8-附图与附件.html">附图与附件</a><div class="g">GC 控制器</div><a href="GC-控制器方案与选型.html">平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</a><a href="GC-打样-上电调试步骤书.html">上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</a><a href="GC-附图与附件.html">附图与附件</a><div class="g">企业标准</div><a href="标准-Q-WQ-001_缝纫机螺纹与螺钉.html" class=cur>Q/WQ 001—2026 缝纫机螺纹与螺钉</a><ul><li><a href="#s2">1 范围</a></li><li><a href="#s3">2 引用文件</a></li><li><a href="#s4">3 螺纹</a></li><ul><li><a href="#s5">3.1 牙型和尺寸</a></li><li><a href="#s6">3.2 规格（mm）</a></li><li><a href="#s7">3.3 公差和检验</a></li><li><a href="#s8">3.4 螺孔</a></li></ul><li><a href="#s9">4 螺钉</a></li><ul><li><a href="#s10">4.1 盘头一字螺钉 SMP（右旋）、SML（左旋）</a></li><li><a href="#s11">4.2 内六角平端紧定螺钉 SMS</a></li><li><a href="#s12">4.3 材料和表面</a></li><li><a href="#s13">4.4 标记</a></li></ul><li><a href="#s14">5 出处</a></li></ul></nav>
+<main><div class="crumb"><a href="index.html">总览</a> › 企业标准 › Q/WQ 001—2026 缝纫机螺纹与螺钉</div><div class="meta">原文：<code>docs/设计/WQ-LS/标准/Q-WQ-001_缝纫机螺纹与螺钉.md</code> · 最后修改 2026-11-16</div>
+<div id="res"></div><article><h1 id="s1">Q/WQ 001—2026 缝纫机螺纹与螺钉<a class="hl" href="#s1" aria-label="本节链接">#</a></h1>
+<p>问渠企业标准，2026-11-16 发布（WQ-LS G8.0 第 7 步）。数据由 <code>library/tools/import_sm.py</code> 生成，零件库条目 A-SCR-SMP、A-SCR-SMS、A-SCR-SML；本文表格与零件库一致，改动时先改程序再重新生成。</p>
+<h2 id="s2">1 范围<a class="hl" href="#s2" aria-label="本节链接">#</a></h2>
+<ul>
+<li>适用于问渠平缝机（WQ-LS）及以后的缝纫机产品中<strong>机构内部</strong>的小螺钉：紧针螺钉、针杆连接块、导轨、线钩、曲柄销等。</li>
+<li>机壳盖板、顶盖、电机等外部连接用 ISO 公制螺钉（M4、M5……），不在本标准内。</li>
+</ul>
+<h2 id="s3">2 引用文件<a class="hl" href="#s3" aria-label="本节链接">#</a></h2>
+<ul>
+<li>JIS B 0226 ミシン用ねじ（缝纫机螺纹）：牙型、直径与牙数系列。</li>
+<li>ISO 68-1：60° 基本牙型（与 JIS B 0226 的基本牙型相同）。</li>
+<li>ISO 1580（盘头螺钉）、ISO 4026（内六角平端紧定螺钉）：本标准头部尺寸比例的参照。</li>
+</ul>
+<h2 id="s4">3 螺纹<a class="hl" href="#s4" aria-label="本节链接">#</a></h2>
+<h3 id="s5">3.1 牙型和尺寸<a class="hl" href="#s5" aria-label="本节链接">#</a></h3>
+<ul>
+<li>牙型角 60°，基本牙型同 ISO 68-1。</li>
+<li>大径 d = 公称英寸数 × 25.4 mm，螺距 P = 25.4 / 每英寸牙数。</li>
+<li>基本中径 d2 = d − 0.649519 P，基本小径 D1 = d − 1.082532 P，基本牙高 H1 = 0.541266 P。</li>
+<li>标记：SM + 公称英寸 + “-” + 每英寸牙数，如 <strong>SM 9/64-40</strong>。左旋加 LH：<strong>SM 9/64-40 LH</strong>。</li>
+</ul>
+<h3 id="s6">3.2 规格（mm）<a class="hl" href="#s6" aria-label="本节链接">#</a></h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>规格</th>
+<th>大径 d</th>
+<th>螺距 P</th>
+<th>基本中径 d2</th>
+<th>基本小径 D1</th>
+<th>牙高 H1</th>
+<th>攻丝底孔</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SM 3/32-56</td>
+<td>2.3812</td>
+<td>0.4536</td>
+<td>2.0866</td>
+<td>1.8902</td>
+<td>0.2455</td>
+<td>1.95</td>
+</tr>
+<tr>
+<td>SM 1/8-44</td>
+<td>3.175</td>
+<td>0.5773</td>
+<td>2.8001</td>
+<td>2.5501</td>
+<td>0.3125</td>
+<td>2.6</td>
+</tr>
+<tr>
+<td>SM 9/64-40</td>
+<td>3.5719</td>
+<td>0.635</td>
+<td>3.1594</td>
+<td>2.8845</td>
+<td>0.3437</td>
+<td>2.95</td>
+</tr>
+<tr>
+<td>SM 5/32-32</td>
+<td>3.9688</td>
+<td>0.7937</td>
+<td>3.4532</td>
+<td>3.1095</td>
+<td>0.4296</td>
+<td>3.2</td>
+</tr>
+<tr>
+<td>SM 11/64-40</td>
+<td>4.3656</td>
+<td>0.635</td>
+<td>3.9532</td>
+<td>3.6782</td>
+<td>0.3437</td>
+<td>3.75</td>
+</tr>
+<tr>
+<td>SM 15/64-28</td>
+<td>5.9531</td>
+<td>0.9071</td>
+<td>5.3639</td>
+<td>4.9711</td>
+<td>0.491</td>
+<td>5.05</td>
+</tr>
+<tr>
+<td>SM 1/4-40</td>
+<td>6.35</td>
+<td>0.635</td>
+<td>5.9376</td>
+<td>5.6626</td>
+<td>0.3437</td>
+<td>5.75</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s7">3.3 公差和检验<a class="hl" href="#s7" aria-label="本节链接">#</a></h3>
+<ul>
+<li><strong>螺纹公差按 JIS B 0226 的 2 级。</strong> 本标准暂不列公差数值：JIS B 0226 正文要向日本规格协会购买，买到后把公差表补进 3.2 和零件库规格表，本标准随之改版。</li>
+<li>检验：内、外螺纹都用 <strong>SM 2 级螺纹量规</strong>（通规、止规），OSG 等刀具厂有售，覆盖 SM 3/32-56 ～ SM 1/4-40。量规通过即合格。</li>
+<li>外购螺钉、丝锥都按“SM 2 级”订货。</li>
+</ul>
+<h3 id="s8">3.4 螺孔<a class="hl" href="#s8" aria-label="本节链接">#</a></h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>规定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>攻丝底孔</td>
+<td>d − 0.974 P（75% 牙高），取到 0.05 mm，见 3.2 表</td>
+</tr>
+<tr>
+<td>螺纹深度</td>
+<td>≥ 螺钉旋入长度 + 2P；铸铁件旋入长度 ≥ 1.5d，钢件 ≥ 1.0d</td>
+</tr>
+<tr>
+<td>盲孔钻孔深度</td>
+<td>螺纹深度 + 3P（丝锥头部不完整牙和铁屑）</td>
+</tr>
+<tr>
+<td>螺钉通孔</td>
+<td>d + 0.3 mm，取到 0.1 mm（如 SM 9/64-40 用 Ø3.9）</td>
+</tr>
+<tr>
+<td>盘头沉孔</td>
+<td>直径 dk + 0.7 mm，深度 k + 0.4 mm</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s9">4 螺钉<a class="hl" href="#s9" aria-label="本节链接">#</a></h2>
+<h3 id="s10">4.1 盘头一字螺钉 SMP（右旋）、SML（左旋）<a class="hl" href="#s10" aria-label="本节链接">#</a></h3>
+<p>头部：dk = 1.9d、k = 0.6d（取到 0.1 mm），槽宽 n = 0.2d、槽深 t = 0.5k（取到 0.05 mm），头部上缘倒圆。全螺纹。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>规格</th>
+<th>dk</th>
+<th>k</th>
+<th>n</th>
+<th>t</th>
+<th>公称长度 l</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SM 3/32-56</td>
+<td>4.5</td>
+<td>1.4</td>
+<td>0.5</td>
+<td>0.7</td>
+<td>3、4、5、6、8、10、12</td>
+</tr>
+<tr>
+<td>SM 1/8-44</td>
+<td>6.0</td>
+<td>1.9</td>
+<td>0.65</td>
+<td>0.95</td>
+<td>4 ～ 16</td>
+</tr>
+<tr>
+<td>SM 9/64-40</td>
+<td>6.8</td>
+<td>2.1</td>
+<td>0.7</td>
+<td>1.05</td>
+<td>4 ～ 20</td>
+</tr>
+<tr>
+<td>SM 5/32-32</td>
+<td>7.5</td>
+<td>2.4</td>
+<td>0.8</td>
+<td>1.2</td>
+<td>4 ～ 20</td>
+</tr>
+<tr>
+<td>SM 11/64-40</td>
+<td>8.3</td>
+<td>2.6</td>
+<td>0.85</td>
+<td>1.3</td>
+<td>5 ～ 20</td>
+</tr>
+<tr>
+<td>SM 15/64-28</td>
+<td>11.3</td>
+<td>3.6</td>
+<td>1.2</td>
+<td>1.8</td>
+<td>6 ～ 20</td>
+</tr>
+<tr>
+<td>SM 1/4-40</td>
+<td>12.1</td>
+<td>3.8</td>
+<td>1.25</td>
+<td>1.9</td>
+<td>8 ～ 20</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>长度系列：3、4、5、6、8、10、12、16、20，在 d ～ 6d 之间取。</li>
+<li>左旋 SML 只有 SM 9/64-40、SM 11/64-40、SM 15/64-28 三档，长度 4 ～ 12。用在转动件上，旋向选成转动和振动时越拧越紧的方向。</li>
+</ul>
+<h3 id="s11">4.2 内六角平端紧定螺钉 SMS<a class="hl" href="#s11" aria-label="本节链接">#</a></h3>
+<p>平端直径 dp = 0.65d，内六角对边 s 按 ISO 4026 同径档，内六角深 t = min(0.5d, 0.6l)。全螺纹。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>规格</th>
+<th>dp</th>
+<th>s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SM 3/32-56</td>
+<td>1.5</td>
+<td>0.9</td>
+</tr>
+<tr>
+<td>SM 1/8-44</td>
+<td>2.1</td>
+<td>1.5</td>
+</tr>
+<tr>
+<td>SM 9/64-40</td>
+<td>2.3</td>
+<td>1.5</td>
+</tr>
+<tr>
+<td>SM 5/32-32</td>
+<td>2.6</td>
+<td>2.0</td>
+</tr>
+<tr>
+<td>SM 11/64-40</td>
+<td>2.8</td>
+<td>2.0</td>
+</tr>
+<tr>
+<td>SM 15/64-28</td>
+<td>3.9</td>
+<td>3.0</td>
+</tr>
+<tr>
+<td>SM 1/4-40</td>
+<td>4.1</td>
+<td>3.0</td>
+</tr>
+</tbody>
+</table></div>
+<p>长度：3、4、5、6、8、10、12、16、20，在 0.8d ～ 6d 之间取。</p>
+<h3 id="s12">4.3 材料和表面<a class="hl" href="#s12" aria-label="本节链接">#</a></h3>
+<ul>
+<li>钢，性能等级 8.8（紧定螺钉 45H），发黑。</li>
+<li>紧针螺钉、线钩螺钉在外面看得到的，镀镍。</li>
+</ul>
+<h3 id="s13">4.4 标记<a class="hl" href="#s13" aria-label="本节链接">#</a></h3>
+<p><code>螺钉 SMP 9/64-40 × 8 Q/WQ 001</code>、<code>螺钉 SML 9/64-40 × 6 Q/WQ 001</code>、<code>紧定螺钉 SMS 11/64-40 × 5 Q/WQ 001</code>。</p>
+<p>零件库编号：A-SCR-SMP/SM9_64-40x8 这样（规格里的“/”在文件名中写成“_”）。</p>
+<h2 id="s14">5 出处<a class="hl" href="#s14" aria-label="本节链接">#</a></h2>
+<ul>
+<li>improwis 螺纹表（SM 螺纹 60° 牙型，JIS B 0226 / KS B 0225）：https://www.improwis.com/tables/threads2.webt</li>
+<li>OSG 螺纹量规样本（ミシン（SM）ねじ 2 级，SM 3/32-56 ～ SM 1/4-40）：https://osg.co.jp/media_dl/flier/file/p_9.pdf</li>
+<li>JUKI DDL-8700 零件表（各规格在平缝机上的用法）：https://www.juki.co.jp/industrial_j/download_j/manual_j/ddl8700/menu/ddl8700/pdf/partslist.pdf</li>
+<li>攻丝底孔公式：Machinery's Handbook，“Tap drill sizes”（75% 牙高）。</li>
+</ul></article><div class="pn"><a href="GC-附图与附件.html"><span>← 上一篇</span>附图与附件</a></div></main>
+<aside class="toc" aria-label="本篇目录"><b>本篇目录</b><a class="l2" href="#s2">1 范围</a><a class="l2" href="#s3">2 引用文件</a><a class="l2" href="#s4">3 螺纹</a><a class="l3" href="#s5">3.1 牙型和尺寸</a><a class="l3" href="#s6">3.2 规格（mm）</a><a class="l3" href="#s7">3.3 公差和检验</a><a class="l3" href="#s8">3.4 螺孔</a><a class="l2" href="#s9">4 螺钉</a><a class="l3" href="#s10">4.1 盘头一字螺钉 SMP（右旋）、SML（左旋）</a><a class="l3" href="#s11">4.2 内六角平端紧定螺钉 SMS</a><a class="l3" href="#s12">4.3 材料和表面</a><a class="l3" href="#s13">4.4 标记</a><a class="l2" href="#s14">5 出处</a></aside>
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<script src="spec.js"></script>
+</body></html>

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</title>
+<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计） · Design documentation (Chinese original)">
+<link rel="stylesheet" href="spec.css"></head>
+<body>
+<header class="top"><button id="menu" aria-label="目录">☰ 目录</button><a class="brand" href="index.html">WQ-LS 设计说明书<small>Design documentation (Chinese original)</small></a>
+<span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文"><a class="ext" href="../index.html" target="_blank">三维整机 ↗</a></header>
+<div class="wrap">
+<nav class="side" aria-label="总目录"><a href="index.html">总览</a><div class="g">G1 设计任务书与总体方案</div><a href="G1-设计任务书.html">设计任务书与总体方案（G1）</a><a href="G1-附图与附件.html">附图与附件</a><div class="g">G2 动力学、强度与仿真</div><a href="G2-设计计算书.html">动力学、强度与仿真</a><a href="G2-附图与附件.html">附图与附件</a><div class="g">G3 外观与机壳铸件</div><a href="G3-外观与机壳铸件.html">外观方案与机壳铸件（中期）</a><a href="G3-附图与附件.html">附图与附件</a><div class="g">G4 零件与机构</div><a href="G4-刺布与挑线机构.html">G4.1 刺布与挑线机构</a><a href="G4-旋梭组.html">旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</a><a href="G4-送布组.html">送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）</a><a href="G4-压脚与操纵件.html">压脚与操纵件：压脚、手抬和膝抬压脚、松线、夹线器、针距旋钮和倒缝扳手（G4.7，2026-11-12）</a><a href="G4-剪线与电子针距.html">选配件：自动剪线 T、电子针距 E（G4.8，2026-11-13）</a><a href="G4-附图与附件.html">附图与附件</a><div class="g">G5 机壳工艺</div><a href="G5-机壳铸造工艺.html">机壳铸造工艺（G5.1 第 1、2 步，2026-11-11）</a><a href="G5-机壳机加工工艺.html">机壳机加工工艺（G5.1 第 3–6 步；G5.2 改版，2026-11-11）</a><a href="G5-附图与附件.html">附图与附件</a><div class="g">G6 网页三维整机</div><a href="G6-网页三维整机.html">G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）</a><a href="G6-附图与附件.html">附图与附件</a><div class="g">G7 工程图与物料清单</div><a href="G7-工程图与物料清单.html">工程图与物料清单（G7）</a><div class="g">G8 整机补全与虚拟样机</div><a href="G8-G8.0-1_总体布置与刺布机构复查.html">G8.0 第 1 步：总体布置复查、刺布机构设计依据</a><a href="G8-G8.0-2_刺布机构依据与改动清单.html">G8.0 第 2 步：刺布机构依据与改动清单（待 Eddie 定）</a><a href="G8-G8.1_虚拟样机验证方案.html">虚拟样机：三维、装配、运动学、动力学、验证（方案，2026-11-16，施工前先定）</a><a href="G8-G8.1_配合表.html">配合表（G8.1 第二步）</a><a href="G8-附图与附件.html">附图与附件</a><div class="g">GC 控制器</div><a href="GC-控制器方案与选型.html" class=cur>平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</a><ul><li><a href="#s2">一、一块板，主控以母线负端为地</a></li><li><a href="#s3">二、由规格推出来的额定值（第一遍，159b 的计算书逐项复核）</a></li><li><a href="#s4">三、器件表</a></li><li><a href="#s5">四、几处选择和原因</a></li><li><a href="#s6">五、和细则的偏差</a></li><li><a href="#s7">六、159b 计算后的改动</a></li></ul><a href="GC-打样-上电调试步骤书.html">上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</a><a href="GC-附图与附件.html">附图与附件</a><div class="g">企业标准</div><a href="标准-Q-WQ-001_缝纫机螺纹与螺钉.html">Q/WQ 001—2026 缝纫机螺纹与螺钉</a></nav>
+<main><div class="crumb"><a href="index.html">总览</a> › GC 控制器 › 平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</div><div class="meta">原文：<code>docs/设计/WQ-LS/GC/控制器方案与选型.md</code> · 最后修改 2026-11-12</div>
+<div id="res"></div><article><h1 id="s1">平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）<a class="hl" href="#s1" aria-label="本节链接">#</a></h1>
+<p>示例设计，未经硬件验证，不能直接投产；器件是示例选型。架构照第 138 轮 GC（Eddie 11-10 定）：单相 110–250 V 宽电压输入 → 有源功率因数校正 → 母线 → 智能功率模块逆变 → 永磁同步直驱电机。</p>
+<p><a class="im" href="f/GC/控制器框图.png" target="_blank"><img loading="lazy" alt="控制器框图" src="f/GC/控制器框图.png" /></a></p>
+<p>框图源文件 <a class="fl" href="f/GC/控制器框图.mmd"><code>控制器框图.mmd</code></a>（红：强电；蓝：以母线负端为地的弱电；绿：与人能碰到的接口之间隔离）。</p>
+<h2 id="s2">一、一块板，主控以母线负端为地<a class="hl" href="#s2" aria-label="本节链接">#</a></h2>
+<p>功率部分和主控做在同一块板上（细则第二节第 1 条）。主控不隔离、直接以母线负端为地，这样三相电流用下桥采样电阻、MCU 片内运放直接采，功率模块的输入也不用隔离。
+人能碰到的只有操作面板和它后面的联网：这一路经数字隔离 ADuM1201 和隔离电源 B0505S。脚踏板、电机编码器、针位传感器、电磁铁、步进电机都在机头和电控箱里，按“不可触及”处理（159d 的安全一节写清楚它们的绝缘要求）。</p>
+<h2 id="s3">二、由规格推出来的额定值（第一遍，159b 的计算书逐项复核）<a class="hl" href="#s3" aria-label="本节链接">#</a></h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>推法</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>母线电压</td>
+<td>输入最高 250 V，留 10% 电网波动：250 × 1.1 × √2 = 389 V；升压级的输出必须高于输入峰值才能调节</td>
+<td><strong>390 V</strong>（第 138 轮写“约 380 V”，按这条改为 390 V）</td>
+</tr>
+<tr>
+<td>母线电容耐压</td>
+<td>本设计电容降额 1.25（沿用关节驱动板的设计规则）：390 × 1.25 = 488 V</td>
+<td><strong>500 V</strong>（450 V 不够）</td>
+</tr>
+<tr>
+<td>电机反电势</td>
+<td>选电机时的要求：5000 r/min 时线反电势峰值 ≤ 300 V，给母线留余量</td>
+<td>线反电势常数 ≤ 300 ÷ 523.6 rad/s = 0.573 V·s/rad（峰值）</td>
+</tr>
+<tr>
+<td>电机力矩常数</td>
+<td>磁场定向控制下 Kt = 1.5 × 相反电势常数（峰值）= 1.5 × 0.573 ÷ √3</td>
+<td>0.496 N·m 每安（相电流峰值）</td>
+</tr>
+<tr>
+<td>相电流</td>
+<td>峰值力矩 3 N·m ÷ 0.496；第 138 轮仿真的力矩均方根 0.58 N·m ÷ 0.496</td>
+<td>峰值 6.05 A；均方根力矩对应 1.17 A（峰值）</td>
+</tr>
+<tr>
+<td>母线功率</td>
+<td>电机额定 550 W ÷ 电机效率 0.90 ÷ 逆变效率 0.97 + 辅助电源 ≤ 40 W</td>
+<td>约 670 W</td>
+</tr>
+<tr>
+<td>输入电流</td>
+<td>670 W ÷ 校正效率 0.95 ÷（90 V × 功率因数 0.99）</td>
+<td>约 7.9 A（有效值），保险丝 10 A 慢断</td>
+</tr>
+</tbody>
+</table></div>
+<p>效率、功率因数是第一遍的取值（标“假设”），159b 用规格书参数算出损耗后替换；电机是按上面的要求定制的永磁同步直驱电机（第 138 轮 G2 已定 550 W、峰值 ≥ 3 N·m、转子加手轮 4 × 10⁻⁴ kg·m²）。</p>
+<h2 id="s4">三、器件表<a class="hl" href="#s4" aria-label="本节链接">#</a></h2>
+<p>26 种外购件和 2 种定制磁性元件（159b 计算后换了 3 处、加了 1 种，见第六节）。外购件 2026-11-11 在立创 LCSC 逐个打开核实型号存在、有货；机读清单 <code>factory/designs/ctrl-ls/parts.yaml</code>（159d 生成原理图和物料清单用）。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>用途</th>
+<th>型号</th>
+<th>厂家</th>
+<th>立创编号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入保险丝（5×20 mm，10 A 慢断）</td>
+<td>0215010.MXP</td>
+<td>Littelfuse</td>
+<td><a href="https://www.lcsc.com/product-detail/C142733.html" target="_blank" rel="noopener">C142733</a></td>
+</tr>
+<tr>
+<td>压敏电阻（275 V 交流）</td>
+<td>B72214S0271K101</td>
+<td>TDK</td>
+<td><a href="https://www.lcsc.com/product-detail/C7502584.html" target="_blank" rel="noopener">C7502584</a></td>
+</tr>
+<tr>
+<td>X2 电容 0.47 µF</td>
+<td>BFC233920474</td>
+<td>Vishay</td>
+<td><a href="https://www.lcsc.com/product-detail/C511073.html" target="_blank" rel="noopener">C511073</a></td>
+</tr>
+<tr>
+<td>Y 电容 2.2 nF</td>
+<td>DE1E3RA222MA4BP01F</td>
+<td>Murata</td>
+<td><a href="https://www.lcsc.com/product-detail/C907949.html" target="_blank" rel="noopener">C907949</a></td>
+</tr>
+<tr>
+<td>共模电感 15 mH 10 A</td>
+<td>FC-HLF2018-15mH-10A-LF</td>
+<td>FANGCHENG</td>
+<td><a href="https://www.lcsc.com/product-detail/C5142780.html" target="_blank" rel="noopener">C5142780</a></td>
+</tr>
+<tr>
+<td>浪涌限流热敏电阻</td>
+<td>B57364S0259M000</td>
+<td>TDK</td>
+<td><a href="https://www.lcsc.com/product-detail/C17362791.html" target="_blank" rel="noopener">C17362791</a></td>
+</tr>
+<tr>
+<td>旁路继电器（12 V 线圈）</td>
+<td>G5LE-1-E DC12</td>
+<td>Omron</td>
+<td><a href="https://www.lcsc.com/product-detail/C152711.html" target="_blank" rel="noopener">C152711</a></td>
+</tr>
+<tr>
+<td>整流桥 10 A 600 V</td>
+<td>GBU1006</td>
+<td>LGE</td>
+<td><a href="https://www.lcsc.com/product-detail/C5183365.html" target="_blank" rel="noopener">C5183365</a></td>
+</tr>
+<tr>
+<td>连续导通功率因数校正控制器</td>
+<td>ICE3PCS01G</td>
+<td>Infineon</td>
+<td><a href="https://www.lcsc.com/product-detail/C192050.html" target="_blank" rel="noopener">C192050</a></td>
+</tr>
+<tr>
+<td>升压开关管 600 V 60 mΩ（TO-247）</td>
+<td>IPW60R060P7</td>
+<td>Infineon</td>
+<td><a href="https://www.lcsc.com/product-detail/C454258.html" target="_blank" rel="noopener">C454258</a></td>
+</tr>
+<tr>
+<td>升压二极管（碳化硅 6 A 600 V）</td>
+<td>C3D06060A</td>
+<td>Wolfspeed (Cree)</td>
+<td><a href="https://www.lcsc.com/product-detail/C5693025.html" target="_blank" rel="noopener">C5693025</a></td>
+</tr>
+<tr>
+<td>升压电感</td>
+<td>定制（规格见 159b 计算书）</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>母线电容 330 µF 500 V（3 只）</td>
+<td>500MXH330MEFCSN30X50</td>
+<td>Rubycon</td>
+<td><a href="https://www.lcsc.com/product-detail/C472902.html" target="_blank" rel="noopener">C472902</a></td>
+</tr>
+<tr>
+<td>智能功率模块（三相，14 A 600 V，带热敏电阻）</td>
+<td>STGIPS14K60T</td>
+<td>STMicroelectronics</td>
+<td><a href="https://www.lcsc.com/product-detail/C5268145.html" target="_blank" rel="noopener">C5268145</a></td>
+</tr>
+<tr>
+<td>三相下桥采样电阻 25 mΩ 2512</td>
+<td>WSLT2512R0250FEA</td>
+<td>Vishay</td>
+<td><a href="https://www.lcsc.com/product-detail/C4210426.html" target="_blank" rel="noopener">C4210426</a></td>
+</tr>
+<tr>
+<td>反激控制器（集成开关管）</td>
+<td>TOP266KG</td>
+<td>Power Integrations</td>
+<td><a href="https://www.lcsc.com/product-detail/C568204.html" target="_blank" rel="noopener">C568204</a></td>
+</tr>
+<tr>
+<td>反激变压器</td>
+<td>定制（规格见 159b 计算书）</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>反馈光耦</td>
+<td>PC817X2NSZ9F</td>
+<td>Sharp</td>
+<td><a href="https://www.lcsc.com/product-detail/C390734.html" target="_blank" rel="noopener">C390734</a></td>
+</tr>
+<tr>
+<td>反馈基准</td>
+<td>TL431AIDBZR</td>
+<td>Texas Instruments</td>
+<td><a href="https://www.lcsc.com/product-detail/C23892.html" target="_blank" rel="noopener">C23892</a></td>
+</tr>
+<tr>
+<td>主控</td>
+<td>STM32G431CBT6</td>
+<td>STMicroelectronics</td>
+<td><a href="https://www.lcsc.com/product-detail/C529355.html" target="_blank" rel="noopener">C529355</a></td>
+</tr>
+<tr>
+<td>编码器与针位信号施密特整形</td>
+<td>SN74LVC14APWR</td>
+<td>Texas Instruments</td>
+<td><a href="https://www.lcsc.com/product-detail/C7663.html" target="_blank" rel="noopener">C7663</a></td>
+</tr>
+<tr>
+<td>电磁铁驱动管 80 V</td>
+<td>BSC040N08NS5</td>
+<td>Infineon</td>
+<td><a href="https://www.lcsc.com/product-detail/C534333.html" target="_blank" rel="noopener">C534333</a></td>
+</tr>
+<tr>
+<td>电磁铁关断钳位稳压管</td>
+<td>SMBJ24A</td>
+<td>Littelfuse</td>
+<td><a href="https://www.lcsc.com/product-detail/C224017.html" target="_blank" rel="noopener">C224017</a></td>
+</tr>
+<tr>
+<td>电磁铁续流二极管、24 V 整流管</td>
+<td>ES3D</td>
+<td>onsemi</td>
+<td><a href="https://www.lcsc.com/product-detail/C241735.html" target="_blank" rel="noopener">C241735</a></td>
+</tr>
+<tr>
+<td>针距步进驱动</td>
+<td>TMC2226-SA</td>
+<td>ADI / Trinamic</td>
+<td><a href="https://www.lcsc.com/product-detail/C6718351.html" target="_blank" rel="noopener">C6718351</a></td>
+</tr>
+<tr>
+<td>面板口数字隔离</td>
+<td>ADUM1201ARZ-RL7</td>
+<td>Analog Devices</td>
+<td><a href="https://www.lcsc.com/product-detail/C9669.html" target="_blank" rel="noopener">C9669</a></td>
+</tr>
+<tr>
+<td>面板口隔离电源 5 V→5 V 1 W</td>
+<td>B0505S-1WR2</td>
+<td>YLPTEC</td>
+<td><a href="https://www.lcsc.com/product-detail/C2992393.html" target="_blank" rel="noopener">C2992393</a></td>
+</tr>
+<tr>
+<td>面板口 RS-485</td>
+<td>MAX3485ESA+T</td>
+<td>Analog Devices (Maxim)</td>
+<td><a href="https://www.lcsc.com/product-detail/C18148.html" target="_blank" rel="noopener">C18148</a></td>
+</tr>
+</tbody>
+</table></div>
+<p>阻容、晶振、连接器等通用件在 159d 生成原理图时按封装和数值选，和关节驱动板一样走“到外部库查”的链接。</p>
+<h2 id="s5">四、几处选择和原因<a class="hl" href="#s5" aria-label="本节链接">#</a></h2>
+<ul>
+<li><strong>功率模块选 ST 的 STGIPS14K60T</strong>：KiCad 官方库里有它的符号和封装（SDIP-25L），整个流程能自动生成；14 A 对峰值 6.05 A 余量足，内带三相驱动、自举二极管和热敏电阻。</li>
+<li><strong>校正控制器选英飞凌 ICE3PCS01G（连续导通模式）</strong>：670 W 用临界导通模式电流峰值太大；KiCad 库里有符号。</li>
+<li><strong>辅助电源选 TOP266KG</strong>：电磁铁吸合时 24 V 要几十瓦的脉冲，小功率离线芯片（VIPer、TNY）带不动；TOP26x 在 KiCad 库里有。</li>
+<li><strong>编码器接口不用 WQ-ENCIF</strong>：第 138 轮 GC 提过用它，但它没流片、买不到，和“器件都是查得到的真型号”冲突；电机编码器 ABZ 和霍尔 UVW 经 SN74LVC14A 整形后进 MCU 定时器的编码器模式。</li>
+<li><strong>电流采样用 MCU 片内运放</strong>：STM32G431 有三路运放和比较器，下桥采样直接用，比关节驱动板少三颗 INA240。</li>
+<li><strong>定制磁性元件</strong>：升压电感和反激变压器没有对口的现成型号，159b 由计算给出磁芯、匝数、线径，按规格找绕制厂，这两项在物料清单里标“定制”。</li>
+</ul>
+<h2 id="s6">五、和细则的偏差<a class="hl" href="#s6" aria-label="本节链接">#</a></h2>
+<ul>
+<li>细则 159a 写了“<code>eda/parts/</code> 补录规格书参数”“设计描述骨架 design.yaml”：参数要逐项对规格书的页码录，和用它的计算一起做更不容易错；design.yaml 的功能块还没有实现，先写骨架会让现有的检查报错。两项都挪到 159b，和新功能块一起提交。</li>
+</ul>
+<h2 id="s7">六、159b 计算后的改动<a class="hl" href="#s7" aria-label="本节链接">#</a></h2>
+<ul>
+<li>升压开关管 IPA60R180P7S → IPW60R060P7（TO-247）；母线电容 2 只 → 3 只；电磁铁驱动管 AOD4184A → BSC040N08NS5，钳位 SMBJ33A → SMBJ24A，加续流二极管 ES3D。原因和数见计算书 <code>factory/designs/ctrl-ls/calc/calc.md</code>、细则第八节 159b。</li>
+</ul></article><div class="pn"><a href="G8-附图与附件.html"><span>← 上一篇</span>附图与附件</a><a class="nx" href="GC-打样-上电调试步骤书.html"><span>下一篇 →</span>上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</a></div></main>
+<aside class="toc" aria-label="本篇目录"><b>本篇目录</b><a class="l2" href="#s2">一、一块板，主控以母线负端为地</a><a class="l2" href="#s3">二、由规格推出来的额定值（第一遍，159b 的计算书逐项复核）</a><a class="l2" href="#s4">三、器件表</a><a class="l2" href="#s5">四、几处选择和原因</a><a class="l2" href="#s6">五、和细则的偏差</a><a class="l2" href="#s7">六、159b 计算后的改动</a></aside>
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<script src="spec.js"></script>
+</body></html>

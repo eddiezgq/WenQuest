@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>设计任务书与总体方案（G1）</title>
+<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计） · Design documentation (Chinese original)">
+<link rel="stylesheet" href="spec.css"></head>
+<body>
+<header class="top"><button id="menu" aria-label="目录">☰ 目录</button><a class="brand" href="index.html">WQ-LS 设计说明书<small>Design documentation (Chinese original)</small></a>
+<span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文"><a class="ext" href="../index.html" target="_blank">三维整机 ↗</a></header>
+<div class="wrap">
+<nav class="side" aria-label="总目录"><a href="index.html">总览</a><div class="g">G1 设计任务书与总体方案</div><a href="G1-设计任务书.html" class=cur>设计任务书与总体方案（G1）</a><ul><li><a href="#s3">一、用途与定位 · Purpose</a></li><li><a href="#s4">二、性能指标 · Performance</a></li><li><a href="#s5">三、总体方案 · General scheme</a></li><li><a href="#s6">四、主要机构参数 · Main mechanism parameters</a></li><li><a href="#s7">五、G1 校核结果 · Checks</a></li><ul><li><a href="#s8">G1 里发现并处理的三件事</a></li></ul><li><a href="#s9">六、交给 G2 的问题 · Open items for G2</a></li></ul><a href="G1-附图与附件.html">附图与附件</a><div class="g">G2 动力学、强度与仿真</div><a href="G2-设计计算书.html">动力学、强度与仿真</a><a href="G2-附图与附件.html">附图与附件</a><div class="g">G3 外观与机壳铸件</div><a href="G3-外观与机壳铸件.html">外观方案与机壳铸件（中期）</a><a href="G3-附图与附件.html">附图与附件</a><div class="g">G4 零件与机构</div><a href="G4-刺布与挑线机构.html">G4.1 刺布与挑线机构</a><a href="G4-旋梭组.html">旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</a><a href="G4-送布组.html">送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）</a><a href="G4-压脚与操纵件.html">压脚与操纵件：压脚、手抬和膝抬压脚、松线、夹线器、针距旋钮和倒缝扳手（G4.7，2026-11-12）</a><a href="G4-剪线与电子针距.html">选配件：自动剪线 T、电子针距 E（G4.8，2026-11-13）</a><a href="G4-附图与附件.html">附图与附件</a><div class="g">G5 机壳工艺</div><a href="G5-机壳铸造工艺.html">机壳铸造工艺（G5.1 第 1、2 步，2026-11-11）</a><a href="G5-机壳机加工工艺.html">机壳机加工工艺（G5.1 第 3–6 步；G5.2 改版，2026-11-11）</a><a href="G5-附图与附件.html">附图与附件</a><div class="g">G6 网页三维整机</div><a href="G6-网页三维整机.html">G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）</a><a href="G6-附图与附件.html">附图与附件</a><div class="g">G7 工程图与物料清单</div><a href="G7-工程图与物料清单.html">工程图与物料清单（G7）</a><div class="g">G8 整机补全与虚拟样机</div><a href="G8-G8.0-1_总体布置与刺布机构复查.html">G8.0 第 1 步：总体布置复查、刺布机构设计依据</a><a href="G8-G8.0-2_刺布机构依据与改动清单.html">G8.0 第 2 步：刺布机构依据与改动清单（待 Eddie 定）</a><a href="G8-G8.1_虚拟样机验证方案.html">虚拟样机：三维、装配、运动学、动力学、验证（方案，2026-11-16，施工前先定）</a><a href="G8-G8.1_配合表.html">配合表（G8.1 第二步）</a><a href="G8-附图与附件.html">附图与附件</a><div class="g">GC 控制器</div><a href="GC-控制器方案与选型.html">平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</a><a href="GC-打样-上电调试步骤书.html">上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</a><a href="GC-附图与附件.html">附图与附件</a><div class="g">企业标准</div><a href="标准-Q-WQ-001_缝纫机螺纹与螺钉.html">Q/WQ 001—2026 缝纫机螺纹与螺钉</a></nav>
+<main><div class="crumb"><a href="index.html">总览</a> › G1 设计任务书与总体方案 › 设计任务书与总体方案（G1）</div><div class="meta">原文：<code>docs/设计/WQ-LS/G1/设计任务书.md</code> · 最后修改 2026-11-10</div>
+<div id="res"></div><article><h1 id="s1">WQ-LS 工业直驱平缝机 · 设计任务书与总体方案（G1）<a class="hl" href="#s1" aria-label="本节链接">#</a></h1>
+<h1 id="s2">WQ-LS Direct-Drive Industrial Lockstitch Machine · Design Brief and General Scheme (G1)<a class="hl" href="#s2" aria-label="本节链接">#</a></h1>
+<p>问渠示例设计，第 138 轮　2026-11-10　版本 G1-1
+<em>WenQuest example design, round 138. Checked by calculation and 3D only. No physical prototype has been built.</em></p>
+<p>本文的图和数都由程序生成：<code>python3 tools/wqls/g1.py</code>。主参数在 <code>tools/wqls/spec.py</code>，机构计算用问渠缝纫机设计软件（<code>services/gateway/app/sewcore</code>），原始校核数据在 <a class="fl" href="f/G1/校核.json"><code>校核.json</code></a>。</p>
+<hr />
+<h2 id="s3">一、用途与定位 · Purpose<a class="hl" href="#s3" aria-label="本节链接">#</a></h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>项目 Item</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>产品 Product</td>
+<td>单针平缝机（301 线迹），工业用，直驱伺服，自动润滑</td>
+</tr>
+<tr>
+<td>面料 Fabrics</td>
+<td>轻薄到中厚：衬里、衬衫、棉布、轻牛仔（两到四层）</td>
+</tr>
+<tr>
+<td>用户 Users</td>
+<td>服装厂流水线；同一个机头装在问渠缝纫机厂（数字工厂）的平缝机装配线上，也是蓝湾演示的 WQ-8800D</td>
+</tr>
+<tr>
+<td>选项 Options</td>
+<td><strong>T</strong> 自动剪线（剪线凸轮 + 剪线 / 拨线电磁铁）· <strong>E</strong> 电子针距（闭环步进电机代替机械针距调节）· <strong>D</strong> 少油旋梭（DLC 镀膜）；共 8 种变型，旗舰 WQ-LS-TED（教材《缝纫机设计与制造》第 27 章）</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s4">二、性能指标 · Performance<a class="hl" href="#s4" aria-label="本节链接">#</a></h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>指标 Parameter</th>
+<th>目标 Target</th>
+<th>出处 Basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最高缝速 Max. speed</td>
+<td>5000 r/min</td>
+<td>设计软件默认工况；同类机型公开资料为 4000–5500 r/min</td>
+</tr>
+<tr>
+<td>最大针距 Max. stitch length</td>
+<td>5 mm，带倒缝</td>
+<td>同类机型公开资料（5 mm）</td>
+</tr>
+<tr>
+<td>针杆行程 Needle-bar stroke</td>
+<td>31.0 mm（曲柄半径 15.5 × 2）</td>
+<td>设计软件；同类机型公开资料为 30.7–35 mm</td>
+</tr>
+<tr>
+<td>压脚提升 Presser-foot lift</td>
+<td>手抬 5.5 mm / 膝抬 13 mm</td>
+<td>同类机型公开资料</td>
+</tr>
+<tr>
+<td>机针 Needle</td>
+<td>DB×1，#9–#18，常用 #14（Nm 90）</td>
+<td>同类机型公开资料；设计软件按 Nm 90 校核</td>
+</tr>
+<tr>
+<td>旋梭 Hook</td>
+<td>全回转旋梭，与主轴 2 : 1，自动供油</td>
+<td>教材第 5 章；设计软件</td>
+</tr>
+<tr>
+<td>驱动 Drive</td>
+<td>交流伺服直驱，装在上轴右端（手轮内），额定功率 550 W（示例，G2 按力矩复核）</td>
+<td>教材第 14 章；功率待 G2</td>
+</tr>
+<tr>
+<td>电源 Power supply</td>
+<td>单相 110–250 V，50/60 Hz，宽电压一个型号通用（有源功率因数校正）</td>
+<td>Eddie 2026-11-10 定</td>
+</tr>
+<tr>
+<td>润滑 Lubrication</td>
+<td>油泵自动润滑，油盘在机座下</td>
+<td>教材；工艺方案</td>
+</tr>
+<tr>
+<td>机座 Bed</td>
+<td>517 × 178 mm 平板</td>
+<td>通行的标准平板尺寸（<strong>待核</strong>：G3 前用一份标准或实测资料确认）</td>
+</tr>
+<tr>
+<td>机臂空间 Arm space</td>
+<td>机针到立柱 300 mm，台面到机臂下沿 160 mm</td>
+<td>本设计定</td>
+</tr>
+<tr>
+<td>振动 Vibration</td>
+<td>机壳振动速度 ≤ 4.5 mm/s（5000 r/min）</td>
+<td>设计软件第 23 讲模型；G1 计算 4.0 mm/s</td>
+</tr>
+<tr>
+<td>噪声 Noise</td>
+<td>≤ 84 dB(A)（估算）</td>
+<td>设计软件估算 83.5 dB(A)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s5">三、总体方案 · General scheme<a class="hl" href="#s5" aria-label="本节链接">#</a></h2>
+<p>见 <a class="fl" href="f/G1/总体布置图.png"><code>总体布置图.png</code></a>、<a class="fl" href="f/G1/机构运动简图.png"><code>机构运动简图.png</code></a>。</p>
+<ol>
+<li><strong>坐标</strong> Coordinates：原点在针板上表面、机针中心线上；X 沿上轴向右（手轮方向），Y 向后，Z 向上。</li>
+<li><strong>传动</strong> Drive train：直驱电机 → <strong>上轴</strong>（Z = 200）→ 同步带 1 : 1 → <strong>下轴</strong>（Z = −36）→ 一对 1 : 2 齿轮 → <strong>旋梭轴</strong>（Z = −21.5，旋梭转速为主轴的 2 倍）。</li>
+<li><strong>刺布</strong> Needle bar：上轴左端的刺布曲柄（r = 15.5）、连杆（l = 55）带动针杆，即曲柄滑块机构，连杆比 λ = 0.282。</li>
+<li><strong>挑线</strong> Take-up：与刺布曲柄同在上轴左端的挑线曲柄（20.7），加挑线杆、摇杆组成四连杆机构（设计软件第 4 章参数）。</li>
+<li><strong>送布</strong> Feed：上轴上的送布偏心经针距调节器、连杆带动送布摆轴（水平送布）；下轴上的抬牙偏心（偏心距 1.1 mm）带动抬牙摆轴（升降），两者合成送布牙的椭圆轨迹。E 选项用步进电机代替针距调节器。</li>
+<li><strong>钩线</strong> Hook：钩线时机针从下止点回升 2.0 mm（主轴 206.1°），梭尖高于针眼上沿 1.0 mm，梭尖间隙 0.08 mm。旋梭轴中心高度由这个几何关系反推（梭尖回转半径 13.5）。</li>
+<li><strong>润滑</strong> Lubrication：下轴带油泵，经油管送到上轴、针杆、旋梭；油盘兼作机座下盖。</li>
+<li><strong>机壳</strong> Frame：整体铸铁（HT250，工艺方案定），机臂、立柱、机座一体；轴承座孔一次装夹镗出（工艺方案 3.2 节）。外形在 G3 设计。</li>
+</ol>
+<h2 id="s6">四、主要机构参数 · Main mechanism parameters<a class="hl" href="#s6" aria-label="本节链接">#</a></h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>机构</th>
+<th>参数</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>刺布</td>
+<td>曲柄半径 r / 连杆 l / 行程</td>
+<td>15.5 / 55.0 / 31.0 mm</td>
+</tr>
+<tr>
+<td>刺布</td>
+<td>针杆组件质量</td>
+<td>0.12 kg</td>
+</tr>
+<tr>
+<td>挑线</td>
+<td>曲柄 / 挑线杆 P–M / 摇杆 M–Q / P–线眼</td>
+<td>20.7 / 43.4 / 40.9 / 65.7 mm</td>
+</tr>
+<tr>
+<td>挑线</td>
+<td>线眼偏角 / 曲柄相位 / 摇杆支点 Q</td>
+<td>2.8° / −6.8° / (21.5, −45.5) mm</td>
+</tr>
+<tr>
+<td>钩线</td>
+<td>钩线角 / 回升量 / 梭尖高于针眼 / 梭尖间隙</td>
+<td>206.1° / 2.0 mm / 1.0 mm / 0.08 mm</td>
+</tr>
+<tr>
+<td>送布</td>
+<td>抬牙偏心距 / 牙高出针板 / 送布定时</td>
+<td>1.1 mm / 0.8 mm / <strong>提前 6°</strong></td>
+</tr>
+<tr>
+<td>平衡</td>
+<td>平衡率 / 平衡块（曲柄半径处）</td>
+<td>0.40 / 89 g（G2 由 0.3 定为 0.45；G4 改 0.35；G4.1 挑线机构改共用曲柄销后按实体质量重扫定 0.40，见 G2 计算书）</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s7">五、G1 校核结果 · Checks<a class="hl" href="#s7" aria-label="本节链接">#</a></h2>
+<p>针距 1–5 mm 逐档用设计软件校核（<a class="fl" href="f/G1/校核.json"><code>校核.json</code></a>）：<strong>机构类 17 项全部合格</strong>（刺布、钩线、挑线、送布、整机惯性力、机壳共振、梭尖间隙装配合格率）。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>1 mm</th>
+<th>3 mm</th>
+<th>5 mm</th>
+<th>限值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>针杆下止点惯性力</td>
+<td>654 N</td>
+<td>654 N</td>
+<td>654 N</td>
+<td>≤ 800 N</td>
+</tr>
+<tr>
+<td>钩线时机针回升量</td>
+<td>2.00 mm</td>
+<td>2.00 mm</td>
+<td>2.00 mm</td>
+<td>1.6–2.5 mm</td>
+</tr>
+<tr>
+<td>绕梭时挑线余量</td>
+<td>1.9 mm</td>
+<td>1.9 mm</td>
+<td>1.9 mm</td>
+<td>≥ 1 mm</td>
+</tr>
+<tr>
+<td>挑线四杆传动角</td>
+<td>41°–115°</td>
+<td>41°–115°</td>
+<td>41°–115°</td>
+<td>40°–140°</td>
+</tr>
+<tr>
+<td>机针在布中时送布量</td>
+<td>0.00 mm</td>
+<td>0.01 mm</td>
+<td>0.02 mm</td>
+<td>≤ 0.05 mm</td>
+</tr>
+<tr>
+<td>整机惯性力（最大合力）</td>
+<td>433 N</td>
+<td>433 N</td>
+<td>433 N</td>
+<td>≤ 550 N</td>
+</tr>
+<tr>
+<td>二阶激振 / 机壳固有频率</td>
+<td>0.877</td>
+<td>0.877</td>
+<td>0.877</td>
+<td>≤ 0.90</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s8">G1 里发现并处理的三件事<a class="hl" href="#s8" aria-label="本节链接">#</a></h3>
+<ol>
+<li><strong>改了设计：送布定时提前 6°。</strong> 设计软件的默认定时（0°）在 5 mm 针距时，“机针在布中时送布量”是 0.06 mm，超过 0.05 mm：针还在布里，布已经被拉着走，会拉弯针、跳针。扫了送布定时 −12°…+0.5°：要提前 1.5° 以上，5 mm 才合格；提前到 −12° 仍全部合格（再往前没扫）。提前太多，送布牙抬起得早，牙在针板上的时间整体前移，设计软件里没有校核这一项。所以取 −6°：5 mm 时为 0.02 mm，比限值少 0.03 mm；离 −1.5° 的边界还有 4.5°，以后真机调机时也有调整余地。</li>
+<li><strong>定了 G2、G3 的目标：机壳一阶固有频率 ≥ 210 Hz。</strong> 按设计软件默认的 190 Hz，二阶激振（主轴转速的两倍）和固有频率之比是 0.877，离限值 0.90 很近，共振转速 5700 r/min，只比最高转速高 14%。G3 设计机壳铸件、G2 用 CAE 做模态分析时，一阶要做到 210 Hz 以上（共振转速 ≥ 6300 r/min，比最高转速高 26%）。</li>
+<li><strong>记入使用说明书：短针距要调张力。</strong> 张力类是使用中调的，不是机构问题。按设计软件的模型，棉布两层：
+   - 3–5 mm：标准张力（面线 100 cN、底线 40 cN）合格。
+   - 2 mm：面线降到 95 cN 才不起皱。
+   - 1 mm：调不出既不起皱、又能收紧的张力。所以 1 mm 只用于起止针加固和倒缝，正常缝纫用 2–5 mm。</li>
+</ol>
+<h2 id="s9">六、交给 G2 的问题 · Open items for G2<a class="hl" href="#s9" aria-label="本节链接">#</a></h2>
+<ul>
+<li>动力学：5000 r/min 下主轴驱动力矩曲线和电机选型；各轴承反力随转角的变化；平衡率再优化（现 0.3）。</li>
+<li>强度：上轴（教材《机械设计》33.11）、下轴、刺布曲柄、连杆的疲劳校核。</li>
+<li>机壳：模态目标一阶 ≥ 210 Hz；谐响应。</li>
+<li>机座 517 × 178 的出处核实（见第二节）。</li>
+<li>旋梭轴中心的位置（Y 方向）、齿轮参数、同步带选型。</li>
+</ul></article><div class="pn"><a href="index.html"><span>← 上一篇</span>总览</a><a class="nx" href="G1-附图与附件.html"><span>下一篇 →</span>附图与附件</a></div></main>
+<aside class="toc" aria-label="本篇目录"><b>本篇目录</b><a class="l2" href="#s3">一、用途与定位 · Purpose</a><a class="l2" href="#s4">二、性能指标 · Performance</a><a class="l2" href="#s5">三、总体方案 · General scheme</a><a class="l2" href="#s6">四、主要机构参数 · Main mechanism parameters</a><a class="l2" href="#s7">五、G1 校核结果 · Checks</a><a class="l3" href="#s8">G1 里发现并处理的三件事</a><a class="l2" href="#s9">六、交给 G2 的问题 · Open items for G2</a></aside>
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<script src="spec.js"></script>
+</body></html>

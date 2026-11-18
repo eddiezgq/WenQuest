@@ -1,0 +1,55 @@
+{
+ "input": {
+  "n_rpm": 5000,
+  "r_mm": 15.5,
+  "l_mm": 55.0,
+  "lambda_": 0.282,
+  "m_recip_kg": 0.12,
+  "d_bar_mm": 8.0,
+  "l_bush_mm": [
+   12.0,
+   20.0
+  ],
+  "m_rod_rot_kg": 0.01,
+  "hk0810": {
+   "C": 3800.0,
+   "C0": 3950.0,
+   "n_oil": 29500.0
+  }
+ },
+ "needle_bar": {
+  "f_axial_max_N": 653.6,
+  "beta_max_deg": 16.37,
+  "side_max_N": 82.3,
+  "side_mean_N": 50.4,
+  "v_mean_m_s": 5.17,
+  "v_max_m_s": 8.43
+ },
+ "bushes_without_slide": {
+  "area_mm2": 256.0,
+  "p_MPa": 0.197,
+  "pv": 1.02,
+  "limit_pv": 1.8,
+  "ok": true
+ },
+ "slide_block": {
+  "area_needed_mm2": 144.7,
+  "note": "滑块与导轨接触面积要不小于这个值（按烧结含油材料 pv 1.8 算；有油芯供油时可取更大许用值）"
+ },
+ "rod_bearing_HK0810": {
+  "P_eq_N": 409.5,
+  "P_max_N": 655.0,
+  "static_safety": 6.03,
+  "L10h": 5596
+ },
+ "rod_bearing_compare": {
+  "HK0810（销 Ø8，现值）": {
+   "L10h": 5596,
+   "static_safety": 6.03
+  },
+  "HK1012（销 Ø10）": {
+   "L10h": 19193,
+   "static_safety": 10.38
+  }
+ }
+}

@@ -55,6 +55,7 @@ body.shot .panel,body.shot .top,body.shot .card{display:none!important}
     <button class="toggle" id="fold" data-t="controls">控制</button></div>
   <div class="body">
   <p class="sub" data-t="lead">工业直驱平缝机的真设计：每个零件是 FreeCAD 实体，每 2° 的运动来自设计计算。拖动手轮转主轴，点零件看物料号。</p>
+  <p class="sub" id="specL" hidden><a href="spec/index.html" target="_blank" rel="noopener" data-t="spec">设计说明书：全部设计文档、计算书、工程图 ↗</a></p>
   <div class="sec"><b data-t="s_turn">转动</b>
     <div class="row"><button id="play" class="on" data-t="pause">暂停</button><button data-sp="0.25" data-t="slow">慢</button><button data-sp="1" class="on" data-t="mid">中</button><button data-sp="3" data-t="fast">快</button></div>
     <input id="phi" type="range" min="0" max="359.9" step="0.1" value="0" aria-label="φ">
@@ -90,7 +91,7 @@ const q = new URLSearchParams(location.search);
 const BASE = q.get('d') || '.';
 // ---------------------------------------------------------------- 文字
 const TXT = {
-  zh: { title: 'WQ-LS 整机', controls: '控制', lead: '工业直驱平缝机的真设计：每个零件是 FreeCAD 实体，每 2° 的运动来自设计计算。拖动手轮转主轴，点零件看物料号。',
+  zh: { title: 'WQ-LS 整机', controls: '控制', spec: '设计说明书：全部设计文档、计算书、工程图 ↗', lead: '工业直驱平缝机的真设计：每个零件是 FreeCAD 实体，每 2° 的运动来自设计计算。拖动手轮转主轴，点零件看物料号。',
     s_turn: '转动', pause: '暂停', play: '播放', slow: '慢', mid: '中', fast: '快', phi: '上轴转角 φ', wipeProg: '拨线进度', tip: '针尖高出针板',
     wheelHint: '也可以按住手轮拖着转（点“手轮”视角，右端的轮子）。', s_state: '状态与选项', presser: '压脚', down: '放下', hand: '手抬', knee: '膝抬',
     stitch: '针距', rev5: '倒缝 5', options: '选项', optT: 'T 自动剪线', optE: 'E 电子针距', optD: 'D 少油旋梭', action: '动作', sew: '缝纫',
@@ -104,7 +105,7 @@ const TXT = {
     code: '物料号', kind: '来源', make: '自制', buy: '外购', buyDwg: '按我们的图外协加工或外购', grp: '部件', mat: '材料', matNone: '未定（质量按钢 7.85 g/cm³ 算）',
     mass: '质量', qty: '件数', of: '属于', dwg: '图纸', calc: '计算书', step: '三维模型 STEP', inAsm: '外购部件里的一件', dlc: '选 D 时梭床、梭尖镀 DLC 膜',
     noDwg: '图纸：这一件外协或外购，零件图还没出（本厂自制件都有图）。', g: 'g', kg: 'kg', hsgNote: '机壳上下件合箱后一起精加工，合件物料号 HSG-LS。', fps: '帧/秒' },
-  en: { title: 'WQ-LS complete machine', controls: 'Controls', lead: 'The real design of an industrial direct-drive lockstitch machine: every part is a FreeCAD solid and every 2° of motion comes from the design calculations. Drag the handwheel to turn the main shaft; click a part for its item number.',
+  en: { title: 'WQ-LS complete machine', controls: 'Controls', spec: 'Design documentation: all design documents, calculations and drawings (Chinese) ↗', lead: 'The real design of an industrial direct-drive lockstitch machine: every part is a FreeCAD solid and every 2° of motion comes from the design calculations. Drag the handwheel to turn the main shaft; click a part for its item number.',
     s_turn: 'Turn', pause: 'Pause', play: 'Play', slow: 'Slow', mid: 'Medium', fast: 'Fast', phi: 'Main-shaft angle φ', wipeProg: 'Wiper sweep', tip: 'Needle tip above plate',
     wheelHint: 'You can also grab the handwheel and drag it round (Handwheel view: the wheel at the right end).', s_state: 'States and options', presser: 'Presser', down: 'Down', hand: 'Hand lift', knee: 'Knee lift',
     stitch: 'Stitch', rev5: 'Reverse 5', options: 'Options', optT: 'T thread trimmer', optE: 'E electronic stitch', optD: 'D low-oil hook', action: 'Action', sew: 'Sewing',
@@ -530,4 +531,6 @@ r.setAnimationLoop(now => {
   nfps++; if (now - tf > 1000) { fpsEl.textContent = `${Math.round(nfps * 1000 / (now - tf))} ${t('fps')}`; nfps = 0; tf = now; }
 });
 })();
+// 第 172 轮：设计说明书只在数字工厂有（教材里复制的这份没有 spec/），有才显示入口
+fetch('spec/manifest.json', { method: 'HEAD' }).then(r => { if (r.ok && (r.headers.get('content-type') || '').includes('json')) document.getElementById('specL').hidden = false; }).catch(() => {});
 </script></body></html>

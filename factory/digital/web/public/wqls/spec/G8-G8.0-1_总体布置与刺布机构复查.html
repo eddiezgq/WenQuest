@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G8.0 第 1 步：总体布置复查、刺布机构设计依据</title>
+<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计） · Design documentation (Chinese original)">
+<link rel="stylesheet" href="spec.css"></head>
+<body>
+<header class="top"><button id="menu" aria-label="目录">☰ 目录</button><a class="brand" href="index.html">WQ-LS 设计说明书<small>Design documentation (Chinese original)</small></a>
+<span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文"><a class="ext" href="../index.html" target="_blank">三维整机 ↗</a></header>
+<div class="wrap">
+<nav class="side" aria-label="总目录"><a href="index.html">总览</a><div class="g">G1 设计任务书与总体方案</div><a href="G1-设计任务书.html">设计任务书与总体方案（G1）</a><a href="G1-附图与附件.html">附图与附件</a><div class="g">G2 动力学、强度与仿真</div><a href="G2-设计计算书.html">动力学、强度与仿真</a><a href="G2-附图与附件.html">附图与附件</a><div class="g">G3 外观与机壳铸件</div><a href="G3-外观与机壳铸件.html">外观方案与机壳铸件（中期）</a><a href="G3-附图与附件.html">附图与附件</a><div class="g">G4 零件与机构</div><a href="G4-刺布与挑线机构.html">G4.1 刺布与挑线机构</a><a href="G4-旋梭组.html">旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</a><a href="G4-送布组.html">送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）</a><a href="G4-压脚与操纵件.html">压脚与操纵件：压脚、手抬和膝抬压脚、松线、夹线器、针距旋钮和倒缝扳手（G4.7，2026-11-12）</a><a href="G4-剪线与电子针距.html">选配件：自动剪线 T、电子针距 E（G4.8，2026-11-13）</a><a href="G4-附图与附件.html">附图与附件</a><div class="g">G5 机壳工艺</div><a href="G5-机壳铸造工艺.html">机壳铸造工艺（G5.1 第 1、2 步，2026-11-11）</a><a href="G5-机壳机加工工艺.html">机壳机加工工艺（G5.1 第 3–6 步；G5.2 改版，2026-11-11）</a><a href="G5-附图与附件.html">附图与附件</a><div class="g">G6 网页三维整机</div><a href="G6-网页三维整机.html">G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）</a><a href="G6-附图与附件.html">附图与附件</a><div class="g">G7 工程图与物料清单</div><a href="G7-工程图与物料清单.html">工程图与物料清单（G7）</a><div class="g">G8 整机补全与虚拟样机</div><a href="G8-G8.0-1_总体布置与刺布机构复查.html" class=cur>G8.0 第 1 步：总体布置复查、刺布机构设计依据</a><ul><li><a href="#s2">一、主参数对照公开资料</a></li><ul><li><a href="#s3">结构上的两点不同（要说清楚为什么）</a></li></ul><li><a href="#s4">二、刺布机构：零件对照与缺项</a></li><ul><li><a href="#s5">要查清的依据（下一步）</a></li></ul><li><a href="#s6">出处</a></li></ul><a href="G8-G8.0-2_刺布机构依据与改动清单.html">G8.0 第 2 步：刺布机构依据与改动清单（待 Eddie 定）</a><a href="G8-G8.1_虚拟样机验证方案.html">虚拟样机：三维、装配、运动学、动力学、验证（方案，2026-11-16，施工前先定）</a><a href="G8-G8.1_配合表.html">配合表（G8.1 第二步）</a><a href="G8-附图与附件.html">附图与附件</a><div class="g">GC 控制器</div><a href="GC-控制器方案与选型.html">平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</a><a href="GC-打样-上电调试步骤书.html">上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</a><a href="GC-附图与附件.html">附图与附件</a><div class="g">企业标准</div><a href="标准-Q-WQ-001_缝纫机螺纹与螺钉.html">Q/WQ 001—2026 缝纫机螺纹与螺钉</a></nav>
+<main><div class="crumb"><a href="index.html">总览</a> › G8 整机补全与虚拟样机 › G8.0 第 1 步：总体布置复查、刺布机构设计依据</div><div class="meta">原文：<code>docs/设计/WQ-LS/G8/G8.0-1_总体布置与刺布机构复查.md</code> · 最后修改 2026-11-15</div>
+<div id="res"></div><article><h1 id="s1">WQ-LS G8.0 第 1 步：总体布置复查、刺布机构设计依据<a class="hl" href="#s1" aria-label="本节链接">#</a></h1>
+<p>2026-11-15。依据第 138 轮 G8 细则（Eddie 11-15：先把四大机构、机壳搞好；精品，不急）。</p>
+<p>本步只查、不改模型。每条结论写明出处；改什么，等 Eddie 看过再动手。</p>
+<h2 id="s2">一、主参数对照公开资料<a class="hl" href="#s2" aria-label="本节链接">#</a></h2>
+<p>参照机型是 JUKI 公开的说明书、零件表和产品目录。只取参数和结构关系，不抄图。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>WQ-LS 现值</th>
+<th>公开资料</th>
+<th>判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最高缝速</td>
+<td>5000 r/min</td>
+<td>DDL-8700 5500；DDL-9000C、DDL-8000A、DDL-7000A 5000 [1][2]</td>
+<td>合理</td>
+</tr>
+<tr>
+<td>最大针距</td>
+<td>5 mm</td>
+<td>5 mm [1][2]</td>
+<td>合理</td>
+</tr>
+<tr>
+<td>针杆行程</td>
+<td>31.0 mm</td>
+<td>DDL-8700 30.7 mm，DDL-7000A 35 mm [1][2]</td>
+<td>合理，与 DDL-8700 同级</td>
+</tr>
+<tr>
+<td>压脚提升</td>
+<td>手抬 5.5 / 膝抬 13 mm</td>
+<td>DDL-8700 5.5 / 13；DDL-9000C、DDL-8000A 膝抬 15 mm [1][2]</td>
+<td>合理</td>
+</tr>
+<tr>
+<td>机针</td>
+<td>DB×1 #9–#18，常用 #14</td>
+<td>DB×1 (#14) #9–#18 [1]</td>
+<td>一致</td>
+</tr>
+<tr>
+<td>送布牙高出针板</td>
+<td>0.8 mm</td>
+<td>DDL-8700 0.75–0.85 mm [3]</td>
+<td>在范围内</td>
+</tr>
+<tr>
+<td>梭尖与机针间隙</td>
+<td>0.08 mm</td>
+<td>0.04–0.1 mm [3]</td>
+<td>在范围内</td>
+</tr>
+<tr>
+<td>钩线时机针回升</td>
+<td>2.0 mm</td>
+<td>公开说明书用针杆上的刻线定，不写数值 [3]</td>
+<td>待查（第二节第 4 条）</td>
+</tr>
+<tr>
+<td>机头重量</td>
+<td>铸件 24.6 kg，整机未算</td>
+<td>DDL-8700A 机头 28 kg [1]</td>
+<td>铸件偏重：机构装上后整机会超过 28 kg，G8.0 装完机构要算总重</td>
+</tr>
+<tr>
+<td>润滑油</td>
+<td>未定</td>
+<td>JUKI New Defrix Oil No.1，相当于 ISO VG7 [1]</td>
+<td>定为 ISO VG7 级的缝纫机油，说明书也就有了依据</td>
+</tr>
+<tr>
+<td>机座 517 × 178 mm</td>
+<td>G1 写“通行尺寸，待核”</td>
+<td>尚未找到一手出处</td>
+<td>仍待核：找标准台板开口或厂家外形图</td>
+</tr>
+<tr>
+<td>机臂空间</td>
+<td>300 × 120 mm（G3 为了刚度由 160 改成 120）</td>
+<td>DDL-8000C 特意加长到 305 mm [2]</td>
+<td>长度合理；高度 120 要找同类数值核对</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s3">结构上的两点不同（要说清楚为什么）<a class="hl" href="#s3" aria-label="本节链接">#</a></h3>
+<ol>
+<li><strong>上轴支承</strong>
+   - 我们：两只深沟球轴承（前 6202、后 6201）。
+   - DDL-8700：上轴是三只滑动轴套，前、中、后各一只，叫 MAIN SHAFT BUSHING FRONT / INTERMEDIATE / REAR [4]。
+   - 球轴承的寿命已在 G2 算过：前轴承约 1.6 万小时。
+   - 要做的事：比较“球轴承、滑动轴套”在噪声、润滑、成本上的差别，定下用哪种，写进设计说明。</li>
+<li><strong>旋梭传动</strong>
+   - 我们：上轴经同步带带下轴，下轴经一对齿轮带旋梭轴。
+   - DDL-8700：竖轴加两对锥齿轮 [4]。
+   - 同步带方案在新机型里常见，不改；把选它的理由写进设计说明。</li>
+</ol>
+<h2 id="s4">二、刺布机构：零件对照与缺项<a class="hl" href="#s4" aria-label="本节链接">#</a></h2>
+<p>DDL-8700 零件表里刺布部分的组成 [4]：</p>
+<ul>
+<li>针杆、针杆上导套、针杆下导套；</li>
+<li>针杆夹头组件（带紧定螺钉）、滑块；</li>
+<li>针杆线钩（两处）、橡胶塞；</li>
+<li>针杆曲柄、曲柄连杆、平衡块、左旋螺钉；</li>
+<li>挑线杆里 4 只滚针轴承。</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>零件</th>
+<th>WQ-LS 现状</th>
+<th>缺什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>针杆</td>
+<td>Ø8 圆柱，两端倒角</td>
+<td>缺两条刻线：一条定针杆高度，一条定旋梭定时，DDL-8700 就是这样调的 [3]。缺上端油槽、下端针孔与紧针螺孔的细节。Ø8 的出处待查。</td>
+</tr>
+<tr>
+<td>针杆导套</td>
+<td>机壳里留了 Ø12 孔，写了“含油轴套 Ø8 × Ø12”，<strong>但轴套没有建成零件，BOM 里也没有</strong></td>
+<td>补成两个零件（上、下导套），选材和配合要写明</td>
+</tr>
+<tr>
+<td>针杆连接块（夹头）</td>
+<td>有，靠一个夹紧螺钉固定在针杆上</td>
+<td>夹紧螺钉要换成零件库的标准件</td>
+</tr>
+<tr>
+<td><strong>滑块与导槽</strong></td>
+<td><strong>没有</strong></td>
+<td>DDL-8700 有 SLIDE BLOCK [4]：夹头上的滑块在机壳导槽里上下滑动，承受侧向力，防止针杆转动。要补滑块，机壳上补导槽</td>
+</tr>
+<tr>
+<td>针夹、紧针螺钉</td>
+<td>针夹有；螺钉只是个圆柱</td>
+<td>螺钉换标准件</td>
+</tr>
+<tr>
+<td>针杆线钩</td>
+<td>一处，长在针夹上</td>
+<td>参照机有两处 [4]，按面线路径核对</td>
+</tr>
+<tr>
+<td>连杆与滚针轴承</td>
+<td>连杆有；注释写了“内装滚针轴承”，<strong>轴承没建</strong></td>
+<td>从零件库选滚针轴承（HK 系列）装上，核寿命</td>
+</tr>
+<tr>
+<td>曲柄、平衡块、曲柄销</td>
+<td>有</td>
+<td>销的轴向固定方式（参照机用左旋螺钉 [4]）要定</td>
+</tr>
+<tr>
+<td>上端橡胶塞、防油</td>
+<td>没有</td>
+<td>补</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s5">要查清的依据（下一步）<a class="hl" href="#s5" aria-label="本节链接">#</a></h3>
+<ol>
+<li>针杆直径、导套长度和间距：查专利和教材里的范围，按针杆受力和导套比压校核。</li>
+<li>滑块和导槽的尺寸与间隙。</li>
+<li>缝纫机专用英制细牙螺钉：参照零件表里的规格写法，如 9/64-40、11/64-40、1/4-40、15/64-28 [4]。找到尺寸标准或厂家目录后建模，收进零件库。</li>
+<li>钩线时机针回升量 2.0 mm：用钩线几何复核，再在针杆上刻出对应的刻线。</li>
+</ol>
+<h2 id="s6">出处<a class="hl" href="#s6" aria-label="本节链接">#</a></h2>
+<ol>
+<li>JUKI DDL-8700 系列规格（JUKI 说明书，ManualsLib 收录）：https://www.manualslib.com/manual/832447/Juki-Ddl-5530n.html?page=5</li>
+<li>JUKI 2025 服装类产品目录：https://www.juki.co.jp/industrial_e/products_e/pdf/2025_general_apparel_e.pdf</li>
+<li>JUKI DDL-8700 说明书“针杆高度、机针与旋梭关系、送布牙高度”及“送布牙倾角、送布定时”：https://manualslib.com/manual/884997/Juki-Ddl-8700.html?page=11 、https://www.manualslib.com/manual/884997/Juki-Ddl-8700.html?page=12</li>
+<li>JUKI DDL-8700 零件表：https://www.juki.co.jp/industrial_j/download_j/manual_j/ddl8700/menu/ddl8700/pdf/partslist.pdf</li>
+</ol></article><div class="pn"><a href="G7-工程图与物料清单.html"><span>← 上一篇</span>工程图与物料清单（G7）</a><a class="nx" href="G8-G8.0-2_刺布机构依据与改动清单.html"><span>下一篇 →</span>G8.0 第 2 步：刺布机构依据与改动清单（待 Eddie 定）</a></div></main>
+<aside class="toc" aria-label="本篇目录"><b>本篇目录</b><a class="l2" href="#s2">一、主参数对照公开资料</a><a class="l3" href="#s3">结构上的两点不同（要说清楚为什么）</a><a class="l2" href="#s4">二、刺布机构：零件对照与缺项</a><a class="l3" href="#s5">要查清的依据（下一步）</a><a class="l2" href="#s6">出处</a></aside>
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<script src="spec.js"></script>
+</body></html>

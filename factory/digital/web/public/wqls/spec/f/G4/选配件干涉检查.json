@@ -1,0 +1,405 @@
+{
+ "note": "G4.8 一转干涉检查，每 2°。除设计的配合外 ≥ 1.0 mm；动刀和旋梭、梭壳、送布牙排 ≥ 0.5 mm（mech_check.py 的 TIGHT）。第一遍查出的两处（滚子销离凸轮槽底 0.5、拨线钩扫到压脚前端）改后复查合格；摆杆离凸轮端面 1.2（复查 ted_trim3）。",
+ "states": {
+  "ted_trim": {
+   "name": "旗舰 TED · 剪线那一转 · 5 mm 正缝 · 压脚放下",
+   "scope": "全部选配件，机壳 g73（第一遍）",
+   "step_deg": 2,
+   "frames": 180,
+   "too_close": [
+    [
+     "trim_lever | trim_cam",
+     0.499,
+     42
+    ]
+   ],
+   "closest": [
+    [
+     "trim_lever | trim_cam",
+     0.499,
+     42
+    ],
+    [
+     "hook | moving_knife",
+     0.6,
+     358
+    ],
+    [
+     "feed_bar | moving_knife",
+     0.647,
+     338
+    ],
+    [
+     "moving_knife | casting",
+     1.0,
+     338
+    ],
+    [
+     "knife_shaft | casting",
+     1.4,
+     338
+    ],
+    [
+     "estep_motor | casting",
+     1.4,
+     0
+    ],
+    [
+     "fixed_knife | casting",
+     1.5,
+     0
+    ],
+    [
+     "trim_rock | trim_cam",
+     1.694,
+     358
+    ],
+    [
+     "feed_rock | trim_solenoid",
+     1.888,
+     8
+    ],
+    [
+     "trim_rock | trim_solenoid",
+     2.0,
+     358
+    ]
+   ]
+  },
+  "ted_trim3": {
+   "name": "旗舰 TED · 剪线那一转（复查）",
+   "scope": "改过的件：动刀、动刀轴、动刀轴座、摆轴座、电机板，机壳最后一版",
+   "step_deg": 2,
+   "frames": 180,
+   "too_close": [],
+   "closest": [
+    [
+     "hook | moving_knife",
+     0.6,
+     358
+    ],
+    [
+     "feed_bar | moving_knife",
+     0.647,
+     338
+    ],
+    [
+     "moving_knife | casting",
+     1.0,
+     338
+    ],
+    [
+     "knife_shaft | casting",
+     1.4,
+     338
+    ],
+    [
+     "feed_rock | trim_brackets",
+     3.246,
+     332
+    ],
+    [
+     "bobbin_case | moving_knife",
+     4.4,
+     358
+    ],
+    [
+     "trim_base | trim_rock",
+     8.0,
+     358
+    ],
+    [
+     "trim_brackets | trim_link",
+     8.383,
+     338
+    ],
+    [
+     "feed_bar | trim_base",
+     9.6,
+     330
+    ],
+    [
+     "needle | moving_knife",
+     10.838,
+     134
+    ]
+   ]
+  },
+  "ted_wipe3": {
+   "name": "旗舰 TED · 停在 80° 拨线",
+   "scope": "拨线钩，压脚前端减薄、钢丝抬到 z 5.3 以后",
+   "step_deg": 2,
+   "frames": 180,
+   "too_close": [],
+   "closest": [
+    [
+     "presser_foot | wiper",
+     1.087,
+     288
+    ],
+    [
+     "needle | wiper",
+     2.436,
+     358
+    ],
+    [
+     "feed_bar | wiper",
+     4.599,
+     358
+    ],
+    [
+     "presser_bar | wiper",
+     10.761,
+     358
+    ],
+    [
+     "presser_bushes | wiper",
+     13.26,
+     344
+    ],
+    [
+     "needle_bar | wiper",
+     20.952,
+     298
+    ],
+    [
+     "needle_clamp | wiper",
+     24.123,
+     358
+    ]
+   ]
+  },
+  "ted_hand": {
+   "name": "旗舰 TED · 手抬 5.5 mm · 平时缝纫",
+   "scope": "全部选配件",
+   "step_deg": 2,
+   "frames": 180,
+   "too_close": [],
+   "closest": [
+    [
+     "moving_knife | casting",
+     1.0,
+     0
+    ],
+    [
+     "knife_shaft | casting",
+     1.4,
+     0
+    ],
+    [
+     "estep_motor | casting",
+     1.4,
+     0
+    ],
+    [
+     "feed_bar | fixed_knife",
+     1.5,
+     306
+    ],
+    [
+     "fixed_knife | casting",
+     1.5,
+     0
+    ],
+    [
+     "trim_rock | trim_cam",
+     1.694,
+     352
+    ],
+    [
+     "feed_rock | trim_solenoid",
+     1.888,
+     8
+    ],
+    [
+     "trim_rock | trim_solenoid",
+     2.0,
+     0
+    ],
+    [
+     "trim_lever | trim_cam",
+     2.2,
+     358
+    ],
+    [
+     "feed_rock | trim_brackets",
+     3.246,
+     332
+    ]
+   ]
+  },
+  "ted_r5": {
+   "name": "旗舰 TED · 倒缝 5 mm · 平时缝纫",
+   "scope": "全部选配件",
+   "step_deg": 2,
+   "frames": 180,
+   "too_close": [],
+   "closest": [
+    [
+     "moving_knife | casting",
+     1.0,
+     0
+    ],
+    [
+     "knife_shaft | casting",
+     1.4,
+     0
+    ],
+    [
+     "estep_motor | casting",
+     1.4,
+     0
+    ],
+    [
+     "fixed_knife | casting",
+     1.5,
+     0
+    ],
+    [
+     "trim_lever | trim_cam",
+     1.5,
+     358
+    ],
+    [
+     "trim_rock | trim_cam",
+     1.694,
+     352
+    ],
+    [
+     "feed_rock | trim_solenoid",
+     1.888,
+     4
+    ],
+    [
+     "trim_rock | trim_solenoid",
+     2.0,
+     0
+    ],
+    [
+     "presser_foot | fixed_knife",
+     2.5,
+     102
+    ],
+    [
+     "feed_rock | trim_brackets",
+     3.246,
+     358
+    ]
+   ]
+  },
+  "t_trim": {
+   "name": "只带 T · 剪线那一转 · 3 mm 正缝（机械针距件还在）",
+   "scope": "全部选配件",
+   "step_deg": 2,
+   "frames": 180,
+   "too_close": [
+    [
+     "trim_lever | trim_cam",
+     0.499,
+     42
+    ]
+   ],
+   "closest": [
+    [
+     "trim_lever | trim_cam",
+     0.499,
+     42
+    ],
+    [
+     "hook | moving_knife",
+     0.6,
+     358
+    ],
+    [
+     "feed_bar | moving_knife",
+     0.657,
+     338
+    ],
+    [
+     "moving_knife | casting",
+     1.0,
+     338
+    ],
+    [
+     "knife_shaft | casting",
+     1.4,
+     338
+    ],
+    [
+     "feed_bar | fixed_knife",
+     1.5,
+     304
+    ],
+    [
+     "fixed_knife | casting",
+     1.5,
+     0
+    ],
+    [
+     "trim_rock | trim_cam",
+     1.694,
+     358
+    ],
+    [
+     "feed_rock | trim_solenoid",
+     1.888,
+     4
+    ],
+    [
+     "trim_rock | trim_solenoid",
+     2.0,
+     358
+    ]
+   ]
+  },
+  "e_s5": {
+   "name": "只带 E · 平时缝纫 · 5 mm 正缝",
+   "scope": "电子针距件",
+   "step_deg": 2,
+   "frames": 180,
+   "too_close": [],
+   "closest": [
+    [
+     "estep_motor | casting",
+     1.4,
+     0
+    ],
+    [
+     "estep_pulley_m | casting",
+     4.0,
+     0
+    ],
+    [
+     "estep_belt | casting",
+     4.883,
+     0
+    ],
+    [
+     "estep_bracket | estep_pulley_r",
+     11.0,
+     0
+    ],
+    [
+     "estep_bracket | estep_belt",
+     13.0,
+     0
+    ],
+    [
+     "regulator | estep_pulley_m",
+     17.903,
+     0
+    ],
+    [
+     "bearings_lower | estep_pulley_r",
+     69.345,
+     0
+    ],
+    [
+     "bearings_lower | estep_belt",
+     73.03,
+     0
+    ]
+   ]
+  }
+ }
+}

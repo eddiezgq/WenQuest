@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）</title>
+<meta name="description" content="WQ-LS 工业直驱平缝机设计说明书（问渠示例设计） · Design documentation (Chinese original)">
+<link rel="stylesheet" href="spec.css"></head>
+<body>
+<header class="top"><button id="menu" aria-label="目录">☰ 目录</button><a class="brand" href="index.html">WQ-LS 设计说明书<small>Design documentation (Chinese original)</small></a>
+<span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文"><a class="ext" href="../index.html" target="_blank">三维整机 ↗</a></header>
+<div class="wrap">
+<nav class="side" aria-label="总目录"><a href="index.html">总览</a><div class="g">G1 设计任务书与总体方案</div><a href="G1-设计任务书.html">设计任务书与总体方案（G1）</a><a href="G1-附图与附件.html">附图与附件</a><div class="g">G2 动力学、强度与仿真</div><a href="G2-设计计算书.html">动力学、强度与仿真</a><a href="G2-附图与附件.html">附图与附件</a><div class="g">G3 外观与机壳铸件</div><a href="G3-外观与机壳铸件.html">外观方案与机壳铸件（中期）</a><a href="G3-附图与附件.html">附图与附件</a><div class="g">G4 零件与机构</div><a href="G4-刺布与挑线机构.html">G4.1 刺布与挑线机构</a><a href="G4-旋梭组.html">旋梭组：下轴、同步带、1 : 2 齿轮、旋梭轴、旋梭（G4.5，2026-11-11）</a><a href="G4-送布组.html">送布组：送布、抬牙、针距调节与倒缝、油泵（G4.6，2026-11-11）</a><a href="G4-压脚与操纵件.html">压脚与操纵件：压脚、手抬和膝抬压脚、松线、夹线器、针距旋钮和倒缝扳手（G4.7，2026-11-12）</a><a href="G4-剪线与电子针距.html">选配件：自动剪线 T、电子针距 E（G4.8，2026-11-13）</a><a href="G4-附图与附件.html">附图与附件</a><div class="g">G5 机壳工艺</div><a href="G5-机壳铸造工艺.html">机壳铸造工艺（G5.1 第 1、2 步，2026-11-11）</a><a href="G5-机壳机加工工艺.html">机壳机加工工艺（G5.1 第 3–6 步；G5.2 改版，2026-11-11）</a><a href="G5-附图与附件.html">附图与附件</a><div class="g">G6 网页三维整机</div><a href="G6-网页三维整机.html" class=cur>G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）</a><ul><li><a href="#s2">结论</a></li><li><a href="#s3">一、数据怎么来的</a></li><li><a href="#s4">二、物料号</a></li><li><a href="#s5">三、页面</a></li><li><a href="#s6">四、验收（tools/wqls/render/machine_check.js）</a></li></ul><a href="G6-附图与附件.html">附图与附件</a><div class="g">G7 工程图与物料清单</div><a href="G7-工程图与物料清单.html">工程图与物料清单（G7）</a><div class="g">G8 整机补全与虚拟样机</div><a href="G8-G8.0-1_总体布置与刺布机构复查.html">G8.0 第 1 步：总体布置复查、刺布机构设计依据</a><a href="G8-G8.0-2_刺布机构依据与改动清单.html">G8.0 第 2 步：刺布机构依据与改动清单（待 Eddie 定）</a><a href="G8-G8.1_虚拟样机验证方案.html">虚拟样机：三维、装配、运动学、动力学、验证（方案，2026-11-16，施工前先定）</a><a href="G8-G8.1_配合表.html">配合表（G8.1 第二步）</a><a href="G8-附图与附件.html">附图与附件</a><div class="g">GC 控制器</div><a href="GC-控制器方案与选型.html">平缝机控制器 CTRL-LS · 系统方案与选型（第 159 轮 159a）</a><a href="GC-打样-上电调试步骤书.html">上电调试步骤书：平缝机控制器 CTRL-LS 样板（A 版）</a><a href="GC-附图与附件.html">附图与附件</a><div class="g">企业标准</div><a href="标准-Q-WQ-001_缝纫机螺纹与螺钉.html">Q/WQ 001—2026 缝纫机螺纹与螺钉</a></nav>
+<main><div class="crumb"><a href="index.html">总览</a> › G6 网页三维整机 › G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）</div><div class="meta">原文：<code>docs/设计/WQ-LS/G6/网页三维整机.md</code> · 最后修改 2026-11-13</div>
+<div id="res"></div><article><h1 id="s1">G6.1 网页三维整机“WQ-LS 整机”（第 138 轮，2026-11-13）<a class="hl" href="#s1" aria-label="本节链接">#</a></h1>
+<h2 id="s2">结论<a class="hl" href="#s2" aria-label="本节链接">#</a></h2>
+<p>一个网页，打开就是整台 WQ-LS：98 个零件（FreeCAD 实体）、每 2° 一帧的运动（设计计算 <code>g4_mech.py</code>），8 种变型（T、E、D 任意组合）、压脚三种状态、针距三档、剪线那一转和拨线。
+拖手轮转主轴，一键爆炸、三向剖开，点零件看物料号、来源、材料、质量、图纸和计算书那一节。中英文。</p>
+<ul>
+<li>数字工厂：<code>/wqls/index.html</code>（公开页面，不用登录）；“设计与工艺 → 本厂物料”里问渠缝纫机厂的物料有“在三维整机里看 ↗”；设计案例“WQ-LS”第 5 步有链接。</li>
+<li>教材：《缝纫机设计与制造》第 27 章 27.3 节“三维模型 27-2”，互动资源页也列了。</li>
+<li>设计说明书网页版（第 172 轮）：<code>/wqls/spec/</code>，全部设计文档带总目录和搜索；三维整机面板里有入口。</li>
+</ul>
+<p><a class="im" href="f/G6/整机.png" target="_blank"><img loading="lazy" alt="整机" src="f/G6/整机.png" /></a></p>
+<h2 id="s3">一、数据怎么来的<a class="hl" href="#s3" aria-label="本节链接">#</a></h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>程序</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 各状态的整机</td>
+<td><code>cad/mech.py</code>，<code>WQ_FEED</code> × <code>WQ_PRESS</code> × <code>WQ_OPT</code>（none、TE 各 9 组，T、E 各 1 组），共 20 个整机目录</td>
+<td>每个零件的 STEP、质量</td>
+</tr>
+<tr>
+<td>2. 网页网格</td>
+<td><code>render/web_tess.py</code>（FreeCAD 重新划网格，线偏差 0.1 mm、角偏差 0.5）</td>
+<td>比出图用的粗，网页加载快</td>
+</tr>
+<tr>
+<td>3. 打包</td>
+<td><code>g6_web.py</code>：网格和运动按内容去重；27 组运动（档位 × 压脚 × 剪线）由 <code>g4_mech.py</code> 重算</td>
+<td><code>machine.json</code>、<code>mesh.bin</code>、<code>frames.bin</code>、<code>doc/</code>、<code>dwg/</code>、<code>codes.json</code></td>
+</tr>
+<tr>
+<td>4. 物料号</td>
+<td><code>tools/wqls/part_codes.yaml</code>（三维零件名 → 物料号，G7.1 的 BOM 也用它）</td>
+<td>98 个零件全有号</td>
+</tr>
+</tbody>
+</table></div>
+<p>只带 T 或只带 E 的变型没有在每个状态下单独建，由不带选项的零件加上 TE 里的选配件拼成；在 s3、放下时与真建的逐个比对，网格完全一样（程序里有断言）。</p>
+<p>数据量：98 个零件、141 份网格、18.2 万个三角形；网格 1.99 MB、运动 0.54 MB、零件表 0.13 MB，压缩后合计约 1.25 MB（计划上限 15 MB）。</p>
+<h2 id="s4">二、物料号<a class="hl" href="#s4" aria-label="本节链接">#</a></h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>范围</th>
+<th>规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LS-1xx 主轴与传动、LS-2xx 刺布挑线、LS-3xx 旋梭、LS-4xx 送布与油泵、LS-5xx 压脚与操纵件、LS-7xx 选配件 T、LS-8xx 选配件 E</td>
+<td>我们自己设计的件；kind = make 本厂做，buy = 按我们的图外购（弹簧、铜套）</td>
+</tr>
+<tr>
+<td>BUY-…</td>
+<td>照型号买的：机针、梭壳、同步带、轴承、电磁铁、步进电机、按钮；直驱电机的 9 个零件都用电机的号 BUY-MOTOR-LS，并写明是电机里的哪一件</td>
+</tr>
+<tr>
+<td>HSG-LS-U、HSG-LS-L，合件 HSG-LS-P</td>
+<td>机壳，沿用 G5</td>
+</tr>
+<tr>
+<td>沿用缝纫机厂已有的</td>
+<td>LS-101 上轴、LS-102 下轴、LS-201 针杆、LS-301 旋梭、LS-401 送布偏心、BUY-MOTOR-LS、BUY-NEEDLE-DB、BUY-BOBCASE、BUY-BELT-LS</td>
+</tr>
+</tbody>
+</table></div>
+<p>改正：<a class="fl" href="G4-旋梭组.html"><code>G4/旋梭组.md</code></a> 把下轴写成 LS-501，与工厂的 LS-102 冲突，已改成 LS-102（LS-501 现在是压脚杆）。
+缝纫机厂里现在的 HSG-LS、LS-401 × 2 等是示意 BOM，G7.1 按这张表换成真的。</p>
+<p>材料只写设计文档里写了的（45 钢调质、20CrMnTi、ADC12、HT250、锡青铜、琴钢丝）；没写的页面显示“未定（质量按钢 7.85 g/cm³ 算）”，不编。
+图纸：现在只有机壳有零件图（G5），其他零件点开显示“这一件还没有出零件图”。</p>
+<h2 id="s5">三、页面<a class="hl" href="#s5" aria-label="本节链接">#</a></h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>功能</th>
+<th>做法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>转动</td>
+<td>播放 / 慢、中、快；滑块；按住手轮拖（“手轮”视角，手轮在右端，从左前方看被电机挡住）。帧间插值：平移线性、转动球面插值，拖动是连续的</td>
+</tr>
+<tr>
+<td>状态与选项</td>
+<td>压脚放下 / 手抬 / 膝抬；针距 3 / 5 / 倒缝 5；T、E、D 开关（型号显示 WQ-LS-TED 等）；剪线那一转、拨线（要先开 T；拨线时滑块是拨线进度，针停在 80°）</td>
+</tr>
+<tr>
+<td>爆炸</td>
+<td>8 组（机壳不动；主轴与电机、刺布挑线、旋梭、送布与油泵、压脚与操纵、选配件 T、选配件 E），每组沿退出方向推开，组内再散开；滑块控制</td>
+</tr>
+<tr>
+<td>剖开</td>
+<td>左右、前后、上下三个方向，滑块移动；剖到的实体内壁画成橙色（看起来就是剖面）</td>
+</tr>
+<tr>
+<td>点零件</td>
+<td>卡片：名称、物料号、来源、部件、材料、质量、件数、属于哪个合件；图纸 PDF、计算书那一节（计算书转成网页，原文中文）</td>
+</tr>
+<tr>
+<td>中英文</td>
+<td>不指定时按网站：国内站中文，美国站英文（同数字工厂）；右上角切换，记住选择（和数字工厂同一个设置）；<code>?lang=en</code> 或 <code>?lang=zh</code> 指定；教材中文版带 <code>?lang=zh</code>、英文版带 <code>?lang=en</code></td>
+</tr>
+<tr>
+<td>地址参数</td>
+<td><code>?part=LS-101</code>（选中这个零件）、<code>?opt=TED</code>、<code>?view=whole/iso/face/front/hook/feed/press/trim/wheel</code>、<code>?fps=1</code>（显示帧率）</td>
+</tr>
+</tbody>
+</table></div>
+<p>three.js 用 r128，就放在页面同一目录（数字工厂没有 <code>/vendor/</code>；教材复制时一起带上）。不连任何外部网站，国内也能打开。</p>
+<p><a class="im" href="f/G6/剖开.png" target="_blank"><img loading="lazy" alt="剖开" src="f/G6/剖开.png" /></a>
+<a class="im" href="f/G6/爆炸.png" target="_blank"><img loading="lazy" alt="爆炸" src="f/G6/爆炸.png" /></a>
+<a class="im" href="f/G6/剪线_英文.png" target="_blank"><img loading="lazy" alt="剪线（英文）" src="f/G6/剪线_英文.png" /></a></p>
+<h2 id="s6">四、验收（<code>tools/wqls/render/machine_check.js</code>）<a class="hl" href="#s6" aria-label="本节链接">#</a></h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>要求</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>载入</td>
+<td>20 Mbps 下 5 秒内能转起来</td>
+<td>限速 20 Mbps、延迟 40 ms：1.7 s 可以操作</td>
+</tr>
+<tr>
+<td>帧率</td>
+<td>普通手机 ≥ 30 帧/秒</td>
+<td>18.2 万三角形、约 100 次绘制，手机上不开阴影、像素比限 1.5。<strong>要在真手机上看一次</strong>：打开 <code>/wqls/index.html?fps=1</code>，画面顶上显示帧率</td>
+</tr>
+<tr>
+<td>零件</td>
+<td>每个零件点得到、都有物料号</td>
+<td>98 个零件全有物料号；点上轴弹出 LS-101 卡片</td>
+</tr>
+<tr>
+<td>功能</td>
+<td>爆炸、剖开、8 种变型、各状态</td>
+<td>8 种变型 × 3 档 × 3 种压脚 × 各动作共 144 组切换、每组转一圈，0 报错；三向剖开、爆炸截图如上</td>
+</tr>
+<tr>
+<td>手轮</td>
+<td>拖手轮转主轴</td>
+<td>拖动后 φ 跟着变</td>
+</tr>
+<tr>
+<td>中英文</td>
+<td>都通</td>
+<td>切换正常，截图如上</td>
+</tr>
+<tr>
+<td>数据量</td>
+<td>压缩后 ≤ 15 MB</td>
+<td>约 1.25 MB</td>
+</tr>
+</tbody>
+</table></div></article><div class="pn"><a href="G5-附图与附件.html"><span>← 上一篇</span>附图与附件</a><a class="nx" href="G6-附图与附件.html"><span>下一篇 →</span>附图与附件</a></div></main>
+<aside class="toc" aria-label="本篇目录"><b>本篇目录</b><a class="l2" href="#s2">结论</a><a class="l2" href="#s3">一、数据怎么来的</a><a class="l2" href="#s4">二、物料号</a><a class="l2" href="#s5">三、页面</a><a class="l2" href="#s6">四、验收（tools/wqls/render/machine_check.js）</a></aside>
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<script src="spec.js"></script>
+</body></html>

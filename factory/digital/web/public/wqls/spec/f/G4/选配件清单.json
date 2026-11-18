@@ -1,0 +1,251 @@
+{
+ "note": "8 种变型；质量按三维零件（钢 7.85、铝 2.75、塑料 1.2、电磁铁和电机按铜 8.9 g/cm³ 粗算）",
+ "names": {
+  "moving_knife": "动刀",
+  "knife_shaft": "动刀轴（含曲柄）",
+  "fixed_knife": "定刀",
+  "trim_base": "动刀轴座",
+  "trim_cam": "剪线凸轮",
+  "trim_lever": "剪线摆杆",
+  "trim_roller": "滚子 Ø8",
+  "trim_rock": "剪线摆轴（含曲柄）",
+  "trim_link": "球头拉杆",
+  "trim_brackets": "摆轴座（两个，右边托电磁铁）",
+  "trim_solenoid": "剪线电磁铁 24 V Ø22",
+  "wiper": "拨线钩（钢丝 Ø0.8、轴、小曲柄）",
+  "wiper_solenoid": "拨线电磁铁 24 V Ø16",
+  "release_arm_t": "立轴拨杆加的臂",
+  "release_solenoid": "松线电磁铁 24 V Ø16（含支架）",
+  "estep_motor": "42 步进电机 48 mm（带磁编码器）",
+  "estep_bracket": "电机板",
+  "estep_pulley_m": "电机带轮 12 齿",
+  "estep_pulley_r": "调节器带轮 24 齿",
+  "estep_belt": "同步带 HTD 3M 宽 9",
+  "reverse_button": "倒缝按钮"
+ },
+ "removed_by_E": {
+  "pull_rod": "针距拉杆",
+  "stitch_dial": "针距旋钮（槽轮）",
+  "reverse_lever": "倒缝扳手",
+  "reverse_spring": "拉簧"
+ },
+ "variants": [
+  {
+   "model": "WQ-LS",
+   "T": false,
+   "E": false,
+   "D": false,
+   "add": [],
+   "remove": [],
+   "mass_add_g": 0,
+   "mass_remove_g": 0.0,
+   "process_extra": []
+  },
+  {
+   "model": "WQ-LS-D",
+   "T": false,
+   "E": false,
+   "D": true,
+   "add": [],
+   "remove": [],
+   "mass_add_g": 0,
+   "mass_remove_g": 0.0,
+   "process_extra": [
+    "旋梭（梭床、梭尖）镀 DLC 膜，膜厚 2–3 µm"
+   ]
+  },
+  {
+   "model": "WQ-LS-E",
+   "T": false,
+   "E": true,
+   "D": false,
+   "add": [
+    "estep_belt",
+    "estep_bracket",
+    "estep_motor",
+    "estep_pulley_m",
+    "estep_pulley_r",
+    "reverse_button"
+   ],
+   "remove": [
+    "pull_rod",
+    "reverse_lever",
+    "reverse_spring",
+    "stitch_dial"
+   ],
+   "mass_add_g": 907.8,
+   "mass_remove_g": "unknown",
+   "process_extra": [
+    "合件工序 80 第 9 步：选 E 的孔；立柱旋钮、倒缝扳手孔不加工，装盖板"
+   ]
+  },
+  {
+   "model": "WQ-LS-ED",
+   "T": false,
+   "E": true,
+   "D": true,
+   "add": [
+    "estep_belt",
+    "estep_bracket",
+    "estep_motor",
+    "estep_pulley_m",
+    "estep_pulley_r",
+    "reverse_button"
+   ],
+   "remove": [
+    "pull_rod",
+    "reverse_lever",
+    "reverse_spring",
+    "stitch_dial"
+   ],
+   "mass_add_g": 907.8,
+   "mass_remove_g": "unknown",
+   "process_extra": [
+    "旋梭（梭床、梭尖）镀 DLC 膜，膜厚 2–3 µm",
+    "合件工序 80 第 9 步：选 E 的孔；立柱旋钮、倒缝扳手孔不加工，装盖板"
+   ]
+  },
+  {
+   "model": "WQ-LS-T",
+   "T": true,
+   "E": false,
+   "D": false,
+   "add": [
+    "fixed_knife",
+    "knife_shaft",
+    "moving_knife",
+    "release_arm_t",
+    "release_solenoid",
+    "trim_base",
+    "trim_brackets",
+    "trim_cam",
+    "trim_lever",
+    "trim_link",
+    "trim_rock",
+    "trim_roller",
+    "trim_solenoid",
+    "wiper",
+    "wiper_solenoid"
+   ],
+   "remove": [],
+   "mass_add_g": 554.3,
+   "mass_remove_g": 0.0,
+   "process_extra": [
+    "合件工序 80 第 9 步：选 T 的孔"
+   ]
+  },
+  {
+   "model": "WQ-LS-TD",
+   "T": true,
+   "E": false,
+   "D": true,
+   "add": [
+    "fixed_knife",
+    "knife_shaft",
+    "moving_knife",
+    "release_arm_t",
+    "release_solenoid",
+    "trim_base",
+    "trim_brackets",
+    "trim_cam",
+    "trim_lever",
+    "trim_link",
+    "trim_rock",
+    "trim_roller",
+    "trim_solenoid",
+    "wiper",
+    "wiper_solenoid"
+   ],
+   "remove": [],
+   "mass_add_g": 554.3,
+   "mass_remove_g": 0.0,
+   "process_extra": [
+    "旋梭（梭床、梭尖）镀 DLC 膜，膜厚 2–3 µm",
+    "合件工序 80 第 9 步：选 T 的孔"
+   ]
+  },
+  {
+   "model": "WQ-LS-TE",
+   "T": true,
+   "E": true,
+   "D": false,
+   "add": [
+    "estep_belt",
+    "estep_bracket",
+    "estep_motor",
+    "estep_pulley_m",
+    "estep_pulley_r",
+    "fixed_knife",
+    "knife_shaft",
+    "moving_knife",
+    "release_arm_t",
+    "release_solenoid",
+    "reverse_button",
+    "trim_base",
+    "trim_brackets",
+    "trim_cam",
+    "trim_lever",
+    "trim_link",
+    "trim_rock",
+    "trim_roller",
+    "trim_solenoid",
+    "wiper",
+    "wiper_solenoid"
+   ],
+   "remove": [
+    "pull_rod",
+    "reverse_lever",
+    "reverse_spring",
+    "stitch_dial"
+   ],
+   "mass_add_g": 1462.1,
+   "mass_remove_g": "unknown",
+   "process_extra": [
+    "合件工序 80 第 9 步：选 T 的孔",
+    "合件工序 80 第 9 步：选 E 的孔；立柱旋钮、倒缝扳手孔不加工，装盖板"
+   ]
+  },
+  {
+   "model": "WQ-LS-TED",
+   "T": true,
+   "E": true,
+   "D": true,
+   "add": [
+    "estep_belt",
+    "estep_bracket",
+    "estep_motor",
+    "estep_pulley_m",
+    "estep_pulley_r",
+    "fixed_knife",
+    "knife_shaft",
+    "moving_knife",
+    "release_arm_t",
+    "release_solenoid",
+    "reverse_button",
+    "trim_base",
+    "trim_brackets",
+    "trim_cam",
+    "trim_lever",
+    "trim_link",
+    "trim_rock",
+    "trim_roller",
+    "trim_solenoid",
+    "wiper",
+    "wiper_solenoid"
+   ],
+   "remove": [
+    "pull_rod",
+    "reverse_lever",
+    "reverse_spring",
+    "stitch_dial"
+   ],
+   "mass_add_g": 1462.1,
+   "mass_remove_g": "unknown",
+   "process_extra": [
+    "旋梭（梭床、梭尖）镀 DLC 膜，膜厚 2–3 µm",
+    "合件工序 80 第 9 步：选 T 的孔",
+    "合件工序 80 第 9 步：选 E 的孔；立柱旋钮、倒缝扳手孔不加工，装盖板"
+   ]
+  }
+ ]
+}

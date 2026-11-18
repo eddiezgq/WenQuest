@@ -8,6 +8,10 @@
 "Bulk capacitor 500 V"
 ],
 [
+"缝纫机左旋盘头螺钉 SML 9/64-40 × 8 + 紧定螺钉 SMS 15/64-28 × 8 两个（曲柄螺钉组） Crank screw set",
+"Crank screw set"
+],
+[
 "采样电阻 25 mΩ 1% 2512（示例选型 Vishay WSLT2512R0250FEA，未经硬件验证） Current shunt 25 mΩ",
 "Current shunt 25 mΩ"
 ],
@@ -48,6 +52,10 @@
 "Encoder interface IC"
 ],
 [
+"缝纫机盘头螺钉 SMP 9/64-40 × 20（Q/WQ 001） Pan head screw SM 9/64-40 × 20",
+"Pan head screw SM 9/64-40 × 20"
+],
+[
 "平缝机控制器光板 4 层 外层 3 oz 250 × 150 mm（外协） Sewing controller bare PCB",
 "Sewing controller bare PCB"
 ],
@@ -80,6 +88,10 @@
 "Rotary hook, low-oil (DLC-coated, bought)"
 ],
 [
+"缝纫机盘头螺钉 SMP 9/64-40 × 5（Q/WQ 001） Pan head screw SM 9/64-40 × 5",
+"Pan head screw SM 9/64-40 × 5"
+],
+[
 "升压开关管 600 V 60 mΩ（示例选型 Infineon IPW60R060P7，未经硬件验证） PFC MOSFET",
 "PFC MOSFET"
 ],
@@ -102,6 +114,10 @@
 [
 "实时内核与驱动的开源组件包（BSD / Apache，审查入库） RTOS open-source components",
 "RTOS open-source components"
+],
+[
+"缝纫机紧定螺钉 SMS 11/64-40 × 4（Q/WQ 001） Set screw SM 11/64-40 × 4",
+"Set screw SM 11/64-40 × 4"
 ],
 [
 "问渠工业直驱平缝机 WQ-LS-D（示例）Direct-drive lockstitch machine WQ-LS-D",
@@ -150,6 +166,10 @@
 [
 "台式机主板元件套料（供电、芯片组、插座、接口，型号待确认） Desktop board component kit",
 "Desktop board component kit"
+],
+[
+"油路螺钉组：M4 × 10 两个、SMP 9/64-40 × 12 两个 Oil-system screw set",
+"Oil-system screw set"
 ],
 [
 "云原生组件包（容器编排、分布式存储、网络，Apache-2.0） Cloud-native components",
@@ -272,6 +292,14 @@
 "Bridge rectifier"
 ],
 [
+"深沟球轴承 6201-2RS（两面接触密封） Ball bearing 12×32×10, sealed",
+"Ball bearing 12×32×10, sealed"
+],
+[
+"深沟球轴承 6203-2RS（两面接触密封） Ball bearing 17×40×12, sealed",
+"Ball bearing 17×40×12, sealed"
+],
+[
 "半桥栅极驱动（示例选型 IR2101S，未经硬件验证） Half-bridge gate driver",
 "Half-bridge gate driver"
 ],
@@ -328,6 +356,10 @@
 "Schmitt inverter"
 ],
 [
+"滚针保持架组件 K10×14×10 Needle roller and cage K10×14×10",
+"Needle roller and cage K10×14×10"
+],
+[
 "贴片电阻 0805（抱闸电流采样 0.5 Ω，第 114 轮） Chip resistor 0805",
 "Chip resistor 0805"
 ],
@@ -382,6 +414,10 @@
 [
 "失电制动器 80 机座（24 V，型号待确认） Fail-safe brake frame 80",
 "Fail-safe brake frame 80"
+],
+[
+"滚针保持架组件 K10×14×8 Needle roller and cage K10×14×8",
+"Needle roller and cage K10×14×8"
 ],
 [
 "笔记本主板光板 10 层 HDI（外协） Notebook mainboard bare PCB",
@@ -892,6 +928,10 @@
 "2N7002 Small-signal MOSFET"
 ],
 [
+"尼龙油管 Ø2 × 0.4，0.2 m Nylon oil line Ø2",
+"m Nylon oil line Ø2"
+],
+[
 "扭矩传感器线缆（屏蔽，型号待确认） Torque sensor cable",
 "Torque sensor cable"
 ],
@@ -1356,10 +1396,6 @@
 "6201 Ball bearing 12×32×10"
 ],
 [
-"深沟球轴承 6202 Ball bearing 15×35×11",
-"6202 Ball bearing 15×35×11"
-],
-[
 "环氧塑封料（型号待确认） Epoxy mold compound",
 "Epoxy mold compound"
 ],
@@ -1742,6 +1778,10 @@
 [
 "服务器处理器（插座式，型号待确认） Server CPU",
 "Server CPU"
+],
+[
+"橡胶塞 Ø12（机头顶） Rubber plug Ø12",
+"Rubber plug Ø12"
 ],
 [
 "砝码标定 Dead-weight calibration",

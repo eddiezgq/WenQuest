@@ -1,0 +1,99 @@
+{
+ "limit_mm": 1.0,
+ "step_deg": 2,
+ "frames": 180,
+ "seconds": 6262,
+ "pairs": [
+  [
+   "needle | bobbin_case",
+   1.08,
+   166
+  ],
+  [
+   "hook_shaft | bobbin_case",
+   1.47,
+   358
+  ],
+  [
+   "hook | casting",
+   1.47,
+   356
+  ],
+  [
+   "hook_shaft | casting",
+   2.0,
+   358
+  ],
+  [
+   "gear_hook | casting",
+   2.87,
+   356
+  ],
+  [
+   "pulley_lower | casting",
+   2.899,
+   342
+  ],
+  [
+   "bushes_hook | hook",
+   3.47,
+   356
+  ],
+  [
+   "gear_lower | hook_shaft",
+   4.353,
+   352
+  ],
+  [
+   "belt | casting",
+   4.5,
+   0
+  ],
+  [
+   "pulley_lower | bearings_lower",
+   4.899,
+   342
+  ],
+  [
+   "lower_shaft | casting",
+   4.999,
+   342
+  ],
+  [
+   "needle | casting",
+   5.19,
+   358
+  ],
+  [
+   "shaft | belt",
+   5.778,
+   310
+  ],
+  [
+   "gear_lower | casting",
+   6.0,
+   358
+  ],
+  [
+   "belt | bearings_lower",
+   6.5,
+   0
+  ],
+  [
+   "belt | lower_shaft",
+   7.779,
+   358
+  ],
+  [
+   "bobbin_case | casting",
+   8.47,
+   0
+  ],
+  [
+   "pulley_upper | casting",
+   10.899,
+   342
+  ]
+ ],
+ "too_close": []
+}
