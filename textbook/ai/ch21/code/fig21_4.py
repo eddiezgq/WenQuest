@@ -55,7 +55,7 @@ a.set_title(T("(a) 同一个模型、同一批数据，换个划分就换个结�
               "(a) one model, one dataset, three different verdicts"), fontsize=10)
 a.annotate(T("竖线是 8 折的全距；按时间划分不含随机性，所以没有竖线",
              "bars show the range over 8 folds; the time split is deterministic"),
-           xy=(0.5, 0.06), xycoords="axes fraction", ha="center",
+           xy=(0.5, -0.13), xycoords="axes fraction", ha="center",
            fontsize=8, color=C["muted"])
 a.grid(alpha=0.25, lw=0.5, axis="y")
 
@@ -73,8 +73,8 @@ b.axvline(cut - 0.5, color=C["ink"], ls="--", lw=1.6)
 b.annotate(T(f"训练 / 测试的分界\n训练段 {np.mean([r['fault'] for r in tr]) * 100:.0f}% 有故障，"
              f"测试段 {np.mean([r['fault'] for r in te]) * 100:.0f}%",
              "train/test cut"),
-           xy=(cut - 0.5, 50), xytext=(-8, 0), textcoords="offset points",
-           ha="right", fontsize=8.5, color=C["ink"])
+           xy=(0.2, 88), xytext=(0, 0), textcoords="offset points",
+           ha="left", fontsize=8.5, color=C["ink"])
 b.set_xlabel(T("第几轮采集（时间先后）", "run index (in time order)"))
 b.set_ylabel(T("有故障的比例（%）", "share with a fault (%)"))
 b.set_title(T("(b) 故障是长出来的：未来那一段更多、也更重",
