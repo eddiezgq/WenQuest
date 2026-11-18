@@ -47,10 +47,14 @@ def policy(params, bat):
     return out_c
 
 
+MARGIN = 0.05                      # 安全层额外留的余量（占总容量），显式假设
+v["margin"] = MARGIN
+
+
 def evaluate(params, bat, use_safe):
     plan = policy(params, bat)
     if use_safe:
-        plan = safe_layer(plan, pv, load, bat)
+        plan = safe_layer(plan, pv, load, bat, margin=MARGIN)
     cost, _, viol = dispatch_cost(pv, load, price, plan, bat)
     return cost, viol
 
@@ -87,12 +91,15 @@ print("**这就是仿真到现实的差距**：仿真里调出来的参数，真
 v["cost_safe"], v["viol_safe"] = evaluate(best, REAL, True)
 v["safe_cost_pct"] = (v["cost_safe"] / v["cost_sim_tuned_real"] - 1) * 100
 v["viol_avoided"] = v["viol_sim_tuned_real"] - v["viol_safe"]
-print(f"\n外面套一层安全层：电费 {v['cost_safe']:,.0f} 元"
+print(f"\n外面套一层安全层（额外留 {MARGIN:.0%} 余量）：电费 {v['cost_safe']:,.0f} 元"
       f"（{v['safe_cost_pct']:+.2f}%），越界 {v['viol_safe']} 次"
       f"（少了 {v['viol_avoided']} 次）")
-assert v["viol_safe"] <= v["viol_sim_tuned_real"], "安全层只会让越界更少"
-print("**安全层几乎不花钱，却把“靠电池管理系统拦着”变成了“自己不越界”**——"
-      "前者每一次都是报警、是寿命损耗，后者什么也不会发生")
+assert v["viol_safe"] == 0, "安全层的职责就是把越界清零"
+assert v["cost_safe"] > v["cost_sim_tuned_real"], "留余量要花钱，这笔钱就是安全层的价钱"
+print(f"**安全层的价钱是 {v['safe_cost_pct']:.2f}% 的电费，买回来的是 "
+      f"{v['viol_avoided']} 次越界变成 0 次**")
+print("要留余量，是因为真设备的效率与可用容量都与标称值不一样：只按标称值投影，"
+      "等于把余量全交给电池管理系统去兜——那每一次都是报警、是寿命损耗，不是免费的")
 
 # ---------- 四、把越界计入目标，再调一次
 best2, best2_cost = BASE, 1e18

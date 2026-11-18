@@ -269,10 +269,17 @@ def rule_dispatch(pv: np.ndarray, load: np.ndarray, price: np.ndarray,
 
 
 def safe_layer(charge: np.ndarray, pv: np.ndarray, load: np.ndarray,
-               bat: dict = BATTERY) -> np.ndarray:
-    """安全层：把计划投影到"不会越界"的范围里。**学不出来的那一层，要写出来。**"""
+               bat: dict = BATTERY, margin: float = 0.0) -> np.ndarray:
+    """安全层：把计划投影到"不会越界"的范围里。**学不出来的那一层，要写出来。**
+
+    `margin` 是**额外留出来的余量**（占总容量的比例）：真设备的效率与可用容量都与标称值
+    不一样，只按标称值投影，等于把余量全交给电池管理系统去兜。留余量要花钱——
+    这笔钱就是安全层的价钱，算例会把它算出来。
+    """
     soc = bat["soc0"] * bat["cap_kwh"]
-    lo, hi = bat["soc_min"] * bat["cap_kwh"], bat["soc_max"] * bat["cap_kwh"]
+    lo = (bat["soc_min"] + margin) * bat["cap_kwh"]
+    hi = (bat["soc_max"] - margin) * bat["cap_kwh"]
+    soc = float(np.clip(soc, lo, hi))
     out = np.empty(len(charge))
     for i, c in enumerate(charge):
         c = float(np.clip(c, -bat["p_max_kw"], bat["p_max_kw"]))
@@ -283,3 +290,98 @@ def safe_layer(charge: np.ndarray, pv: np.ndarray, load: np.ndarray,
         soc += (c * bat["eta"] if c > 0 else c / bat["eta"]) * DT_H
         soc = float(np.clip(soc, lo, hi))
     return out
+
+
+# ================================ 四、约束下的连续控制：机房冷却（22.3 节）
+
+HALL = {
+    "c_th": 1200.0,        # 机房热容（kWh/℃），显式假设
+    "ua": 9.0,             # 与室外的换热系数（kW/℃）
+    "t_max": 27.0,         # 冷通道温度上限（℃），超过就算越界
+    "t_min": 18.0,         # 低于这个温度是白花钱
+    "t0": 23.0,            # 初始温度（℃）
+    "cool_max": 750.0,     # 冷机最大制冷量（kW）
+}
+
+
+def it_load(n_days: int, seed: int = 0, base_kw: float = 260.0,
+            peak_kw: float = 230.0) -> np.ndarray:
+    """机房的 IT 热负荷（kW）：白天忙、夜里闲，偶尔来一波批量作业。"""
+    g = np.random.default_rng(seed + 4201)
+    t = np.arange(n_days * STEPS_PER_DAY) * DT_H % 24.0
+    shape = 0.5 + 0.5 * np.sin((t - 9.0) / 24.0 * 2 * math.pi)
+    x = base_kw + peak_kw * shape
+    for _ in range(n_days * 2):                      # 批量作业：突然加载，持续一两小时
+        i = int(g.integers(0, n_days * STEPS_PER_DAY))
+        w = int(g.integers(4, 10))
+        x[i:i + w] += peak_kw * 0.55
+    x *= 1.0 + 0.03 * g.normal(0.0, 1.0, len(t))
+    return np.maximum(x, 0.0)
+
+
+def ambient(n_days: int, seed: int = 0, mean_c: float = 24.0,
+            swing_c: float = 7.0) -> np.ndarray:
+    """室外温度（℃）：日变化 + 几天尺度的慢变化。"""
+    g = np.random.default_rng(seed + 613)
+    t = np.arange(n_days * STEPS_PER_DAY) * DT_H
+    daily = -np.cos((t % 24.0 - 3.0) / 24.0 * 2 * math.pi)
+    slow = np.convolve(g.normal(0, 1, len(t) + 400), np.ones(400) / 400, "same")[:len(t)]
+    return mean_c + swing_c * 0.5 * daily + 3.0 * slow * 4.0
+
+
+def cop(t_amb: np.ndarray | float, cop0: float = 5.6, k: float = 0.085):
+    """冷机能效比：室外越热，同样的制冷量越费电。**这是本节省电空间的来源**。"""
+    return np.maximum(cop0 - k * (np.asarray(t_amb) - 20.0), 1.6)
+
+
+def run_hall(policy, n_days: int, seed: int = 0, hall: dict = HALL,
+             gain: float = 1.0, safety: bool = False) -> dict:
+    """把一个控制策略放进机房跑一遍，返回电耗、越界次数与温度轨迹。
+
+    `policy(t_now, t_amb, q_it, k)` 返回制冷量（kW）。`gain` 是**真实设备与仿真的差别**：
+    真实冷机的制冷量比仿真里标称的少一点（gain < 1）。`safety` 打开时，
+    外面那层会在温度快要越界前把制冷量顶到最大——**学不出来的那一层，要写出来**。
+    """
+    q = it_load(n_days, seed)
+    amb = ambient(n_days, seed)
+    n = len(q)
+    t_now = hall["t0"]
+    temps = np.empty(n)
+    kwh = 0.0
+    viol = 0
+    over = 0.0
+    for k in range(n):
+        u = float(policy(t_now, amb[k], q[k], k))
+        if safety:
+            # 预测下一步的温度：要越界就顶到最大
+            nxt = t_now + (q[k] - u * gain + hall["ua"] * (amb[k] - t_now)) / hall["c_th"] * DT_H
+            if nxt > hall["t_max"] - 0.3:
+                u = hall["cool_max"]
+        u = float(np.clip(u, 0.0, hall["cool_max"]))
+        kwh += u / float(cop(amb[k])) * DT_H
+        t_now += (q[k] - u * gain + hall["ua"] * (amb[k] - t_now)) / hall["c_th"] * DT_H
+        temps[k] = t_now
+        if t_now > hall["t_max"]:
+            viol += 1
+            over += (t_now - hall["t_max"]) * DT_H
+    return {"kwh": kwh, "viol": viol, "over_degh": over, "temps": temps,
+            "amb": amb, "q": q, "t_max": hall["t_max"]}
+
+
+def setpoint_policy(setpoint: float, kp: float = 240.0, hall: dict = HALL):
+    """规则控制：盯住一个设定温度，差多少补多少（比例控制）。"""
+    def f(t_now, t_amb, q_it, k):
+        return q_it + hall["ua"] * (t_amb - t_now) + kp * (t_now - setpoint)
+    return f
+
+
+def learned_policy(setpoint: float, kp: float, lead: float, hall: dict = HALL):
+    """“学出来的”策略：同样的结构，但多用了两件仿真里学到的事——
+
+    设定温度可以贴着上限走（省电），而且可以**借室外温度提前动**（lead）。
+    参数由算例在仿真里搜出来，不是手写的。
+    """
+    def f(t_now, t_amb, q_it, k):
+        return (q_it + hall["ua"] * (t_amb - t_now) + kp * (t_now - setpoint)
+                + lead * (t_amb - 24.0))
+    return f

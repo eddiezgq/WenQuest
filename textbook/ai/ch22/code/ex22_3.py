@@ -86,8 +86,32 @@ v["nn_ratio"] = v["nn_time"] / v["nn_random"]
 print(f"\n最近邻模型（只会照抄最像的那条）：随机划分 {v['nn_random']:.2f} kW，"
       f"按时间划分 {v['nn_time']:.2f} kW，差 {v['nn_ratio']:.1f} 倍")
 assert v["nn_time"] > v["nn_random"], "随机划分时，测试集里每一条都有近亲在训练集里"
-print("**模型越能记，随机划分虚高得越厉害**——线性模型记不住，所以上一段差别不大；"
-      "换成树模型或神经网络，这个倍数会大得多")
+
+
+# 泄漏本身有没有发生，看的不是误差，而是“最像的那条离测试点多远”
+def twin_share(X, tr, te, within_h=0.5):
+    Xt = X[tr]
+    mu, sd = Xt.mean(0), Xt.std(0) + 1e-9
+    A, B = (Xt - mu) / sd, (X[te] - mu) / sd
+    close = tot = 0
+    for k, bvec in enumerate(B):
+        if not day[te][k]:
+            continue
+        j = int(np.argmin(((A - bvec) ** 2).sum(axis=1)))
+        tot += 1
+        close += abs(int(tr[j]) - int(te[k])) / STEPS_PER_DAY * 24.0 <= within_h
+    return close / tot * 100
+
+
+v["twin_random"] = twin_share(X_causal, *split_random(n, 0.25, seed=0))
+v["twin_time"] = twin_share(X_causal, tr_t, te_t)
+print(f"随机划分：{v['twin_random']:.0f}% 的白天测试点，最像的那条训练样本就在半小时之内；"
+      f"按时间划分：{v['twin_time']:.0f}%")
+assert v["twin_random"] > v["twin_time"], "随机划分确实把隔壁的样本摆到了训练集里"
+print(f"**泄漏确实发生了，可误差只差 {v['nn_ratio']:.1f} 倍**——因为日变化天天重复，"
+      "昨天的同一时刻本来就是个像样的替身，照抄隔壁并没有多赚多少")
+print("所以这一条要分开说：**泄漏有没有发生**，看近亲的距离；**泄漏坑不坑人**，"
+      "看这条序列有没有天天重复的形状。慢漂移、工况切换那类序列没有替身，同样的泄漏会要命")
 
 # ---------- 三、留间隔
 for gap, tag in ((0, "0"), (WIN, "w"), (WIN * 3, "w3"), (STEPS_PER_DAY, "day")):
