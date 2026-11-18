@@ -1,0 +1,35 @@
+# 实验 21.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab21_5.js。
+原理:
+  - ["**控制限与规格限来源不同、用途不同。** 控制限由过程自己的波动算出来（均值图用 x̄ ± A₂·R̄），回答“过程有没有变”；规格限由图纸给出，回答“做得出合格品吗”。两者的宽窄没有固定关系：能力很差的过程可以完全受控，能力很好的过程也可以天天报警（21.5 节）。", "Control limits come from the process's own variation and answer whether the process changed; specification limits come from the drawing and answer whether the part is acceptable. There is no fixed relationship between their widths: a process with poor capability can be perfectly in control, and a capable one can alarm constantly (Section 21.5)."]
+  - ["**均值图对均值漂移灵，对方差变化钝。** 方差变大时子组均值的分布变宽，但中心没动，所以要等到某个均值碰巧出界才报警。**极差图才是看波动的那一张**——两张图必须一起看。", "The mean chart reacts quickly to a shift in the mean and slowly to a change in spread, because a wider distribution still has the same centre. The range chart is what watches the spread; the two must be read together."]
+  - ["**三倍标准差控制限下，过程没变时也会报警**：理论上平均每 370 个子组一次。现场往往更频繁，因为控制限是用有限个子组**估**出来的——本实验把“用前多少个子组定控制限”做成可拖的参数，正是让你量这件事。", "Even with a stable process, three-sigma limits produce an alarm about once every 370 subgroups in theory. In practice it is more often, because the limits are estimated from a finite baseline — which is why the baseline length is a slider here."]
+  - ["**学习式报警不是控制图的替代，是补充。** 本实验里的报警器只做一件事：用稳定期估出中心与散布，再看新子组离中心多远。它能同时看好几个量，所以“均值没动但别的变了”这类异常也抓得到；代价是它不知道什么叫异常，稳定期挑坏了就天天误报，而且**报警之后不告诉你该查什么**。", "The learned alarm here is a complement, not a replacement: it measures how far each new subgroup sits from a centre estimated during a stable window. It watches several quantities at once, so it reacts to upsets where the mean does not move — but it has no notion of what abnormal means, and it does not tell you what to go and look at."]
+  - 式: "均值图控制限 = x̄ ± A₂·R̄；极差图上限 = D₄·R̄；由极差估过程标准差 σ̂ = R̄/d₂；Cp = (USL−LSL)/(6σ̂)"
+步骤:
+  - ["第一个场景，异常选 0、子组大小 5、基线 50、规格限 ±3：记下控制限、规格限、两者宽度之比与 Cp（任务 1），填表 1 第一行。再把规格限拖到 ±1.5 与 ±6，确认控制限一动不动。", "In the first scene with no upset, subgroup size 5, baseline 50 and ±3 spec limits, record the control limits, spec limits, their width ratio and Cp (task 1). Then move the spec limits to ±1.5 and ±6 and confirm the control limits do not move."]
+  - ["注入均值漂移，大小依次 0.5、1.0、1.5、2.0，每档换三个重复编号，记下均值图要多少个子组才报警（任务 2），填表 2 上半。", "Inject mean shifts of 0.5, 1.0, 1.5 and 2.0, repeating each with three different repeat numbers, and record how many subgroups the mean chart needs (task 2)."]
+  - ["换成方差变大，大小依次 0.5、1.0、1.5，同样记均值图与极差图各要多久（任务 3），填表 2 下半。", "Switch to a variance increase of 0.5, 1.0 and 1.5, recording both the mean chart and the range chart (task 3)."]
+  - ["换成周期波动，大小 1.5：均值图抓得到吗？把基线从 50 拖到 120 再看一遍（任务 4），结论写进报告。", "Switch to the periodic upset at size 1.5: does the mean chart see it? Repeat with the baseline widened to 120 (task 4)."]
+  - ["切到第二个场景，三种异常各走一遍，记下学习式报警多久发现、以及稳定期里两种办法各误报几次（任务 5），填表 3。", "In the second scene run all three upsets, recording how quickly the learned alarm reacts and how many false alarms each approach raises during the stable window (task 5)."]
+数据表:
+  - 标题: ["表 1  控制限与规格限", "Table 1  Control limits versus specification limits"]
+    表头: ["规格限", "控制限（下 … 上）", "规格宽 ÷ 控制宽", "Cp", "控制限变了吗"]
+    表头英文: ["spec limits", "control limits", "spec width ÷ control width", "Cp", "did the control limits move?"]
+    行: [["±3", "", "", "", "—"], ["±1.5", "", "", "", ""], ["±6", "", "", "", ""]]
+  - 标题: ["表 2  多久才发现过程变了", "Table 2  How long until the chart notices"]
+    表头: ["异常种类", "大小", "均值图（子组数）", "极差图（子组数）", "三次重复的范围"]
+    表头英文: ["upset", "size", "mean chart", "range chart", "range over three repeats"]
+    行: [["均值漂移", "0.5", "", "", ""], ["均值漂移", "1.0", "", "", ""], ["均值漂移", "1.5", "", "", ""], ["均值漂移", "2.0", "", "", ""], ["方差变大", "0.5", "", "", ""], ["方差变大", "1.0", "", "", ""], ["方差变大", "1.5", "", "", ""]]
+  - 标题: ["表 3  控制图对学习式报警", "Table 3  Chart versus learned alarm"]
+    表头: ["异常种类", "控制图多久发现", "学习式多久发现", "稳定期误报（控制图 / 学习式）", "谁先发现"]
+    表头英文: ["upset", "chart", "learned alarm", "false alarms (chart / learned)", "which first"]
+    行: [["均值漂移 1.0", "", "", "", ""], ["方差变大 1.0", "", "", "", ""], ["周期波动 1.5", "", "", "", ""]]
+注意:
+  - ["**“多久才报警”是个随机量。** 同样的设置换个重复编号，结果能差好几倍，所以表 2 要求每档记三次并写出范围。只记一次的数不能用来比较两种办法。", "The time to an alarm is a random variable: the same settings with another repeat number can differ severalfold, which is why each row asks for three repeats and a range."]
+  - ["本实验只用了**最基本的一条判据**（均值出界、极差出界）。现场常用的还有连续七点同侧、连续上升等“游程判据”，它们对小漂移更灵，但也会把虚发警报率提高。报告里不要把本实验的结论当成“控制图的全部能力”。", "Only the basic out-of-limit rules are used here. Shop-floor practice adds run rules, which catch small shifts sooner but also raise the false-alarm rate. Do not read these results as the full capability of a control chart."]
+  - ["学习式报警的阈值取的是稳定期距离的 99 分位，与三倍标准差是同一个意思。**换个分位数，它的灵敏度与误报率一起变**——这正是机器学习报警最常被忽略的一个旋钮。", "The learned alarm's threshold is the 99th percentile of the stable-window distances, in the same spirit as three sigma. Changing that percentile trades sensitivity against false alarms — the knob most often left undocumented."]
+  - ["规格限在本实验里只用来**对照**，不参与任何报警判定。**真实车间里把规格限画在控制图上是常见错误**，本实验刻意把两者用不同颜色分开。", "The specification limits here are shown only for comparison and never drive an alarm. Drawing them on a control chart is a common shop-floor error, so the two are deliberately coloured differently."]
+思考题:
+  - ["控制图报警之后，你知道该去查什么（均值跑了还是波动大了）。要让学习式报警也具备这条好处，它的报警信息里至少要带上什么？", "A chart tells you what to inspect. What would the learned alarm have to report to be equally actionable?"]
+  - ["如果用来定控制限的那 50 个子组里本身就藏着一个没被发现的异常，两种办法各会出什么错？怎么事先防住？", "If the baseline itself contained an undetected upset, how would each approach fail, and how would you guard against it?"]
+  - ["把本实验的“多久才发现”与 21.2 节的代价表接起来：**发现晚一个子组，要多做多少件废品**？用你们自己的节拍算一遍。", "Connect the detection delay here with the cost table of Section 21.2: how many scrap parts does each extra subgroup of delay cost at your line's takt time?"]

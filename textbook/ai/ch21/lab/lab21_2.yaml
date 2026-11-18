@@ -1,0 +1,35 @@
+# 实验 21.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab21_2.js。
+原理:
+  - ["产线的不良率常常只有千分之几。**在这种基率下，准确率几乎不含信息**：什么都不做、全判合格，准确率就是“1 − 不良率”。所以视觉检测要报的是**查准率**（报出来的里有多少真是坏件）与**查全率**（坏件里有多少被抓到），而且必须把**不良率**一起印出来（21.2 节）。", "Defect rates on a production line are often a few per thousand, and at that base rate accuracy carries almost no information: passing everything already scores one minus the defect rate. What must be reported is precision, recall, and the defect rate itself (Section 21.2)."]
+  - ["**检测器的本事与不良率是两回事。** 本实验里“两类分开多远”这个参数就是检测器的本事；它不变时，查全率与误判率完全不随不良率变，而查准率会随不良率下降而塌。看懂这一点，就不会把“查准率低”错怪到模型头上。", "The detector's discriminating power and the defect rate are independent. With the separation held fixed, recall and the false-positive rate do not change with the defect rate at all, while precision collapses as the rate falls."]
+  - ["**按图片算与按零件算是两套数。** 一个零件拍几张图，任何一张报警就判不良，查全率会上去，**误判率按零件算要被放大几倍**。所以报指标必须写明按哪一级算——这是验收时最容易被含糊过去的一处。", "Per-image and per-part metrics are different numbers. If a part is imaged several times and any alarm condemns it, recall rises while the per-part false-alarm rate is multiplied. Always state the unit of analysis."]
+  - ["**阈值是经济决策。** 漏检一个与误判一个的代价常差几十到上千倍，最优阈值要跟着移。按“准确率最高”定阈值，在代价不对称时必然吃亏——本实验让你把这个倍数量出来。", "The threshold is an economic decision: the cost of a miss and of a false alarm typically differ by orders of magnitude, and the optimum moves with them. Choosing the threshold by accuracy is a loss whenever the costs are asymmetric."]
+  - 式: "查准率 = TP/(TP+FP)；查全率 = TP/(TP+FN)；总代价 = FN × 漏检代价 + FP × 误判代价"
+步骤:
+  - ["第一个场景，不良率 5%、阈值 1.1、每个零件 1 张图：记下准确率、查准率、查全率、误判率（任务 1），填表 1 第一行。", "In the first scene at a 5% defect rate, threshold 1.1 and one image per part, record accuracy, precision, recall and the false-positive rate (task 1) in the first row of Table 1."]
+  - ["把不良率依次拖到 2%、1%、0.5%、0.1%、0.05%，每档记同样四个数，并记下“全判合格”的准确率（任务 2），填满表 1。", "Step the defect rate down to 2%, 1%, 0.5%, 0.1% and 0.05%, recording the same four numbers plus the accuracy of passing everything (task 2)."]
+  - ["不良率回到 1%，把“一个零件拍几张图”从 1 拖到 5，记下误判率与查全率（任务 3），填表 2。", "Set the defect rate back to 1% and raise the images per part from 1 to 5, recording the false-positive rate and recall (task 3) in Table 2."]
+  - ["切到第二个场景，误判代价固定为 1，把漏检代价依次取 1、10、100、1000，每档记下代价最低的阈值与总代价（任务 4），填表 3。", "In the second scene fix the false-alarm cost at 1 and step the cost of a miss through 1, 10, 100 and 1000, recording the cost-optimal threshold and the cost at it (task 4) in Table 3."]
+  - ["漏检代价取 100，把阈值拖到读数里那个“按准确率最高”的位置，记下总代价是最优的几倍（任务 5），写进表 3 最后一行。", "With the cost of a miss at 100, drag the threshold to the accuracy-optimal value shown in the readouts and record how many times the minimum cost it is (task 5)."]
+数据表:
+  - 标题: ["表 1  同一个检测器，不良率一变分数就变", "Table 1  One detector, different defect rates"]
+    表头: ["不良率", "准确率", "“全判合格”的准确率", "查准率", "查全率", "误判率"]
+    表头英文: ["defect rate", "accuracy", "accuracy of passing everything", "precision", "recall", "false-positive rate"]
+    行: [["5%", "", "", "", "", ""], ["2%", "", "", "", "", ""], ["1%", "", "", "", "", ""], ["0.5%", "", "", "", "", ""], ["0.1%", "", "", "", "", ""], ["0.05%", "", "", "", "", ""]]
+  - 标题: ["表 2  按图片还是按零件", "Table 2  Per image or per part"]
+    表头: ["一个零件几张图", "查全率", "误判率", "与 1 张图比放大几倍"]
+    表头英文: ["images per part", "recall", "false-positive rate", "factor versus one image"]
+    行: [["1", "", "", "—"], ["3", "", "", ""], ["5", "", "", ""]]
+  - 标题: ["表 3  代价决定阈值", "Table 3  Costs decide the threshold"]
+    表头: ["漏检:误判", "代价最低的阈值", "那时的总代价", "查全率", "查准率"]
+    表头英文: ["miss:false", "cost-optimal threshold", "cost there", "recall", "precision"]
+    行: [["1:1", "", "", "", ""], ["10:1", "", "", "", ""], ["100:1", "", "", "", ""], ["1000:1", "", "", "", ""], ["按准确率最高定的阈值（100:1 下）", "", "", "", ""]]
+注意:
+  - ["本实验的分数分布是**造出来的**（好件与坏件各取一个正态分布）。真实检测器的分数分布常常长尾、双峰，甚至随批次漂移。要记的是**结构性的结论**（基率怎样压垮查准率、代价怎样移动阈值），不是这里的具体百分数。", "The score distributions here are synthetic Gaussians. Real detectors have long tails, several modes and batch-to-batch drift. Take away the structural conclusions, not the particular percentages."]
+  - ["把“一个零件拍几张图”调大时，本实验假设**坏件的缺陷在其中两张图上可见**。真实情况取决于拍摄方案；方案不同，这一组数就不同。报告里要写明你用的是哪种假设。", "When several images per part are used, this lab assumes the defect is visible in two of them. Real coverage depends on the imaging plan, so state the assumption in your report."]
+  - ["**代价要用同一种单位**（比如都折成钱，或都折成工时）。把“漏检代价 = 1000 元”与“误判代价 = 1 件”混在一起算出来的阈值没有意义。", "Both costs must be in the same unit. Mixing money with pieces produces a meaningless optimum."]
+  - ["读数里的“全判合格的准确率”是拿来对照的基线，**不是建议**。本实验不鼓励任何放弃检测的做法。", "The accuracy of passing everything is a baseline for comparison, not a recommendation."]
+思考题:
+  - ["你们厂的漏检代价与误判代价各是多少？把两个数写下来，回到实验里找最优阈值，与现在用的阈值比一比。写不出这两个数，说明第一件该做的事是去把它们问出来。", "What do a miss and a false alarm cost on your line? Find the optimum with those numbers and compare it with the threshold in use today."]
+  - ["如果不良率本身会随批次变（换了一批来料就从 0.3% 跳到 3%），固定阈值还合适吗？要怎么改——改阈值、改判定规则，还是改报的指标？", "If the defect rate itself jumps between batches, is a fixed threshold still right? What would you change: the threshold, the decision rule, or the metric you report?"]
+  - ["验收一个视觉检测系统，你会在合同里写哪三个数？为什么不是“准确率 ≥ 99%”？", "Which three numbers would you put in an acceptance clause for a vision system, and why is '99% accuracy' not one of them?"]
