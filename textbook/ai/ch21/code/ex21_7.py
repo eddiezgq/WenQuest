@@ -116,6 +116,7 @@ v["thr_ok_max"] = max(ok_thr) if ok_thr else float("nan")
 v["cost_at_ok"] = (maintenance_cost(fleet, thr=v["thr_ok_max"], cost_plan=COST_PLAN,
                                     cost_fail=COST_FAIL, cost_early=COST_EARLY)["total"]
                    if ok_thr else float("nan"))
+v["cost_penalty_pct"] = (v["cost_at_ok"] / v["cost_cbm"] - 1) * 100 if ok_thr else float("nan")
 print(f"\n验收条款写成“每一台都至少提前 {v['lead_need']} 个周期报警、且不许有失效”：")
 if ok_thr:
     print(f"  满足的阈值有 {v['n_thr_ok']} 档，其中最省的是 {v['thr_ok_max']:.2f}，"

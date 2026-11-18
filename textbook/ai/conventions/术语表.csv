@@ -507,3 +507,28 @@ M4,梯度裁剪,gradient clipping,
 20,贝叶斯优化,Bayesian optimization,
 20,系统偏差,systematic bias,不随重复测量消失
 20,径向分布函数,radial distribution function,
+21,控制限,control limit,来自过程自身波动
+21,规格限,specification limit,来自图纸
+21,子组均值,subgroup mean,
+21,电火花加工,electro-discharge machining,公开轴承数据的人工缺陷做法
+21,预定变更控制计划,predetermined change control plan (PCCP),
+21,调制,modulation,故障频率调制在高频共振上
+21,最短提前期,minimum lead time,与平均提前期相对
+21,仿真,simulation,与数字孪生相对
+21,包络谱,envelope spectrum,
+21,统计过程控制,statistical process control (SPC),
+21,控制图,control chart,
+21,过程能力指数,process capability index,Cp 与 Cpk
+21,剩余寿命,remaining useful life (RUL),
+21,预测性维护,predictive maintenance,
+21,数字孪生,digital twin,会被真实数据持续纠正的模型
+21,制造执行系统,manufacturing execution system (MES),
+21,企业资源计划,enterprise resource planning (ERP),
+21,设备综合效率,overall equipment effectiveness (OEE),本书只写定义，不写标杆值
+21,不良率,defect rate,基率；低不良率下准确率失去意义
+21,信赖域,trust region,
+21,单因素轮换,one factor at a time (OFAT),
+21,提前期,lead time,报警到失效之间还有多久
+21,阶次分析,order analysis,把频率轴按转速归一化
+21,设计确认,design validation,与设计验证相区别
+21,设计验证,design verification,
