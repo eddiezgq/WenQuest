@@ -331,7 +331,10 @@ body.searching #res{display:block}body.searching article,body.searching .pn,body
 #res mark{background:var(--hl);color:inherit;border-radius:2px}
 /* 首页 */
 .hero{position:relative;margin:0 calc(50% - 50vw);background:#0f141a}
-.hero iframe{display:block;width:100%;height:min(86vh,860px);border:0}
+.hero iframe{display:block;width:100%;height:min(64vh,680px);border:0}
+.godoc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 calc(50% - 50vw);padding:12px 16px;background:var(--needle)}
+.godoc a{color:#fff;text-decoration:none;font-weight:600;font-size:1rem;border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:6px 18px}
+.godoc a:hover{background:rgba(255,255,255,.15)}
 .hero .cap{position:absolute;left:max(16px,4vw);bottom:22px;pointer-events:none;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.45)}
 .hero .cap b{display:block;font-family:var(--f-display);font-size:clamp(1.6rem,4vw,2.8rem);line-height:1.2}
 .hero .cap span{font-size:.95rem;opacity:.9}
@@ -405,7 +408,7 @@ var m=location.search.match(/[?&]q=([^&]+)/);if(m){q.value=decodeURIComponent(m[
 def bar_html(menu: bool = True) -> str:
     return ('<header class="bar">' + ('<button id="menu" aria-label="目录">☰ 目录</button>' if menu else '') +
             '<a class="brand" href="index.html"><span class="stitch-mark"></span>WQ-LS 设计说明书<small>Design documentation</small></a>'
-            '<nav><a href="index.html">总览</a><a href="../index.html?proto=1&lang=zh" target="_blank">虚拟样机 ↗</a><a href="../index.html?lang=zh" target="_blank">三维整机 ↗</a></nav>'
+            '<nav><a href="index.html">总览</a><a href="index.html#all">十关目录</a><a href="../index.html?proto=1&lang=zh" target="_blank">虚拟样机 ↗</a><a href="../index.html?lang=zh" target="_blank">三维整机 ↗</a></nav>'
             '<span class="sp"></span><input id="q" type="search" placeholder="搜索全文（/）" aria-label="搜索全文">'
             '<button class="theme" id="theme" aria-label="深浅色">◐</button></header>')
 
@@ -444,7 +447,8 @@ def home_html(site, nums_all: dict, readme: str, groups) -> str:
     readme = re.sub(r'<div class="tbl"><table>.*?</table></div>', "", readme, count=1, flags=re.S)
     readme = re.sub(r"<h1[^>]*>.*?</h1>", "", readme, count=1, flags=re.S)
     return (f'<div class="hero" data-src="../index.html?proto=1&pv=iso&lang=zh"><iframe title="WQ-LS 整机虚拟样机" allow="fullscreen"></iframe>'
-            f'</div><div class="home"><p class="eyebrow" style="font-family:var(--f-mono);letter-spacing:.14em;color:var(--muted);font-size:.74rem;margin:0">WQ-LS · 问渠示例设计 · WENQUEST EXAMPLE DESIGN</p>'
+            f'</div><div class="godoc"><a href="#all">↓ 读设计说明书：十关目录 · Read the documentation</a><a href="../index.html?proto=1&lang=zh" target="_blank">虚拟样机全屏 ↗</a></div>'
+            f'<div class="home"><p class="eyebrow" style="font-family:var(--f-mono);letter-spacing:.14em;color:var(--muted);font-size:.74rem;margin:0">WQ-LS · 问渠示例设计 · WENQUEST EXAMPLE DESIGN</p>'
             f'<h1 class="gt">工业直驱平缝机设计说明书<small>Direct-drive industrial lockstitch machine — design documentation</small></h1>'
             f'<p class="one" style="font-size:1.05rem">上面是这台机器的整机虚拟样机：真设计的全部零件在转、在缝，脚踏和仪表盘都来自设计计算和控制器固件仿真。'
             f'<br><span class="en">Above: the virtual prototype — every part of the real design sewing; pedal and gauges come from the design calculations and the controller firmware simulation.</span></p>'
