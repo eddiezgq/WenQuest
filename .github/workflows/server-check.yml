@@ -66,7 +66,7 @@ jobs:
             docker inspect -f "{{.State.Status}} health={{.State.Health.Status}} restarts={{.RestartCount}} started={{.State.StartedAt}}" "$h"
             docker logs --tail 80 "$h" 2>&1 | cut -c1-300
             docker top "$h" 2>&1 | head -8
-            docker stats --no-stream --format "{{.Name}} {{.CPUPerc}} {{.MemUsage}}" 2>/dev/null | sort -k2 -rn | head -15
+            docker stats --no-stream --format "{{.MemUsage}} {{.Name}} {{.CPUPerc}}" 2>/dev/null | sort -h -r | head -70
             d=$(docker ps --format "{{.Names}}" | grep -E "^wq-factory-db-1$" | head -1); echo "db=$d"
             docker exec "$d" sh -c "psql -U \"\$POSTGRES_USER\" -d \"\${POSTGRES_DB:-\$POSTGRES_USER}\" -c \"select pid, usename, application_name, state, wait_event_type, wait_event, now()-query_start as dur, left(query,140) as q from pg_stat_activity order by query_start\"" 2>&1 | grep -v "| idle " | head -40
             docker exec "$d" sh -c "psql -U \"\$POSTGRES_USER\" -d \"\${POSTGRES_DB:-\$POSTGRES_USER}\" -c \"select l.pid, l.locktype, l.mode, l.granted, c.relname from pg_locks l left join pg_class c on c.oid=l.relation where not l.granted\"" 2>&1 | head -30' 2>&1 | sed 's/^/hub: /'
