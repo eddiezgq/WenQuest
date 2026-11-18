@@ -217,28 +217,38 @@ def peak_near(f: np.ndarray, X: np.ndarray, target: float, window: float) -> tup
 # ================================================================ 四、划分口径（21.3 节，第四次）
 
 
-def make_runs(n_machines: int = 6, per_machine: int = 4, seconds: float = 1.0,
+def make_runs(n_machines: int = 8, per_machine: int = 8, seconds: float = 0.5,
               fs: float = 12000.0, seed: int = 0) -> list[dict]:
-    """造若干台机床、每台若干次采集；同一台机床有自己的"个性"（共振频率与底噪）。
+    """造若干台机床、每台按时间先后采集若干次。
 
-    这就是现场数据的样子：**同一台机床的几次采集彼此很像**，随机划分会把它们分到两边。
+    现场数据的三条特点这里都有：
+    * **同一台机床的几次采集彼此很像**（同一个共振频率、同一档底噪）——随机划分会把它们分到两边；
+    * **故障是慢慢长出来的**：每台机床有自己的起病时刻，之后冲击一次比一次重；
+    * **越往后坏的越多**：所以"拿过去训、拿未来测"比随机划分难，而这才是现场的问法。
     """
     g = np.random.default_rng(seed)
     runs = []
     for m in range(n_machines):
-        carrier = 2400.0 + 500.0 * m                 # 这台机床的共振频率
+        carrier = 2400.0 + 420.0 * (m % 5)                  # 这台机床的共振频率
         noise = 0.30 + 0.05 * (m % 3)
+        never = (m % 4 == 0)                                # 四分之一的机床一直没坏
+        onset = per_machine if never else int(g.integers(1, per_machine - 1))
         for k in range(per_machine):
-            fault = (m + k) % 2                      # 一半有故障、一半没有
             rpm = 1750.0 + 20.0 * float(g.normal())
-            hz = bearing_freqs(9, 7.94, 39.04, rpm)["BPFO"]
-            x = bearing_signal(fs, seconds, hz if fault else 0.0, rpm,
-                               carrier_hz=carrier, noise=noise,
-                               seed=int(g.integers(1 << 30))) if fault else \
-                (noise * g.normal(0.0, 1.0, int(fs * seconds))
-                 + 0.25 * np.sin(2 * np.pi * rpm / 60.0 * np.arange(int(fs * seconds)) / fs))
+            n = int(fs * seconds)
+            t = np.arange(n) / fs
+            if k < onset:
+                x = noise * g.normal(0.0, 1.0, n) + 0.25 * np.sin(2 * np.pi * rpm / 60.0 * t)
+                fault = 0
+            else:
+                sev = 0.35 + 0.65 * (k - onset) / max(1, per_machine - onset)   # 越往后越重
+                hz = bearing_freqs(9, 7.94, 39.04, rpm)["BPFO"]
+                x = sev * bearing_signal(fs, seconds, hz, rpm, carrier_hz=carrier,
+                                         noise=noise / max(sev, 1e-6) * sev,
+                                         seed=int(g.integers(1 << 30)))
+                fault = 1
             runs.append({"machine": m, "run": k, "t": int(k), "fault": fault,
-                         "x": x, "rpm": rpm, "fs": fs})
+                         "x": x, "rpm": rpm, "fs": fs, "onset": onset})
     return runs
 
 
