@@ -57,6 +57,19 @@ jobs:
           ssh "deploy@$HOST" 'sudo -n du -xsh /var/lib/docker/containers /var/log 2>/dev/null; journalctl --disk-usage 2>/dev/null' | sed 's/^/sys: /' | note
           ssh "deploy@$HOST" 'ls -ld /opt/wenquest /opt/wenquest/site /opt/wenquest/deploy 2>&1; find /opt/wenquest/site /opt/wenquest/deploy -maxdepth 2 ! -user deploy 2>/dev/null | head -5' | sed 's/^/perm: /' | note
           ssh "deploy@$HOST" 'p=/opt/wenquest/site/.probe; (echo x > $p && rm -f $p && echo write OK) 2>&1' | sed 's/^/write: /' | note
+      - name: 数字工厂枢纽起不来（第 172b 轮：11-18 部署后 hub 停在“Waiting for application startup”，网站 502）
+        if: always() && inputs.server == 'us'
+        run: |
+          ssh "deploy@$HOST" 'free -m; uptime; nproc
+            docker ps -a --format "{{.Names}} {{.Status}}" | grep -E "wq-factory-(hub|db|bus)" | head -20
+            h=$(docker ps -a --format "{{.Names}}" | grep -E "^wq-factory-hub-1$" | head -1); echo "hub=$h"
+            docker inspect -f "{{.State.Status}} health={{.State.Health.Status}} restarts={{.RestartCount}} started={{.State.StartedAt}}" "$h"
+            docker logs --tail 80 "$h" 2>&1 | cut -c1-300
+            docker top "$h" 2>&1 | head -8
+            docker stats --no-stream --format "{{.Name}} {{.CPUPerc}} {{.MemUsage}}" 2>/dev/null | sort -k2 -rn | head -15
+            d=$(docker ps --format "{{.Names}}" | grep -E "^wq-factory-db-1$" | head -1); echo "db=$d"
+            docker exec "$d" sh -c "psql -U \"\$POSTGRES_USER\" -d \"\${POSTGRES_DB:-\$POSTGRES_USER}\" -c \"select pid, usename, application_name, state, wait_event_type, wait_event, now()-query_start as dur, left(query,140) as q from pg_stat_activity order by query_start\"" 2>&1 | grep -v "| idle " | head -40
+            docker exec "$d" sh -c "psql -U \"\$POSTGRES_USER\" -d \"\${POSTGRES_DB:-\$POSTGRES_USER}\" -c \"select l.pid, l.locktype, l.mode, l.granted, c.relname from pg_locks l left join pg_class c on c.oid=l.relation where not l.granted\"" 2>&1 | head -30' 2>&1 | sed 's/^/hub: /'
       - uses: actions/checkout@v4
       - name: Try the real copy (dry) — 和部署同样的打包，解到临时目录
         run: |
