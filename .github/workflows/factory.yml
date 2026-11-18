@@ -1,5 +1,5 @@
 # 数字工厂部署（第 3 轮 D10）：只在推送改动 factory/ 时运行，与学习平台的“Build and deploy”互不影响。
-#   测试 → 服务器演练（在 GitHub 的机器上按服务器配置装一套真 ERPNext，走完整闭环）→ 构建镜像 → 部署到服务器
+#   测试 → 构建镜像 → 部署到服务器（服务器演练——真 ERPNext 完整闭环——2026-11-18 Eddie 定停用）
 name: Digital factory 数字工厂部署
 
 on:
@@ -185,6 +185,7 @@ jobs:
 
   rehearsal:
     name: 服务器演练（真 ERPNext）
+    if: false                 # 2026-11-18 Eddie：“以后都不需要”——停用，保留步骤备查；要恢复删掉这一行
     needs: test
     runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     timeout-minutes: 260
