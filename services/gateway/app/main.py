@@ -34,6 +34,7 @@ from . import assist
 from . import orgs
 from . import pilots
 from . import phone
+from . import license as wq_license          # 第 175 轮：软件测试版授权码
 from . import sewing
 from . import sewing_cae
 from . import sewing_ai
@@ -177,6 +178,7 @@ def create_app() -> FastAPI:
     micro.register(app, sys.modules[__name__])
     whiteboard_api.register(app, sys.modules[__name__])
     video3d_api.register(app, sys.modules[__name__])
+    wq_license.register(app, sys.modules[__name__])
     return app
 
 
