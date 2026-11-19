@@ -14,7 +14,7 @@ handle @cn_page {
 	header /assets/* Cache-Control "public, max-age=86400"
 	file_server
 }
-@shared_asset path_regexp \.(jpg|jpeg|png|webp|svg|mp4|webm|vtt|js|json|glb|woff2)$
+@shared_asset path_regexp \.(jpg|jpeg|png|webp|svg|mp4|webm|vtt|js|json|glb|woff2|zip|exe|sha256)$
 handle @shared_asset {
 	root * /srv/site
 	file_server

@@ -786,6 +786,10 @@ def main():
     for f in (home, qms, platform, sewing, cam, bearing, custom, services, education, edu_platform, consulting, cases, about, contact,
               privacy, terms, ai_notice, report, pilot):
         f()
+    sys.path.insert(0, str(ROOT / "tools" / "wqlicense"))      # 第 175 轮：软件下载中心（测试版），两站同一个生成器
+    import download_page
+    (OUT / "download").mkdir(exist_ok=True)
+    (OUT / "download" / "index.html").write_text(download_page.render("cn", footer(), f'<link rel="stylesheet" href="/assets/cn.css?v={VER}">'), encoding="utf-8")
     n = len(list(OUT.rglob("index.html")))
     print(f"site/{OUT.name}: {n} 个页面")
 
