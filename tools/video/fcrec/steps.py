@@ -234,3 +234,23 @@ def pick_workbench(d, zh, en):
         Gui.activateWorkbench(cls)
     yield 1200
     log("workbench", Gui.activeWorkbench().name())
+
+
+def answer_modal(d, texts=("是", "Yes", "确定", "OK"), wait=2500):
+    """有对话框弹出来（比如“草图替代约束”问要不要换成端点相切）：移过去点“是 / 确定”"""
+    t = 0
+    while t < wait:
+        m = QtWidgets.QApplication.activeModalWidget()
+        if m is not None:
+            log("modal", m.windowTitle())
+            bs = [b for b in m.findChildren(QtWidgets.QAbstractButton) if b.isVisible() and b.text().replace("&", "").strip() in texts]
+            if bs:
+                yield 700
+                p = d.center(bs[0])
+                yield d.move(p, 600)
+                d.ring(p)
+                bs[0].click()
+                yield 800
+            return
+        yield 150
+        t += 150

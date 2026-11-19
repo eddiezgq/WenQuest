@@ -74,5 +74,12 @@
  "别人要你的零件，又不用 FreeCAD：导出成 STEP，几乎所有 CAD 都能打开。先在模型树里选针杆": "Someone needs your part but does not use FreeCAD: export STEP, which almost every CAD program opens. First select the needle bar in the tree",
  "菜单“文件 → 导出”，文件类型选 STEP，起名“针杆”，保存": "Menu File → Export, choose the STEP file type, name it \"needle_bar\", Save",
  "导出好了。检查一下：新建空文档，“文件 → 导入”刚才的 STEP": "Exported. Check it: new empty document, File → Import the STEP file",
- "针杆完整回来了，体积和原来一样。STL（三维打印用）、DXF（二维图）也在“导出”里，用法一样": "The needle bar comes back complete, with the same volume. STL (3D printing) and DXF (2D drawings) are under Export too and work the same way"
+ "针杆完整回来了，体积和原来一样。STL（三维打印用）、DXF（二维图）也在“导出”里，用法一样": "The needle bar comes back complete, with the same volume. STL (3D printing) and DXF (2D drawings) are under Export too and work the same way",
+ "曲柄的轮廓：下面是套在主轴上的大圆（直径 33），上面是装曲柄销的小圆（直径 22），中心距 15.5": "The crank outline: a large circle on the main shaft (diameter 33) below, a small circle for the crank pin (diameter 22) above, 15.5 apart",
+ "右边画一条线，两头分别点在两个圆上": "On the right draw a line with one end on each circle",
+ "加“相切”：选线、选大圆，点相切；再选线、选小圆，点相切": "Add Tangent: select the line and the large circle, click Tangent; then the line and the small circle, Tangent",
+ "修剪：点“修剪”工具，再点圆上不要的那一段——大圆上面一段、小圆下面一段": "Trim: click the Trim tool, then the parts of the circles you do not want — the top of the large circle, the bottom of the small one",
+ "轮廓出来了：大圆弧、两条切线、小圆弧连成一圈": "There is the outline: the large arc, two tangent lines and the small arc form one closed loop",
+ "左边不用再画：选中这条线，点“对称”工具，再点竖轴（Y 轴）——镜像出左边的线": "No need to draw the left side: select the line, click the Symmetry tool, then click the vertical (Y) axis — it mirrors the line",
+ "任务栏里勾上“创建对称约束”：左右两条线就一直对称，改一边另一边跟着变": "Tick \"Create symmetric constraints\" in the task panel: the two lines then stay symmetric, change one and the other follows"
 }
