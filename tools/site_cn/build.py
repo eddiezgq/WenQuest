@@ -126,7 +126,7 @@ def nav(cur):
         return f'<div class="dd"><button type="button" aria-expanded="false">{label}</button><div class="menu">{links}</div></div>'
 
     return ("<nav class=\"main\" aria-label=\"主菜单\">" + dd("企业服务", ENTERPRISE) + a("/services/", "技术服务")
-            + dd("教育服务", EDUCATION) + a("/consulting/", "咨询") + a("/cases/", "案例") + a("/about/", "关于我们")
+            + dd("教育服务", EDUCATION) + a("/consulting/", "咨询") + a("/cases/", "案例") + a("/download/", "软件下载") + a("/about/", "关于我们")
             + f'<a class="auth-m" href="{LEARN}/pages/login/login">登录学习平台</a><a class="auth-m" href="/contact/?trial=1#demo-form">注册（按单位申请体验账号）</a>'
             + '<a class="cta-m" href="/contact/">预约演示</a></nav>')
 
