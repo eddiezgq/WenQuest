@@ -1,0 +1,25 @@
+WEBVTT
+
+00:00:00.657 --> 00:00:09.505
+A sweep moves a section along a path. The check spring is a 0.7 wire bent into an R9.35 arc with a straight leg
+
+00:00:09.505 --> 00:00:17.790
+First the path. Arc: centre on the origin, start on the horizontal axis, then sweep round to the lower right
+
+00:00:17.790 --> 00:00:22.889
+From the end of the arc, draw a line roughly continuing its direction
+
+00:00:22.889 --> 00:00:34.889
+Constraints: arc radius 9.35, angle 265°; line tangent to the arc, length 14.85
+
+00:00:47.660 --> 00:00:50.757
+The path is fully constrained. Close the sketch
+
+00:00:50.757 --> 00:01:02.757
+Now the section on the XZ plane: centre at the start of the arc (on the horizontal axis, 9.35 out); zoom in, add diameter 0.7 and horizontal distance 9.35
+
+00:01:20.556 --> 00:01:32.486
+Select the section sketch, click Additive pipe; in the panel click Object next to the path, then click the path in the view
+
+00:01:32.486 --> 00:01:41.120
+The wire follows the path. Path and section are separate sketches: change the path and the spring follows

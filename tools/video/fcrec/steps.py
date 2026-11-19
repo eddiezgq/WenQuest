@@ -299,6 +299,15 @@ def type_into(d, w, text):
     yield 900
     d.key(QtCore.Qt.Key_Tab, w)
     yield 600
+    le = w.findChild(QtWidgets.QLineEdit)
+    if le is not None and le.text() == text:      # 有的输入框（螺旋的节距、高度）Tab 不交值：让它自己解析一次
+        le.editingFinished.emit()
+        try:
+            w.setProperty("rawValue", float(text.split()[0]))
+        except ValueError:
+            pass
+        yield 400
+        log("type_into fallback", w.objectName(), w.text())
 
 
 def task_ok(d):
@@ -333,3 +342,10 @@ def datum(d, value):
         except RuntimeError:
             pass
         yield 600
+
+
+def pick_sp(d, *pts):
+    """同 pick，草图坐标按当前草图的放置换算（草图不在 XY 平面时用）"""
+    for u, v in pts:
+        yield d.move(sp(d, u, v), 800)
+        d.click(); yield 500

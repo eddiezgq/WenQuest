@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–7)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–8)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -175,7 +175,16 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l07-do" data-s="l07">Follow along</a>
 <a class="sub" href="#l07-self" data-s="l07">On your own</a>
 <a class="sub" href="#l07-quiz" data-s="l07">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">08</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l08" data-s="l08"><span class="n">08</span>Lesson 8 Sweep, loft, helix</a>
+<a class="sub" href="#l08-goal" data-s="l08">What you will be able to do</a>
+<a class="sub" href="#l08-three" data-s="l08">Three features</a>
+<a class="sub" href="#l08-helix" data-s="l08">Presser spring: helix</a>
+<a class="sub" href="#l08-sweep" data-s="l08">Check spring: sweep</a>
+<a class="sub" href="#l08-loft" data-s="l08">Loft</a>
+<a class="sub" href="#l08-do" data-s="l08">Follow along</a>
+<a class="sub" href="#l08-self" data-s="l08">On your own</a>
+<a class="sub" href="#l08-quiz" data-s="l08">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">09</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -196,9 +205,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 8</td><td>Sweep, loft, helix</td><td>Tension spring, thread guide</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 9</td><td>Patterns, mirror, multi-transform</td><td>Handwheel (spoke pattern)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 9</td><td>Patterns, mirror, multi-transform</td><td>Handwheel (spoke pattern)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
 
-<p>Lessons 1–7 are online now; the others follow module by module.</p>
+<p>Lessons 1–8 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
 <p>Every recording is the real software at work: FreeCAD 1.1.4 on a cloud computer with the WenQuest CAD branding and the same AI workbench, English interface. Where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. The only difference from WenQuest CAD on your computer is the 27 kernel fixes, which do not change the interface; “Check geometry” and “Unfold face” give different results, so those are not recorded and are taught with the book's verified data instead.</p>
 <p>The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.</p></section>
@@ -866,7 +875,102 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">Chamfering two edges at once: how do you pick the second edge?</p><div class="opts"><button type="button" data-k="a">A. Just click it</button><button type="button" data-k="b">B. Hold Ctrl and click it</button><button type="button" data-k="c">C. Hold Shift and click it</button><button type="button" data-k="d">D. One at a time only</button></div><p class="why" hidden>In Part Design a plain click replaces the selection; Ctrl adds to it.</p></div>
 <div class="quiz" data-ok="b"><p class="q">What happens to the face selected for Thickness?</p><div class="opts"><button type="button" data-k="a">A. It gets thicker</button><button type="button" data-k="b">B. It is opened</button><button type="button" data-k="c">C. Nothing</button><button type="button" data-k="d">D. The whole part is deleted</button></div><p class="why" hidden>The selected faces are the openings; all other faces keep the wall thickness.</p></div>
 <div class="quiz" data-ok="c"><p class="q">A cup needs a 0.6 side wall and a 1.5 bottom. Best approach?</p><div class="opts"><button type="button" data-k="a">A. Thickness 0.6</button><button type="button" data-k="b">B. Thickness 1.5</button><button type="button" data-k="c">C. Pad, then pocket the cavity</button><button type="button" data-k="d">D. Draft</button></div><p class="why" hidden>Thickness is uniform; when walls differ, pocket the cavity to its own size so each wall is set by a dimension.</p></div></section>
-<section id="appA"><h2><span class="n">08</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l08"><h2><span class="n">08</span>Lesson 8 Sweep, loft, helix</h2><p class="lead">You will be able to make springs with Helix; move a section along a path with a sweep (Additive pipe) for bent wires and tubes; and join several different sections with a loft. You make the WQ-LS presser spring and check spring. About 1.5 hours.</p><h3 id="l08-goal">What you will be able to do</h3>
+<ul>
+<li>Helix: a section sketch plus an axis; pitch, height (or turns), left or right hand.</li>
+<li>Sweep (Additive pipe in Part Design): one sketch for the path, another for the section, with the section at the start of the path and perpendicular to it.</li>
+<li>Loft: two or more sections joined in order into one solid.</li>
+<li>Each has a subtractive version: subtractive helix (threads), subtractive pipe, subtractive loft.</li>
+</ul>
+
+<h3 id="l08-three">Three features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Needs</th>
+<th>Typical parts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Helix</td>
+<td>a section sketch + axis; pitch, height, turns, cone angle</td>
+<td>springs, threads, screw conveyors</td>
+</tr>
+<tr>
+<td>Pipe (sweep)</td>
+<td>section sketch + path (sketch, edges)</td>
+<td>bent wire, piping, seals</td>
+</tr>
+<tr>
+<td>Loft</td>
+<td>two or more sections (sketches on different planes)</td>
+<td>transition pieces, ducts, handles, blades</td>
+</tr>
+</tbody>
+</table>
+<p>Where the section sits matters most: a helix section must not touch the axis; a sweep section must be at the start of the path and perpendicular to it, or the result twists or self-intersects.</p>
+<h3 id="l08-helix">Presser spring: helix</h3>
+<p>The presser spring is 15.8 outside with 1.8 wire, so the section circle sits 7 from the axis (half the mean diameter).</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l08a-en.jpg"><source src="../media/wqcad-l08a-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l08a-en.vtt"></video><figcaption>▶ Recording: Ø1.8 circle on XZ, 7 from the axis → Helix: vertical sketch axis, pitch 4, height 60 (about 60 s)</figcaption></figure>
+<p>The result has 15 turns and 1678.82 mm³. In the machine model the presser spring is drawn as a tube (15.8 outside, 12.2 inside, 62.79 long, 4971.25 mm³): assembly and motion simulation don't need every coil, and a tube is fast. For a part drawing or a stiffness calculation, use the real helix. The pitch of 4 is a demonstration value chosen for this lesson; the machine model doesn't give one.</p>
+<table>
+<thead>
+<tr>
+<th>Helix panel</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Axis</td>
+<td>vertical / horizontal / normal sketch axis; here the section is on XZ and the spring grows upwards, so vertical</td>
+</tr>
+<tr>
+<td>Mode</td>
+<td>pitch-height-angle, pitch-turns-angle, height-turns-angle, height-turns-growth</td>
+</tr>
+<tr>
+<td>Cone angle</td>
+<td>non-zero gives a conical spring</td>
+</tr>
+<tr>
+<td>Left handed</td>
+<td>ticked for a left-hand coil</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l08-sweep">Check spring: sweep</h3>
+<p>The check spring is a Ø0.7 wire: an R9.35 arc through 265°, then a straight leg 14.85 long.</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l08b-en.jpg"><source src="../media/wqcad-l08b-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l08b-en.vtt"></video><figcaption>▶ Recording: path sketch (arc + tangent line, fully constrained) → section sketch (Ø0.7 on XZ) → Additive pipe, Object to pick the path (about 100 s)</figcaption></figure>
+<ul>
+<li>Path: arc with Radius 9.35 and Angle 265°, line tangent to the arc and 14.85 long — fully constrained.</li>
+<li>Section: the XZ plane passes through the start of the arc, perpendicular to it there; the centre is at (9.35, 0).</li>
+<li>Pipe panel: the section is already chosen; for the path click Object, then click any part of the path in the view — the whole sketch becomes the path.</li>
+</ul>
+<p>The result is 22.36 mm³. The check spring in the machine STEP is 27.37 mm³; the difference is in how the ends finish, which this lesson doesn't go into.</p>
+<h3 id="l08-loft">Loft</h3>
+<p>A loft needs two or more sections on different planes, say a circle and a rectangle 20 mm above it: select the first section sketch, click Additive loft, Add section in the panel, then click the second sketch. Sections should have the same number of vertices (a circle lofts to anything) with aligned start points, or the result twists. There is no lofted part in the WQ-LS, so this is practice only (On your own).</p>
+<h3 id="l08-do">Follow along</h3>
+<ol class="steps">
+<li>New body, circle on XZ: centre on the horizontal axis, horizontal distance 7, diameter 1.8. Helix: vertical sketch axis, pitch 4, height 60.</li>
+<li>New file, path on XY: arc (centre on the origin, start on the horizontal axis, radius 9.35, angle 265°), a line from its end, tangent to the arc, 14.85 long.</li>
+<li>Section on XZ: centre at horizontal distance 9.35 on the horizontal axis, diameter 0.7.</li>
+<li>Select the section sketch, Additive pipe, Object for the path and click the path. The volume should be 22.36 mm³.</li>
+</ol>
+
+<h3 id="l08-self">On your own</h3>
+<ol>
+<li>Switch the presser spring to height-turns-angle: height 60, 14 turns. What is the pitch now?</li>
+<li>On one end of the needle bar (lessons 6–7), cut an illustrative M8 thread with a subtractive helix: the section is a small triangle.</li>
+<li>Loft practice: a Ø20 circle on XY; a datum plane 20 above with a 16 × 10 rectangle; Additive loft. Then replace the rectangle with a circle and compare.</li>
+</ol>
+<h3 id="l08-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">The helix section circle is 7 from the axis with diameter 1.8. What is the spring&#x27;s outside diameter?</p><div class="opts"><button type="button" data-k="a">A. 14</button><button type="button" data-k="b">B. 15.8</button><button type="button" data-k="c">C. 8.8</button><button type="button" data-k="d">D. 17.6</button></div><p class="why" hidden>Outside diameter = 2 × (7 + 0.9) = 15.8; mean 14, inside 12.2.</p></div>
+<div class="quiz" data-ok="b"><p class="q">Where should a sweep section be?</p><div class="opts"><button type="button" data-k="a">A. Anywhere</button><button type="button" data-k="b">B. At the start of the path, perpendicular to it</button><button type="button" data-k="c">C. At the end of the path</button><button type="button" data-k="d">D. In the plane of the path</button></div><p class="why" hidden>At the start and perpendicular, the sweep is a uniform tube; placed askew it twists or self-intersects.</p></div>
+<div class="quiz" data-ok="b"><p class="q">Why are springs often drawn as plain tubes in a machine model?</p><div class="opts"><button type="button" data-k="a">A. FreeCAD can&#x27;t do helices</button><button type="button" data-k="b">B. Assembly and motion don&#x27;t need every coil; tubes are light and fast</button><button type="button" data-k="c">C. Tubes are more accurate</button><button type="button" data-k="d">D. To save material</button></div><p class="why" hidden>Hundreds of parts move together; helical faces are many and slow. Use the real helix for part drawings and stiffness.</p></div></section>
+<section id="appA"><h2><span class="n">09</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">

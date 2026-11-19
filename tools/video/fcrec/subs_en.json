@@ -117,5 +117,18 @@
  "先做实心的：圆 22.4，凸台 14": "First the solid: circle 22.4, Pad 14",
  "点选上端面——开口就开在这一面": "Click the top face—this is where the opening goes",
  "点“抽壳”，厚度 0.6，确定：选中的面被挖开，其余的面都留 0.6 的壁": "Click Thickness, 0.6, OK: the selected face is opened and every other face keeps a 0.6 wall",
- "杯子出来了，体积约 787 mm³。真梭壳的底厚 1.5：抽壳只能处处一样厚，底要更厚，就改用凹槽挖内腔（本课“自己做”）": "There's the cup, about 787 mm³. The real bobbin case has a 1.5 bottom: Thickness is the same everywhere, so for a thicker bottom pocket the cavity instead (see On your own)"
+ "杯子出来了，体积约 787 mm³。真梭壳的底厚 1.5：抽壳只能处处一样厚，底要更厚，就改用凹槽挖内腔（本课“自己做”）": "There's the cup, about 787 mm³. The real bobbin case has a 1.5 bottom: Thickness is the same everywhere, so for a thicker bottom pocket the cavity instead (see On your own)",
+ "弹簧是螺旋：一个圆（钢丝的截面）绕着轴边转边往上走。压脚簧：外径 15.8、钢丝直径 1.8": "A spring is a helix: a circle (the wire section) turns around an axis while climbing. The presser spring: 15.8 outside, wire 1.8",
+ "XZ 平面上画钢丝截面：圆心放在横轴上、离原点 7（弹簧中径的一半），直径 1.8": "On the XZ plane, draw the wire section: centre on the horizontal axis, 7 from the origin (half the mean diameter), diameter 1.8",
+ "圆心的位置用“水平距离”锁住：7": "Lock the centre with Horizontal distance: 7",
+ "点“螺旋”：轴选“垂直草绘轴”，节距 4、高度 60": "Click Additive helix: axis Vertical sketch axis, pitch 4, height 60",
+ "15 圈的弹簧。改节距、圈数、高度，弹簧跟着变；左旋弹簧勾“左旋”": "A 15-turn spring. Change pitch, turns or height and the spring follows; tick Left handed for a left-hand coil",
+ "扫掠：一个截面沿着一条路径走一遍。挑线簧是一根直径 0.7 的钢丝，弯成 R9.35 的圆弧再伸出一段直腿": "A sweep moves a section along a path. The check spring is a 0.7 wire bent into an R9.35 arc with a straight leg",
+ "先画路径。圆弧：圆心点原点，起点点在横轴上，绕一大圈到右下方": "First the path. Arc: centre on the origin, start on the horizontal axis, then sweep round to the lower right",
+ "从圆弧的终点画一条直线，大致顺着圆弧的方向": "From the end of the arc, draw a line roughly continuing its direction",
+ "加约束：圆弧半径 9.35、圆心角 265°；直线和圆弧相切，长 14.85": "Constraints: arc radius 9.35, angle 265°; line tangent to the arc, length 14.85",
+ "路径完全约束了。关闭草图": "The path is fully constrained. Close the sketch",
+ "再画截面：XZ 平面，圆心在圆弧的起点（横轴上、离原点 9.35）；放大，加直径 0.7、水平距离 9.35": "Now the section on the XZ plane: centre at the start of the arc (on the horizontal axis, 9.35 out); zoom in, add diameter 0.7 and horizontal distance 9.35",
+ "选中截面草图，点“添加式管道”；在面板里点路径旁的“对象”，再到视图里点一下路径": "Select the section sketch, click Additive pipe; in the panel click Object next to the path, then click the path in the view",
+ "钢丝沿着路径弯出来了。路径和截面分开画：改路径，弹簧形状跟着变": "The wire follows the path. Path and section are separate sketches: change the path and the spring follows"
 }

@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00:00.667 --> 00:00:09.850
+A spring is a helix: a circle (the wire section) turns around an axis while climbing. The presser spring: 15.8 outside, wire 1.8
+
+00:00:09.850 --> 00:00:18.290
+On the XZ plane, draw the wire section: centre on the horizontal axis, 7 from the origin (half the mean diameter), diameter 1.8
+
+00:00:18.290 --> 00:00:26.366
+Lock the centre with Horizontal distance: 7
+
+00:00:26.366 --> 00:00:38.366
+Click Additive helix: axis Vertical sketch axis, pitch 4, height 60
+
+00:00:46.730 --> 00:00:55.560
+A 15-turn spring. Change pitch, turns or height and the spring follows; tick Left handed for a left-hand coil
