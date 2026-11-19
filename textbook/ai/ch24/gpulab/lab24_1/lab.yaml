@@ -1,0 +1,61 @@
+标题: ["GPU 实验 24.1 在成千上万个并行环境里训一个到达任务，并用两列成绩验收它", "GPU Lab 24.1 Train a reaching task in thousands of parallel environments and score it in two columns"]
+目的: ["在显卡上把一台平面二连杆机械臂的环境**成批地**跑起来（几十到上万个并行环境），用进化策略训一个到达并闭合夹爪的策略，然后做比训练更要紧的两件事：**按标称仿真参数**验收一遍、**把物理参数改掉之后**再验收一遍，两列分开报；并把“达到同一成功率要多少**迭代轮数**”与“要烧多少**总环境步数**”两个数也分开报。你会看到：并行环境买下来的是等待的轮数，付出去的是成倍的环境步数，而且步数涨得比轮数降得多——**收益是递减的**。",
+       "Run a planar two-link arm environment in batch on the GPU — from dozens to tens of thousands of parallel environments — train a reach-and-close policy with an evolution strategy, and then do the two things that matter more than training: score it on the nominal simulator parameters, score it again after the physics parameters are changed, and report the two columns separately. Report the iteration count and the total environment steps separately as well. Parallel environments buy down the iterations you wait for and pay for it in environment steps, and the steps rise faster than the iterations fall: the returns diminish."]
+显卡: basic
+结果:
+  - {名: n_envs, 说明: ["报表那一行用的并行环境数", "parallel environments in the headline row"], 单位: "个"}
+  - {名: iters, 说明: ["达到留出集目标成功率用的迭代轮数", "iterations to reach the holdout target"], 单位: "轮"}
+  - {名: env_steps, 说明: ["训练一共烧掉的环境步数（不含验收）", "total environment steps burned in training (evaluation excluded)"], 单位: "步"}
+  - {名: sim_success_pct, 说明: ["仿真成功率（标称参数，留出集）", "success rate in simulation (nominal parameters, holdout)"], 单位: "%"}
+  - {名: real_success_pct, 说明: ["改了物理参数之后的成功率（同一留出集）", "success rate after the physics parameters are changed"], 单位: "%"}
+  - {名: n_trials, 说明: ["两列各验收了多少回合", "episodes scored in each column"], 单位: "回合"}
+  - {名: succ_ratio, 说明: ["改了参数那一列比仿真那一列低多少（后者除以前者）", "ratio of the changed-physics column to the simulation column"], 单位: "倍"}
+  - {名: iter_speedup, 说明: ["环境数最少到最多：迭代轮数少几倍", "iterations saved from the smallest to the largest env count"], 单位: "倍"}
+  - {名: steps_blowup, 说明: ["环境数最少到最多：总环境步数多几倍", "environment steps multiplied from the smallest to the largest env count"], 单位: "倍"}
+  - {名: train_s, 说明: ["报表那一行的训练用时（墙钟）", "wall-clock training time of the headline row"], 单位: "秒"}
+文件: []
+实际问题:
+  标题: ["车间那台机械臂要会“伸过去抓住”，先在显卡里把它练出来", "The arm on the line has to learn to reach and grasp; train it on the GPU first"]
+  内容: ["问渠减速器厂的装配工位上有一台机械臂，要把来料的工件抓起来放到夹具里。真机上试错太贵——撞一次夹具就是停线，所以策略先在仿真里练。并行物理仿真的卖点是“几千个环境一起跑”，可它到底买来了什么？本实验在显卡上把环境成批跑起来，扫一遍并行环境数，回答三个问题：达到同一成功率要多少轮、要烧多少环境步数、以及**把物理参数改掉之后这个策略还剩多少**。第三个问题最要紧：仿真里练出来的成绩不是真机上的成绩，报表上必须是两列。",
+         "On the assembly station of the gearbox plant an arm has to pick incoming parts and place them in a fixture. Trial and error on the machine is expensive — one collision with the fixture stops the line — so the policy is trained in simulation first. Parallel physics simulation is sold on running thousands of environments at once, but what does that actually buy? This lab runs the environment in batch on the GPU, sweeps the environment count and answers three questions: how many iterations to reach a given success rate, how many environment steps that burns, and how much of the policy survives when the physics parameters are changed. The third is the one that matters: a simulated score is not a hardware score, and the report must have two columns."]
+原理:
+  - ["**并行环境换来的不是“更好的策略”，是“更少的等待轮数”。** 每一轮策略更新都要等所有并行环境跑完；环境数越多，这一轮对“哪个方向更好”的估计越准，走错的弯路越少，于是**迭代轮数下降**。但每一轮要跑的回合数成倍上升，**总环境步数上升**。两个数必须分开报（算例 24.6）。", "Parallel environments do not buy a better policy; they buy fewer iterations of waiting. Each update waits for every environment, and with more of them the estimate of which direction is better is sharper, so fewer iterations are wasted — while the episodes per iteration multiply, so the total environment steps rise. The two numbers must be reported separately."]
+  - ["**收益递减是算得出来的**：总步数差不多每翻一倍就翻一倍，而省下的轮数越来越少。本实验还会看到更要紧的一头：**环境数太少的那几档根本达不到达标线**（选精英时混进来的全是运气好的回合）——那几档买到的不是“更快”，而是“能不能收敛”；过了那个门槛之后再加环境，轮数降不了多少，算力的账却照样翻倍。", "The diminishing returns can be computed: the total steps roughly double with every doubling while the iterations saved shrink. This lab also shows the more important end of the curve: the smallest environment counts fail to reach the target at all, because the elite set fills up with lucky episodes. There the environments buy convergence rather than speed; past that threshold, more of them save few iterations while the compute bill keeps doubling."]
+  - ["**仿真成功率不是真机成功率**（本章第一号引用警告）。本实验把同一个策略在标称参数与改掉的参数上各验收一遍，两列并排报，并写明每列验收了多少回合——几百个回合的成功率，小数点后那一位没有意义（24.5 节）。", "A simulation success rate is not a hardware success rate. The same policy is scored on nominal and on changed parameters, the two columns are reported side by side, and the number of episodes in each is stated."]
+  - ["**“每秒多少步”不是性能指标，而是（显卡、环境数、物理步长、任务）四元组的函数。** 四样不全的吞吐数本章一律不印；本实验也**不把自己的机时折算成吞吐**。要引吞吐，只能引四样齐全的公开值（见本实验第 5 节）。", "Steps per second is not a performance figure but a function of four things together: the GPU, the environment count, the physics timestep and the task. Throughput quoted without all four is not printed in this chapter, and this lab does not convert its own wall time into a throughput either."]
+  - 式: "总环境步数 = 并行环境数 × 每回合步数 × 迭代轮数（验收用的回合不算进去）；成功 = （闭合夹爪的那一刻 位置误差 < 2 cm）且（姿态误差 < 0.4 rad）"
+步骤:
+  - ["运行第 1 节：装环境、确认显卡型号与 PyTorch 版本（任务 1），把显卡型号记进表 1。", "Run section 1 to confirm the GPU model and the PyTorch version (task 1) and record the GPU in Table 1."]
+  - ["运行第 2 节：把成批的环境与策略建起来，确认物理步长、每回合步数、留出集回合数与两套物理参数（任务 2），填表 1。", "Run section 2 to build the batched environment and the policy, confirming the timestep, the episode length, the holdout size and the two parameter sets (task 2) in Table 1."]
+  - ["运行第 3 节：扫并行环境数，每档记下达标的迭代轮数、总环境步数与训练用时（任务 3），填表 2。", "Run section 3 to sweep the environment count, recording the iterations, the total environment steps and the wall time at each (task 3) in Table 2."]
+  - ["运行第 4 节：把最大那一档的策略在两套物理参数上各验收一遍，记下两列成功率、两列各多少回合与比值（任务 4），填表 3。", "Run section 4 to score the largest run's policy under both parameter sets, recording the two columns, the episodes in each and their ratio (task 4) in Table 3."]
+  - ["运行第 5 节：读那一段关于吞吐的说明，把引用的公开值与它的四元组抄进表 4——注意**那是引用，不是你这台机器的数**（任务 5）。", "Run section 5, read the note on throughput and copy the cited public figure with its four-part context into Table 4 — it is a citation, not a measurement of your machine (task 5)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  机器与口径", "Table 1  Machine and conventions"]
+    表头: ["项", "值", "来源或假设"]
+    表头英文: ["item", "value", "source or assumption"]
+    行: [["显卡型号", "", "本机实测"], ["物理步长", "", "本实验的显式假设"], ["每回合步数", "", "本实验的显式假设"], ["留出集回合数", "{n_trials}", "本实验的显式假设"], ["标称仿真参数（连杆 / 摩擦 / 噪声 / 延迟）", "", "本实验的显式假设"], ["改掉之后的参数", "", "本实验的显式假设"], ["达标线（留出集成功率）", "", "本实验的显式假设"]]
+  - 标题: ["表 2  并行环境数买到了什么", "Table 2  What the environment count buys"]
+    表头: ["并行环境数", "达标迭代轮数", "总环境步数", "训练用时（秒）", "没达标就写“未达标”"]
+    表头英文: ["parallel environments", "iterations to target", "total environment steps", "wall time (s)", "or 'not reached'"]
+    行: [["64", "", "", "", ""], ["256", "", "", "", ""], ["1024", "", "", "", ""], ["{n_envs}", "{iters}", "{env_steps}", "{train_s}", ""], ["最少到最多：轮数少几倍 / 步数多几倍", "{iter_speedup}", "{steps_blowup}", "—", ""]]
+  - 标题: ["表 3  两列成绩（**不要平均**）", "Table 3  The two columns (do not average them)"]
+    表头: ["验收用的物理参数", "成功率", "验收了多少回合", "这个数回答的是什么问题"]
+    表头英文: ["physics used for scoring", "success rate", "episodes scored", "which question it answers"]
+    行: [["标称仿真参数", "{sim_success_pct}", "{n_trials}", ""], ["改掉之后的参数", "{real_success_pct}", "{n_trials}", ""], ["后者 ÷ 前者", "{succ_ratio}", "—", ""]]
+  - 标题: ["表 4  吞吐：只抄四样齐全的公开值", "Table 4  Throughput: only a citation with all four parts"]
+    表头: ["项", "值", "出处"]
+    表头英文: ["item", "value", "source"]
+    行: [["显卡", "", ""], ["任务", "", ""], ["并行环境数", "", ""], ["物理步长 / 控制步长", "", ""], ["训练过程中平均步/秒", "", ""], ["本机的吞吐", "不折算", "机时折吞吐缺四元组，本章不印"]]
+注意:
+  - ["**不要把两列成绩平均。** 标称参数那一列回答“这个策略在我建的模型里行不行”，改掉参数那一列回答“模型错一点它还剩多少”。平均出来的数不回答任何问题，报告里要分两行写，并各自带上验收了多少回合。", "Do not average the two columns: the nominal column asks whether the policy works in the model you built, the changed column asks how much survives when the model is a little wrong. The average answers no question; write two rows, each with its episode count."]
+  - ["**本实验的“改了物理参数”不是真机。** 它只是换了连杆长度、摩擦、观测噪声与执行延迟的同一个玩具，没有接触、形变、工件滑动、相机标定漂移。真机那一列只能靠**真的试**，试多少次也必须报（本章口径 b）。", "The changed-physics column is not hardware: it is the same toy with different link lengths, friction, observation noise and actuation delay, without contact, deflection, slipping parts or calibration drift. A hardware column can only come from real trials, whose count must be reported."]
+  - ["**不要把这台机器的机时折算成吞吐印出来。** “每秒多少步”是（显卡、环境数、物理步长、任务）四元组的函数，本实验只报**迭代轮数**与**总环境步数**，墙钟时间只作为“这台机器上跑了多久”的记录。要引吞吐，只能引四样齐全的公开值——本章用的是 Isaac Gym 论文正文那组（单块 NVIDIA A100、Ant 任务、4096 个并行环境、物理步长 1/120 s、控制步长 1/60 s，训练过程中平均 540,000 步/秒），**引用时必须连这四样一起写，并注明是引用**。Isaac Lab 官方基准页与 MuJoCo MJX 官方文档的吞吐数缺物理步长，按本章口径不印。", "Do not turn your wall time into a printed throughput. Steps per second is a function of the GPU, the environment count, the physics timestep and the task together; this lab reports iterations and environment steps, with wall time only as a record of how long this machine took. The one throughput this chapter cites is from the Isaac Gym paper (a single NVIDIA A100, the Ant task, 4096 parallel environments, a 1/120 s physics step and a 1/60 s control step, averaging 540,000 steps per second during training) and it must always be quoted with all four parts and marked as a citation."]
+  - ["**同一块显卡上不同任务的吞吐能差好几倍**（Isaac Gym 论文正文里 Ant 峰值 700,000 步/秒、Shadow Hand 150,000 步/秒），所以跨任务、跨框架的吞吐比较本章一律不做。", "Throughput on the same GPU differs several-fold between tasks (700,000 steps per second peak for Ant against 150,000 for Shadow Hand in the same paper), so this chapter makes no cross-task or cross-framework throughput comparisons."]
+  - ["**达标线、物理步长、每回合步数、两套参数都是本实验的显式假设**；成功判据（位置 2 cm、姿态 0.4 rad）与本章算例同口径。换一套假设，表 2 以下的数全变——所以引用本实验的任何数都要连这几项一起写。", "The target, the timestep, the episode length and both parameter sets are explicit assumptions of this lab; the success criterion (2 cm and 0.4 rad) is the one used in the chapter's worked examples. Change the assumptions and every number below Table 2 changes, so quote none of them without these settings."]
+  - ["进化策略每一轮都要重新采样，**随机种子换一个，达标轮数就会变**。本实验每档只跑一个种子，所以表 2 的轮数要当成“这一个种子上的观测”，不要当成定值；要下结论就多跑几个种子报中位数。", "The evolution strategy resamples every iteration, so a different seed changes the iteration count. Each setting here runs one seed, so read Table 2 as one observation rather than a constant; for a conclusion, run several seeds and report the median."]
+思考题:
+  - ["你的表 2 里，环境数从最少加到最多，轮数少了几倍、步数多了几倍？如果你的显卡再贵十倍、能同时跑十倍的环境，按这张表你会不会买？", "In your Table 2, how many times fewer iterations and how many times more steps did the largest setting take? If a GPU ten times more expensive could run ten times the environments, would this table persuade you to buy it?"]
+  - ["把“改了物理参数”那一列的参数再改大一倍（连杆差一倍、摩擦再高一截），两列的比值变成多少？这个比值可以当成一条验收指标吗？要补上哪些口径才能当？", "Double the perturbation in the changed-physics column: what does the ratio become, and could that ratio serve as an acceptance metric? What conventions would have to be fixed first?"]
+  - ["本实验只报轮数与步数，不报吞吐。如果供应商报的是“每秒多少万步”，你要向他追问哪四件事才能判断这个数有没有意义？", "This lab reports iterations and steps rather than throughput. If a supplier quotes steps per second, which four things must you ask for before the figure means anything?"]

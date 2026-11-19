@@ -1,0 +1,36 @@
+# 实验 24.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab24_2.js。
+原理:
+  - ["**仿真成功率不是真机成功率。** 同一条策略，在标称仿真参数上验收一遍、在真机参数上再验收一遍，得到的是**两个数**，回答两个不同的问题。本章的硬口径是：凡报成绩，分“仿真”与“真机”两列，并写清真机试了多少次——几十次试验的成功率，小数点后那一位没有意义（24.5 节）。", "A simulation success rate is not a hardware success rate. The same policy scored on nominal simulator parameters and on hardware parameters gives two numbers answering two different questions. This chapter's rule: always two columns, and always state how many hardware trials were run — with a few dozen trials the first decimal place means nothing."]
+  - ["**只在标称参数上训，策略会学会一条偷懒的捷径。** 本实验的观测里有“量出来的夹爪位姿”，也有关节角。标称参数固定不变时，策略按固定的连杆长度心算一套正运动学就够用了——于是连杆一变就错。见过各种连杆长度之后，这条捷径不管用，它只好去用“工件位姿 − 量出来的夹爪位姿”这个误差项，而**这个误差项在真机上照样成立**（算例 24.2）。", "Trained on fixed nominal parameters, the policy learns a shortcut: with the link lengths never changing it can compute the gripper pose in its head from the joint angles alone, and that breaks the moment the links differ. Having seen many link lengths it must instead use the task-space error between the part and the measured gripper pose — and that error term still holds on hardware."]
+  - ["**范围有个最佳值，在中间。** 太窄盖不住真机与仿真之间那段差距；太宽则同一个观测对应的专家动作互相矛盾，策略只能学个平均，于是**仿真与真机两列一起掉**。合起来是一条倒 U 形曲线（算例 24.2）。", "The range has an optimum in the middle: too narrow fails to cover the gap, too wide makes the same observation demand contradictory actions, so the policy averages them and both columns fall. Together they form an inverted U."]
+  - ["**范围该按差距定，不按手感定。** 第二个场景把差距本身拉大，最好的范围跟着往宽走。所以“随机化范围调多少”这个问题的答案不在训练日志里，而在**你有没有量过自己和真机之间差多少**（24.5 节）。", "The range should follow the gap, not intuition. Widen the gap in the second scene and the best range widens with it, so the answer is not in the training log but in whether you have measured your own sim-to-real gap."]
+  - 式: "成功 = （闭合夹爪的那一刻 位置误差 < 2 cm） 且 （姿态误差 < 0.4 rad）；差距大小 = 0.4×连杆项 + 0.4×摩擦项 + 0.1×噪声项 + 0.1×延迟项（出厂差距记作 1.00，本实验的显式假设）"
+步骤:
+  - ["第一个场景，出厂差距（连杆差 13 mm、摩擦 0.11、噪声 4 mm、延迟 1 拍）：把随机化范围依次取 0、0.05、0.1、0.2、0.3、0.5、0.8、1.0、1.4，每档记下仿真与真机两列成功率（任务 1—3），填表 1。", "In the first scene at the factory gap, step the randomisation range through 0, 0.05, 0.1, 0.2, 0.3, 0.5, 0.8, 1.0 and 1.4, recording both columns at each (tasks 1–3) in Table 1."]
+  - ["在表 1 上找出真机那一列最高的那一档，和读数里“真机那一列最高的范围”核对；把同一档的仿真成绩与范围 0 时的仿真成绩比一比，写下差了几个百分点。", "Find the best range for the hardware column in Table 1 and check it against the readout, then compare that row's simulation score with the simulation score at range 0."]
+  - ["切到第二个场景，把差距依次取四档（见表 2 的行），每档记下“真机那一列最高的范围”、那一档的两列成绩，以及范围 0 时的真机成绩（任务 4、5），填表 2。", "In the second scene step the gap through the four settings in Table 2, recording the best range, both of its columns and the hardware score at range 0 (tasks 4, 5)."]
+  - ["把表 2 的“差距大小”与“最好的范围”画成一张图（横轴差距，纵轴最好的范围），看是不是单调往上。", "Plot the gap size against the best range from Table 2 and check whether it rises monotonically."]
+  - ["最后把表 1 里范围 0 那一行单独抄进表 3，连“真机试了多少次”一起写——这一行就是“只有仿真成功率的结果不采信”的证据。", "Finally copy the range-0 row of Table 1 into Table 3 together with the number of hardware trials: that row is the evidence for 'a simulation-only number is not evidence'."]
+数据表:
+  - 标题: ["表 1  同一个任务，两列成绩随随机化范围怎么走", "Table 1  Both columns against the randomisation range"]
+    表头: ["随机化范围", "仿真成功率", "真机成功率", "真机试了多少次", "真机平均位置误差（cm）"]
+    表头英文: ["randomisation range", "success in simulation", "success on hardware", "hardware trials", "mean position error (cm)"]
+    行: [["0", "", "", "", ""], ["0.05", "", "", "", ""], ["0.10", "", "", "", ""], ["0.20", "", "", "", ""], ["0.30", "", "", "", ""], ["0.50", "", "", "", ""], ["0.80", "", "", "", ""], ["1.00", "", "", "", ""], ["1.40", "", "", "", ""]]
+  - 标题: ["表 2  差距越大，该留的范围越宽", "Table 2  The wider the gap, the wider the range"]
+    表头: ["差距设置（连杆 / 摩擦 / 噪声 / 延迟）", "差距大小", "最好的范围", "那一档的仿真 / 真机", "范围 0 时的真机"]
+    表头英文: ["gap setting (links / friction / noise / delay)", "gap size", "best range", "sim / hardware there", "hardware at range 0"]
+    行: [["4 mm / 0.06 / 2 mm / 0 拍", "", "", "", ""], ["13 mm / 0.11 / 4 mm / 1 拍（出厂）", "", "", "", ""], ["22 mm / 0.18 / 7 mm / 1 拍", "", "", "", ""], ["30 mm / 0.26 / 11 mm / 2 拍", "", "", "", ""]]
+  - 标题: ["表 3  报表该长什么样", "Table 3  What the report should look like"]
+    表头: ["做法", "仿真成功率", "真机成功率", "真机试了多少次", "这个数能回答什么"]
+    表头英文: ["method", "success in simulation", "success on hardware", "hardware trials", "what it answers"]
+    行: [["不随机化（范围 0）", "", "", "", ""], ["最好的那一档", "", "", "", ""], ["最宽的那一档（1.4）", "", "", "", ""]]
+注意:
+  - ["**本实验里的“真机”也是算出来的。** 它只是换了一套参数的同一个玩具，没有接触、形变、工件滑动、相机标定漂移、线缆拖拽。真设备上这些都在，所以真机那一列**只能靠真的试**，试多少次也必须报。本实验能教的是报表的结构与范围的道理，不是任何具体数字。", "The 'hardware' column here is also computed: the same toy with different parameters, without contact, deflection, slipping parts, calibration drift or cable drag. On a real machine all of those are present, so the hardware column can only come from real trials, whose count must be reported. This lab teaches the shape of the report and the logic of the range, not any particular number."]
+  - ["**“范围折成策略”这一步是本实验的显式假设**，不是训练过程：范围越宽，策略越不敢用心算的正运动学（权重按范围的平方上升）、增益越偏小、动作越带抖动。真训练里这三件事是一起涌现出来的，强弱也不是这个比例。换一套假设，曲线的形状还在，具体数字全变。", "Mapping the range onto a policy is an explicit assumption of this lab rather than a training run: a wider range means less reliance on the mental kinematics (weight rising with the square of the range), a lower gain and noisier actions. In real training these emerge together and not in this proportion; change the assumption and the shape survives but the numbers do not."]
+  - ["**不要把两列成绩平均，也不要只报其中一列。** 平均出来的数不回答任何问题。本章的报表格式是四列：做法 / 仿真成功率 / 真机成功率 / 真机试了多少次。", "Do not average the two columns and do not report only one of them: the average answers no question. The report format in this chapter has four columns — method, simulation success, hardware success, number of hardware trials."]
+  - ["**两列各只试 40 次**，所以一档与一档之间差一两个百分点不说明问题；本实验要你读的是趋势（谷底在哪、峰在哪、两端怎么掉），不是单点。", "Each column here is only 40 trials, so a difference of one or two points between settings means nothing: read the trend — where the trough is, where the peak is, how both ends fall — not single points."]
+  - ["域随机化不是唯一的办法，也不总是最好的办法。把真机量准（标定连杆长度、辨识摩擦）往往比把范围开大划算得多——**本实验第二个场景正好说明这一点：差距缩小之后，范围 0 也不差了**。", "Randomisation is not the only remedy and not always the best one: measuring the machine properly — calibrating the links, identifying the friction — is often cheaper than widening the range, which is exactly what the second scene shows."]
+思考题:
+  - ["把你们自己设备与模型之间的差距列成一张表，标明哪几项量过、哪几项是猜的。按本实验的结论，这张表怎样决定随机化范围？", "List the gap between your own machine and your model, marking which entries are measured and which are guessed. How does that table set your randomisation range?"]
+  - ["如果供应商只给你仿真成功率，你会怎么把“真机那一列”写成一条可验收的合同条款？要写明哪几件事（次数、判据、谁试、失败怎么算）？", "If a supplier quotes only a simulation success rate, how would you write the hardware column into an acceptance clause? Which things must the clause fix — trial count, criterion, who runs it, how a failure is counted?"]
+  - ["本实验的差距只有四项（连杆、摩擦、噪声、延迟）。你们那台设备上还有哪几项是本实验没建模的？其中哪一项最可能让“范围调对了也没用”？", "The gap here has only four entries. Which further ones exist on your machine, and which is most likely to make even a well-chosen range useless?"]
