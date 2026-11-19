@@ -266,6 +266,8 @@ def sp(d, u, v):
 
 def combo_pick(d, combo, text):
     """真点下拉框，在弹出的列表里点 text（按开头匹配；给整数就是第几项）"""
+    show(combo)
+    yield 300
     p = d.center(combo)
     yield d.move(p, 700)
     d.click(p)
@@ -288,8 +290,20 @@ def named(cls, name):
     return ws[0] if ws else None
 
 
+def show(w):
+    """任务面板很长时，先把 w 滚到看得见的地方（不然算出来的点会落在面板外面）"""
+    p = w.parentWidget()
+    while p is not None:
+        if isinstance(p, QtWidgets.QScrollArea):
+            p.ensureWidgetVisible(w, 10, 40)
+            return
+        p = p.parentWidget()
+
+
 def type_into(d, w, text):
     """点输入框，全选，键入，Tab 交给特征"""
+    show(w)
+    yield 300
     p = d.center(w)
     yield d.move(p, 700)
     d.click(p)
@@ -311,12 +325,25 @@ def type_into(d, w, text):
         log("type_into fallback", w.objectName(), w.text())
 
 
-def task_ok(d):
-    """任务面板的“确定”"""
-    ok = d.find(QtWidgets.QPushButton, "确定") or d.find(QtWidgets.QPushButton, "OK")
+def task_ok(d, gone=None):
+    """任务面板的“确定”（只找任务面板里的，别点到状态栏上的按钮）。gone：等这个名字的控件消失（基准面这类不进“编辑”的对话框）"""
+    def in_task(w):
+        p = w.parentWidget()
+        while p is not None:
+            if "Task" in p.metaObject().className():
+                return True
+            p = p.parentWidget()
+        return False
+    oks = [w for w in QtWidgets.QApplication.allWidgets() if isinstance(w, QtWidgets.QPushButton) and w.isVisible()
+           and w.text().replace("&", "") in ("确定", "OK") and in_task(w)]
+    ok = oks[0] if oks else (d.find(QtWidgets.QPushButton, "确定") or d.find(QtWidgets.QPushButton, "OK"))
+    log("task ok", len(oks), ok.text() if ok else None, d.center(ok) if ok else None)
     yield d.move(d.center(ok), 700)
     d.click(d.center(ok))
-    yield from d.until(lambda: Gui.ActiveDocument.getInEdit() is None)
+    if gone:
+        yield from d.until(lambda: not [w for w in QtWidgets.QApplication.allWidgets() if w.isVisible() and w.objectName() == gone], 6000)
+    else:
+        yield from d.until(lambda: Gui.ActiveDocument.getInEdit() is None)
     yield 900
 
 
@@ -356,18 +383,18 @@ def pick_sp(d, *pts):
 def circle_on_axis(d, x, y, dia, axis_tool, value):
     """圆心点在坐标轴上，键入直径；选圆心，加水平 / 竖直距离"""
     yield d.tool("Sketcher_CompCreateConic", "Sketcher_CreateCircle"); yield 300
-    yield d.move(d.model_pt(x, y), 900)
+    yield d.move(sp(d, x, y), 900)
     d.click(); yield 500
-    yield d.move(d.model_pt(x + dia * 0.4, y + dia * 0.3), 700)
+    yield d.move(sp(d, x + dia * 0.4, y + dia * 0.3), 700)
     n0 = len(sketch().Geometry)
     d.keys(str(dia), enter=True); yield 1000
     if len(sketch().Geometry) == n0:     # 小圆键入的直径有时接不住：点第二下定大概，后面补直径约束
-        yield d.move(d.model_pt(x + dia * 0.4, y + dia * 0.3), 300)
+        yield d.move(sp(d, x + dia * 0.4, y + dia * 0.3), 300)
         d.click(); yield 700
     d.key(QtCore.Qt.Key_Escape); yield 600
     sk = sketch()
     c = sk.Geometry[-1].Center
-    p = d.model_pt(c.x, c.y)
+    p = sp(d, c.x, c.y)
     yield d.move(p, 700)
     d.ring(p)                      # 圆心压在坐标轴上，点下去会选中轴：直接选圆心那个点
     Gui.Selection.clearSelection()
@@ -380,7 +407,7 @@ def circle_on_axis(d, x, y, dia, axis_tool, value):
     if not any(c.Type in ("Diameter", "Radius") for c in sk.Constraints):
         Gui.Selection.clearSelection()
         g = sk.Geometry[-1]
-        yield d.move(d.model_pt(g.Center.x, g.Center.y + g.Radius), 800)
+        yield d.move(sp(d, g.Center.x, g.Center.y + g.Radius), 800)
         d.click(); yield 500
         yield d.tool("Sketcher_CompDimensionTools", "Sketcher_ConstrainDiameter")
         yield from datum(d, dia)
@@ -434,3 +461,15 @@ def polar(d, feat, n):
     log("polar", pp.Occurrences, pp.Angle.Value, pp.Axis, round(pp.Shape.Volume, 2))
 
 
+
+
+def zoom_sk(d, mm, px, at=None):
+    """同 d.zoom_to，但按当前草图的横轴量（草图不在 XY 平面时用）"""
+    for _ in range(90):
+        a, b = sp(d, 0, 0), sp(d, mm, 0)
+        cur = ((b.x() - a.x()) ** 2 + (b.y() - a.y()) ** 2) ** 0.5
+        if 0.85 * px <= cur <= 1.18 * px:
+            return
+        d.wheel(1 if cur < px else -1, at or d.center(d.vp()))
+        yield 120
+    log("zoom_sk gave up", cur)

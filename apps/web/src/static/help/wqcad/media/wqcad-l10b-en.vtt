@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00:02.764 --> 00:00:14.764
+Parametric design: dimensions that relate to each other. The block height goes into a spreadsheet; the pin always sits at mid-height
+
+00:00:25.233 --> 00:00:34.933
+Double-click the pad: type = in the length box, then Spreadsheet.B1
+
+00:00:34.933 --> 00:00:46.933
+Double-click the pin's sketch, double-click the vertical distance 8 constraint, and make it =Spreadsheet.B1 / 2
+
+00:00:50.534 --> 00:01:02.283
+Now edit the sheet: height 16 → 22, recompute
+
+00:01:02.283 --> 00:01:14.283
+The block grew by 6 and the pin moved to the new middle by itself. That's parametric design: the intent is in the model, so change one number and everything related follows

@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00:03.030 --> 00:00:12.530
+The needle-bar link: a block with a vertical bore for the needle bar and a Ø6 pin out of one side. The block is a lesson-6 pad, already made
+
+00:00:12.530 --> 00:00:21.530
+The pin is sketched on the side. Instead of clicking the face, make a datum plane: attached to the YZ plane, offset 6—exactly the side face
+
+00:00:21.530 --> 00:00:29.101
+Reference: the YZ plane, attachment mode Plane; in the attachment offset below, Z (the plane normal) = 6
+
+00:00:29.101 --> 00:00:36.530
+The datum plane lies on the side of the block. Select it and create a sketch: the sketch sits on the datum plane
+
+00:00:36.530 --> 00:00:47.630
+A Ø6 circle, centre on the vertical axis at height 8 (half the block height)
+
+00:00:47.630 --> 00:00:59.630
+Close the sketch, Pad 17: the pin sticks out of the side
+
+00:01:00.330 --> 00:01:11.200
+Why a datum plane: it doesn't depend on a face number. If earlier features change and faces renumber, the datum and the pin on it stay put

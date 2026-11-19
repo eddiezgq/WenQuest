@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–9)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–10)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -193,7 +193,15 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l09-do" data-s="l09">Follow along</a>
 <a class="sub" href="#l09-self" data-s="l09">On your own</a>
 <a class="sub" href="#l09-quiz" data-s="l09">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">10</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l10" data-s="l10"><span class="n">10</span>Lesson 10 Datum planes and axes, attachment; parametric design</a>
+<a class="sub" href="#l10-goal" data-s="l10">What you will be able to do</a>
+<a class="sub" href="#l10-datum" data-s="l10">Datums and attachment</a>
+<a class="sub" href="#l10-pin" data-s="l10">Needle-bar link: a pin sketched on a datum plane</a>
+<a class="sub" href="#l10-param" data-s="l10">Parametric: change one number, everything follows</a>
+<a class="sub" href="#l10-do" data-s="l10">Follow along</a>
+<a class="sub" href="#l10-self" data-s="l10">On your own</a>
+<a class="sub" href="#l10-quiz" data-s="l10">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">11</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -214,9 +222,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
 
-<p>Lessons 1–9 are online now; the others follow module by module.</p>
+<p>Lessons 1–10 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
 <p>Every recording is the real software at work: FreeCAD 1.1.4 on a cloud computer with the WenQuest CAD branding and the same AI workbench, English interface. Where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. The only difference from WenQuest CAD on your computer is the 27 kernel fixes, which do not change the interface; “Check geometry” and “Unfold face” give different results, so those are not recorded and are taught with the book's verified data instead.</p>
 <p>The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.</p></section>
@@ -1054,7 +1062,78 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">Polar pattern, extent 360°, 5 occurrences: the angle between neighbours?</p><div class="opts"><button type="button" data-k="a">A. 90°</button><button type="button" data-k="b">B. 72°</button><button type="button" data-k="c">C. 60°</button><button type="button" data-k="d">D. 75°</button></div><p class="why" hidden>At 360° the ends coincide: 360 ÷ 5 = 72°.</p></div>
 <div class="quiz" data-ok="b"><p class="q">After patterning, you change the original hole from Ø20 to Ø16. What happens?</p><div class="opts"><button type="button" data-k="a">A. Only the original changes</button><button type="button" data-k="b">B. All copies change</button><button type="button" data-k="c">C. The pattern fails</button><button type="button" data-k="d">D. The copies vanish</button></div><p class="why" hidden>The pattern copies the feature, so copies follow the original.</p></div>
 <div class="quiz" data-ok="b"><p class="q">The sketch is on the datum plane at the handwheel&#x27;s bottom face and a through-all pocket removes nothing. Most likely cause?</p><div class="opts"><button type="button" data-k="a">A. Sketch not fully constrained</button><button type="button" data-k="b">B. It cuts outwards; tick Reversed</button><button type="button" data-k="c">C. Circle too small</button><button type="button" data-k="d">D. Pattern it first</button></div><p class="why" hidden>A pocket cuts opposite to the sketch normal by default; on an outer face that points away from the material, so Reversed is needed.</p></div></section>
-<section id="appA"><h2><span class="n">10</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l10"><h2><span class="n">10</span>Lesson 10 Datum planes and axes, attachment; parametric design</h2><p class="lead">You will be able to create datum planes and axes and place them with attachment modes and offsets; sketch on a datum plane; and put design intent into the model with spreadsheets and expressions, so that changing one number updates everything related. You make the WQ-LS needle-bar link. About 1.5 hours.</p><h3 id="l10-goal">What you will be able to do</h3>
+<ul>
+<li>Datum planes, lines and points: helper geometry that isn't part of the solid, used as references for sketches and features.</li>
+<li>Attachment: pick references (plane, face, edge, point), an attachment mode, then an attachment offset (move, rotate).</li>
+<li>Why datums: they don't depend on a face number of the solid, so the model doesn't “lose a face” when it changes.</li>
+<li>Parametric design: expressions in dimensions, referring to a spreadsheet; put intent like “the pin is at mid-height” into the model.</li>
+</ul>
+
+<h3 id="l10-datum">Datums and attachment</h3>
+<table>
+<thead>
+<tr>
+<th>Datum</th>
+<th>Common attachment modes</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Datum plane</td>
+<td>Plane (on a plane, then offset); three points; normal to edge; tangent to surface</td>
+<td>a sketch on a side, an inclined mounting face</td>
+</tr>
+<tr>
+<td>Datum line (axis)</td>
+<td>two points; along an edge; intersection of two planes</td>
+<td>axis of an inclined hole, a revolve axis</td>
+</tr>
+<tr>
+<td>Datum point</td>
+<td>vertex; edge midpoint; circle centre</td>
+<td>hole position, measuring origin</td>
+</tr>
+<tr>
+<td>Local coordinate system</td>
+<td>any</td>
+<td>tilting a group of features</td>
+</tr>
+</tbody>
+</table>
+<p>The attachment offset is in the <strong>reference's own coordinates</strong>: attached to the YZ plane, “Z” is the YZ plane's normal, i.e. global X.</p>
+<h3 id="l10-pin">Needle-bar link: a pin sketched on a datum plane</h3>
+<p>The WQ-LS needle-bar link: a 12 × 14 × 16 block with a Ø8 vertical bore for the needle bar, and a Ø6 pin 17 long out of one side (to the take-up link). The block is a lesson-6 pad, made before the recording.</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l10a-en.jpg"><source src="../media/wqcad-l10a-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l10a-en.vtt"></video><figcaption>▶ Recording: datum plane on YZ, offset 6 → Ø6 circle at height 8 on the datum → Pad 17 (about 75 s)</figcaption></figure>
+<p>The volume is 2364.42 mm³. The link in the machine STEP is 2295.65 mm³ — it also has two set-screw holes in the front (On your own).</p>
+<h3 id="l10-param">Parametric: change one number, everything follows</h3>
+<p>“The pin is at mid-height” is design intent. Write it as expressions: pad length = <code>Spreadsheet.B1</code>, pin height = <code>Spreadsheet.B1 / 2</code>.</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l10b-en.jpg"><source src="../media/wqcad-l10b-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l10b-en.vtt"></video><figcaption>▶ Recording: spreadsheet height 16 → expressions for pad length and pin height → change to 22: taller block, pin still in the middle (about 75 s)</figcaption></figure>
+<p>At 22 the pin height becomes 11 by itself and the volume is 3070.82 mm³. A good parametric model:
+- keeps the key dimensions in one sheet, with meaningful names (aliases);
+- writes relationships between dimensions as expressions (half, equal, sum) instead of typing the same number in several places;
+- has fully constrained sketches, and features that refer to datum planes and axes rather than “face number n”.</p>
+<h3 id="l10-do">Follow along</h3>
+<ol class="steps">
+<li>New body, on XY: a 12 × 14 rectangle centred on the origin plus a Ø8 circle, Pad 16.</li>
+<li>New datum plane: reference the YZ plane, mode Plane, attachment offset Z = 6.</li>
+<li>Select the datum plane, new sketch: Ø6 circle, centre on the vertical axis, vertical distance 8. Pad 17.</li>
+<li>Spreadsheet B1 = 16; pad length <code>=Spreadsheet.B1</code>; the pin sketch's vertical distance <code>=Spreadsheet.B1 / 2</code>.</li>
+<li>Change B1 to 22 and recompute: taller block, pin in the middle.</li>
+</ol>
+
+<h3 id="l10-self">On your own</h3>
+<ol>
+<li>Add two set-screw holes in the front (Y = −7) at heights 4 and 12, Ø3.75, down to the bore (use a datum plane or click the front face). The volume should come close to 2295.65 mm³ (at height 16).</li>
+<li>Give B1 the alias <code>h</code> and change both expressions to <code>Spreadsheet.h</code>.</li>
+<li>Add a row “width” = 12 and make the datum offset = width / 2: change the width and the pin stays on the side face.</li>
+</ol>
+<h3 id="l10-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">A datum plane attached to the YZ plane with offset Z = 6. Where is it?</p><div class="opts"><button type="button" data-k="a">A. Horizontal at global Z = 6</button><button type="button" data-k="b">B. At global X = 6, parallel to YZ</button><button type="button" data-k="c">C. At global Y = 6</button><button type="button" data-k="d">D. It doesn&#x27;t move</button></div><p class="why" hidden>The offset is in the reference&#x27;s own coordinates; the YZ plane&#x27;s Z is its normal, global X.</p></div>
+<div class="quiz" data-ok="b"><p class="q">Why sketch on a datum plane instead of clicking a face of the solid?</p><div class="opts"><button type="button" data-k="a">A. It looks nicer</button><button type="button" data-k="b">B. It doesn&#x27;t depend on face numbers, so references survive changes</button><button type="button" data-k="c">C. Faces can&#x27;t take sketches</button><button type="button" data-k="d">D. It computes faster</button></div><p class="why" hidden>Face numbers change when earlier features change; a datum attached to an origin plane or a stable reference is robust.</p></div>
+<div class="quiz" data-ok="c"><p class="q">Pad length =Spreadsheet.B1, pin height =Spreadsheet.B1 / 2. B1 changes from 16 to 22. The pin height?</p><div class="opts"><button type="button" data-k="a">A. 8</button><button type="button" data-k="b">B. 16</button><button type="button" data-k="c">C. 11</button><button type="button" data-k="d">D. 22</button></div><p class="why" hidden>The expression follows the sheet: 22 / 2 = 11.</p></div></section>
+<section id="appA"><h2><span class="n">11</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">

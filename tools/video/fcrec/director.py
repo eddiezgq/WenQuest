@@ -123,6 +123,16 @@ class Director:
     def tree_item(self, label):
         t = self.tree()
         it = t.findItems(label, Qt.MatchExactly | Qt.MatchRecursive)[0]
+        pars = []
+        par = it.parent()
+        while par is not None:                # 收着的父项先展开（比如凸台下面的草图），不然取到的位置是空的
+            pars.append(par)
+            par = par.parent()
+        if any(not x.isExpanded() for x in pars):
+            for x in reversed(pars):
+                x.setExpanded(True)
+            QtWidgets.QApplication.processEvents()
+            it = t.findItems(label, Qt.MatchExactly | Qt.MatchRecursive)[0]   # 展开会重建子项：重新找
         t.scrollToItem(it)
         return t.viewport().mapToGlobal(t.visualItemRect(it).center())
 

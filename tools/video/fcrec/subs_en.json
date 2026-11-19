@@ -142,5 +142,17 @@
  "一道槽变 48 道，每道 7.5°。两次阵列，手轮就和整机里的一样了": "One groove becomes 48, every 7.5°. Two patterns, and the handwheel matches the one in the machine",
  "第 6 课的针杆只挖了一圈油槽。第二圈在上面 2 mm：不用再画草图，用“线性阵列”": "Lesson 6's needle bar has one oil groove. The second is 2 mm higher: no new sketch, use Linear pattern",
  "方向选“垂直草图轴”（沿着针杆），长度 2，次数 2": "Direction: Vertical sketch axis (along the bar), length 2, 2 occurrences",
- "第二圈出来了，体积和第 7 课补的那圈一样。阵列跟着原特征走：改第一圈的槽宽，两圈一起变": "There's the second groove, same volume as the one added in lesson 7. A pattern follows its original: change the first groove's width and both change"
+ "第二圈出来了，体积和第 7 课补的那圈一样。阵列跟着原特征走：改第一圈的槽宽，两圈一起变": "There's the second groove, same volume as the one added in lesson 7. A pattern follows its original: change the first groove's width and both change",
+ "针杆接头：方块中间一个竖孔（套针杆），侧面伸出一根 Ø6 的销。方块是第 6 课的凸台，已经做好": "The needle-bar link: a block with a vertical bore for the needle bar and a Ø6 pin out of one side. The block is a lesson-6 pad, already made",
+ "销要画在侧面上。这次不直接点面，建一个“基准面”：附着在 YZ 平面上，往外偏 6——正好是侧面": "The pin is sketched on the side. Instead of clicking the face, make a datum plane: attached to the YZ plane, offset 6—exactly the side face",
+ "参照选 YZ 平面，附着模式“平面”；下面的附着偏移量里，Z 方向（面的法向）填 6": "Reference: the YZ plane, attachment mode Plane; in the attachment offset below, Z (the plane normal) = 6",
+ "基准面贴在方块的侧面上。选中它，新建草图：草图就画在基准面上": "The datum plane lies on the side of the block. Select it and create a sketch: the sketch sits on the datum plane",
+ "Ø6 的圆，圆心在竖轴上、高 8（方块高度的一半）": "A Ø6 circle, centre on the vertical axis at height 8 (half the block height)",
+ "关闭草图，凸台 17：销从侧面伸出来": "Close the sketch, Pad 17: the pin sticks out of the side",
+ "基准面的好处：它不依赖某个面的编号。前面的特征改了，面编号变了，基准面和画在上面的销都不会丢": "Why a datum plane: it doesn't depend on a face number. If earlier features change and faces renumber, the datum and the pin on it stay put",
+ "参数化：让尺寸之间有关系。方块的高写进电子表格；侧销永远在高度正中": "Parametric design: dimensions that relate to each other. The block height goes into a spreadsheet; the pin always sits at mid-height",
+ "双击凸台：长度框里先打等号，写 Spreadsheet.B1": "Double-click the pad: type = in the length box, then Spreadsheet.B1",
+ "再双击侧销的草图，双击“竖直距离 8”那条约束，改成 =Spreadsheet.B1 / 2": "Double-click the pin's sketch, double-click the vertical distance 8 constraint, and make it =Spreadsheet.B1 / 2",
+ "现在改表：高 16 改成 22，重新计算": "Now edit the sheet: height 16 → 22, recompute",
+ "方块高了 6，销自己跟到了新的正中。这就是参数化：设计意图写进模型，改一个数，相关的都跟着变": "The block grew by 6 and the pin moved to the new middle by itself. That's parametric design: the intent is in the model, so change one number and everything related follows"
 }
