@@ -51,6 +51,16 @@ if [ "$(envval FACTORY_INSTALLED)" != 1 ]; then
 fi
 
 log "拉取镜像..."
+# 2026-11-18：国内服务器的 Docker 用 containerd 镜像存储，compose 几十个服务同时拉同一个镜像时，
+# 拉新版本报 “short read … unexpected EOF”（仓库里每一层都核对过没坏）。先一个镜像一个镜像地拉、断了重试，
+# 剩下的 dc pull 就都是现成的，不再并发下载。
+for img in $(dc config --images 2>/dev/null | sort -u); do
+    for try in 1 2 3; do
+        docker pull -q "$img" >/dev/null 2>/tmp/wq-pull.err && break
+        log "拉 $img 第 $try 次没成功：$(tail -1 /tmp/wq-pull.err)"
+        sleep 5
+    done
+done
 dc pull --quiet
 log "启动数字工厂..."
 dc up -d --remove-orphans
