@@ -83,6 +83,10 @@ print(f"**收益递减得很快**：2 → 4 这一次翻倍省下 {v['jitter_gai
 # ---------- 三、成功率在哪里就饱和了
 i_sat = int(np.argmax(succ >= v["succ_cont"] - 3.0))
 v["bins_saturate"] = int(BINS[i_sat])
+# 正文表格与行文要用的几个扫描档位（第 175 轮补：原来是手打的）
+v["bins_min"], v["bins_max"] = int(BINS[0]), int(BINS[-1])
+v["bins_odd"] = int(BINS_ODD)
+v["bins_first_hi"], v["bins_last_lo"] = int(BINS[1]), int(BINS[-2])
 v["succ_saturate"] = float(succ[i_sat])
 print(f"\n成功率在 **{v['bins_saturate']} 个箱**上就追平了连续动作"
       f"（{v['succ_saturate']:.1f}% 对 {v['succ_cont']:.1f}%），"

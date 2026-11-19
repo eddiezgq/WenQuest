@@ -90,6 +90,7 @@ v["dev_bc_plateau"] = float(dev_bc[-1])
 v["dev_dg_step5"], v["dev_dg_step20"] = float(dev_dg[5]), float(dev_dg[20])
 v["dev_dg_plateau"] = float(dev_dg[-1])
 v["dev_plateau_ratio"] = v["dev_bc_plateau"] / v["dev_dg_plateau"]
+v["dev_step_a"], v["dev_step_b"] = 5, 20        # 正文表头那两步（第 175 轮补）
 print(f"\n离专家轨迹的偏差（m）：第 5 步 {v['dev_bc_step5']:.4f} 对 {v['dev_dg_step5']:.4f}，"
       f"第 20 步 {v['dev_bc_step20']:.4f} 对 {v['dev_dg_step20']:.4f}，"
       f"到末尾 {v['dev_bc_plateau']:.4f} 对 {v['dev_dg_plateau']:.4f}")
@@ -105,6 +106,8 @@ v["slope_early_bc"] = slope(dev_bc, 1, 6)
 v["slope_late_bc"] = slope(dev_bc, 10, 40)
 v["slope_early_dg"] = slope(dev_dg, 1, 6)
 v["slope_late_dg"] = slope(dev_dg, 10, 40)
+v["slope_early_to"] = 6                          # 两段斜率各量哪几步（第 175 轮补）
+v["slope_late_from"], v["slope_late_to"] = 10, 40
 print(f"对数—对数斜率：纯克隆前 6 步 {v['slope_early_bc']:.2f}、第 10—40 步 "
       f"{v['slope_late_bc']:.2f}；带纠正的 {v['slope_early_dg']:.2f} / {v['slope_late_dg']:.2f}")
 
@@ -131,6 +134,10 @@ print(f"**这一条照实报**：偏差**不是**超线性累积的（前 6 步�
 # ---------- 四、把“演示条数”这一列写进报表
 v["labels_bc"] = N_EPISODES
 v["labels_dagger"] = N_EPISODES
+# 正文表格要用的几个设定值（第 175 轮补：原来正文里是手打的）
+v["demos_dagger"] = per                 # 带纠正的那一支先采多少条演示
+v["rounds_correct"] = ROUNDS - 1        # 之后做几轮纠正
+v["one_trial_pct"] = 100.0 / N_TEST     # 验收 N_TEST 次时，成败一次值几个百分点
 print(f"\n报表要这么写（本章口径 a）：")
 print(f"  纯克隆　　：演示 {v['labels_bc']} 条（专家采，起始位姿集中），"
       f"样本 {v['n_samples_bc']} 步，成功率 {v['succ_bc']:.1f}%（{v['n_trials']} 次）")

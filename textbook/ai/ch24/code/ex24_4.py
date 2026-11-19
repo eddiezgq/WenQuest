@@ -95,6 +95,9 @@ print("**两条曲线背离**：奖励这条一路上升，成功率那条掉到
 v["w_critical"] = float(WEIGHTS[i_farm])
 v["w_last_good"] = float(WEIGHTS[i_farm - 1]) if i_farm > 0 else None
 v["bonus_over_steps"] = TASK_BONUS / STEPS
+# 第 175 轮补：正文要印塑形尺度与“临界权重是这个数的几倍”
+v["d0_cm"] = D0 * 100
+v["w_critical_over_bonus"] = v["w_critical"] / v["bonus_over_steps"]
 print(f"\n临界权重落在 {v['w_last_good']:.2f} 与 {v['w_critical']:.2f} 之间。"
       f"量级可以手估：任务分 {TASK_BONUS:.0f} 分摊到 {STEPS} 步，每步 "
       f"{v['bonus_over_steps']:.2f} 分——**塑形项每步给的奖励一旦接近这个数，"

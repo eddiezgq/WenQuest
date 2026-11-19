@@ -96,6 +96,7 @@ steps_med = np.array(steps_med)
 v["iters_median"] = iters_med.tolist()
 v["env_steps_median"] = steps_med.tolist()
 v["n_failed_seeds"] = fails
+v["n_envs_min"], v["n_envs_max"] = int(N_ENVS[0]), int(N_ENVS[-1])   # 第 175 轮补：正文表格的行标签
 
 # ---------- 一、轮数降、总步数升
 v["iters_1env"], v["iters_max_env"] = float(iters_med[0]), float(iters_med[-1])

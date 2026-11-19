@@ -33,6 +33,10 @@ v["centroid_x"], v["centroid_y"] = float(c[0]), float(c[1])
 v["bbox_w"] = float(P[:, 0].max() - P[:, 0].min())
 v["bbox_h"] = float(P[:, 1].max() - P[:, 1].min())
 v["corner_x"] = float((P[:, 0].min() + P[:, 0].max()) / 2)
+# 第 175 轮补：正文要印外廓中心（与质心对照）与“前 10 名”那个 k
+v["bbox_cx"] = float((P[:, 0].min() + P[:, 0].max()) / 2)
+v["bbox_cy"] = float((P[:, 1].min() + P[:, 1].max()) / 2)
+v["top_k2"] = 10
 print(f"工件：L 形连接板，外廓 {v['bbox_w'] * 1000:.0f} × {v['bbox_h'] * 1000:.0f} mm，"
       f"质心在 ({v['centroid_x'] * 1000:.1f}, {v['centroid_y'] * 1000:.1f}) mm"
       f"——**不在外廓中心**")

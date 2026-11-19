@@ -37,7 +37,7 @@ print(f"真机参数：{v['real_params']}（四样各差一点，**这才是真�
 test_poses = sample_targets(N_TEST, seed=11)
 test_starts = sample_starts(N_TEST, seed=11, spread=0.25)
 
-sim_succ, real_succ = [], []
+sim_succ, real_succ, real_err = [], [], []
 print(f"\n随机化范围　仿真成功率　真机成功率（两列各试 {N_TEST} 次）")
 for scale in SCALES:
     def world_of(i, g, s=scale):
@@ -49,6 +49,7 @@ for scale in SCALES:
     rr = evaluate(pol, test_poses, test_starts, REAL, seed=7)
     sim_succ.append(rs["success_pct"])
     real_succ.append(rr["success_pct"])
+    real_err.append(rr["pos_err"])            # 第 175 轮补：正文要印真机那一列的位置误差
     print(f"  {scale:9.2f}　{rs['success_pct']:9.1f}%　{rr['success_pct']:9.1f}%"
           f"　（真机平均位置误差 {rr['pos_err'] * 100:.2f} cm）")
 
@@ -56,6 +57,14 @@ sim_succ = np.array(sim_succ)
 real_succ = np.array(real_succ)
 v["sim_success_pct"] = sim_succ.tolist()
 v["real_success_pct"] = real_succ.tolist()
+# ---------- 第 175 轮补：正文那张“仿真 / 真机四项参数”表与真机误差，原来都是手打的
+v["pos_err_real_no_rand_cm"] = float(real_err[0]) * 100
+for _k, _name in (("l1", "l1"), ("l2", "l2"), ("friction", "friction")):
+    v[f"sim_{_name}"] = float(SIM[_k])
+    v[f"real_{_name}"] = float(REAL[_k])
+v["sim_obs_noise_mm"] = float(SIM["obs_noise"]) * 1000
+v["real_obs_noise_mm"] = float(REAL["obs_noise"]) * 1000
+v["sim_delay"], v["real_delay"] = int(SIM["delay"]), int(REAL["delay"])
 
 # ---------- 一、不随机化：仿真漂亮，真机归零
 v["sim_no_rand"], v["real_no_rand"] = float(sim_succ[0]), float(real_succ[0])

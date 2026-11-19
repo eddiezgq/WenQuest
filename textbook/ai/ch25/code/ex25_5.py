@@ -24,7 +24,8 @@ N_AGV = 10
 STEPS = 1500
 SEEDS = range(12)
 THRS = (0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50, 0.65, 0.80)
-v = {"n_agv": N_AGV, "steps": STEPS, "n_seeds": len(list(SEEDS)),
+v = {**{f"thr{int(t * 100)}": t for t in THRS},   # 第 175 轮补：正文表格的阈值行标签
+     "n_agv": N_AGV, "steps": STEPS, "n_seeds": len(list(SEEDS)),
      "n_chargers": len(grid.chargers), "battery_full": FLEET["battery_full"],
      "charge_rate": FLEET["charge_rate"], "thresholds": str(list(THRS))}
 print(f"{N_AGV} 台搬运车、{len(grid.chargers)} 个充电位，跑 {STEPS} 步，"
@@ -161,6 +162,7 @@ def _sweep_fleet(zone: int) -> dict:
 
 _plain, _zoned = _sweep_fleet(0), _sweep_fleet(2)
 _i10 = FLEET_NS.index(10)
+v["fleet_n_ref"] = FLEET_NS[_i10]        # 第 175 轮补：正文表格里那一行的车队规模
 v["fleet_n_min"], v["fleet_n_max"] = FLEET_NS[0], FLEET_NS[-1]
 v["fleet_steps"], v["fleet_seeds"] = FLEET_STEPS, len(list(FLEET_SEEDS))
 v["fleet_plain_done_10"] = _plain["done"][_i10]

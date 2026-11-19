@@ -14,6 +14,8 @@
 这里的计算**一个厂家标称值都没用**，用的是本书自己设的工况参数（见 `_ch25.DRONE_ASSUMED`）。
 为什么不能直接拿标称值来算，程序开头把标称条件打出来就明白了。
 """
+import math
+
 import numpy as np
 from logi_facts import DRONE_M4, DRONE_M350
 
@@ -25,7 +27,8 @@ cfg = DRONE_ASSUMED
 SEEDS = range(8)
 N_SMALL = 8                 # 能穷举的规模（8! 个次序）
 N_BIG = 14                  # 只有下界的规模
-v = {"n_small": N_SMALL, "n_big": N_BIG, "n_seeds": len(list(SEEDS)),
+v = {"n_perm_small": math.factorial(N_SMALL - 1) // 2,   # 第 175 轮补：小规模的闭合路径条数
+     "n_small": N_SMALL, "n_big": N_BIG, "n_seeds": len(list(SEEDS)),
      "cruise_ms": cfg["cruise_ms"], "endurance_s": cfg["endurance_s"],
      "hover_s": cfg["hover_s"], "swap_s": cfg["swap_s"]}
 

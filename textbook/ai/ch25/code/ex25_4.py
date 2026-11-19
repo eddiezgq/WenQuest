@@ -34,6 +34,10 @@ for i, cond in enumerate(LITTLES_LAW["conditions"], 1):
     print(f"  ({i}) {cond}")
 v["littles_formula"] = LITTLES_LAW["formula"]
 v["littles_n_conditions"] = len(LITTLES_LAW["conditions"])
+# 第 175 轮补：正文两张表的行标签（利用率）与行文里提到的那两档
+for _i, _r in enumerate(LOADS, 1):
+    v[f"rho_{_i}"] = _r
+v["rho_high"], v["rho_second_high"] = LOADS[-1], LOADS[-2]
 
 
 def sweep(cv2: float) -> list:

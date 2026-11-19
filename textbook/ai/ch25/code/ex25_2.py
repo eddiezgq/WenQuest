@@ -54,6 +54,13 @@ for n, a, b, t, w in rows:
           f"              {w:6.3f}")
 
 v["ratio_opt_small"], v["ratio_opt_large"] = rows[0][1], rows[-1][1]
+# 第 175 轮补：正文两张表的行标签（点数）与“几到几个点”都要由程序给出
+v["n_exact_min"], v["n_exact_max"] = EXACT[0], EXACT[-1]
+for _i, _n in enumerate(EXACT, 1):
+    v[f"size_exact_{_i}"] = _n
+v["n_big_min"], v["n_big_max"] = BIG[0], BIG[-1]
+for _i, _n in enumerate(BIG, 1):
+    v[f"size_big_{_i}"] = _n
 v["ratio_lb_small"], v["ratio_lb_large"] = rows[0][2], rows[-1][2]
 v["slope_ratio_opt"] = float(np.polyfit([r[0] for r in rows], [r[1] for r in rows], 1)[0])
 v["gap_small_pct"] = (v["ratio_opt_small"] - 1) * 100
