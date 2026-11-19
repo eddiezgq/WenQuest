@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ 目录</button>
 <aside>
-  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–4 课）</small></div>
+  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–5 课）</small></div>
   <input class="find" placeholder="搜索帮助…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>课程怎么学</a>
 <a class="sub" href="#course-1" data-s="course">这套课程</a>
@@ -152,7 +152,14 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l04-do" data-s="l04">跟着做</a>
 <a class="sub" href="#l04-self" data-s="l04">自己做</a>
 <a class="sub" href="#l04-quiz" data-s="l04">小测</a>
-<a href="#appA" data-s="appA"><span class="n">05</span>附录 A 安装问渠 CAD</a>
+<a href="#l05" data-s="l05"><span class="n">05</span>第 5 课 草图技巧</a>
+<a class="sub" href="#l05-goal" data-s="l05">学完能做什么</a>
+<a class="sub" href="#l05-trim" data-s="l05">镜像与修剪</a>
+<a class="sub" href="#l05-sheet" data-s="l05">表达式和电子表格</a>
+<a class="sub" href="#l05-do" data-s="l05">跟着做</a>
+<a class="sub" href="#l05-self" data-s="l05">自己做</a>
+<a class="sub" href="#l05-quiz" data-s="l05">小测</a>
+<a href="#appA" data-s="appA"><span class="n">06</span>附录 A 安装问渠 CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">下载和授权</a>
 <a class="sub" href="#appA-install" data-s="appA">安装</a>
 <a class="sub" href="#appA-fix" data-s="appA">排错</a></nav>
@@ -173,9 +180,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">课程表</h3>
-<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td>第 5 课</td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 6 课</td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 7 课</td><td>倒角、圆角、拔模、抽壳、加厚</td><td>曲柄（带平衡块）</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 8 课</td><td>扫掠、放样、螺旋</td><td>拉簧、面线导线钩</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 9 课</td><td>阵列、镜像、多重变换</td><td>手轮（辐条阵列）</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 10 课</td><td>基准面、基准轴、附着方式；参数化设计</td><td>挑线杆（改一个全跟着变）</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 11 课</td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 12 课</td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机壳外形的特征曲线</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 13 课</td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的过渡曲面</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 14 课</td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>一块外壳变实体</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 15 课</td><td>装配工作台：插入零件、固定、关节、自由度</td><td>曲柄滑块</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 16 课</td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>挑线四连杆转一圈</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 17 课</td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td>第 6 课</td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 7 课</td><td>倒角、圆角、拔模、抽壳、加厚</td><td>曲柄（带平衡块）</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 8 课</td><td>扫掠、放样、螺旋</td><td>拉簧、面线导线钩</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 9 课</td><td>阵列、镜像、多重变换</td><td>手轮（辐条阵列）</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 10 课</td><td>基准面、基准轴、附着方式；参数化设计</td><td>挑线杆（改一个全跟着变）</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 11 课</td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 12 课</td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机壳外形的特征曲线</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 13 课</td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的过渡曲面</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 14 课</td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>一块外壳变实体</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 15 课</td><td>装配工作台：插入零件、固定、关节、自由度</td><td>曲柄滑块</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 16 课</td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>挑线四连杆转一圈</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 17 课</td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
 
-<p>现在上线的是第 1–4 课，其余各课按模块陆续上线。</p>
+<p>现在上线的是第 1–5 课，其余各课按模块陆续上线。</p>
 <h3 id="course-3">录屏是怎么录的</h3>
 <p>录屏都是真软件在操作：云端电脑上装的 FreeCAD 1.1.4、问渠 CAD 的品牌和同一版 AI 工作台，中文界面；鼠标点哪里、键盘输什么，软件就真的执行（画草图、加约束、凸台都是软件自己算的）。和你电脑上的问渠 CAD 只差 27 个内核补丁——补丁不改界面；“检查几何”“展开面”两处结果不同，这两处不录屏，用书里的验收数据讲。</p>
 <p>录屏暂时没有配音，看字幕（视频右下角可以开关）。讲解配音以后补上。</p></section>
@@ -575,7 +582,73 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="c"><p class="q">一段圆弧有几个自由度？</p><div class="opts"><button type="button" data-k="a">A. 2</button><button type="button" data-k="b">B. 3</button><button type="button" data-k="c">C. 5</button><button type="button" data-k="d">D. 6</button></div><p class="why" hidden>圆心 2 个 + 半径 1 个 + 起始角、终止角各 1 个 = 5 个。</p></div>
 <div class="quiz" data-ok="b"><p class="q">下边线已有“水平”，再选左右两个下角和 Y 轴加“对称”，软件报“冗余约束”。为什么？</p><div class="opts"><button type="button" data-k="a">A. 对称只能用在圆上</button><button type="button" data-k="b">B. 对称已经让两点一样高，和“水平”重复</button><button type="button" data-k="c">C. Y 轴不能选</button><button type="button" data-k="d">D. 下边线太短</button></div><p class="why" hidden>关于竖轴对称 = x 相反、y 相等；y 相等就是水平。两个约束说了同一件事，所以冗余。</p></div>
 <div class="quiz" data-ok="b"><p class="q">草图变成全绿、写着“完全约束”，说明什么？</p><div class="opts"><button type="button" data-k="a">A. 零件已经做好了</button><button type="button" data-k="b">B. 每条线在哪、多大都定了，没有自由度</button><button type="button" data-k="c">C. 不能再改尺寸</button><button type="button" data-k="d">D. 草图里没有构造线</button></div><p class="why" hidden>完全约束 = 0 个自由度。尺寸照样能改（双击尺寸改数），改了以后仍然完全约束。</p></div></section>
-<section id="appA"><h2><span class="n">05</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
+<section id="l05"><h2><span class="n">05</span>第 5 课 草图技巧</h2><p class="lead">学完能做：用镜像省掉一半的画图；用修剪把交在一起的圆和线整理成一圈轮廓；用表达式和电子表格驱动尺寸，改一个数整个零件跟着变。做出 WQ-LS 曲柄的板形轮廓。约 1.5 小时。</p><h3 id="l05-goal">学完能做什么</h3>
+<ul>
+<li>相切约束：线和圆、线和圆弧；碰到“草图替代约束”问话知道选“是”。</li>
+<li>镜像（“对称”工具）：画一边，另一边照着生成。</li>
+<li>修剪：一段一段点掉不要的部分；知道修剪按“最近的交点”剪。</li>
+<li>表达式：尺寸里写 <code>=</code> 引用别的量；电子表格：一张表管一组尺寸。</li>
+</ul>
+
+<p>本课做 <strong>曲柄的板形轮廓</strong>：套主轴的大圆直径 33、装曲柄销的小圆直径 22、中心距 15.5，两条切线连成一圈，凸台 10 mm。（WQ-LS 真曲柄下面还有一块扇形平衡块，第 7 课加。）</p>
+<h3 id="l05-trim">镜像与修剪</h3>
+<p>两个圆加两条切线，交在一起有好几个交点。修剪工具点哪一段，就剪掉这一段两头<strong>最近的交点</strong>之间的部分——所以大圆上面要点三下（先剪掉中间，再剪两边到切点的小段），小圆下面点一下。下面先在网页上试一试：</p>
+<div class="anim" data-anim="trim"></div>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l05a.jpg"><source src="media/wqcad-l05a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l05a.vtt"></video><figcaption>▶ 录屏：两个圆、切线、镜像、修剪，补相切（约 85 秒）</figcaption></figure>
+<p>录屏里有两个细节：
+- 第二个“相切”会弹出“草图替代约束”：软件问要不要把“点在圆上 + 相切”换成一个“端点相切”，选“是”。
+- 镜像出来的线只是形状，没有约束；修剪把它两头接上圆弧以后，还要照右边一样加两次相切。</p>
+<h3 id="l05-sheet">表达式和电子表格</h3>
+<p>在尺寸框里先打 <code>=</code>，就变成表达式：可以写算式（<code>=33/2</code>），也可以引用别的对象的量（<code>=Spreadsheet.B1</code>）。用电子表格把一组关键尺寸放在一起：改表格里的数，所有引用它的尺寸、零件一起更新——做系列零件、把计算书的结果带进模型，都这样做。</p>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l05b.jpg"><source src="media/wqcad-l05b.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l05b.vtt"></video><figcaption>▶ 录屏：电子表格写中心距，草图引用它，凸台；改表，曲柄跟着变（约 85 秒）</figcaption></figure>
+<p>录屏里中心距 15.5 时板的体积 10710.93 mm³；表里改成 18，重算后 11360.1 mm³。</p>
+<table>
+<thead>
+<tr>
+<th>写法</th>
+<th>意思</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>=Spreadsheet.B1</code></td>
+<td>电子表格 B1 格的值</td>
+</tr>
+<tr>
+<td><code>=Spreadsheet.e</code></td>
+<td>给 B1 起了别名 e 以后，用名字引用（单元格右键 → 属性 → 别名）</td>
+</tr>
+<tr>
+<td><code>=Sketch.Constraints.D / 2</code></td>
+<td>草图里名叫 D 的尺寸的一半</td>
+</tr>
+<tr>
+<td><code>=Pad.Length + 2</code></td>
+<td>凸台长度加 2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l05-do">跟着做</h3>
+<ol class="steps">
+<li>新建参数实体，XY 平面开草图：圆心在原点画直径 33 的圆，Y 轴上画直径 22 的圆。</li>
+<li>右边画一条线、两头点在两个圆上，加两次相切（问话选“是”）。</li>
+<li>选这条线，点“对称”，再点 Y 轴：镜像出左边。</li>
+<li>修剪：大圆上面三段、小圆下面一段。左边的线补两次相切。</li>
+<li>电子表格 B1 写 15.5；草图里给原点和小圆圆心加竖直距离 <code>=Spreadsheet.B1</code>；凸台 10。</li>
+<li>B1 改成 18，重算，看曲柄变化；改回 15.5。</li>
+</ol>
+
+<h3 id="l05-self">自己做</h3>
+<ol>
+<li>给 B1 起别名 <code>e</code>，把草图里的表达式改成 <code>=Spreadsheet.e</code>。</li>
+<li>在表里 B2、B3 写大圆、小圆直径，让两个直径约束也读表。</li>
+<li>镜像时勾上“创建对称约束”再做一遍：修剪以后软件报什么？怎么处理？（第 4 课的冗余约束）</li>
+</ol>
+<h3 id="l05-quiz">小测</h3>
+<div class="quiz" data-ok="b"><p class="q">修剪工具点在一个圆上，会剪掉哪一段？</p><div class="opts"><button type="button" data-k="a">A. 整个圆</button><button type="button" data-k="b">B. 点击处两边最近的两个交点之间那一段</button><button type="button" data-k="c">C. 离原点最近的一段</button><button type="button" data-k="d">D. 最长的一段</button></div><p class="why" hidden>修剪按最近的交点（和别的线、圆的交点或切点）找边界，所以有时要点好几下。</p></div>
+<div class="quiz" data-ok="c"><p class="q">尺寸框里写 =Spreadsheet.B1，然后把表里 B1 从 15.5 改成 18，会怎样？</p><div class="opts"><button type="button" data-k="a">A. 什么都不变</button><button type="button" data-k="b">B. 草图报错</button><button type="button" data-k="c">C. 重算后这个尺寸变成 18，零件跟着变</button><button type="button" data-k="d">D. 表格里的值变回 15.5</button></div><p class="why" hidden>表达式把尺寸和表格连起来了；重算（或自动重算）后所有引用它的地方一起更新。</p></div>
+<div class="quiz" data-ok="a"><p class="q">加相切时弹出“草图替代约束”，问要不要换成端点相切。一般选？</p><div class="opts"><button type="button" data-k="a">A. 是</button><button type="button" data-k="b">B. 否</button><button type="button" data-k="c">C. 取消</button><button type="button" data-k="d">D. 关掉软件</button></div><p class="why" hidden>线的端点已经在圆上，再加相切会重复；换成一个“端点相切”约束，既在圆上又相切，不冗余。</p></div></section>
+<section id="appA"><h2><span class="n">06</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
 <p>官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1.4 GB）。</p>
 <h3 id="appA-install">安装</h3>
 <ol class="steps">
@@ -756,6 +829,69 @@ spy();
     cv.cv.addEventListener("click", (e) => {
       const b = cv.cv.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top;
       for (const k in N) { const [nx, ny] = pos(k); if (Math.abs(x - nx) < 66 && Math.abs(y - ny) < 22) { cur = k; draw(); } }
+    });
+    addEventListener("resize", draw);
+    document.addEventListener("themechange", draw);
+    draw();
+  };
+
+  // ---------------------------------------------------------------- 第 5 课：修剪（点一段剪一段，按最近的交点切）
+  A.trim = function (el) {
+    const R = 16.5, r = 11, e = 15.5;
+    // 切点、交点（角度，度）：大圆上切点 ±φ1，小圆上切点 ±φ2；两圆交点
+    const s = (R - r) / e, ang = Math.acos(s);                    // 外公切线：法向与中心连线夹角
+    const tR = [90 - ang * 180 / Math.PI, 90 + ang * 180 / Math.PI];  // 大圆切点（右、左）
+    const yi = (R * R - r * r + e * e) / (2 * e), xi = Math.sqrt(R * R - yi * yi);
+    const iR = [Math.atan2(yi, xi) * 180 / Math.PI, Math.atan2(yi, -xi) * 180 / Math.PI];
+    const iS = [Math.atan2(yi - e, xi) * 180 / Math.PI, Math.atan2(yi - e, -xi) * 180 / Math.PI];
+    const norm = (a) => ((a % 360) + 360) % 360;
+    // 每个圆按全部断点切成小段；修剪时只认“还存在”的断点（交点所在的另一个圆的那一段被剪掉了，交点就没了）
+    function segs(cuts) { const c = cuts.map(norm).sort((a, b) => a - b); return c.map((a, i) => ({ a, b: i + 1 < c.length ? c[i + 1] : c[0] + 360, on: true })); }
+    let big, small;
+    const reset = () => { big = segs([tR[0], tR[1], iR[0], iR[1]]); small = segs([tR[0], tR[1], iS[0], iS[1]]); };
+    reset();
+    const inSeg = (list, a) => list.find((sg) => (a >= sg.a && a < sg.b) || (a + 360 >= sg.a && a + 360 < sg.b));
+    function cutPoints(which) {        // 现在还算数的断点：切点总在；交点要两个圆在那里都还有线
+      const pts = [norm(tR[0]), norm(tR[1])];
+      const mine = which === "big" ? iR : iS, other = which === "big" ? iS : iR, olist = which === "big" ? small : big, mlist = which === "big" ? big : small;
+      [0, 1].forEach((k) => { const so = inSeg(olist, norm(other[k])), sm = inSeg(mlist, norm(mine[k])); if (so && so.on && sm && sm.on) pts.push(norm(mine[k])); });
+      return pts;
+    }
+    function trim(list, which, a) {
+      const pts = cutPoints(which);
+      const d = (p) => norm(p - a);                         // 逆时针方向到断点的角距
+      const next = pts.reduce((m, p) => (d(p) > 1e-6 && d(p) < d(m) ? p : m), pts[0]);
+      const prev = pts.reduce((m, p) => (norm(a - p) > 1e-6 && norm(a - p) < norm(a - m) ? p : m), pts[0]);
+      const lo = prev, span = norm(next - prev) || 360;
+      list.forEach((sg) => { const mid = norm((sg.a + sg.b) / 2); if (norm(mid - lo) < span) sg.on = false; });
+    }
+    const cv = canvas(el, 320);
+    bar(el, `<button data-a="reset">${T("重来", "Reset")}</button>`).onclick = () => { reset(); draw(); };
+    const info = cap(el, "");
+    let S = 6, O = [0, 0];
+    const P = (x, y) => [O[0] + x * S, O[1] - y * S];
+    function draw() {
+      const c = C(), g = cv.g;
+      cv.begin(); S = Math.min(cv.W() / 70, (cv.H - 30) / 46); O = [cv.W() / 2, 15 + 27.5 * S];
+      const pts = [];
+      const arc = (cx, cy, rad, sg, col, w) => { g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.arc(...P(cx, cy), rad * S, -sg.a * Math.PI / 180, -sg.b * Math.PI / 180, true); g.stroke(); };
+      big.forEach((sg) => sg.on && arc(0, 0, R, sg, c.ink, 2.2));
+      small.forEach((sg) => sg.on && arc(0, e, r, sg, c.ink, 2.2));
+      const tp = (a, rad, cy) => [rad * Math.cos(a * Math.PI / 180), cy + rad * Math.sin(a * Math.PI / 180)];
+      for (const k of [0, 1]) { const a = tp(tR[k], R, 0), b = tp(tR[k], r, e); g.strokeStyle = c.ink; g.lineWidth = 2.2; g.beginPath(); g.moveTo(...P(...a)); g.lineTo(...P(...b)); g.stroke(); pts.push(a, b); }
+      [0, 1].forEach((k) => { const sb = inSeg(big, norm(iR[k])), ss = inSeg(small, norm(iS[k])); if (sb && sb.on && ss && ss.on) pts.push(tp(iR[k], R, 0)); });
+      g.fillStyle = c.accent2; pts.forEach((p) => { g.beginPath(); g.arc(...P(...p), 3.5, 0, 7); g.fill(); });
+      const arcOn = (list) => list.filter((x) => x.on).reduce((t, x) => t + x.b - x.a, 0);
+      const done = Math.abs(arcOn(big) - (360 - (tR[1] - tR[0]))) < 0.5 && Math.abs(arcOn(small) - (tR[1] - tR[0])) < 0.5;
+      info.innerHTML = done ? T("剪好了：大圆弧、两条切线、小圆弧连成一圈——和录屏里一样。", "Done: large arc, two tangent lines and small arc in one loop — as in the recording.")
+        : T(`点圆上的一段把它剪掉（圆点是交点、切点：修剪就在这些点之间切）。`, `Click a piece of a circle to trim it (the dots are the intersections and tangent points that Trim cuts between).`);
+    }
+    cv.cv.addEventListener("click", (ev) => {
+      const b = cv.cv.getBoundingClientRect(), x = (ev.clientX - b.left - O[0]) / S, y = (O[1] - (ev.clientY - b.top)) / S;
+      const hit = (cx, cy, rad, list, which) => { const d = Math.hypot(x - cx, y - cy); if (Math.abs(d - rad) > 1.6) return false;
+        const a = norm(Math.atan2(y - cy, x - cx) * 180 / Math.PI); const sg = inSeg(list, a); if (!sg || !sg.on) return false; trim(list, which, a); return true; };
+      if (!hit(0, 0, R, big, "big")) hit(0, e, r, small, "small");
+      draw();
     });
     addEventListener("resize", draw);
     document.addEventListener("themechange", draw);

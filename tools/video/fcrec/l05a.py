@@ -49,15 +49,6 @@ def script(d):
     log("sel sym", [s.SubElementNames for s in Gui.Selection.getSelectionEx()])
     yield d.tool("Sketcher_Symmetry")
     yield 900
-    cb = [w for w in QtWidgets.QApplication.allWidgets() if w.isVisible() and isinstance(w, QtWidgets.QCheckBox) and w.text().startswith(("创建对称约束", "Create symmetric"))][0]
-    if not cb.isChecked():
-        yield d.say("任务栏里勾上“创建对称约束”：左右两条线就一直对称，改一边另一边跟着变")
-        p = d.center(cb)
-        yield d.move(p, 800)
-        d.ring(p)
-        cb.click()
-        yield 900
-    log("sym checkbox", cb.isChecked())
     yield d.move(d.model_pt(0, -24), 900)
     d.click(); yield 1200
     yield from steps.answer_modal(d, wait=800)
@@ -66,16 +57,35 @@ def script(d):
         if w.isVisible() and isinstance(w, QtWidgets.QAbstractButton) and w.text().replace("&", "") in ("确定", "OK") and w.window() is not d.mw:
             log("sym task ok?", w.window().windowTitle())
     steps.dump("mirrored")
-    yield d.say("修剪：点“修剪”工具，再点圆上不要的那一段——大圆上面一段、小圆下面一段")
+    yield d.say("修剪：点“修剪”工具，再一段段点掉圆上不要的部分——大圆上面三段、小圆下面一段")
     yield d.tool("Sketcher_CompCurveEdition", "Sketcher_Trimming"); yield 500
-    yield d.move(d.model_pt(0, 16.5), 900)
-    d.click(); yield 900
-    yield d.move(d.model_pt(0, 4.5), 900)
+    import math
+    for ang in (90, 35, 145):            # 大圆：先剪掉中间一段，再剪两边到切点的小段
+        a = math.radians(ang)
+        yield d.move(d.model_pt(16.5 * math.cos(a), 16.5 * math.sin(a)), 800)
+        d.click(); yield 900
+        steps.dump(f"trim{ang}")
+    c = steps.sketch().Geometry[1].Center
+    yield d.move(d.model_pt(0, c.y - 11), 800)     # 小圆：剪掉下面一段
     d.click(); yield 900
     d.key(Qt.Key_Escape); yield 800
     steps.dump("trimmed")
     log("dof", steps.dof_text(d))
-    yield d.say("轮廓出来了：大圆弧、两条切线、小圆弧连成一圈")
+    yield d.say("左边那条线是镜像出来的，修剪把它的两头接上了圆弧，但还没“相切”：照右边一样，选线、选圆弧，点相切，两次")
+    sk = steps.sketch()
+    a, b = sk.getPoint(3, 1), sk.getPoint(3, 2)
+    mid = ((a.x + b.x) / 2, (a.y + b.y) / 2)
+    yield from steps.pick(d, mid, (0, -16.5))
+    yield d.tool("Sketcher_ConstrainTangent")
+    yield from steps.answer_modal(d)
+    yield 800
+    yield from steps.pick(d, mid, (0, sk.Geometry[1].Center.y + 11))
+    yield d.tool("Sketcher_ConstrainTangent")
+    yield from steps.answer_modal(d)
+    yield 1000
+    log("dof after tangents", steps.dof_text(d), list(steps.sketch().RedundantConstraints))
+    steps.dump("final")
+    yield d.say("轮廓出来了：大圆弧、两条切线、小圆弧连成一圈。还剩 1 个自由度：两个圆心的距离，下一段用电子表格来定")
     yield 1500
     App.ActiveDocument.saveAs(model_file("曲柄草图.FCStd", "CrankSketch.FCStd"))
     yield 300

@@ -109,6 +109,69 @@
     draw();
   };
 
+  // ---------------------------------------------------------------- 第 5 课：修剪（点一段剪一段，按最近的交点切）
+  A.trim = function (el) {
+    const R = 16.5, r = 11, e = 15.5;
+    // 切点、交点（角度，度）：大圆上切点 ±φ1，小圆上切点 ±φ2；两圆交点
+    const s = (R - r) / e, ang = Math.acos(s);                    // 外公切线：法向与中心连线夹角
+    const tR = [90 - ang * 180 / Math.PI, 90 + ang * 180 / Math.PI];  // 大圆切点（右、左）
+    const yi = (R * R - r * r + e * e) / (2 * e), xi = Math.sqrt(R * R - yi * yi);
+    const iR = [Math.atan2(yi, xi) * 180 / Math.PI, Math.atan2(yi, -xi) * 180 / Math.PI];
+    const iS = [Math.atan2(yi - e, xi) * 180 / Math.PI, Math.atan2(yi - e, -xi) * 180 / Math.PI];
+    const norm = (a) => ((a % 360) + 360) % 360;
+    // 每个圆按全部断点切成小段；修剪时只认“还存在”的断点（交点所在的另一个圆的那一段被剪掉了，交点就没了）
+    function segs(cuts) { const c = cuts.map(norm).sort((a, b) => a - b); return c.map((a, i) => ({ a, b: i + 1 < c.length ? c[i + 1] : c[0] + 360, on: true })); }
+    let big, small;
+    const reset = () => { big = segs([tR[0], tR[1], iR[0], iR[1]]); small = segs([tR[0], tR[1], iS[0], iS[1]]); };
+    reset();
+    const inSeg = (list, a) => list.find((sg) => (a >= sg.a && a < sg.b) || (a + 360 >= sg.a && a + 360 < sg.b));
+    function cutPoints(which) {        // 现在还算数的断点：切点总在；交点要两个圆在那里都还有线
+      const pts = [norm(tR[0]), norm(tR[1])];
+      const mine = which === "big" ? iR : iS, other = which === "big" ? iS : iR, olist = which === "big" ? small : big, mlist = which === "big" ? big : small;
+      [0, 1].forEach((k) => { const so = inSeg(olist, norm(other[k])), sm = inSeg(mlist, norm(mine[k])); if (so && so.on && sm && sm.on) pts.push(norm(mine[k])); });
+      return pts;
+    }
+    function trim(list, which, a) {
+      const pts = cutPoints(which);
+      const d = (p) => norm(p - a);                         // 逆时针方向到断点的角距
+      const next = pts.reduce((m, p) => (d(p) > 1e-6 && d(p) < d(m) ? p : m), pts[0]);
+      const prev = pts.reduce((m, p) => (norm(a - p) > 1e-6 && norm(a - p) < norm(a - m) ? p : m), pts[0]);
+      const lo = prev, span = norm(next - prev) || 360;
+      list.forEach((sg) => { const mid = norm((sg.a + sg.b) / 2); if (norm(mid - lo) < span) sg.on = false; });
+    }
+    const cv = canvas(el, 320);
+    bar(el, `<button data-a="reset">${T("重来", "Reset")}</button>`).onclick = () => { reset(); draw(); };
+    const info = cap(el, "");
+    let S = 6, O = [0, 0];
+    const P = (x, y) => [O[0] + x * S, O[1] - y * S];
+    function draw() {
+      const c = C(), g = cv.g;
+      cv.begin(); S = Math.min(cv.W() / 70, (cv.H - 30) / 46); O = [cv.W() / 2, 15 + 27.5 * S];
+      const pts = [];
+      const arc = (cx, cy, rad, sg, col, w) => { g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.arc(...P(cx, cy), rad * S, -sg.a * Math.PI / 180, -sg.b * Math.PI / 180, true); g.stroke(); };
+      big.forEach((sg) => sg.on && arc(0, 0, R, sg, c.ink, 2.2));
+      small.forEach((sg) => sg.on && arc(0, e, r, sg, c.ink, 2.2));
+      const tp = (a, rad, cy) => [rad * Math.cos(a * Math.PI / 180), cy + rad * Math.sin(a * Math.PI / 180)];
+      for (const k of [0, 1]) { const a = tp(tR[k], R, 0), b = tp(tR[k], r, e); g.strokeStyle = c.ink; g.lineWidth = 2.2; g.beginPath(); g.moveTo(...P(...a)); g.lineTo(...P(...b)); g.stroke(); pts.push(a, b); }
+      [0, 1].forEach((k) => { const sb = inSeg(big, norm(iR[k])), ss = inSeg(small, norm(iS[k])); if (sb && sb.on && ss && ss.on) pts.push(tp(iR[k], R, 0)); });
+      g.fillStyle = c.accent2; pts.forEach((p) => { g.beginPath(); g.arc(...P(...p), 3.5, 0, 7); g.fill(); });
+      const arcOn = (list) => list.filter((x) => x.on).reduce((t, x) => t + x.b - x.a, 0);
+      const done = Math.abs(arcOn(big) - (360 - (tR[1] - tR[0]))) < 0.5 && Math.abs(arcOn(small) - (tR[1] - tR[0])) < 0.5;
+      info.innerHTML = done ? T("剪好了：大圆弧、两条切线、小圆弧连成一圈——和录屏里一样。", "Done: large arc, two tangent lines and small arc in one loop — as in the recording.")
+        : T(`点圆上的一段把它剪掉（圆点是交点、切点：修剪就在这些点之间切）。`, `Click a piece of a circle to trim it (the dots are the intersections and tangent points that Trim cuts between).`);
+    }
+    cv.cv.addEventListener("click", (ev) => {
+      const b = cv.cv.getBoundingClientRect(), x = (ev.clientX - b.left - O[0]) / S, y = (O[1] - (ev.clientY - b.top)) / S;
+      const hit = (cx, cy, rad, list, which) => { const d = Math.hypot(x - cx, y - cy); if (Math.abs(d - rad) > 1.6) return false;
+        const a = norm(Math.atan2(y - cy, x - cx) * 180 / Math.PI); const sg = inSeg(list, a); if (!sg || !sg.on) return false; trim(list, which, a); return true; };
+      if (!hit(0, 0, R, big, "big")) hit(0, e, r, small, "small");
+      draw();
+    });
+    addEventListener("resize", draw);
+    document.addEventListener("themechange", draw);
+    draw();
+  };
+
   // ---------------------------------------------------------------- 第 3 课：画圆的两下（模拟草图里的圆工具）
   A.circle = function (el) {
     const cv = canvas(el, 300);

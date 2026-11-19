@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00:09.762 --> 00:00:21.364
+The crank outline: a large circle on the main shaft (diameter 33) below, a small circle for the crank pin (diameter 22) above, 15.5 apart
+
+00:00:21.364 --> 00:00:26.763
+On the right draw a line with one end on each circle
+
+00:00:26.763 --> 00:00:38.763
+Add Tangent: select the line and the large circle, click Tangent; then the line and the small circle, Tangent
+
+00:00:41.228 --> 00:00:49.661
+No need to draw the left side: select the line, click the Symmetry tool, then click the vertical (Y) axis — it mirrors the line
+
+00:00:49.661 --> 00:01:00.186
+Trim: click the Trim tool, then click away the unwanted parts of the circles one by one — three on top of the large circle, one at the bottom of the small one
+
+00:01:00.186 --> 00:01:12.186
+The left line came from the mirror; the trims joined its ends to the arcs, but it is not tangent yet: as on the right, select the line and an arc, click Tangent — twice
+
+00:01:14.766 --> 00:01:26.766
+There is the outline: large arc, two tangent lines and small arc in one loop. One degree of freedom is left — the distance between the centres; the next clip sets it from a spreadsheet

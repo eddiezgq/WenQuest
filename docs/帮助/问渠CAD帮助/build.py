@@ -31,7 +31,7 @@ LESSONS = [
     ("一 入门", 2, "文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系", "导出一个零件给别人", "l02"),
     ("二 草图", 3, "草图入门：直线、圆、圆弧、矩形、多段线；构造线", "压脚杆套环；针夹轮廓", "l03"),
     ("二 草图", 4, "约束：几何约束、尺寸约束、完全约束、过约束怎么查", "针夹（完全约束）", "l04"),
-    ("二 草图", 5, "草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸", "曲柄轮廓（表格驱动）", None),
+    ("二 草图", 5, "草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸", "曲柄轮廓（表格驱动）", "l05"),
     ("三 零件建模", 6, "凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）", "针杆、曲柄销", None),
     ("三 零件建模", 7, "倒角、圆角、拔模、抽壳、加厚", "曲柄（带平衡块）", None),
     ("三 零件建模", 8, "扫掠、放样、螺旋", "拉簧、面线导线钩", None),
@@ -75,9 +75,9 @@ LESSONS_EN = [
     ("8 AI", "AI workbench: part selection and checks, company parts library, AI part design", "Pick a bearing; replay the upper-shaft design"),
 ]
 
-FILES = ["00-course", "l01", "l02", "l03", "l04", "appA-install"]
-EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–4 课）", other=("English", "en/"), files=FILES)
-EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–4)",
+FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "appA-install"]
+EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–5 课）", other=("English", "en/"), files=FILES)
+EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–5)",
                   other=("中文", "../"), files=FILES)
 
 
@@ -99,6 +99,7 @@ def numbers(en=False):
         "nc": {"R": f"{nc['R']:g}", "d": f"{nc['R'] * 2:g}", "bore": f"{nc['bore']:g}", "w": f"{nc['tab_w']:g}", "dep": f"{nc['tab_d']:g}",
                "t": f"{nc['t']:g}", "v": f"{nc['volume']:.1f}"},
         "dep": {"v": f"{1000 - math.pi * 9 * 10:.2f}"},
+        "cr": {"D": "33", "d": "22", "e": "15.5", "t": "10", "v1": "10710.93", "v2": "11360.1"},   # 录屏里软件算的（director.log：pad 10.0 10710.93；after 18 11360.1）
         "nb": {"v": f"{P['needle_bar']['volume']:.2f}"},
         "table": f"<table class=\"plan\"><thead><tr>{head}</tr></thead><tbody>"
                  + "".join(rows) + "</tbody></table>",

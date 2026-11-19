@@ -15,7 +15,9 @@ for WQ_LANG in ${LANGS:-zh en}; do
   cp "$M/${F}_L3.FCStd" "$M/$F.FCStd"
   "$H/rec.sh" "$H/l04b.py" "$WQ_REC/l04b$sfx.mp4"
   "$H/rec.sh" "$H/l04c.py" "$WQ_REC/l04c$sfx.mp4"
-  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c; do
+  "$H/rec.sh" "$H/l05a.py" "$WQ_REC/l05a$sfx.mp4"
+  "$H/rec.sh" "$H/l05b.py" "$WQ_REC/l05b$sfx.mp4"
+  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b; do
     ffmpeg -loglevel error -y -i "$WQ_REC/$c$sfx.mp4" -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart -an "$OUT/wqcad-$c$sfx.mp4"
     ffmpeg -loglevel error -y -sseof -2 -i "$WQ_REC/$c$sfx.mp4" -frames:v 1 -vf scale=960:-1 -q:v 4 "$OUT/wqcad-$c$sfx.jpg"
     cp "$WQ_REC/$c$sfx.vtt" "$OUT/wqcad-$c$sfx.vtt"

@@ -1,0 +1,25 @@
+WEBVTT
+
+00:00:02.835 --> 00:00:14.396
+The crank sketch still needs the centre distance. Instead of typing 15.5 into the sketch, put it in a spreadsheet and let the sketch read it — later you just change the sheet
+
+00:00:14.396 --> 00:00:24.112
+A Spreadsheet appears in the model tree. Double-click it: a name in A1, 15.5 in B1
+
+00:00:24.112 --> 00:00:33.352
+Back to the model; double-click the sketch to edit it
+
+00:00:33.352 --> 00:00:45.352
+Select the origin and the small circle's centre, click "Vertical distance". In the box type an equals sign, then Spreadsheet.B1, Enter
+
+00:00:45.731 --> 00:00:52.096
+The dimension now shows an f(x) mark: it is computed, not typed. The sketch is fully constrained
+
+00:00:52.096 --> 00:01:04.096
+Close the sketch and pad 10 mm: there is the crank plate
+
+00:01:04.748 --> 00:01:16.748
+Now change the sheet: set B1 to 18, recompute, and the crank gets longer
+
+00:01:17.125 --> 00:01:27.000
+One sheet controls a set of dimensions: that is how you make part families and bring calculation results straight into the model

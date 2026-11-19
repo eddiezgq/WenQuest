@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–4)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–5)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -152,7 +152,14 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l04-do" data-s="l04">Follow along</a>
 <a class="sub" href="#l04-self" data-s="l04">On your own</a>
 <a class="sub" href="#l04-quiz" data-s="l04">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">05</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l05" data-s="l05"><span class="n">05</span>Lesson 5 Sketch techniques</a>
+<a class="sub" href="#l05-goal" data-s="l05">What you will be able to do</a>
+<a class="sub" href="#l05-trim" data-s="l05">Mirror and trim</a>
+<a class="sub" href="#l05-sheet" data-s="l05">Expressions and spreadsheets</a>
+<a class="sub" href="#l05-do" data-s="l05">Follow along</a>
+<a class="sub" href="#l05-self" data-s="l05">On your own</a>
+<a class="sub" href="#l05-quiz" data-s="l05">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">06</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -173,9 +180,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td>Lesson 5</td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 6</td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 7</td><td>Chamfer, fillet, draft, thickness</td><td>Crank with counterweight</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 8</td><td>Sweep, loft, helix</td><td>Tension spring, thread guide</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 9</td><td>Patterns, mirror, multi-transform</td><td>Handwheel (spoke pattern)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 6</td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 7</td><td>Chamfer, fillet, draft, thickness</td><td>Crank with counterweight</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 8</td><td>Sweep, loft, helix</td><td>Tension spring, thread guide</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 9</td><td>Patterns, mirror, multi-transform</td><td>Handwheel (spoke pattern)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
 
-<p>Lessons 1–4 are online now; the others follow module by module.</p>
+<p>Lessons 1–5 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
 <p>Every recording is the real software at work: FreeCAD 1.1.4 on a cloud computer with the WenQuest CAD branding and the same AI workbench, English interface. Where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. The only difference from WenQuest CAD on your computer is the 27 kernel fixes, which do not change the interface; “Check geometry” and “Unfold face” give different results, so those are not recorded and are taught with the book's verified data instead.</p>
 <p>The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.</p></section>
@@ -575,7 +582,73 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="c"><p class="q">How many degrees of freedom does an arc have?</p><div class="opts"><button type="button" data-k="a">A. 2</button><button type="button" data-k="b">B. 3</button><button type="button" data-k="c">C. 5</button><button type="button" data-k="d">D. 6</button></div><p class="why" hidden>Centre 2 + radius 1 + start angle 1 + end angle 1 = 5.</p></div>
 <div class="quiz" data-ok="b"><p class="q">The bottom edge is already Horizontal. You add Symmetric to the two lower corners about the Y axis and get “Redundant constraints”. Why?</p><div class="opts"><button type="button" data-k="a">A. Symmetric only works on circles</button><button type="button" data-k="b">B. Symmetric already makes the two points level, which repeats Horizontal</button><button type="button" data-k="c">C. The Y axis cannot be selected</button><button type="button" data-k="d">D. The bottom edge is too short</button></div><p class="why" hidden>Symmetric about a vertical axis = opposite x, equal y; equal y is exactly horizontal. Two constraints say the same thing, so one is redundant.</p></div>
 <div class="quiz" data-ok="b"><p class="q">The whole sketch is green and says “Fully constrained”. That means?</p><div class="opts"><button type="button" data-k="a">A. The part is finished</button><button type="button" data-k="b">B. Every line&#x27;s position and size is fixed; no freedom is left</button><button type="button" data-k="c">C. Dimensions can no longer be changed</button><button type="button" data-k="d">D. There are no construction lines</button></div><p class="why" hidden>Fully constrained = 0 degrees of freedom. You can still change dimensions (double-click and type), and it stays fully constrained.</p></div></section>
-<section id="appA"><h2><span class="n">05</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l05"><h2><span class="n">05</span>Lesson 5 Sketch techniques</h2><p class="lead">You will be able to save half the drawing with a mirror; tidy intersecting circles and lines into one closed outline with Trim; drive dimensions with expressions and a spreadsheet so that changing one number updates the whole part. You make the plate outline of the WQ-LS crank. About 1.5 hours.</p><h3 id="l05-goal">What you will be able to do</h3>
+<ul>
+<li>Tangent constraints: line to circle, line to arc; answer “Yes” to the “Sketcher constraint substitution” question.</li>
+<li>Mirror (the Symmetry tool): draw one side, generate the other.</li>
+<li>Trim: click away unwanted pieces one by one; know that Trim cuts at the nearest intersections.</li>
+<li>Expressions: type <code>=</code> in a dimension to refer to other values; spreadsheets: one sheet controls a set of dimensions.</li>
+</ul>
+
+<p>This lesson makes the <strong>crank plate outline</strong>: a circle of diameter 33 on the main shaft, a circle of diameter 22 for the crank pin, 15.5 apart, joined by two tangent lines into one loop and padded 10 mm. (The real WQ-LS crank also has a sector-shaped counterweight below; lesson 7 adds it.)</p>
+<h3 id="l05-trim">Mirror and trim</h3>
+<p>Two circles and two tangent lines cross at several points. Trim removes the piece you click <strong>between the nearest intersections on either side</strong> — so the large circle needs three clicks on top (first the middle, then the two small pieces up to the tangent points) and the small circle one click at the bottom. Try it here first:</p>
+<div class="anim" data-anim="trim"></div>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l05a-en.jpg"><source src="../media/wqcad-l05a-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l05a-en.vtt"></video><figcaption>▶ Recording: two circles, tangents, mirror, trim, tangents again (about 90 s)</figcaption></figure>
+<p>Two details in the recording:
+- The second Tangent pops up “Sketcher constraint substitution”: FreeCAD offers to replace “point on circle + tangent” with a single “endpoint tangency”. Choose Yes.
+- The mirrored line is geometry only, without constraints; after the trims join its ends to the arcs, add two tangents just as on the right.</p>
+<h3 id="l05-sheet">Expressions and spreadsheets</h3>
+<p>Type <code>=</code> first in a dimension box and it becomes an expression: arithmetic (<code>=33/2</code>) or a reference to another object's value (<code>=Spreadsheet.B1</code>). Keep a set of key dimensions in a spreadsheet: change a number in the sheet and every dimension and part that refers to it updates — that is how part families are made and how calculation results are carried into the model.</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l05b-en.jpg"><source src="../media/wqcad-l05b-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l05b-en.vtt"></video><figcaption>▶ Recording: centre distance in a spreadsheet, the sketch refers to it, pad; change the sheet and the crank follows (about 85 s)</figcaption></figure>
+<p>In the recording the plate volume is 10710.93 mm³ with a centre distance of 15.5; with 18 in the sheet it becomes 11360.1 mm³ after recompute.</p>
+<table>
+<thead>
+<tr>
+<th>Write</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>=Spreadsheet.B1</code></td>
+<td>The value in cell B1</td>
+</tr>
+<tr>
+<td><code>=Spreadsheet.e</code></td>
+<td>By name, after giving B1 the alias e (right-click the cell → Properties → Alias)</td>
+</tr>
+<tr>
+<td><code>=Sketch.Constraints.D / 2</code></td>
+<td>Half of the sketch dimension named D</td>
+</tr>
+<tr>
+<td><code>=Pad.Length + 2</code></td>
+<td>The pad length plus 2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l05-do">Follow along</h3>
+<ol class="steps">
+<li>New Parametric Body, sketch on XY: a circle of diameter 33 centred on the origin and one of diameter 22 on the Y axis.</li>
+<li>On the right draw a line with its ends on the two circles and add two tangents (answer Yes).</li>
+<li>Select the line, click Symmetry, then click the Y axis: the left side appears.</li>
+<li>Trim: three pieces on top of the large circle, one at the bottom of the small one. Add two tangents to the left line.</li>
+<li>Spreadsheet B1 = 15.5; in the sketch add a vertical distance from the origin to the small circle's centre: <code>=Spreadsheet.B1</code>; pad 10.</li>
+<li>Change B1 to 18, recompute, watch the crank; change it back to 15.5.</li>
+</ol>
+
+<h3 id="l05-self">On your own</h3>
+<ol>
+<li>Give B1 the alias <code>e</code> and change the expression to <code>=Spreadsheet.e</code>.</li>
+<li>Put the two diameters in B2 and B3 and make the diameter constraints read them too.</li>
+<li>Mirror again with “Create symmetric constraints” ticked: what does FreeCAD report after trimming, and how do you deal with it? (Redundant constraints, lesson 4.)</li>
+</ol>
+<h3 id="l05-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">You click a circle with the Trim tool. Which part is removed?</p><div class="opts"><button type="button" data-k="a">A. The whole circle</button><button type="button" data-k="b">B. The piece between the nearest intersections on either side of the click</button><button type="button" data-k="c">C. The piece nearest the origin</button><button type="button" data-k="d">D. The longest piece</button></div><p class="why" hidden>Trim looks for the nearest intersections or tangent points with other geometry, which is why it sometimes takes several clicks.</p></div>
+<div class="quiz" data-ok="c"><p class="q">A dimension says =Spreadsheet.B1, and you change B1 from 15.5 to 18. What happens?</p><div class="opts"><button type="button" data-k="a">A. Nothing</button><button type="button" data-k="b">B. The sketch fails</button><button type="button" data-k="c">C. After recompute the dimension is 18 and the part follows</button><button type="button" data-k="d">D. The sheet goes back to 15.5</button></div><p class="why" hidden>The expression links the dimension to the sheet; after recompute everything that refers to it updates.</p></div>
+<div class="quiz" data-ok="a"><p class="q">Adding a tangent pops up “Sketcher constraint substitution”, offering an endpoint tangency instead. Usually you choose?</p><div class="opts"><button type="button" data-k="a">A. Yes</button><button type="button" data-k="b">B. No</button><button type="button" data-k="c">C. Cancel</button><button type="button" data-k="d">D. Close FreeCAD</button></div><p class="why" hidden>The line&#x27;s end is already on the circle; adding tangency on top would repeat it. One endpoint-tangency constraint means both on the circle and tangent, without redundancy.</p></div></section>
+<section id="appA"><h2><span class="n">06</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">
@@ -756,6 +829,69 @@ spy();
     cv.cv.addEventListener("click", (e) => {
       const b = cv.cv.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top;
       for (const k in N) { const [nx, ny] = pos(k); if (Math.abs(x - nx) < 66 && Math.abs(y - ny) < 22) { cur = k; draw(); } }
+    });
+    addEventListener("resize", draw);
+    document.addEventListener("themechange", draw);
+    draw();
+  };
+
+  // ---------------------------------------------------------------- 第 5 课：修剪（点一段剪一段，按最近的交点切）
+  A.trim = function (el) {
+    const R = 16.5, r = 11, e = 15.5;
+    // 切点、交点（角度，度）：大圆上切点 ±φ1，小圆上切点 ±φ2；两圆交点
+    const s = (R - r) / e, ang = Math.acos(s);                    // 外公切线：法向与中心连线夹角
+    const tR = [90 - ang * 180 / Math.PI, 90 + ang * 180 / Math.PI];  // 大圆切点（右、左）
+    const yi = (R * R - r * r + e * e) / (2 * e), xi = Math.sqrt(R * R - yi * yi);
+    const iR = [Math.atan2(yi, xi) * 180 / Math.PI, Math.atan2(yi, -xi) * 180 / Math.PI];
+    const iS = [Math.atan2(yi - e, xi) * 180 / Math.PI, Math.atan2(yi - e, -xi) * 180 / Math.PI];
+    const norm = (a) => ((a % 360) + 360) % 360;
+    // 每个圆按全部断点切成小段；修剪时只认“还存在”的断点（交点所在的另一个圆的那一段被剪掉了，交点就没了）
+    function segs(cuts) { const c = cuts.map(norm).sort((a, b) => a - b); return c.map((a, i) => ({ a, b: i + 1 < c.length ? c[i + 1] : c[0] + 360, on: true })); }
+    let big, small;
+    const reset = () => { big = segs([tR[0], tR[1], iR[0], iR[1]]); small = segs([tR[0], tR[1], iS[0], iS[1]]); };
+    reset();
+    const inSeg = (list, a) => list.find((sg) => (a >= sg.a && a < sg.b) || (a + 360 >= sg.a && a + 360 < sg.b));
+    function cutPoints(which) {        // 现在还算数的断点：切点总在；交点要两个圆在那里都还有线
+      const pts = [norm(tR[0]), norm(tR[1])];
+      const mine = which === "big" ? iR : iS, other = which === "big" ? iS : iR, olist = which === "big" ? small : big, mlist = which === "big" ? big : small;
+      [0, 1].forEach((k) => { const so = inSeg(olist, norm(other[k])), sm = inSeg(mlist, norm(mine[k])); if (so && so.on && sm && sm.on) pts.push(norm(mine[k])); });
+      return pts;
+    }
+    function trim(list, which, a) {
+      const pts = cutPoints(which);
+      const d = (p) => norm(p - a);                         // 逆时针方向到断点的角距
+      const next = pts.reduce((m, p) => (d(p) > 1e-6 && d(p) < d(m) ? p : m), pts[0]);
+      const prev = pts.reduce((m, p) => (norm(a - p) > 1e-6 && norm(a - p) < norm(a - m) ? p : m), pts[0]);
+      const lo = prev, span = norm(next - prev) || 360;
+      list.forEach((sg) => { const mid = norm((sg.a + sg.b) / 2); if (norm(mid - lo) < span) sg.on = false; });
+    }
+    const cv = canvas(el, 320);
+    bar(el, `<button data-a="reset">${T("重来", "Reset")}</button>`).onclick = () => { reset(); draw(); };
+    const info = cap(el, "");
+    let S = 6, O = [0, 0];
+    const P = (x, y) => [O[0] + x * S, O[1] - y * S];
+    function draw() {
+      const c = C(), g = cv.g;
+      cv.begin(); S = Math.min(cv.W() / 70, (cv.H - 30) / 46); O = [cv.W() / 2, 15 + 27.5 * S];
+      const pts = [];
+      const arc = (cx, cy, rad, sg, col, w) => { g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.arc(...P(cx, cy), rad * S, -sg.a * Math.PI / 180, -sg.b * Math.PI / 180, true); g.stroke(); };
+      big.forEach((sg) => sg.on && arc(0, 0, R, sg, c.ink, 2.2));
+      small.forEach((sg) => sg.on && arc(0, e, r, sg, c.ink, 2.2));
+      const tp = (a, rad, cy) => [rad * Math.cos(a * Math.PI / 180), cy + rad * Math.sin(a * Math.PI / 180)];
+      for (const k of [0, 1]) { const a = tp(tR[k], R, 0), b = tp(tR[k], r, e); g.strokeStyle = c.ink; g.lineWidth = 2.2; g.beginPath(); g.moveTo(...P(...a)); g.lineTo(...P(...b)); g.stroke(); pts.push(a, b); }
+      [0, 1].forEach((k) => { const sb = inSeg(big, norm(iR[k])), ss = inSeg(small, norm(iS[k])); if (sb && sb.on && ss && ss.on) pts.push(tp(iR[k], R, 0)); });
+      g.fillStyle = c.accent2; pts.forEach((p) => { g.beginPath(); g.arc(...P(...p), 3.5, 0, 7); g.fill(); });
+      const arcOn = (list) => list.filter((x) => x.on).reduce((t, x) => t + x.b - x.a, 0);
+      const done = Math.abs(arcOn(big) - (360 - (tR[1] - tR[0]))) < 0.5 && Math.abs(arcOn(small) - (tR[1] - tR[0])) < 0.5;
+      info.innerHTML = done ? T("剪好了：大圆弧、两条切线、小圆弧连成一圈——和录屏里一样。", "Done: large arc, two tangent lines and small arc in one loop — as in the recording.")
+        : T(`点圆上的一段把它剪掉（圆点是交点、切点：修剪就在这些点之间切）。`, `Click a piece of a circle to trim it (the dots are the intersections and tangent points that Trim cuts between).`);
+    }
+    cv.cv.addEventListener("click", (ev) => {
+      const b = cv.cv.getBoundingClientRect(), x = (ev.clientX - b.left - O[0]) / S, y = (O[1] - (ev.clientY - b.top)) / S;
+      const hit = (cx, cy, rad, list, which) => { const d = Math.hypot(x - cx, y - cy); if (Math.abs(d - rad) > 1.6) return false;
+        const a = norm(Math.atan2(y - cy, x - cx) * 180 / Math.PI); const sg = inSeg(list, a); if (!sg || !sg.on) return false; trim(list, which, a); return true; };
+      if (!hit(0, 0, R, big, "big")) hit(0, e, r, small, "small");
+      draw();
     });
     addEventListener("resize", draw);
     document.addEventListener("themechange", draw);

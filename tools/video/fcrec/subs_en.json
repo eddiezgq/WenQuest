@@ -78,8 +78,16 @@
  "曲柄的轮廓：下面是套在主轴上的大圆（直径 33），上面是装曲柄销的小圆（直径 22），中心距 15.5": "The crank outline: a large circle on the main shaft (diameter 33) below, a small circle for the crank pin (diameter 22) above, 15.5 apart",
  "右边画一条线，两头分别点在两个圆上": "On the right draw a line with one end on each circle",
  "加“相切”：选线、选大圆，点相切；再选线、选小圆，点相切": "Add Tangent: select the line and the large circle, click Tangent; then the line and the small circle, Tangent",
- "修剪：点“修剪”工具，再点圆上不要的那一段——大圆上面一段、小圆下面一段": "Trim: click the Trim tool, then the parts of the circles you do not want — the top of the large circle, the bottom of the small one",
- "轮廓出来了：大圆弧、两条切线、小圆弧连成一圈": "There is the outline: the large arc, two tangent lines and the small arc form one closed loop",
  "左边不用再画：选中这条线，点“对称”工具，再点竖轴（Y 轴）——镜像出左边的线": "No need to draw the left side: select the line, click the Symmetry tool, then click the vertical (Y) axis — it mirrors the line",
- "任务栏里勾上“创建对称约束”：左右两条线就一直对称，改一边另一边跟着变": "Tick \"Create symmetric constraints\" in the task panel: the two lines then stay symmetric, change one and the other follows"
+ "修剪：点“修剪”工具，再一段段点掉圆上不要的部分——大圆上面三段、小圆下面一段": "Trim: click the Trim tool, then click away the unwanted parts of the circles one by one — three on top of the large circle, one at the bottom of the small one",
+ "左边那条线是镜像出来的，修剪把它的两头接上了圆弧，但还没“相切”：照右边一样，选线、选圆弧，点相切，两次": "The left line came from the mirror; the trims joined its ends to the arcs, but it is not tangent yet: as on the right, select the line and an arc, click Tangent — twice",
+ "轮廓出来了：大圆弧、两条切线、小圆弧连成一圈。还剩 1 个自由度：两个圆心的距离，下一段用电子表格来定": "There is the outline: large arc, two tangent lines and small arc in one loop. One degree of freedom is left — the distance between the centres; the next clip sets it from a spreadsheet",
+ "上一段的曲柄草图还差中心距。这次不直接写 15.5，而是写进电子表格，让草图去读表——以后改表就行": "The crank sketch still needs the centre distance. Instead of typing 15.5 into the sketch, put it in a spreadsheet and let the sketch read it — later you just change the sheet",
+ "模型树里多了 Spreadsheet，双击打开：A1 写名字，B1 写 15.5": "A Spreadsheet appears in the model tree. Double-click it: a name in A1, 15.5 in B1",
+ "回到模型，双击草图进入编辑": "Back to the model; double-click the sketch to edit it",
+ "选原点和小圆的圆心，点“竖直距离”。弹出的框里先打等号，再写 Spreadsheet.B1，回车": "Select the origin and the small circle's centre, click \"Vertical distance\". In the box type an equals sign, then Spreadsheet.B1, Enter",
+ "尺寸前面多了个“f(x)”标记：它是算出来的，不是手填的。草图完全约束了": "The dimension now shows an f(x) mark: it is computed, not typed. The sketch is fully constrained",
+ "关闭草图，凸台 10 mm，曲柄的板就出来了": "Close the sketch and pad 10 mm: there is the crank plate",
+ "现在改表：B1 改成 18，重新计算，曲柄跟着变长": "Now change the sheet: set B1 to 18, recompute, and the crank gets longer",
+ "一张表管住一组尺寸：做系列零件、把计算结果直接带进模型，都靠它": "One sheet controls a set of dimensions: that is how you make part families and bring calculation results straight into the model"
 }
