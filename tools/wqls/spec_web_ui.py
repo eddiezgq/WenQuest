@@ -335,6 +335,7 @@ body.searching #res{display:block}body.searching article,body.searching .pn,body
 .godoc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 calc(50% - 50vw);padding:12px 16px;background:var(--needle)}
 .godoc a{color:#fff;text-decoration:none;font-weight:600;font-size:1rem;border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:6px 18px}
 .godoc a:hover{background:rgba(255,255,255,.15)}
+.ovv{margin:10px 0 28px}.ovv video{display:block;width:100%;border-radius:12px;background:#000;aspect-ratio:16/9}.ovv .row{display:flex;gap:8px;margin-bottom:8px}.ovv button{font:inherit;font-size:.85rem;border:1px solid var(--rule);background:var(--soft);color:var(--ink);border-radius:999px;padding:4px 14px;cursor:pointer}.ovv button.on{background:var(--needle);border-color:var(--needle);color:#fff}
 .hero .cap{position:absolute;left:max(16px,4vw);bottom:22px;pointer-events:none;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.45)}
 .hero .cap b{display:block;font-family:var(--f-display);font-size:clamp(1.6rem,4vw,2.8rem);line-height:1.2}
 .hero .cap span{font-size:.95rem;opacity:.9}
@@ -447,12 +448,18 @@ def home_html(site, nums_all: dict, readme: str, groups) -> str:
     readme = re.sub(r'<div class="tbl"><table>.*?</table></div>', "", readme, count=1, flags=re.S)
     readme = re.sub(r"<h1[^>]*>.*?</h1>", "", readme, count=1, flags=re.S)
     return (f'<div class="hero" data-src="../index.html?proto=1&pv=iso&lang=zh"><iframe title="WQ-LS 整机虚拟样机" allow="fullscreen"></iframe>'
-            f'</div><div class="godoc"><a href="#all">↓ 读设计说明书：十关目录 · Read the documentation</a><a href="../index.html?proto=1&lang=zh" target="_blank">虚拟样机全屏 ↗</a></div>'
+            f'</div><div class="godoc"><a href="#all">↓ 读设计说明书：十关目录 · Read the documentation</a><a href="#video">▶ 3 分钟讲解视频 · Video</a><a href="../index.html?proto=1&lang=zh" target="_blank">虚拟样机全屏 ↗</a></div>'
             f'<div class="home"><p class="eyebrow" style="font-family:var(--f-mono);letter-spacing:.14em;color:var(--muted);font-size:.74rem;margin:0">WQ-LS · 问渠示例设计 · WENQUEST EXAMPLE DESIGN</p>'
             f'<h1 class="gt">工业直驱平缝机设计说明书<small>Direct-drive industrial lockstitch machine — design documentation</small></h1>'
             f'<p class="one" style="font-size:1.05rem">上面是这台机器的整机虚拟样机：真设计的全部零件在转、在缝，脚踏和仪表盘都来自设计计算和控制器固件仿真。'
             f'<br><span class="en">Above: the virtual prototype — every part of the real design sewing; pedal and gauges come from the design calculations and the controller firmware simulation.</span></p>'
             f'<div class="nums">{cards}</div><div class="notice">示例设计：经计算、三维和仿真校核，<b>没有实物试制</b>，所有数值是示例值。'
             f'<span class="en">Example design, checked by calculation, 3-D and simulation; no physical prototype built.</span></div>'
+            f'<h2 class="sec" id="video">总览讲解视频 · Overview video</h2>'
+            f'<p class="one">约 3 分钟：人定方向、AI 做设计，问渠自己的软件，十关一关一关过，画面都是说明书里在动的页面。'
+            f'<span class="en">About 3 minutes: people decide, AI designs, on WenQuest software, through ten gates — every shot is a live page of this documentation.</span></p>'
+            f'<div class="ovv"><div class="row"><button type="button" class="on" data-v="zh">中文</button><button type="button" data-v="en">English</button></div>'
+            f'<video id="ovv" controls preload="none" playsinline poster="../video/overview.zh.jpg" src="../video/overview.zh.mp4"></video></div>'
+            f'<script>document.querySelectorAll(".ovv [data-v]").forEach(function(b){{b.onclick=function(){{var v=document.getElementById("ovv"),l=b.dataset.v;v.setAttribute("poster", "../video/overview."+l+".jpg");v.setAttribute("src", "../video/overview."+l+".mp4");document.querySelectorAll(".ovv [data-v]").forEach(function(x){{x.classList.toggle("on",x===b)}});}}}});</script>'
             f'<h2 class="sec" id="all">十关 · The gates</h2><div class="cards">{"".join(out)}</div>'
             f'<h2 class="sec">说明 · About</h2><article>{readme}</article></div>')
