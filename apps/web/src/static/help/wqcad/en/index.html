@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–5)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–6)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -159,7 +159,15 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l05-do" data-s="l05">Follow along</a>
 <a class="sub" href="#l05-self" data-s="l05">On your own</a>
 <a class="sub" href="#l05-quiz" data-s="l05">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">06</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l06" data-s="l06"><span class="n">06</span>Lesson 6 Pad, pocket, revolve, hole</a>
+<a class="sub" href="#l06-goal" data-s="l06">What you will be able to do</a>
+<a class="sub" href="#l06-four" data-s="l06">The four basic features</a>
+<a class="sub" href="#l06-bar" data-s="l06">Needle bar: Revolution and Groove</a>
+<a class="sub" href="#l06-pin" data-s="l06">Crank pin: Pad and Hole</a>
+<a class="sub" href="#l06-do" data-s="l06">Follow along</a>
+<a class="sub" href="#l06-self" data-s="l06">On your own</a>
+<a class="sub" href="#l06-quiz" data-s="l06">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">07</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -180,9 +188,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 6</td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 7</td><td>Chamfer, fillet, draft, thickness</td><td>Crank with counterweight</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 8</td><td>Sweep, loft, helix</td><td>Tension spring, thread guide</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 9</td><td>Patterns, mirror, multi-transform</td><td>Handwheel (spoke pattern)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 7</td><td>Chamfer, fillet, draft, thickness</td><td>Crank with counterweight</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 8</td><td>Sweep, loft, helix</td><td>Tension spring, thread guide</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 9</td><td>Patterns, mirror, multi-transform</td><td>Handwheel (spoke pattern)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
 
-<p>Lessons 1–5 are online now; the others follow module by module.</p>
+<p>Lessons 1–6 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
 <p>Every recording is the real software at work: FreeCAD 1.1.4 on a cloud computer with the WenQuest CAD branding and the same AI workbench, English interface. Where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. The only difference from WenQuest CAD on your computer is the 27 kernel fixes, which do not change the interface; “Check geometry” and “Unfold face” give different results, so those are not recorded and are taught with the book's verified data instead.</p>
 <p>The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.</p></section>
@@ -648,7 +656,132 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">You click a circle with the Trim tool. Which part is removed?</p><div class="opts"><button type="button" data-k="a">A. The whole circle</button><button type="button" data-k="b">B. The piece between the nearest intersections on either side of the click</button><button type="button" data-k="c">C. The piece nearest the origin</button><button type="button" data-k="d">D. The longest piece</button></div><p class="why" hidden>Trim looks for the nearest intersections or tangent points with other geometry, which is why it sometimes takes several clicks.</p></div>
 <div class="quiz" data-ok="c"><p class="q">A dimension says =Spreadsheet.B1, and you change B1 from 15.5 to 18. What happens?</p><div class="opts"><button type="button" data-k="a">A. Nothing</button><button type="button" data-k="b">B. The sketch fails</button><button type="button" data-k="c">C. After recompute the dimension is 18 and the part follows</button><button type="button" data-k="d">D. The sheet goes back to 15.5</button></div><p class="why" hidden>The expression links the dimension to the sheet; after recompute everything that refers to it updates.</p></div>
 <div class="quiz" data-ok="a"><p class="q">Adding a tangent pops up “Sketcher constraint substitution”, offering an endpoint tangency instead. Usually you choose?</p><div class="opts"><button type="button" data-k="a">A. Yes</button><button type="button" data-k="b">B. No</button><button type="button" data-k="c">C. Cancel</button><button type="button" data-k="d">D. Close FreeCAD</button></div><p class="why" hidden>The line&#x27;s end is already on the circle; adding tangency on top would repeat it. One endpoint-tangency constraint means both on the circle and tangent, without redundancy.</p></div></section>
-<section id="appA"><h2><span class="n">06</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l06"><h2><span class="n">06</span>Lesson 6 Pad, pocket, revolve, hole</h2><p class="lead">You will be able to make prismatic parts with Pad and Pocket; turned parts such as shafts, rods and pins with Revolution and Groove; and threaded or counterbored holes with the Hole tool. You make the WQ-LS needle bar and crank pin. About 1.5 hours.</p><h3 id="l06-goal">What you will be able to do</h3>
+<ul>
+<li>Tell the four basic features apart: Pad (extrude, add), Pocket (extrude, remove), Revolution (around an axis, add), Groove (around an axis, remove).</li>
+<li>For a turned part, sketch only <b>half the section</b>, with one side on the axis.</li>
+<li>Small sketches: zoom in to draw, then lock the position with Horizontal / Vertical distance.</li>
+<li>Hole tool: place a point in a sketch first; choose thread type, size, depth and bottom shape in the panel.</li>
+</ul>
+
+<h3 id="l06-four">The four basic features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>What it does</th>
+<th>Sketch needs</th>
+<th>Example in this lesson</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pad</td>
+<td>extrude along the normal, add material</td>
+<td>closed profile</td>
+<td>crank pin Ø10 × 25</td>
+</tr>
+<tr>
+<td>Pocket</td>
+<td>extrude along the normal, remove material</td>
+<td>closed profile, on a face or plane of the solid</td>
+<td>(on your own)</td>
+</tr>
+<tr>
+<td>Revolution</td>
+<td>revolve around an axis, add material</td>
+<td>closed half section, must not cross the axis</td>
+<td>needle bar Ø8 × 180</td>
+</tr>
+<tr>
+<td>Groove</td>
+<td>revolve around an axis, remove material</td>
+<td>same</td>
+<td>oil groove on the needle bar</td>
+</tr>
+<tr>
+<td>Hole</td>
+<td>cut a hole to a standard</td>
+<td>points or circles in a sketch</td>
+<td>M3 threaded hole in the pin end</td>
+</tr>
+</tbody>
+</table>
+<p>Which one: the cross-section is the same all along (plate, pin, block) → Pad; the part is symmetric about an axis (shaft, rod, sleeve, wheel) → Revolution.</p>
+<h3 id="l06-bar">Needle bar: Revolution and Groove</h3>
+<p>The WQ-LS needle bar is 8 in diameter and 180 long, with two oil grooves 0.5 wide and 0.2 deep at 39.25 and 41.25 mm from the bottom, and a 0.5 chamfer at each end. This lesson makes the rod and the first groove:</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l06a-en.jpg"><source src="../media/wqcad-l06a-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l06a-en.vtt"></video><figcaption>▶ Recording: half-section rectangle → Revolution → zoom in, small rectangle, lock its position → Groove (about 85 s)</figcaption></figure>
+<ul>
+<li>After the first corner of a rectangle, just type “width, Tab, height, Enter” and the sizes become constraints; the first corner on the origin becomes coincident — fully constrained in one go.</li>
+<li>The Revolution axis defaults to the vertical sketch axis; with the half section drawn against it, the result is a solid rod.</li>
+<li>The groove rectangle is only 0.2 × 0.5: zoom in to over a hundred pixels per millimetre to draw it, then lock its lower-left corner with Horizontal distance 3.8 and Vertical distance 39.25.</li>
+</ul>
+<p>Volumes: plain rod 9047.79 mm³; one groove 9045.34; two grooves 9042.89. After the 0.5 chamfers in lesson 7 it is 9036.86 — the same as the real needle bar in the machine, 9036.86 mm³.</p>
+<h3 id="l06-pin">Crank pin: Pad and Hole</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l06b-en.jpg"><source src="../media/wqcad-l06b-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l06b-en.vtt"></video><figcaption>▶ Recording: circle Ø10 → Pad 25 → sketch on the end face with one point → Hole: M3, tap drill, depth 7.5, flat bottom (about 85 s)</figcaption></figure>
+<table>
+<thead>
+<tr>
+<th>Hole panel item</th>
+<th>Choice here</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard (thread type)</td>
+<td>ISO metric regular profile</td>
+<td>also fine thread, UTS (inch), pipe threads</td>
+</tr>
+<tr>
+<td>Size</td>
+<td>M3x0.5</td>
+<td>the diameter fills in automatically</td>
+</tr>
+<tr>
+<td>Hole type</td>
+<td>Tap drill (to be threaded)</td>
+<td>Clearance: screw clearance hole (3.4 for M3); Tap drill: tap-drill size (2.5 for M3), no thread geometry; Modeled thread: real thread geometry (slow — only for 3D-printed threads)</td>
+</tr>
+<tr>
+<td>Depth</td>
+<td>7.5 mm</td>
+<td>or Through all</td>
+</tr>
+<tr>
+<td>Drill point angle</td>
+<td>unticked</td>
+<td>ticked gives a 118° drill point; unticked is flat</td>
+</tr>
+<tr>
+<td>Head type</td>
+<td>None</td>
+<td>counterbore and countersink are here</td>
+</tr>
+</tbody>
+</table>
+<p>The result is 1926.68 mm³. In the machine STEP this hole is drawn as a plain Ø2.95 hole (simplified), so the real part is 1912.23 mm³ — the difference is just the hole diameter. Not modelling thread geometry is normal practice: the model stays light and drawings label “M3” automatically.</p>
+<h3 id="l06-do">Follow along</h3>
+<ol class="steps">
+<li>New body, sketch on XZ: rectangle from the origin, 4 wide, 180 high. Close the sketch, Revolution 360°.</li>
+<li>Another sketch on XZ: zoom in at the right edge, draw a 0.2 × 0.5 rectangle, lower-left corner at horizontal distance 3.8, vertical distance 39.25. Groove 360°.</li>
+<li>Second groove: the same, vertical distance 41.25. The volume should be 9042.89 mm³. Save as “NeedleBar” for lesson 7.</li>
+<li>New file: circle Ø10 on XY, Pad 25.</li>
+<li>Click the top face, new sketch, one point on the origin; close the sketch.</li>
+<li>Select that sketch, click Hole: ISO metric regular, M3x0.5, tap drill, depth 7.5, drill point unticked.</li>
+</ol>
+
+<h3 id="l06-self">On your own</h3>
+<ol>
+<li>With Pocket, cut a slot 1 wide and 1.5 deep across the other end of the crank pin (not on the real part — practice): sketch on the end face, a rectangle across it, Pocket 1.5.</li>
+<li>Change the hole type to Clearance and see the diameter; then add a counterbore and see which parameters appear.</li>
+<li>Can both needle-bar grooves be drawn in <b>one</b> sketch and cut with a single Groove? Try it.</li>
+</ol>
+<h3 id="l06-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">The quickest way to model a stepped shaft?</p><div class="opts"><button type="button" data-k="a">A. Stack pads one by one</button><button type="button" data-k="b">B. Sketch half the section and revolve it</button><button type="button" data-k="c">C. Combine Part cylinders</button><button type="button" data-k="d">D. Make a block and cut it down</button></div><p class="why" hidden>A shaft is symmetric about its axis: draw the half section with all the steps and revolve once.</p></div>
+<div class="quiz" data-ok="b"><p class="q">What happens if the half section of a Revolution crosses the axis?</p><div class="opts"><button type="button" data-k="a">A. It works anyway</button><button type="button" data-k="b">B. FreeCAD reports an error; no solid</button><button type="button" data-k="c">C. It takes half automatically</button><button type="button" data-k="d">D. It becomes hollow</button></div><p class="why" hidden>Crossing the axis makes the revolved shape pass through itself, which is an error. Keep one side on the axis, or the whole section on one side of it.</p></div>
+<div class="quiz" data-ok="c"><p class="q">Hole type “Tap drill (to be threaded)”, size M3 — what diameter is cut?</p><div class="opts"><button type="button" data-k="a">A. 3.0</button><button type="button" data-k="b">B. 3.4</button><button type="button" data-k="c">C. 2.5</button><button type="button" data-k="d">D. 2.95</button></div><p class="why" hidden>A tap drill is cut at the tap-drill size (2.5 for M3); 3.4 is the clearance hole. The thread itself isn&#x27;t modelled; the size is stored in the properties.</p></div></section>
+<section id="appA"><h2><span class="n">07</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">

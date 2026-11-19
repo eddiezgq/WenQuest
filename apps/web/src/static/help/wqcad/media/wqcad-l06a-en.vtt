@@ -1,0 +1,28 @@
+WEBVTT
+
+00:00:00.581 --> 00:00:10.226
+The needle bar is a long thin rod: diameter 8, length 180. For a turned part, don't pad it layer by layer: sketch half the section and revolve it
+
+00:00:10.226 --> 00:00:19.003
+On the XZ plane, draw the half section: a rectangle from the origin, 4 wide (the radius) and 180 high
+
+00:00:19.003 --> 00:00:24.252
+Its left edge lies on the vertical axis—that is the axis we will revolve around
+
+00:00:24.252 --> 00:00:30.813
+Click Revolution: the default axis is the vertical sketch axis, angle 360°. OK
+
+00:00:30.813 --> 00:00:42.813
+A plain rod, diameter 8. Now the oil groove: 39.25 mm from the bottom end, 0.5 wide, 0.2 deep
+
+00:00:43.340 --> 00:00:50.974
+Zoom in on the right edge of the rod and draw a small rectangle: 0.2 wide, 0.5 high
+
+00:00:50.974 --> 00:01:02.974
+Lock its position with dimensions: pick the lower-left corner, Horizontal distance 3.8; pick it again, Vertical distance 39.25
+
+00:01:02.981 --> 00:01:14.958
+Fully constrained. Close the sketch and click Groove: again 360° around the vertical axis
+
+00:01:14.958 --> 00:01:25.000
+There is the groove. Revolution and Groove are the turned versions of Pad and Pocket: one adds material, the other removes it

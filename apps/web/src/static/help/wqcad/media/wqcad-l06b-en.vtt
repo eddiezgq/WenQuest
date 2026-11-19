@@ -1,0 +1,28 @@
+WEBVTT
+
+00:00:00.780 --> 00:00:12.780
+The crank pin: a cylinder 10 in diameter and 25 long, with an M3 threaded hole in one end; it fits into the crank
+
+00:00:15.982 --> 00:00:27.721
+Centre on the origin, diameter 10: fully constrained. Pad 25 mm
+
+00:00:27.721 --> 00:00:39.180
+A hole needs a position: click the top face, create a sketch, and put a point on the origin
+
+00:00:39.180 --> 00:00:43.185
+Select that sketch and click Hole
+
+00:00:43.185 --> 00:00:50.988
+Thread type: ISO metric regular profile, size M3x0.5
+
+00:00:50.988 --> 00:00:56.429
+Hole type: the second item, the tap drill—drill now, tap later, no thread geometry
+
+00:00:56.429 --> 00:01:04.980
+Depth 7.5; untick the drill point angle so the bottom is flat
+
+00:01:04.980 --> 00:01:14.780
+It is a threaded hole, but the thread isn't modelled: it is cut at the tap-drill size 2.5 and remembers "M3"—drawings label the thread automatically
+
+00:01:14.780 --> 00:01:24.640
+Pad adds material, Pocket removes it; Hole is a specialised pocket: threads, counterbores and drill points are all options

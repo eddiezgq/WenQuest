@@ -254,3 +254,82 @@ def answer_modal(d, texts=("是", "Yes", "确定", "OK"), wait=2500):
             return
         yield 150
         t += 150
+
+
+# ------------------------------------------------------------ 第 6 课起
+def sp(d, u, v):
+    """草图坐标 (u, v) → 屏幕点（草图不在 XY 平面时用；按当前草图的放置换算）"""
+    p = sketch().Placement.multVec(App.Vector(u, v, 0))
+    return d.model_pt(p.x, p.y, p.z)
+
+
+def combo_pick(d, combo, text):
+    """真点下拉框，在弹出的列表里点 text（按开头匹配；给整数就是第几项）"""
+    p = d.center(combo)
+    yield d.move(p, 700)
+    d.click(p)
+    yield 700
+    i = text if isinstance(text, int) else [k for k in range(combo.count()) if combo.itemText(k).replace("&", "").startswith(text)][0]
+    view = combo.view()
+    view.scrollTo(combo.model().index(i, 0))
+    yield 300
+    ip = view.viewport().mapToGlobal(view.visualRect(combo.model().index(i, 0)).center())
+    yield d.move(ip, 600)
+    d.ring(ip)
+    combo.setCurrentIndex(i)
+    combo.activated.emit(i)
+    combo.hidePopup()
+    yield 800
+
+
+def named(cls, name):
+    ws = [w for w in QtWidgets.QApplication.allWidgets() if w.isVisible() and isinstance(w, cls) and w.objectName() == name]
+    return ws[0] if ws else None
+
+
+def type_into(d, w, text):
+    """点输入框，全选，键入，Tab 交给特征"""
+    p = d.center(w)
+    yield d.move(p, 700)
+    d.click(p)
+    yield 300
+    w.setFocus()
+    w.selectAll()
+    d.keys(text, w=w)
+    yield 900
+    d.key(QtCore.Qt.Key_Tab, w)
+    yield 600
+
+
+def task_ok(d):
+    """任务面板的“确定”"""
+    ok = d.find(QtWidgets.QPushButton, "确定") or d.find(QtWidgets.QPushButton, "OK")
+    yield d.move(d.center(ok), 700)
+    d.click(d.center(ok))
+    yield from d.until(lambda: Gui.ActiveDocument.getInEdit() is None)
+    yield 900
+
+
+def datum(d, value):
+    """尺寸约束弹出的输入框：全选、键入、回车，再点框里的“确定”（第 5 课见过回车不一定关框）"""
+    yield from d.until(lambda: isinstance(QtWidgets.QApplication.focusWidget(), QtWidgets.QAbstractSpinBox), 6000)
+    w = QtWidgets.QApplication.focusWidget()
+    yield 500
+    d.key(QtCore.Qt.Key_A, w, QtCore.Qt.ControlModifier)
+    d.keys(str(value), w=w)
+    yield 800
+    d.key(QtCore.Qt.Key_Return, w)
+    yield 800
+    oks = [b for b in QtWidgets.QApplication.allWidgets() if isinstance(b, QtWidgets.QPushButton) and b.isVisible()
+           and b.text().replace("&", "") in ("确定", "OK") and b.window() is not d.mw]
+    if oks:
+        p = d.center(oks[0])
+        yield d.move(p, 600)
+        d.click(p)
+        yield 500
+        try:
+            if oks[0].isVisible():
+                oks[0].click()
+        except RuntimeError:
+            pass
+        yield 600
