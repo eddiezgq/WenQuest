@@ -321,6 +321,7 @@ services:
         bench set-config -g redis_queue "redis://erp-redis-queue:6379";
         bench set-config -g redis_socketio "redis://erp-redis-queue:6379";
         bench set-config -gp socketio_port 9000;
+        bench set-config -gp scheduler_interval 600;
     depends_on:
       erp-db: { condition: service_healthy }
 

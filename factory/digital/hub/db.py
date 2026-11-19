@@ -38,6 +38,9 @@ create index if not exists bus_message_type_mode_seq on bus_message (type, mode,
 create index if not exists bus_message_ts on bus_message (ts);
 create index if not exists bus_message_mode_type_corr on bus_message (mode, type, corr text_pattern_ops);
 create index if not exists bus_message_mode_source on bus_message (mode, source text_pattern_ops);
+-- 第 173b 轮：ERPNext 单据快照（erp_docs）按单据类型、厂取每个单号最新一条，以前每次把全部 erp.doc 排一遍序
+create index if not exists bus_message_erp_doc on bus_message ((payload->'data'->>'doctype'), mode, (payload->'data'->>'name'), ts desc, seq desc)
+    where valid and type = 'erp.doc';
 
 -- 设备状态变化（从 machine.status 提取，只记变化点），算 OEE 用
 create table if not exists machine_state_log (

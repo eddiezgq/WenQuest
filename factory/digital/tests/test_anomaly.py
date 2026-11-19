@@ -219,3 +219,26 @@ def test_rules_not_in_this_plant_get_resolved(db):
     A.Detector(db, catalog=cat).run("teach", NOW)
     r = db.one("select status, closed_reason from anomaly where rule='ZZ9'")
     assert r["status"] == "resolved" and "不属于本厂" in r["closed_reason"]
+
+
+def test_173b_title_shape_and_round_cache():
+    """第 173b 轮：标题只差数字算没变；一轮里同一种单据只查一次"""
+    from hub.ont import anomaly as A
+    assert A._shape("CNC-2 停机 12 分钟") == A._shape("CNC-2 停机 13.5 分钟")
+    assert A._shape("CNC-2 停机 12 分钟") != A._shape("CNC-2 缺料 12 分钟")
+
+    class Fake:
+        n = 0
+        dsn = "x"
+
+        def erp_docs(self, doctype, mode=None):
+            Fake.n += 1
+            return [{"data": {"name": doctype}}]
+
+    c = A.Ctx(Fake(), "teach")
+    a = c.db.erp_docs("Work Order", "teach")
+    a.append("junk")                                  # 调用方改列表不影响缓存
+    assert c.db.erp_docs("Work Order", "teach") == [{"data": {"name": "Work Order"}}]
+    c.db.erp_docs("Sales Order", "teach")
+    assert Fake.n == 2 and c.db.dsn == "x"
+    assert A.Ctx(c.db, "teach").db is c.db

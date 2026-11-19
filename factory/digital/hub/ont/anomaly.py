@@ -10,6 +10,7 @@ import datetime as dt
 import glob
 import logging
 import os
+import re
 import threading
 import time
 
@@ -154,11 +155,32 @@ class Finding:
         self.alert_key = alert_key             # 提醒的 key（沿用原 AI 提醒的写法，首页去重用）
 
 
+def _shape(title):
+    """第 173b 轮：标题里的数（停机分钟数、件数、库存）换成 #，只差数字的算同一个标题"""
+    return re.sub(r"\d+(?:\.\d+)?", "#", title or "")
+
+
+class _RoundDB:
+    """第 173b 轮：一轮检测里同一种 ERPNext 单据只查一次（以前每轮各条规则重复查，占了数据库一半的忙）；别的调用原样转给 db"""
+
+    def __init__(self, db):
+        self._db, self._erp = db, {}
+
+    def erp_docs(self, doctype, mode=None):
+        k = (doctype, mode)
+        if k not in self._erp:
+            self._erp[k] = self._db.erp_docs(doctype, mode)
+        return list(self._erp[k])
+
+    def __getattr__(self, name):
+        return getattr(self._db, name)
+
+
 class Ctx:
     """一轮检测的共享数据（按需计算，只算一次）"""
 
     def __init__(self, db, mode, now=None):
-        self.db, self.mode = db, mode
+        self.db, self.mode = (db if isinstance(db, _RoundDB) else _RoundDB(db)), mode
         self.now = now or dt.datetime.now(dt.timezone.utc)
         self._c = {}
 
@@ -330,16 +352,17 @@ class Detector:
                 up = LEVELS[f.severity] > LEVELS[a["severity"]]
                 # 第 173 轮：还在的异常不必每一轮都写库（以前 20 秒一轮把每条开着的异常都重写一遍，试点厂 7 天改了 8400 万次）。
                 # 标题、级别没变、上一轮也看到了，且距上次写不到 WRITE_EVERY_S 秒，就只在内存里记一次命中，下次写库时一起加上。
-                same = (a["title"] == f.title and a["severity"] == (f.severity if up or LEVELS[f.severity] < LEVELS[a["severity"]] else a["severity"])
+                same = (_shape(a["title"]) == _shape(f.title) and a["severity"] == (f.severity if up or LEVELS[f.severity] < LEVELS[a["severity"]] else a["severity"])
                         and not a["misses"] and a["last_seen"] is not None and (now - a["last_seen"]).total_seconds() < WRITE_EVERY_S)
                 if same:
                     self._pend_hits[a["id"]] = self._pend_hits.get(a["id"], 0) + 1
                     continue
                 pend = self._pend_hits.pop(a["id"], 0)
                 # 标题变了（例如停机原因、时长变了）就清掉旧的因果链，下次打开立即重算，不让链条说法和标题对不上
-                db.x("update anomaly set last_seen=%s, hits=hits+1+%s, misses=0, chain=case when title is distinct from %s then null else chain end, "
+                # 第 173b 轮：只差数字不清链条（不然每分钟重算一次）
+                db.x("update anomaly set last_seen=%s, hits=hits+1+%s, misses=0, chain=case when %s then null else chain end, "
                      "title=%s, detail=%s, severity=%s where id=%s",
-                     (now, pend, f.title, f.title, Jsonb(detail), f.severity if up or LEVELS[f.severity] < LEVELS[a["severity"]] else a["severity"],
+                     (now, pend, _shape(a["title"]) != _shape(f.title), f.title, Jsonb(detail), f.severity if up or LEVELS[f.severity] < LEVELS[a["severity"]] else a["severity"],
                       a["id"]))
                 if up:
                     self.note(a["id"], "system", "escalate", "严重度升为“{}”：{}".format(LEVEL_LABEL[f.severity], f.title))
