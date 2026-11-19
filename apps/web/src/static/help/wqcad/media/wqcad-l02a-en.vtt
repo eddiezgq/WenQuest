@@ -1,0 +1,25 @@
+WEBVTT
+
+00:00:00.743 --> 00:00:04.590
+On the start page click "Empty File": a new empty document
+
+00:00:04.590 --> 00:00:10.440
+Switch to the Part workbench: it has ready-made primitives such as the cube and cylinder
+
+00:00:10.440 --> 00:00:16.590
+Click "Cube": a 10 × 10 × 10 block appears at the origin, and the model tree gets a new item
+
+00:00:16.590 --> 00:00:19.540
+Then click "Cylinder": radius 2, height 10
+
+00:00:19.540 --> 00:00:23.165
+Undo (Ctrl+Z or the curved arrow): the cylinder is gone
+
+00:00:23.165 --> 00:00:27.565
+Redo (Ctrl+Y): the cylinder is back. Undo can step back many steps
+
+00:00:27.565 --> 00:00:34.741
+Save (Ctrl+S): the first time you give it a name; the extension is .FCStd
+
+00:00:34.741 --> 00:00:42.080
+The tab below the view now shows the file name. From now on Ctrl+S saves without asking

@@ -133,3 +133,104 @@ def leave_and_pad(d, length):
     yield 900
     pad = [o for o in App.ActiveDocument.Objects if o.TypeId == "PartDesign::Pad"][-1]
     log("pad", pad.Length.Value, round(pad.Shape.Volume, 2))
+
+
+def prop_pt(d, *path):
+    """属性栏里某一行“值”那一格的位置：prop_pt(d, "Cylinder", "Radius")；路径按每层的名字（中英界面里组名会变，传元组 (中, 英) 也行）"""
+    pe = [w for w in QtWidgets.QApplication.allWidgets() if w.isVisible() and w.metaObject().className() == "Gui::PropertyEditor::PropertyEditor"][0]
+    m = pe.model()
+    par = QtCore.QModelIndex()
+    ix = None
+    for name in path:
+        names = name if isinstance(name, tuple) else (name,)
+        ix = None
+        for r in range(m.rowCount(par)):
+            if m.data(m.index(r, 0, par)) in names:
+                ix = m.index(r, 0, par)
+                break
+        assert ix is not None, (path, name)
+        pe.expand(ix)
+        par = ix
+    v = m.index(ix.row(), 1, ix.parent())
+    pe.scrollTo(v)
+    return pe, pe.viewport().mapToGlobal(pe.visualRect(v).center())
+
+
+def prop_set(d, value, *path):
+    """真操作改属性：双击值那一格，全选，键入，回车"""
+    pe, p = prop_pt(d, *path)
+    yield d.move(p, 800)
+    d.click(p, double=True)
+    yield 600
+    w = QtWidgets.QApplication.focusWidget()
+    log("prop editor", path, w.metaObject().className() if w else None)
+    d.key(QtCore.Qt.Key_A, w, QtCore.Qt.ControlModifier)
+    d.keys(str(value), w=w)
+    yield 500
+    d.key(QtCore.Qt.Key_Return, w)
+    yield 900
+
+
+def file_dialog(d, name, type_hint=None):
+    """Qt 的保存 / 导出对话框：（可选）选文件类型，键入文件名，点“保存”"""
+    yield from d.until(lambda: isinstance(QtWidgets.QApplication.activeModalWidget(), QtWidgets.QFileDialog))
+    dlg = QtWidgets.QApplication.activeModalWidget()
+    import os
+    dlg.setDirectory(os.environ.get("WQ_REC", "."))      # 文件都放录屏工作目录（软件会记上次的目录）
+    yield 700
+    if type_hint:
+        cb = dlg.findChild(QtWidgets.QComboBox, "fileTypeCombo")
+        i = [k for k in range(cb.count()) if type_hint in cb.itemText(k)][0]
+        p = d.center(cb)
+        yield d.move(p, 700)
+        d.click(p)
+        yield 700
+        view = cb.view()
+        ip = view.viewport().mapToGlobal(view.visualRect(cb.model().index(i, 0)).center())
+        yield d.move(ip, 600)
+        d.ring(ip)
+        cb.setCurrentIndex(i)
+        cb.activated.emit(i)
+        cb.hidePopup()
+        yield 600
+    e = dlg.findChild(QtWidgets.QLineEdit, "fileNameEdit")
+    p = d.center(e)
+    yield d.move(p, 600)
+    d.click(p)
+    e.selectAll()
+    d.keys(name, w=e)
+    yield 700
+    ok = [b for b in dlg.findChildren(QtWidgets.QPushButton) if b.isVisible() and b.text().replace("&", "").startswith(("保存", "Save", "打开", "Open"))][0]
+    p = d.center(ok)
+    yield d.move(p, 600)
+    d.click(p)
+    yield 1200
+
+
+def pick_workbench(d, zh, en):
+    """真点工作台下拉框，在弹出的列表里点名字"""
+    from director import L
+    c = d.wb_combo()
+    p = d.center(c)
+    yield d.move(p, 700)
+    d.click(p)
+    yield 800
+    name = en          # 1.1 的工作台下拉框中文界面里也是英文名
+    items = [c.itemText(k).replace("&", "") for k in range(c.count())]
+    log("wb items", items)
+    i = [k for k, t in enumerate(items) if t == name or t.startswith(name + " ")][0]
+    view = c.view()
+    view.scrollTo(c.model().index(i, 0))
+    yield 300
+    ip = view.viewport().mapToGlobal(view.visualRect(c.model().index(i, 0)).center())
+    yield d.move(ip, 700)
+    d.ring(ip)
+    c.setCurrentIndex(i)
+    c.activated.emit(i)
+    c.hidePopup()
+    yield 600
+    cls = {wb.MenuText: k for k, wb in Gui.listWorkbenches().items()}.get(en)
+    if cls and Gui.activeWorkbench().name() != cls:      # 程序里设下拉框当前项不一定触发切换：用它自己的切换命令
+        Gui.activateWorkbench(cls)
+    yield 1200
+    log("workbench", Gui.activeWorkbench().name())

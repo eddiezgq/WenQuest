@@ -68,6 +68,47 @@
     draw();
   };
 
+  // ---------------------------------------------------------------- 第 2 课：依赖关系（点一个对象，看改它会影响谁）
+  A.deps = function (el) {
+    const N = { box: [T("立方体", "Cube"), 0.18, 0.28], cyl: [T("圆柱体", "Cylinder"), 0.18, 0.72], cut: [T("剪切", "Cut"), 0.58, 0.5], doc: [T("导出的 STEP", "Exported STEP"), 0.88, 0.5] };
+    const E = [["box", "cut"], ["cyl", "cut"], ["cut", "doc"]];
+    const WHY = {
+      box: T("改立方体的长宽高：剪切重算，形状跟着变。", "Change the cube's size: the cut is recomputed and the shape follows."),
+      cyl: T("改圆柱的半径、位置：剪切重算（录屏里就是这样把缺口变成通孔的）。", "Change the cylinder's radius or position: the cut is recomputed (that is how the notch became a through hole in the recording)."),
+      cut: T("剪切本身没有尺寸可改，它只记“立方体减圆柱”。删掉它，立方体和圆柱又露出来。", "The cut has no sizes of its own; it only remembers “cube minus cylinder”. Delete it and the cube and cylinder show again."),
+      doc: T("导出的 STEP 是当时的形状快照：之后再改模型，它不会变，要重新导出。", "An exported STEP is a snapshot of the shape at that moment: later changes do not reach it; export again."),
+    };
+    const cv = canvas(el, 230);
+    const info = cap(el, "");
+    let cur = "cyl";
+    const down = (k) => { const out = new Set([k]); let grow = true; while (grow) { grow = false; for (const [a, b] of E) if (out.has(a) && !out.has(b) && b !== "doc") { out.add(b); grow = true; } } return out; };
+    const pos = (k) => [N[k][1] * cv.W(), N[k][2] * cv.H];
+    function draw() {
+      const c = C(), g = cv.g, hit = down(cur);
+      cv.begin();
+      for (const [a, b] of E) {
+        const [x1, y1] = pos(a), [x2, y2] = pos(b), on = hit.has(a) && hit.has(b);
+        g.strokeStyle = on ? c.accent : c.line; g.lineWidth = on ? 3 : 1.5; g.setLineDash(b === "doc" ? [6, 5] : []);
+        g.beginPath(); g.moveTo(x1 + 62, y1); g.lineTo(x2 - 66, y2); g.stroke(); g.setLineDash([]);
+        const ang = Math.atan2(y2 - y1, x2 - 66 - x1 - 62); g.fillStyle = on ? c.accent : c.line;
+        g.beginPath(); g.moveTo(x2 - 66, y2); g.lineTo(x2 - 66 - 10 * Math.cos(ang - 0.4), y2 - 10 * Math.sin(ang - 0.4)); g.lineTo(x2 - 66 - 10 * Math.cos(ang + 0.4), y2 - 10 * Math.sin(ang + 0.4)); g.fill();
+      }
+      for (const k in N) {
+        const [x, y] = pos(k), on = hit.has(k), me = k === cur;
+        rbox(g, x - 64, y - 20, 128, 40, 8, me ? c.accent : on ? c.soft : c.paper, me || on ? c.accent : c.line, me ? 2 : 1.5);
+        txt(g, N[k][0], x, y + 5, me ? "#fff" : c.ink, 14, "center", me);
+      }
+      info.innerHTML = `<b>${N[cur][0]}</b>${T("：", ": ")}${WHY[cur]}`;
+    }
+    cv.cv.addEventListener("click", (e) => {
+      const b = cv.cv.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top;
+      for (const k in N) { const [nx, ny] = pos(k); if (Math.abs(x - nx) < 66 && Math.abs(y - ny) < 22) { cur = k; draw(); } }
+    });
+    addEventListener("resize", draw);
+    document.addEventListener("themechange", draw);
+    draw();
+  };
+
   // ---------------------------------------------------------------- 第 3 课：画圆的两下（模拟草图里的圆工具）
   A.circle = function (el) {
     const cv = canvas(el, 300);

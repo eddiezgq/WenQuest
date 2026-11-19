@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00:02.960 --> 00:00:10.795
+Open the "practice" file from the last clip. In the tree click the cube, then Ctrl-click the cylinder: both are selected
+
+00:00:10.795 --> 00:00:19.471
+Click "Cut": the cylinder is removed from the cube. In the tree the cube and cylinder move under "Cut" — the cut depends on them
+
+00:00:19.471 --> 00:00:24.996
+Change the cylinder: click it in the tree and set its Radius to 3 in the properties
+
+00:00:24.996 --> 00:00:31.997
+Then move it to the middle of the block: x = 5, y = 5
+
+00:00:31.997 --> 00:00:42.680
+The cut follows: now a through hole. That is parametric design — change an earlier object and everything that depends on it is recomputed

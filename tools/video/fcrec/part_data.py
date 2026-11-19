@@ -35,5 +35,7 @@ out["needle_clamp"] = {"name": "针夹", "R": 5.5 if 5.5 in r else max(r), "bore
 # 针夹耳朵宽：看平面 x=±3.5
 xs = sorted({round(f.Surface.Position.x, 3) for f in s.Faces if f.Surface.TypeId == "Part::GeomPlane" and abs(abs(f.Surface.Axis.x) - 1) < 1e-6})
 out["needle_clamp"]["tab_w"] = round(xs[-1] - xs[0], 3)
+s = Part.read(f"{D}/needle_bar.step")
+out["needle_bar"] = {"name": "针杆", "volume": round(s.Volume, 2)}       # 第 2 课：导出 STEP 再导入，体积对得上
 json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print("OK", json.dumps({k: {kk: vv for kk, vv in v.items() if kk != "mesh"} for k, v in out.items()}), os.path.getsize(OUT))

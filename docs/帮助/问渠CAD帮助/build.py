@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import json
+import math
 import shutil
 import sys
 from pathlib import Path
@@ -27,7 +28,7 @@ BRAND = "问渠 CAD"
 # 课程目录：全部 21 课都列在第 0 节的表里；已经写成的课才有自己的一节
 LESSONS = [
     ("一 入门", 1, "认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位", "打开 WQ-LS 整机，转着看", "l01"),
-    ("一 入门", 2, "文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系", "导出一个零件给别人", None),
+    ("一 入门", 2, "文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系", "导出一个零件给别人", "l02"),
     ("二 草图", 3, "草图入门：直线、圆、圆弧、矩形、多段线；构造线", "压脚杆套环；针夹轮廓", "l03"),
     ("二 草图", 4, "约束：几何约束、尺寸约束、完全约束、过约束怎么查", "针夹（完全约束）", "l04"),
     ("二 草图", 5, "草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸", "曲柄轮廓（表格驱动）", None),
@@ -74,9 +75,9 @@ LESSONS_EN = [
     ("8 AI", "AI workbench: part selection and checks, company parts library, AI part design", "Pick a bearing; replay the upper-shaft design"),
 ]
 
-FILES = ["00-course", "l01", "l03", "l04", "appA-install"]
-EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（样课：第 1、3、4 课）", other=("English", "en/"), files=FILES)
-EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (sample lessons 1, 3, 4)",
+FILES = ["00-course", "l01", "l02", "l03", "l04", "appA-install"]
+EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–4 课）", other=("English", "en/"), files=FILES)
+EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–4)",
                   other=("中文", "../"), files=FILES)
 
 
@@ -89,7 +90,7 @@ def numbers(en=False):
             mod, what, make = mod_en, what_en, make_en
         name = f"Lesson {n}" if en else f"第 {n} 课"
         link = f'<a href="#{sec}">{name}</a>' if sec else name
-        state = ("Sample" if sec else "In progress") if en else ("样课" if sec else "制作中")
+        state = ("Online" if sec else "In progress") if en else ("已上线" if sec else "制作中")
         rows.append(f"<tr><td>{mod}</td><td>{link}</td><td>{what}</td><td>{make}</td><td>{state}</td></tr>")
     head = ("<th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th>" if en else
             "<th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th>")
@@ -97,6 +98,8 @@ def numbers(en=False):
         "pc": {"od": f"{pc['od']:g}", "id": f"{pc['id']:g}", "t": f"{pc['t']:g}", "v": f"{pc['volume']:.1f}"},
         "nc": {"R": f"{nc['R']:g}", "d": f"{nc['R'] * 2:g}", "bore": f"{nc['bore']:g}", "w": f"{nc['tab_w']:g}", "dep": f"{nc['tab_d']:g}",
                "t": f"{nc['t']:g}", "v": f"{nc['volume']:.1f}"},
+        "dep": {"v": f"{1000 - math.pi * 9 * 10:.2f}"},
+        "nb": {"v": f"{P['needle_bar']['volume']:.2f}"},
         "table": f"<table class=\"plan\"><thead><tr>{head}</tr></thead><tbody>"
                  + "".join(rows) + "</tbody></table>",
     }

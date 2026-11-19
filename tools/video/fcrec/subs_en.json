@@ -57,5 +57,22 @@
  "点“新建草图”，选 XZ 平面": "Click \"Create sketch\" and choose the XZ plane",
  "点“新建草图”，选 YZ 平面": "Click \"Create sketch\" and choose the YZ plane",
  "打开上一课存的针夹草图，在模型树里双击草图，进入编辑": "Open the needle-clamp sketch saved in the last lesson and double-click the sketch in the model tree to edit it",
- "打开 WQ-LS 整机，这一段练鼠标：平移、旋转、缩放，再看标准视图、选零件": "Open the WQ-LS machine. This clip practises the mouse: pan, rotate, zoom, then standard views and selecting parts"
+ "打开 WQ-LS 整机，这一段练鼠标：平移、旋转、缩放，再看标准视图、选零件": "Open the WQ-LS machine. This clip practises the mouse: pan, rotate, zoom, then standard views and selecting parts",
+ "开始页点“空文件”：新建一个空文档": "On the start page click \"Empty File\": a new empty document",
+ "工作台换成“零件”（Part）：它有现成的立方体、圆柱这些基本体": "Switch to the Part workbench: it has ready-made primitives such as the cube and cylinder",
+ "点“立方体”：10 × 10 × 10 的方块出现在原点；模型树里多了一项": "Click \"Cube\": a 10 × 10 × 10 block appears at the origin, and the model tree gets a new item",
+ "再点“圆柱”：半径 2、高 10": "Then click \"Cylinder\": radius 2, height 10",
+ "撤销（Ctrl+Z 或工具栏的弯箭头）：圆柱没了": "Undo (Ctrl+Z or the curved arrow): the cylinder is gone",
+ "重做（Ctrl+Y）：圆柱又回来了。撤销可以一步步往回退很多步": "Redo (Ctrl+Y): the cylinder is back. Undo can step back many steps",
+ "保存（Ctrl+S）：第一次保存要起名字，文件扩展名是 .FCStd": "Save (Ctrl+S): the first time you give it a name; the extension is .FCStd",
+ "窗口下面的标签页显示了文件名。以后再按 Ctrl+S 就直接存，不再问": "The tab below the view now shows the file name. From now on Ctrl+S saves without asking",
+ "打开上一段存的“练习”。在模型树里先点立方体，再按住 Ctrl 点圆柱：两个都选上": "Open the \"practice\" file from the last clip. In the tree click the cube, then Ctrl-click the cylinder: both are selected",
+ "点“剪切”：从立方体里挖掉圆柱。模型树里，立方体和圆柱收进了“剪切”下面——剪切依赖它们": "Click \"Cut\": the cylinder is removed from the cube. In the tree the cube and cylinder move under \"Cut\" — the cut depends on them",
+ "改圆柱：在模型树里点圆柱，在属性里把半径改成 3": "Change the cylinder: click it in the tree and set its Radius to 3 in the properties",
+ "再把位置改到方块中间：x = 5，y = 5": "Then move it to the middle of the block: x = 5, y = 5",
+ "剪切的结果跟着变了：一个穿通的孔。这就是参数化——改前面的对象，后面依赖它的全部自动重算": "The cut follows: now a through hole. That is parametric design — change an earlier object and everything that depends on it is recomputed",
+ "别人要你的零件，又不用 FreeCAD：导出成 STEP，几乎所有 CAD 都能打开。先在模型树里选针杆": "Someone needs your part but does not use FreeCAD: export STEP, which almost every CAD program opens. First select the needle bar in the tree",
+ "菜单“文件 → 导出”，文件类型选 STEP，起名“针杆”，保存": "Menu File → Export, choose the STEP file type, name it \"needle_bar\", Save",
+ "导出好了。检查一下：新建空文档，“文件 → 导入”刚才的 STEP": "Exported. Check it: new empty document, File → Import the STEP file",
+ "针杆完整回来了，体积和原来一样。STL（三维打印用）、DXF（二维图）也在“导出”里，用法一样": "The needle bar comes back complete, with the same volume. STL (3D printing) and DXF (2D drawings) are under Export too and work the same way"
 }

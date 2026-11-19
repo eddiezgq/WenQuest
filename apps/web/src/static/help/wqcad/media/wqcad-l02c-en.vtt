@@ -1,0 +1,13 @@
+WEBVTT
+
+00:00:07.006 --> 00:00:16.506
+Someone needs your part but does not use FreeCAD: export STEP, which almost every CAD program opens. First select the needle bar in the tree
+
+00:00:16.506 --> 00:00:28.506
+Menu File → Export, choose the STEP file type, name it "needle_bar", Save
+
+00:00:30.106 --> 00:00:42.106
+Exported. Check it: new empty document, File → Import the STEP file
+
+00:00:45.943 --> 00:00:56.680
+The needle bar comes back complete, with the same volume. STL (3D printing) and DXF (2D drawings) are under Export too and work the same way

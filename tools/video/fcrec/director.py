@@ -215,7 +215,12 @@ class Director:
 
     def keys(self, text, enter=False, w=None):
         w = w or QtWidgets.QApplication.focusWidget() or self.vp()
-        QTest.keyClicks(w, text, Qt.NoModifier, 60)
+        if text.isascii():
+            QTest.keyClicks(w, text, Qt.NoModifier, 60)
+        else:      # QTest 只认 ASCII（中文会让 Qt 断言退出）：中文字符用带文字的按键事件发
+            for ch in text:
+                for kind in (QtCore.QEvent.KeyPress, QtCore.QEvent.KeyRelease):
+                    QtWidgets.QApplication.sendEvent(w, QtGui.QKeyEvent(kind, 0, Qt.NoModifier, ch))
         if enter:
             QTest.keyClick(w, Qt.Key_Return)
 

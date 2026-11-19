@@ -19,7 +19,7 @@ WenQuest CAD is built on the open-source FreeCAD 1.1.4: the window, menus and wo
 
 {{table}}
 
-The sample lessons (1, 3 and 4) are online now; the others follow module by module.
+Lessons 1–4 are online now; the others follow module by module.
 
 ### How the recordings are made
 

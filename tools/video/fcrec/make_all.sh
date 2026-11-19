@@ -8,13 +8,14 @@ mkdir -p "$OUT" "$WQ_REC/model" "$WQ_REC/model_en"
 for WQ_LANG in ${LANGS:-zh en}; do
   export WQ_LANG
   if [ $WQ_LANG = en ]; then sfx=-en; M=$WQ_REC/model_en; F=NeedleClampSketch; else sfx=; M=$WQ_REC/model; F=针夹草图; fi
-  for c in l01a l01b l01c l03a l03b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done
+  rm -f "$WQ_REC"/练习.FCStd "$WQ_REC"/practice.FCStd
+  for c in l01a l01b l01c l02a l02b l02c l03a l03b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done
   cp "$M/$F.FCStd" "$M/${F}_L3.FCStd"
   "$H/rec.sh" "$H/l04a.py" "$WQ_REC/l04a$sfx.mp4"
   cp "$M/${F}_L3.FCStd" "$M/$F.FCStd"
   "$H/rec.sh" "$H/l04b.py" "$WQ_REC/l04b$sfx.mp4"
   "$H/rec.sh" "$H/l04c.py" "$WQ_REC/l04c$sfx.mp4"
-  for c in l01a l01b l01c l03a l03b l04a l04b l04c; do
+  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c; do
     ffmpeg -loglevel error -y -i "$WQ_REC/$c$sfx.mp4" -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart -an "$OUT/wqcad-$c$sfx.mp4"
     ffmpeg -loglevel error -y -sseof -2 -i "$WQ_REC/$c$sfx.mp4" -frames:v 1 -vf scale=960:-1 -q:v 4 "$OUT/wqcad-$c$sfx.jpg"
     cp "$WQ_REC/$c$sfx.vtt" "$OUT/wqcad-$c$sfx.vtt"
