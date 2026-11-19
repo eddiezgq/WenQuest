@@ -47,6 +47,10 @@
 	handle /api/v1/auth/* {
 		reverse_proxy web:80
 	}
+	# 软件下载页领测试授权（第 175 轮）：同一个网关
+	handle /api/v1/license/* {
+		reverse_proxy web:80
+	}
 	# 字体与外部库（第 34 轮，tools/vendor 生成）：不再从 Google、cdnjs 取
 	handle /vendor/* {
 		import vendor_files
