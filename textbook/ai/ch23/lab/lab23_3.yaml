@@ -1,0 +1,37 @@
+# 实验 23.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab23_3.js。
+原理:
+  - ["代价函数式规划：在若干候选加速度里挑**代价最低**的那一个。代价有三项——跟车距离偏离期望值、车速偏离巡航目标、舒适（加速度平方）。权重决定三者怎么换：往“跟紧”调，通行效率上去；往“跟远”调，车距宽了，可是前车一刹就要大幅修正（23.4 节）。", "The planner picks the cheapest of a set of candidate accelerations under three cost terms: gap error, speed error and comfort. The weights set the exchange rate: tighter following buys traffic flow, looser following buys margin but needs large corrections whenever the lead brakes."]
+  - ["**通行效率用交通流的标准口径**：流量 q = 3600·v /（车距 + 车长），单位 辆/小时。它正是“跟得紧就通得多”这件事的量化，也正是跟车距离权重真正在交易的东西。", "Traffic flow uses the standard traffic-engineering definition, q = 3600·v/(gap + vehicle length) in vehicles per hour. It quantifies 'closer following carries more cars', which is exactly what the gap weight trades."]
+  - ["**三个指标不可能同时最好，而且三个最优点不在同一处**。所以“调参调到最好”这句话，不说清按哪个指标，就没有意义；只报一个指标的调参结论，一定是错的（算例 23.4）。", "The three metrics cannot be optimal together and their optima sit at different weights. 'Tuned to the best' means nothing until you say on which metric, and a tuning result quoted on one metric alone is wrong."]
+  - ["**可用区间两头都是悬崖**：往小调就侵犯最小安全间距，往大调急刹回升。本实验里既不侵犯也不急刹的权重只有 0.20—0.57 这一段，宽度不到三倍——而权重是可以连续调的。这就是“调快一点点就不安全了”的样子。", "The usable band has a cliff at each end: smaller weights violate the minimum safe gap, larger ones bring the hard braking back. Here only 0.20 to 0.57 does neither — under a factor of three, on a knob that turns continuously."]
+  - ["**时延把这段区间压窄。** 规划器看到的是若干拍以前的车距与车速，踩下去的却是现在。时延不足一个控制周期也要占一个周期（向上取整），所以 400 ms 在 50 ms 的周期里就是 8 拍（23.7 节）。", "Latency narrows that band: the planner acts on a gap and a speed from several cycles ago. A latency shorter than one cycle still costs a whole cycle, so 400 ms is eight cycles at 20 Hz."]
+  - 式: "最小安全间距 = 3.0 m + 0.6 s × 车速；减速度低于 −3.0 m/s² 记一次急刹；流量 q = 3600·v /（车距 + 车长）"
+步骤:
+  - ["第一个场景，车速权重 1.0、舒适权重 0.6、前车激烈程度 1.0、时延 100 ms：把跟车距离权重依次取 0.02、0.05、0.10、0.20、0.40、0.57、1.13、3.20，每档记下平均车距、通行效率、急刹次数、侵犯次数（任务 1—4），填表 1。", "In the first scene, with the speed weight at 1.0, the comfort weight at 0.6, aggressiveness 1.0 and 100 ms of latency, step the gap weight through 0.02, 0.05, 0.10, 0.20, 0.40, 0.57, 1.13 and 3.20, recording mean gap, flow, hard brakes and violations (tasks 1–4) in Table 1."]
+  - ["从表 1 里读出三件事，写进表 2：流量最高的那一档是哪一档、它侵犯几次；安全区间内流量最高的那一档是哪一档；既不侵犯也不急刹的权重区间是哪一段。", "Read three facts out of Table 1 into Table 2: which setting has the highest flow and how many times it violates; which is the highest-flow setting among those that never violate; and which band does neither."]
+  - ["把车速权重依次取 0.2、1.0、3.0（跟车距离权重固定 0.20），记下流量与侵犯次数，填表 2 下半部分——看“另一个权重”会不会把结论推翻。", "Step the speed weight through 0.2, 1.0 and 3.0 with the gap weight fixed at 0.20, recording flow and violations, to see whether another weight overturns the conclusion."]
+  - ["切到第二个场景，跟车距离权重留在 0.20，把时延依次取 0、100、200、400 ms，每档记下“既不侵犯也不急刹的档数”与区间（任务 5），填表 3。", "In the second scene, with the gap weight at 0.20, step the latency through 0, 100, 200 and 400 ms, recording the count and the span of clean settings (task 5) in Table 3."]
+  - ["时延留在 400 ms，把前车激烈程度拖到 1.2，记下还剩几档，写进表 3 最后一行。", "With 400 ms of latency, raise the lead aggressiveness to 1.2 and record how many clean settings survive, in the last row of Table 3."]
+数据表:
+  - 标题: ["表 1  同一个规划器，八档权重的四列数", "Table 1  One planner, eight weights, four columns"]
+    表头: ["跟车距离权重", "平均车距（m）", "通行效率（辆/小时）", "急刹次数", "侵犯次数"]
+    表头英文: ["gap weight", "mean gap (m)", "traffic flow (veh/h)", "hard-braking events", "violations"]
+    行: [["0.02", "", "", "", ""], ["0.05", "", "", "", ""], ["0.10", "", "", "", ""], ["0.20", "", "", "", ""], ["0.40", "", "", "", ""], ["0.57", "", "", "", ""], ["1.13", "", "", "", ""], ["3.20", "", "", "", ""]]
+  - 标题: ["表 2  那点流量是用什么换的", "Table 2  What the extra flow is bought with"]
+    表头: ["项", "权重", "通行效率（辆/小时）", "侵犯次数"]
+    表头英文: ["item", "weight", "traffic flow (veh/h)", "violations"]
+    行: [["流量最高的一档", "", "", ""], ["安全区间内流量最高的一档", "", "", ""], ["既不侵犯也不急刹的区间", "", "—", "0"], ["车速权重 0.2（跟车权重 0.20）", "0.20", "", ""], ["车速权重 1.0（跟车权重 0.20）", "0.20", "", ""], ["车速权重 3.0（跟车权重 0.20）", "0.20", "", ""]]
+  - 标题: ["表 3  时延把可用区间压窄多少", "Table 3  How much latency narrows the band"]
+    表头: ["时延（ms）", "折成几拍", "既不侵犯也不急刹的档数", "区间"]
+    表头英文: ["latency (ms)", "cycles", "clean settings", "span"]
+    行: [["0", "", "", ""], ["100", "", "", ""], ["200", "", "", ""], ["400", "", "", ""], ["400（前车激烈程度 1.2）", "8", "", ""]]
+注意:
+  - ["本实验的最小安全间距取的是**固定时距公式**（3.0 m + 0.6 s × 车速），这是一条**显式假设，不是物理定律**。真正的安全间距要按路面、能见度、制动能力来定；换一条公式，可用区间的位置和宽度都变。", "The minimum safe gap here is a fixed-headway formula and an explicit assumption, not a law of physics. A real safe gap depends on surface, visibility and braking capability, and another formula moves both the position and the width of the usable band."]
+  - ["本实验只有**一辆前车、一条直道、三个权重**。真规划器有十几个权重且互相耦合，调参要在成千条场景上做，而且要分别报“最坏情形”。这里的区间宽度只说明“存在一个窄区间”这件事，不是任何真车的标定值。", "The lab has one lead vehicle, one straight road and three weights. A real planner has a dozen coupled weights, tuned over thousands of scenarios with worst cases reported separately. The width here demonstrates that a narrow band exists; it is not any vehicle's calibration."]
+  - ["**侵犯次数不是碰撞次数。** 本实验的任何一档都没有真撞上；“侵犯”指的是车距落到最小安全间距以内的控制周期数。它是一个**提前量被吃掉了**的信号——真车上对应的是接管、报警、乘客抱怨，不是事故。", "A violation is not a crash: no setting here ever collides. It counts the control cycles spent inside the minimum safe gap — a signal that the margin has been eaten, corresponding to interventions, alarms and complaints rather than accidents."]
+  - ["前车的五次刹车是**写死的**（时刻、持续、幅度都在代码里），为的是让你能重复同一条工况。真路上的前车行为是分布，不是一条曲线；换一条工况，表 1 的数全变，但两头是悬崖这件事不变。", "The lead vehicle's five braking events are hard-coded so that you can repeat the same run. Real lead behaviour is a distribution, not one curve: another run changes every number in Table 1 but not the cliffs at both ends."]
+  - ["时延在本实验里只折成“规划器看到的是几拍以前的数”。真系统的时延还有**抖动**（每一拍都不一样）与**丢帧**，那两件比固定时延更难对付（23.7 节）。", "Latency here is modelled only as a fixed number of stale cycles. Real systems also have jitter and dropped frames, both harder to handle than a constant delay."]
+思考题:
+  - ["把你们自己的最小安全间距公式代进来，可用区间会变宽还是变窄？你们现在用的权重还在区间里吗？", "Substitute your own minimum-safe-gap formula: does the usable band widen or narrow, and is your current tuning still inside it?"]
+  - ["如果验收只报“平均车距”与“通行效率”两列，调参的人会把权重调到哪一档？这组报表会奖励什么样的行为？", "If the acceptance report carries only mean gap and flow, which setting will the tuner choose, and what behaviour does that report reward?"]
+  - ["本实验的时延是固定的。如果时延 90% 的时候是 50 ms、10% 的时候是 300 ms，你会按哪个数定权重？为什么不能按平均值定？", "Here the latency is constant. If it were 50 ms nine times out of ten and 300 ms the rest, which figure would you tune against, and why not the mean?"]

@@ -1,0 +1,59 @@
+标题: ["GPU 实验 23.1 在仿真里训车道保持，再换光照与路面验收它", "GPU Lab 23.1 Train lane keeping in simulation, then accept it under changed lighting and road surface"]
+目的: ["在合成的车道场景上训一个小网络做车道保持（三列车道线像素进去，一个方向盘角出来），然后做比训练更要紧的三件事：**打赢两个笨基线**；**按两种口径分两行报**——同分布测试与“光照和路面变了”的测试；再单独报**罕见情形（急弯）**那一行。三个数会差好几倍，而这正是“仿真里跑通不等于路上能跑”这句话的量化。全部数据合成，不联网、不下载。",
+      "Train a small network for lane keeping on a synthetic lane scene (three lane-line pixel columns in, one steering angle out), then do the three things that matter more than training: beat two dumb baselines; report two separate rows — an in-distribution test and a test where the lighting and road surface have changed; and report the rare case (a sharp curve) on a row of its own. The three numbers differ severalfold, which is what 'it works in simulation' is actually worth. All data is synthetic: no network, no downloads."]
+显卡: basic
+结果:
+  - {名: n_train, 说明: ["训练样本数", "training samples"], 单位: "条"}
+  - {名: rmse_zero, 说明: ["基线一：方向盘不动", "baseline 1: steering held at zero"], 单位: "°"}
+  - {名: rmse_base, 说明: ["基线二：线性最小二乘（同分布）", "baseline 2: linear least squares, in-distribution"], 单位: "°"}
+  - {名: rmse_id, 说明: ["同分布测试的误差", "error, in-distribution test"], 单位: "°"}
+  - {名: rmse_shift, 说明: ["换了光照与路面之后的误差", "error after the lighting and surface change"], 单位: "°"}
+  - {名: shift_ratio, 说明: ["换条件后比同分布差几倍", "how much worse the changed condition is"], 单位: "倍"}
+  - {名: rmse_curve, 说明: ["罕见情形（急弯）的误差", "error on the rare case (sharp curve)"], 单位: "°"}
+  - {名: curve_ratio, 说明: ["急弯比同分布差几倍", "how much worse the sharp curve is"], 单位: "倍"}
+  - {名: train_s, 说明: ["训练用时", "training wall time"], 单位: "秒"}
+文件: []
+实际问题:
+  标题: ["仿真里它已经把车开得很稳了，敢不敢让它上路", "It drives smoothly in simulation — would you let it on the road?"]
+  内容: ["车道保持是量产车上最常见的一项功能，也是最容易在仿真里“做好了”的一项：场景是自己生成的，车道线永远清楚，光照永远一样。于是模型在仿真里的误差可以压得很低，报告很好看。真正的问题出在三个地方：天黑了、路面刚铺过（车道线检测又抖又偏）、以及**一段急弯**（训练分布里几乎没有）。本实验把这三件事做成三行独立的验收，让你亲手量出它们差几倍，并写清**哪一行不能和别的行平均**。",
+         "Lane keeping is the most common production feature and the easiest one to 'finish' in simulation: the scenes are generated, the lane lines are always crisp, the light never changes. The error can be driven very low and the report looks excellent. The trouble arrives in three places: darkness, a freshly surfaced road (lane detection both noisier and biased), and a sharp curve that barely occurs in the training distribution. This lab turns those into three independent acceptance rows, measures how far apart they are, and states which rows may not be averaged."]
+原理:
+  - ["车道保持可以拆成两步：**从观测里估出车道几何**（横向偏差 e、航向偏差 psi、曲率 kappa），再**按几何算方向盘角**。本实验把两步合成一个小网络，直接从三列车道线像素回归到方向盘角——真值由“专家公式”给出，所以两种做法都能被同一把尺子量（23.5 节）。", "Lane keeping splits into estimating the lane geometry (lateral error, heading error, curvature) from the observation and computing a steering angle from that geometry. Here a small network does both at once, regressing from three pixel columns straight to the steering angle, with an expert formula as the ground truth so that any approach can be measured with the same ruler."]
+  - ["**噪声加在像素上，所以远处那一列折回地面时误差被放大**——与算例 23.1 的标定误差是同一回事：图像里一点点，地面上好几米（23.2 节）。", "The noise is added in pixels, so the far column's error is magnified when it is mapped back to the ground — the same effect as the calibration residuals: a little in the image, metres on the road."]
+  - ["**“换了条件还准不准”要单独报。** 本实验把光照与路面的变化折成两件事：检测噪声变大、并且系统性偏一侧。系统性偏置是更凶的那一种——它不会被平均掉，模型会把它当成“车真的偏了”。", "Transfer must be reported separately. Here the lighting and surface change is modelled as more detection noise plus a systematic offset. The offset is the nastier of the two: it does not average out, and the model reads it as the vehicle genuinely being off-centre."]
+  - ["**罕见情形要单独报。** 急弯在训练分布里几乎不出现，所以同分布那一行好看，并不说明急弯上好看。平均误差最会骗人的地方就在这里（23.3 节“平均误差与最坏情形”）。", "Rare cases need their own row. Sharp curves hardly occur in the training distribution, so a good in-distribution number says nothing about them. This is where an averaged error misleads most."]
+  - ["**先打赢两个笨基线**：方向盘不动、以及一个线性最小二乘。打不赢它们的模型不要往下走。本实验的映射接近线性，小网络大体只与线性基线打平——这正是笨基线的用处：它告诉你这一处用不上神经网络。", "Beat two dumb baselines first: steering held at zero, and a linear least-squares fit. This lab's mapping is nearly linear, so the small network only matches the linear baseline — which is exactly what a dumb baseline is for: it tells you a network is not needed here."]
+  - 式: "Y(X) = e + psi·X + kappa·X²/2；方向盘角 = [0.16·e + 0.95·psi + atan(12·kappa)] 折成度数 × 转向比 ÷ 10；均方根误差只在各自的测试集上算"
+步骤:
+  - ["运行第 1 节：装环境、确认显卡（任务 1）。", "Run section 1 to confirm the environment and the GPU (task 1)."]
+  - ["运行第 2 节：合成训练集与三个测试集，记下训练样本数与方向盘角的量级（任务 2），填表 1。", "Run section 2 to synthesise the training set and the three test sets, recording the sample count and the scale of the steering angle (task 2) in Table 1."]
+  - ["运行第 3 节：算两个笨基线，记下它们的误差（任务 3），填表 2 前两行。", "Run section 3 for the two baselines, recording their errors (task 3) in the first rows of Table 2."]
+  - ["运行第 4 节：训一遍，记下同分布误差与训练用时（任务 4），填表 2 第三行。", "Run section 4 to train once, recording the in-distribution error and the wall time (task 4) in the third row of Table 2."]
+  - ["运行第 5 节：换光照与路面再验收一遍，记下误差与比值（任务 5），填表 3 第二行——**不要和第一行平均**。", "Run section 5 to accept the same model under the changed lighting and surface, recording the error and the ratio (task 5) in the second row of Table 3, without averaging it with the first."]
+  - ["运行第 6 节：在急弯上再验收一遍，记下误差与比值（任务 6），填表 3 第三行。", "Run section 6 to accept it on the sharp-curve set, recording the error and the ratio (task 6) in the third row of Table 3."]
+  - ["把表 3 里最差的那一行圈出来，在报告里写一句话：按这一行，这个模型离上车还差什么。", "Circle the worst row of Table 3 and write one sentence: judged by that row, what is still missing before this model goes on a vehicle."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  数据与假设", "Table 1  Data and assumptions"]
+    表头: ["项", "值", "来源或假设"]
+    表头英文: ["item", "value", "source or assumption"]
+    行: [["训练样本数", "{n_train}", "本实验合成"], ["三个测试集各多少条", "", "本实验合成"], ["训练时的检测噪声（像素）", "", "本实验的显式假设"], ["换条件后的检测噪声与偏置", "", "本实验的显式假设"], ["急弯集的曲率上限", "", "本实验的显式假设"]]
+  - 标题: ["表 2  两个笨基线与模型（都在同分布测试集上）", "Table 2  Two baselines and the model, all in-distribution"]
+    表头: ["做法", "误差（°）", "训练用时", "这个数回答的是什么问题"]
+    表头英文: ["method", "error (deg)", "wall time", "which question it answers"]
+    行: [["方向盘不动", "{rmse_zero}", "—", ""], ["线性最小二乘", "{rmse_base}", "—", ""], ["小网络", "{rmse_id}", "{train_s}", ""], ["网络比线性基线提高了", "", "—", ""]]
+  - 标题: ["表 3  三行分开报，不许平均", "Table 3  Three separate rows, never averaged"]
+    表头: ["验收口径", "误差（°）", "比同分布差几倍", "这一行回答的是什么问题"]
+    表头英文: ["acceptance convention", "error (deg)", "ratio to in-distribution", "which question it answers"]
+    行: [["同分布测试", "{rmse_id}", "1.00", ""], ["换了光照与路面", "{rmse_shift}", "{shift_ratio}", ""], ["罕见情形（急弯）", "{rmse_curve}", "{curve_ratio}", ""], ["最差的那一行", "", "", ""]]
+注意:
+  - ["**三种口径的误差不能平均，也不能只报好看的那一个。** 同分布那一行回答“仿真里训得准不准”，换条件那一行回答“条件变了还准不准”，急弯那一行回答“罕见情形上还准不准”。它们是三个不同的问题，报告里要分三行写，并各自注明口径。", "The three errors may not be averaged, nor may the flattering one be quoted alone. They answer three different questions — fit, transfer and rare cases — and a report must carry three rows, each with its convention stated."]
+  - ["**仿真里跑通不等于路上能跑。** 本实验的场景、观测噪声、专家公式全是合成的：没有雨雪、没有磨损的车道线、没有被车挡住的视野、没有坡道与路拱、没有执行机构的时延与死区。本实验的误差是**下界**，真车上一定更大。引用本实验的数时必须带这句话。", "It works in simulation is not it works on the road. The scene, the observation noise and the expert formula are all synthetic: no rain or snow, no worn lane markings, no occlusion by other vehicles, no crown or grade, no actuator latency or dead band. These errors are a lower bound and will be larger on a vehicle."]
+  - ["“换光照与路面”在本实验里**只折成两件事**：检测噪声变大、并且系统性偏一侧。真实的变化还包括车道线被阴影切断、逆光时整段检测丢失、湿路反光造成假线——**丢失与假线这两种，本实验完全没有建模**，而它们才是现场最常见的失效方式。", "The lighting and surface change is modelled here only as more noise plus an offset. Real changes also include shadows cutting the markings, whole stretches lost into backlight and false lines from a wet surface. Dropouts and false positives are not modelled at all, and they are the most common field failures."]
+  - ["**不要用本实验的数与任何厂家、任何论文的车道保持成绩比较。** 数据集不同、划分口径不同、方向盘角的定义与转向比也不同——这三样任意一样不同，两个数就不可比（本章第 1 条共用口径）。", "Do not compare these numbers with any vendor's or paper's lane-keeping results: different data, different split conventions and a different steering-angle definition each make the numbers incomparable."]
+  - ["训练用时取决于显卡型号与网络大小，**只能在同一张卡上比**。本实验的网络很小，用时主要花在一遍遍的小批量上，不代表任何真实训练任务的规模。", "The wall time depends on the GPU and the network size and is comparable only on the same card. The network here is tiny and its time is dominated by loop overhead, representing no real training workload."]
+思考题:
+  - ["你的“换光照与路面”比“同分布”差几倍？如果供应商只给你第一个数，你会怎么把第二个数写成一条验收条款（写明噪声与偏置各取多少）？", "By what factor is your changed-condition row worse than your in-distribution row? If a supplier quotes only the first, how would you write the second into an acceptance clause, stating the noise and offset to be used?"]
+  - ["把系统性偏置从 3 像素改成 0（只放大噪声），误差变成多少？这说明噪声与偏置哪一种更难对付，为什么？", "Set the systematic offset to zero and keep only the extra noise: what happens to the error, and which of the two is harder to handle, and why?"]
+  - ["把急弯集的曲率上限从训练时的 3 倍改成 1.5 倍、再改成 5 倍，误差怎么变？按这条曲线，你会怎么定义“本模型的运行设计域”里的最小转弯半径？", "Vary the sharp-curve set's curvature limit between 1.5× and 5× of the training limit: how does the error move, and how would you use that curve to state a minimum radius in this model's operational design domain?"]
+  - ["本实验的训练数据与测试数据来自同一套生成程序。如果让另一个人用另一套假设重新生成测试集，你预计哪一行会变得最多？这件事对“仿真验收”意味着什么？", "Training and test data here come from one generator. If someone else regenerated the test sets under their own assumptions, which row would move most, and what does that imply for simulation-based acceptance?"]
