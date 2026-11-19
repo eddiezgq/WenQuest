@@ -33,7 +33,7 @@ LESSONS = [
     ("二 草图", 4, "约束：几何约束、尺寸约束、完全约束、过约束怎么查", "针夹（完全约束）", "l04"),
     ("二 草图", 5, "草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸", "曲柄轮廓（表格驱动）", "l05"),
     ("三 零件建模", 6, "凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）", "针杆、曲柄销", "l06"),
-    ("三 零件建模", 7, "倒角、圆角、拔模、抽壳、加厚", "曲柄（带平衡块）", None),
+    ("三 零件建模", 7, "倒角、圆角、拔模、抽壳、加厚", "针杆倒角；梭壳（抽壳）", "l07"),
     ("三 零件建模", 8, "扫掠、放样、螺旋", "拉簧、面线导线钩", None),
     ("三 零件建模", 9, "阵列、镜像、多重变换", "手轮（辐条阵列）", None),
     ("三 零件建模", 10, "基准面、基准轴、附着方式；参数化设计", "挑线杆（改一个全跟着变）", None),
@@ -58,7 +58,7 @@ LESSONS_EN = [
     ("2 Sketching", "Constraints: geometric, dimensional, fully constrained, finding over-constraints", "Needle clamp (fully constrained)"),
     ("2 Sketching", "Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes", "Crank outline (spreadsheet driven)"),
     ("3 Part modelling", "Pad, pocket, revolve, groove, hole (threaded holes)", "Needle bar, crank pin"),
-    ("3 Part modelling", "Chamfer, fillet, draft, thickness", "Crank with counterweight"),
+    ("3 Part modelling", "Chamfer, fillet, draft, thickness", "Needle-bar chamfers; bobbin case (thickness)"),
     ("3 Part modelling", "Sweep, loft, helix", "Tension spring, thread guide"),
     ("3 Part modelling", "Patterns, mirror, multi-transform", "Handwheel (spoke pattern)"),
     ("3 Part modelling", "Datum planes and axes, attachment; parametric design", "Take-up lever (change one, all follow)"),
@@ -75,9 +75,9 @@ LESSONS_EN = [
     ("8 AI", "AI workbench: part selection and checks, company parts library, AI part design", "Pick a bearing; replay the upper-shaft design"),
 ]
 
-FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "appA-install"]
-EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–6 课）", other=("English", "en/"), files=FILES)
-EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–6)",
+FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "appA-install"]
+EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–7 课）", other=("English", "en/"), files=FILES)
+EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–7)",
                   other=("中文", "../"), files=FILES)
 
 
@@ -100,6 +100,7 @@ def numbers(en=False):
                "t": f"{nc['t']:g}", "v": f"{nc['volume']:.1f}"},
         "dep": {"v": f"{1000 - math.pi * 9 * 10:.2f}"},
         "cr": {"D": "33", "d": "22", "e": "15.5", "t": "10", "v1": "10710.93", "v2": "11360.1"},   # 录屏里软件算的（director.log：pad 10.0 10710.93；after 18 11360.1）
+        "l7": {"shell": "787.08", "real": "1104.77"},   # 录屏里抽壳 0.6 的体积（director.log）；real：整机 bobbin_case.step 杯体
         "nb": {"v": f"{P['needle_bar']['volume']:.2f}"},
         # 第 6 课：录屏里软件算的（director.log：rev 9047.79；groove 9045.34；hole 1926.68）；两圈槽、倒角按同样尺寸算
         "l6": {"v0": "9047.79", "v1": "9045.34", "v2": f"{math.pi * 16 * 180 - 2 * math.pi * (16 - 3.8 ** 2) * 0.5:.2f}",

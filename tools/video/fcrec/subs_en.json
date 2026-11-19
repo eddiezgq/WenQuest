@@ -107,5 +107,15 @@
  "孔的类型选第二项“攻丝钻”：先钻底孔、以后攻丝，不画螺纹线": "Hole type: the second item, the tap drill—drill now, tap later, no thread geometry",
  "深度 7.5；去掉“钻孔角度”，孔底是平的": "Depth 7.5; untick the drill point angle so the bottom is flat",
  "孔是螺纹孔，但默认不画螺纹线：按底孔直径 2.5 挖，属性里记着“M3”——出工程图时自动标螺纹": "It is a threaded hole, but the thread isn't modelled: it is cut at the tap-drill size 2.5 and remembers \"M3\"—drawings label the thread automatically",
- "凸台加材料，凹槽去材料；孔是专门的“凹槽”：螺纹、沉头、钻尖都能直接选": "Pad adds material, Pocket removes it; Hole is a specialised pocket: threads, counterbores and drill points are all options"
+ "凸台加材料，凹槽去材料；孔是专门的“凹槽”：螺纹、沉头、钻尖都能直接选": "Pad adds material, Pocket removes it; Hole is a specialised pocket: threads, counterbores and drill points are all options",
+ "接着上一课的针杆，两圈油槽都做好了。真针杆两头还各有 0.5 的倒角：装进轴套不刮、不伤手": "The needle bar from the last lesson, with both oil grooves. The real bar also has a 0.5 chamfer at each end, so it slides into its bushes without scraping",
+ "点选下端的圆边，按住 Ctrl 再点上端的圆边": "Click the circular edge at the bottom, then hold Ctrl and click the edge at the top",
+ "点“倒角”，大小 0.5，确定": "Click Chamfer, size 0.5, OK",
+ "体积 9036.86 mm³：和整机 STEP 里的真针杆一样——尺寸、油槽、倒角一处不差": "Volume 9036.86 mm³: the same as the real needle bar in the machine STEP—sizes, grooves and chamfers all match",
+ "圆角也是这样：选边，点“圆角”，填半径。倒角、圆角都是“修饰特征”，加在零件做好以后": "Fillets work the same way: pick edges, click Fillet, enter a radius. Chamfers and fillets are dress-up features, added once the part is built",
+ "梭壳（装梭芯的小杯子）：外径 22.4、深 14、壁厚 0.6。杯子、盒子、外壳这类零件用“抽壳”": "The bobbin case, a small cup that holds the bobbin: 22.4 outside, 14 deep, 0.6 wall. Cups, boxes and covers are made with Thickness",
+ "先做实心的：圆 22.4，凸台 14": "First the solid: circle 22.4, Pad 14",
+ "点选上端面——开口就开在这一面": "Click the top face—this is where the opening goes",
+ "点“抽壳”，厚度 0.6，确定：选中的面被挖开，其余的面都留 0.6 的壁": "Click Thickness, 0.6, OK: the selected face is opened and every other face keeps a 0.6 wall",
+ "杯子出来了，体积约 787 mm³。真梭壳的底厚 1.5：抽壳只能处处一样厚，底要更厚，就改用凹槽挖内腔（本课“自己做”）": "There's the cup, about 787 mm³. The real bobbin case has a 1.5 bottom: Thickness is the same everywhere, so for a thicker bottom pocket the cavity instead (see On your own)"
 }

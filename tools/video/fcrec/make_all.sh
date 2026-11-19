@@ -19,7 +19,12 @@ for WQ_LANG in ${LANGS:-zh en}; do
   "$H/rec.sh" "$H/l05b.py" "$WQ_REC/l05b$sfx.mp4"
   "$H/rec.sh" "$H/l06a.py" "$WQ_REC/l06a$sfx.mp4"
   "$H/rec.sh" "$H/l06b.py" "$WQ_REC/l06b$sfx.mp4"
-  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b; do
+  if [ $WQ_LANG = en ]; then B=NeedleBar; else B=针杆; fi
+  cp "$M/$B.FCStd" "$M/${B}_L6.FCStd"            # 第 7 课 A 段在上面加第二圈槽、倒角并存盘；录完还原，重录不叠加
+  "$H/rec.sh" "$H/l07a.py" "$WQ_REC/l07a$sfx.mp4"
+  cp "$M/${B}_L6.FCStd" "$M/$B.FCStd"
+  "$H/rec.sh" "$H/l07b.py" "$WQ_REC/l07b$sfx.mp4"
+  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b; do
     ffmpeg -loglevel error -y -i "$WQ_REC/$c$sfx.mp4" -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart -an "$OUT/wqcad-$c$sfx.mp4"
     ffmpeg -loglevel error -y -sseof -2 -i "$WQ_REC/$c$sfx.mp4" -frames:v 1 -vf scale=960:-1 -q:v 4 "$OUT/wqcad-$c$sfx.jpg"
     cp "$WQ_REC/$c$sfx.vtt" "$OUT/wqcad-$c$sfx.vtt"

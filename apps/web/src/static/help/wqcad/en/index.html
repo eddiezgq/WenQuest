@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–6)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–7)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -167,7 +167,15 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l06-do" data-s="l06">Follow along</a>
 <a class="sub" href="#l06-self" data-s="l06">On your own</a>
 <a class="sub" href="#l06-quiz" data-s="l06">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">07</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l07" data-s="l07"><span class="n">07</span>Lesson 7 Chamfer, fillet, draft, thickness</a>
+<a class="sub" href="#l07-goal" data-s="l07">What you will be able to do</a>
+<a class="sub" href="#l07-five" data-s="l07">Five dress-up features</a>
+<a class="sub" href="#l07-chamfer" data-s="l07">Needle bar: chamfer</a>
+<a class="sub" href="#l07-shell" data-s="l07">Bobbin case: thickness</a>
+<a class="sub" href="#l07-do" data-s="l07">Follow along</a>
+<a class="sub" href="#l07-self" data-s="l07">On your own</a>
+<a class="sub" href="#l07-quiz" data-s="l07">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">08</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -188,9 +196,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 7</td><td>Chamfer, fillet, draft, thickness</td><td>Crank with counterweight</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 8</td><td>Sweep, loft, helix</td><td>Tension spring, thread guide</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 9</td><td>Patterns, mirror, multi-transform</td><td>Handwheel (spoke pattern)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 8</td><td>Sweep, loft, helix</td><td>Tension spring, thread guide</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 9</td><td>Patterns, mirror, multi-transform</td><td>Handwheel (spoke pattern)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
 
-<p>Lessons 1–6 are online now; the others follow module by module.</p>
+<p>Lessons 1–7 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
 <p>Every recording is the real software at work: FreeCAD 1.1.4 on a cloud computer with the WenQuest CAD branding and the same AI workbench, English interface. Where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. The only difference from WenQuest CAD on your computer is the 27 kernel fixes, which do not change the interface; “Check geometry” and “Unfold face” give different results, so those are not recorded and are taught with the book's verified data instead.</p>
 <p>The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.</p></section>
@@ -598,7 +606,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>Expressions: type <code>=</code> in a dimension to refer to other values; spreadsheets: one sheet controls a set of dimensions.</li>
 </ul>
 
-<p>This lesson makes the <strong>crank plate outline</strong>: a circle of diameter 33 on the main shaft, a circle of diameter 22 for the crank pin, 15.5 apart, joined by two tangent lines into one loop and padded 10 mm. (The real WQ-LS crank also has a sector-shaped counterweight below; lesson 7 adds it.)</p>
+<p>This lesson makes the <strong>crank plate outline</strong>: a circle of diameter 33 on the main shaft, a circle of diameter 22 for the crank pin, 15.5 apart, joined by two tangent lines into one loop and padded 10 mm. (The real WQ-LS crank also has a sector-shaped counterweight and two bores; a later lesson adds them.)</p>
 <h3 id="l05-trim">Mirror and trim</h3>
 <p>Two circles and two tangent lines cross at several points. Trim removes the piece you click <strong>between the nearest intersections on either side</strong> — so the large circle needs three clicks on top (first the middle, then the two small pieces up to the tangent points) and the small circle one click at the bottom. Try it here first:</p>
 <div class="anim" data-anim="trim"></div>
@@ -781,7 +789,84 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">The quickest way to model a stepped shaft?</p><div class="opts"><button type="button" data-k="a">A. Stack pads one by one</button><button type="button" data-k="b">B. Sketch half the section and revolve it</button><button type="button" data-k="c">C. Combine Part cylinders</button><button type="button" data-k="d">D. Make a block and cut it down</button></div><p class="why" hidden>A shaft is symmetric about its axis: draw the half section with all the steps and revolve once.</p></div>
 <div class="quiz" data-ok="b"><p class="q">What happens if the half section of a Revolution crosses the axis?</p><div class="opts"><button type="button" data-k="a">A. It works anyway</button><button type="button" data-k="b">B. FreeCAD reports an error; no solid</button><button type="button" data-k="c">C. It takes half automatically</button><button type="button" data-k="d">D. It becomes hollow</button></div><p class="why" hidden>Crossing the axis makes the revolved shape pass through itself, which is an error. Keep one side on the axis, or the whole section on one side of it.</p></div>
 <div class="quiz" data-ok="c"><p class="q">Hole type “Tap drill (to be threaded)”, size M3 — what diameter is cut?</p><div class="opts"><button type="button" data-k="a">A. 3.0</button><button type="button" data-k="b">B. 3.4</button><button type="button" data-k="c">C. 2.5</button><button type="button" data-k="d">D. 2.95</button></div><p class="why" hidden>A tap drill is cut at the tap-drill size (2.5 for M3); 3.4 is the clearance hole. The thread itself isn&#x27;t modelled; the size is stored in the properties.</p></div></section>
-<section id="appA"><h2><span class="n">07</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l07"><h2><span class="n">07</span>Lesson 7 Chamfer, fillet, draft, thickness</h2><p class="lead">You will be able to chamfer and fillet edges; make cups, boxes and covers with Thickness; and know when to use draft and thicken. With its chamfers the needle bar becomes identical to the real part in the machine; then you make the WQ-LS bobbin case. About 1 hour.</p><h3 id="l07-goal">What you will be able to do</h3>
+<ul>
+<li>Dress-up features (chamfer, fillet, draft, thickness) come after the shape is built: pick edges or faces first, then the tool.</li>
+<li>Multiple selection: hold Ctrl to add a second or third edge.</li>
+<li>Thickness: the selected faces are opened; every other face keeps the same wall.</li>
+<li>Know the limits: Thickness is uniform; a fillet that is too large fails.</li>
+</ul>
+
+<h3 id="l07-five">Five dress-up features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Pick</th>
+<th>Main parameters</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chamfer</td>
+<td>edges</td>
+<td>size (or two distances, or distance and angle)</td>
+<td>shaft ends, hole edges: easy assembly, no sharp edges</td>
+</tr>
+<tr>
+<td>Fillet</td>
+<td>edges</td>
+<td>radius</td>
+<td>inside and outside corners of castings and mouldings; less stress concentration</td>
+</tr>
+<tr>
+<td>Draft</td>
+<td>faces + neutral plane</td>
+<td>angle</td>
+<td>castings and mouldings release from the mould (1°–3°)</td>
+</tr>
+<tr>
+<td>Thickness</td>
+<td>faces to open</td>
+<td>thickness, inwards or outwards</td>
+<td>cups, boxes, covers</td>
+</tr>
+<tr>
+<td>Thicken (Part workbench, Offset → Thicken)</td>
+<td>a surface or face</td>
+<td>thickness</td>
+<td>turning surfaces into solids (lesson 14)</td>
+</tr>
+</tbody>
+</table>
+<p>Do dress-up features last: finish the shape, then chamfer and fillet. If an earlier feature changes, edge numbers may change and the dress-up reports a missing edge — double-click it and pick the edges again.</p>
+<h3 id="l07-chamfer">Needle bar: chamfer</h3>
+<p>The needle bar from the last lesson, with both oil grooves. Chamfer 0.5 at both ends:</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l07a-en.jpg"><source src="../media/wqcad-l07a-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l07a-en.vtt"></video><figcaption>▶ Recording: click the bottom edge, Ctrl-click the top edge → Chamfer 0.5 (about 50 s)</figcaption></figure>
+<p>The volume is now 9036.86 mm³, the same as the real needle bar in the machine STEP, 9036.86 mm³ — revolution, two grooves and two chamfers, all matching.</p>
+<h3 id="l07-shell">Bobbin case: thickness</h3>
+<p>The bobbin case is a small cup that holds the bobbin: 22.4 outside, 14 deep, 0.6 wall.</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l07b-en.jpg"><source src="../media/wqcad-l07b-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l07b-en.vtt"></video><figcaption>▶ Recording: circle 22.4 → Pad 14 → click the top face → Thickness 0.6 (about 55 s)</figcaption></figure>
+<p>After Thickness the volume is 787.08 mm³. The real bobbin case in the machine is 1104.77 mm³ — its bottom is 1.5 thick, not 0.6. Thickness is the same everywhere; for a thin wall and a thick bottom, skip Thickness: sketch a Ø21.2 circle on the end face and Pocket 12.5 mm to cut the cavity (On your own, 1).</p>
+<h3 id="l07-do">Follow along</h3>
+<ol class="steps">
+<li>Open last lesson's “NeedleBar”. Click the bottom edge, Ctrl-click the top edge, Chamfer 0.5. Check the volume.</li>
+<li>New file: circle Ø22.4 on XY, Pad 14.</li>
+<li>Click the top face, Thickness 0.6, OK.</li>
+</ol>
+
+<h3 id="l07-self">On your own</h3>
+<ol>
+<li>Remake the bobbin case with a 1.5 bottom: after Pad 14, sketch a Ø21.2 circle on the top face and Pocket 12.5. The volume should be 1104.77 mm³.</li>
+<li>Fillet both ends of the crank pin R0.5, then change to a 0.5 × 45° chamfer and compare the volumes.</li>
+<li>In Thickness, untick “Make thickness inwards” (grow outwards). What does the outside diameter become?</li>
+</ol>
+<h3 id="l07-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">Chamfering two edges at once: how do you pick the second edge?</p><div class="opts"><button type="button" data-k="a">A. Just click it</button><button type="button" data-k="b">B. Hold Ctrl and click it</button><button type="button" data-k="c">C. Hold Shift and click it</button><button type="button" data-k="d">D. One at a time only</button></div><p class="why" hidden>In Part Design a plain click replaces the selection; Ctrl adds to it.</p></div>
+<div class="quiz" data-ok="b"><p class="q">What happens to the face selected for Thickness?</p><div class="opts"><button type="button" data-k="a">A. It gets thicker</button><button type="button" data-k="b">B. It is opened</button><button type="button" data-k="c">C. Nothing</button><button type="button" data-k="d">D. The whole part is deleted</button></div><p class="why" hidden>The selected faces are the openings; all other faces keep the wall thickness.</p></div>
+<div class="quiz" data-ok="c"><p class="q">A cup needs a 0.6 side wall and a 1.5 bottom. Best approach?</p><div class="opts"><button type="button" data-k="a">A. Thickness 0.6</button><button type="button" data-k="b">B. Thickness 1.5</button><button type="button" data-k="c">C. Pad, then pocket the cavity</button><button type="button" data-k="d">D. Draft</button></div><p class="why" hidden>Thickness is uniform; when walls differ, pocket the cavity to its own size so each wall is set by a dimension.</p></div></section>
+<section id="appA"><h2><span class="n">08</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">

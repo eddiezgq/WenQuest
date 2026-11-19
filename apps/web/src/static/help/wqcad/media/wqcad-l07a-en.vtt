@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00:02.800 --> 00:00:12.650
+The needle bar from the last lesson, with both oil grooves. The real bar also has a 0.5 chamfer at each end, so it slides into its bushes without scraping
+
+00:00:12.650 --> 00:00:18.650
+Click the circular edge at the bottom, then hold Ctrl and click the edge at the top
+
+00:00:18.650 --> 00:00:28.481
+Click Chamfer, size 0.5, OK
+
+00:00:28.481 --> 00:00:35.649
+Volume 9036.86 mm³: the same as the real needle bar in the machine STEP—sizes, grooves and chamfers all match
+
+00:00:35.649 --> 00:00:46.960
+Fillets work the same way: pick edges, click Fillet, enter a radius. Chamfers and fillets are dress-up features, added once the part is built
