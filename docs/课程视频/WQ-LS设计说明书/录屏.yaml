@@ -1,0 +1,209 @@
+# WQ-LS 设计说明书 · 总览讲解视频 · 真页面录屏（第 172b 轮 D-5）。tools/video/screenrec.py 在本机录，写进 录屏/；讲稿.yaml 的 rec 镜头引用。
+# 录的都是说明书里的页面（factory/digital/web/public/wqls/），本机起静态服务：
+#   cd factory/digital/web/public && python3 -m http.server 8765
+# 页面有中英两版（?lang=），每段按语言各录一段（<名字>.zh.mp4 / <名字>.en.mp4）。长度按配音估，出片时 make.py 再整体放慢或加快。
+clips:
+  - name: proto                     # s02 整机虚拟样机在缝
+    base: http://127.0.0.1:8765
+    url: "/wqls/index.html?proto=1&pv=iso&lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    fps: 15
+    langs: [zh, en]
+    wait: 9000
+    dur: 11
+    do:
+      - {at: 1.0, ring: ".gauge, #gauge, .dash", for: 3}
+  - name: mech                      # s04 机构运动简图
+    base: http://127.0.0.1:8765
+    url: "/wqls/mech.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    fps: 15
+    langs: [zh, en]
+    wait: 7000
+    dur: 8
+    do:
+      - {at: 0.5, ring: "#full", for: 3}
+      - {at: 4.0, ring: "#zoom", for: 3.5}
+  - name: timing                    # s05 时序图拖到钩线 206°
+    base: http://127.0.0.1:8765
+    url: "/wqls/timing.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    fps: 15
+    langs: [zh, en]
+    wait: 7000
+    setup:
+      - {js: "document.getElementById('play').click(); window.__tm.setPhi(120)"}
+    dur: 9
+    do:
+      - {at: 0.5, js: "(()=>{let f=120;const id=setInterval(()=>{f+=2;window.__tm.setPhi(f);if(f>=206)clearInterval(id)},40)})()"}
+      - {at: 3.4, ring: "#rd", for: 4.5}
+  - name: torque                    # s06 驱动力矩：各项、转速
+    base: http://127.0.0.1:8765
+    url: "/wqls/torque.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    langs: [zh, en]
+    wait: 3000
+    dur: 11
+    do:
+      - {at: 0.5, click: "#chips [data-k=T_rod]"}
+      - {at: 1.5, click: "#chips [data-k=T_needle]"}
+      - {at: 2.5, click: "#chips [data-k=T_thread]"}
+      - {at: 3.5, ring: "#kT", for: 3}
+      - {at: 6.5, js: "(()=>{let n=5000;const id=setInterval(()=>{n-=100;window.__tq.setN(n);if(n<=2500)clearInterval(id)},60)})()"}
+      - {at: 6.6, ring: "#n", for: 3}
+  - name: balance                   # s07 平衡率从 0 拖到 0.6
+    base: http://127.0.0.1:8765
+    url: "/wqls/torque.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    langs: [zh, en]
+    wait: 3000
+    setup:
+      - {js: "window.__tq.setK(0)"}
+    dur: 9
+    do:
+      - {at: 0.5, ring: "#polar", for: 2.5}
+      - {at: 1.0, js: "(()=>{let k=0;const id=setInterval(()=>{k=Math.round((k+0.01)*100)/100;window.__tq.setK(k);if(k>=0.6)clearInterval(id)},70)})()"}
+      - {at: 5.6, ring: "#kB", for: 3}
+  - name: fea                       # s08 上轴有限元：转、放大到最危险点
+    base: http://127.0.0.1:8765
+    url: "/wqls/fea.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    fps: 15
+    langs: [zh, en]
+    wait: 5000
+    dur: 10
+    do:
+      - {at: 0.3, drag: [[700, 400], [500, 380]], dur: 2.5}
+      - {at: 3.2, js: "(()=>{const a=[200,0,0],b=[11,0,-4];let i=0;const id=setInterval(()=>{i++;const u=i/40,e=1-(1-u)**3;window.__fea.go(a.map((v,k)=>v+(b[k]-v)*e),430+(55-430)*e);if(i>=40)clearInterval(id)},40)})()"}
+      - {at: 5.5, ring: ".kpi", for: 4}
+  - name: look                      # s09 外观 A/B/C 拖动对比，再剖开机壳
+    base: http://127.0.0.1:8765
+    url: "/wqls/look.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    fps: 15
+    langs: [zh, en]
+    wait: 9000
+    setup:
+      - {js: "window.__look.split(0.9)"}
+    dur: 11
+    do:
+      - {at: 0.3, js: "(()=>{let x=0.9;const id=setInterval(()=>{x-=0.02;window.__look.split(x);if(x<=0.12)clearInterval(id)},45)})()"}
+      - {at: 3.0, click: "#pickL [data-s=C]"}
+      - {at: 3.4, js: "(()=>{let x=0.12;const id=setInterval(()=>{x+=0.02;window.__look.split(x);if(x>=0.6)clearInterval(id)},45)})()"}
+      - {at: 5.8, ring: "#m3d", for: 4.5}
+      - {at: 6.0, js: "(()=>{let p=0.15;window.__look.set('y',p);const id=setInterval(()=>{p+=0.01;window.__look.set('y',p);if(p>=0.6)clearInterval(id)},60)})()"}
+  - name: takeup                    # s10 挑线四连杆虚拟实验：拖尺寸，三种布的曲线当场重算
+    base: http://127.0.0.1:8765
+    url: "/wqls/takeup.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    langs: [zh, en]
+    wait: 4000
+    dur: 10
+    do:
+      - {at: 0.5, ring: "#mech", for: 3}
+      - {at: 3.5, js: "(()=>{const s=document.querySelector('input[type=range]:not(#phi)');if(!s)return;const a=+s.value,b=+s.max;let i=0;const id=setInterval(()=>{i++;s.value=a+(b-a)*0.6*Math.sin(i/30*Math.PI);s.dispatchEvent(new Event('input',{bubbles:true}));if(i>=30)clearInterval(id)},60)})()"}
+      - {at: 3.6, ring: "#chart", for: 4}
+  - name: cast                      # s11 凝固：铁水往冒口缩
+    base: http://127.0.0.1:8765
+    url: "/wqls/cast.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    langs: [zh, en]
+    wait: 4000
+    setup:
+      - {js: "window.__cast.at('upper',0)"}
+    dur: 7
+    do:
+      - {at: 0.1, js: "(()=>{let s=0;const id=setInterval(()=>{s+=4;window.__cast.at('upper',s);if(s>=300)clearInterval(id)},45)})()"}
+      - {at: 1.5, ring: "#curve", for: 4}
+  - name: nc                        # s11 数控刀路：刀具沿刀路走
+    base: http://127.0.0.1:8765
+    url: "/wqls/nc.html?lang={lang}&p=O1202"
+    viewport: [1440, 810]
+    clock: true
+    langs: [zh, en]
+    wait: 4000
+    setup:
+      - {js: "window.__nc.at('O1202',0); document.querySelectorAll('#spd button')[2].click(); document.getElementById('play').click()"}
+    dur: 7
+    do:
+      - {at: 1.5, ring: "#hm", for: 3}
+      - {at: 4.5, ring: "#src", for: 2.5}
+  - name: bom                       # s12 物料清单点一行，零件飞出来
+    base: http://127.0.0.1:8765
+    url: "/wqls/bom.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    fps: 15
+    langs: [zh, en]
+    wait: 10000
+    dur: 9
+    do:
+      - {at: 0.5, js: "window.__bom.pick('BUY-MOTOR-LS')"}
+      - {at: 0.6, ring: "tr.sel", for: 2.5}
+      - {at: 4.0, js: "window.__bom.pick('LS-301')"}
+      - {at: 4.1, ring: "tr.sel", for: 2.5}
+  - name: asm                       # s13 19 步装配
+    base: http://127.0.0.1:8765
+    url: "/wqls/index.html?asm=1&lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    fps: 15
+    langs: [zh, en]
+    wait: 8000
+    dur: 9
+  - name: clash                     # s13 运动干涉：点一行，三维转到那个角度
+    base: http://127.0.0.1:8765
+    url: "/wqls/clash.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    fps: 15
+    langs: [zh, en]
+    wait: 10000
+    dur: 6
+    do:
+      - {at: 0.5, ring: "#hist", for: 2}
+      - {at: 2.0, js: "window.__clash.pick(4)"}
+      - {at: 2.1, ring: "tr.sel", for: 3}
+  - name: dyn                       # s14 多体动力学：运动副的力随转角变
+    base: http://127.0.0.1:8765
+    url: "/wqls/dyn.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    langs: [zh, en]
+    wait: 5000
+    dur: 6
+  - name: inertia                   # s14 惯性力箭头
+    base: http://127.0.0.1:8765
+    url: "/wqls/inertia.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    fps: 15
+    langs: [zh, en]
+    wait: 10000
+    dur: 6
+    do:
+      - {at: 0.5, ring: "#m3d", for: 3}
+  - name: servo                     # s15 伺服工作周期，状态灯一个个亮
+    base: http://127.0.0.1:8765
+    url: "/wqls/servo.html?lang={lang}"
+    viewport: [1440, 810]
+    clock: true
+    langs: [zh, en]
+    wait: 3000
+    setup:
+      - {js: "window.__sv.at('seam',1.25)"}
+      - {click: "#spd button:nth-child(2)"}
+      - {click: "#play"}
+    dur: 11
+    do:
+      - {at: 1.0, ring: "#lights", for: 4}
+      - {at: 6.0, ring: "#sols", for: 4}

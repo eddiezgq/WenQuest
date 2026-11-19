@@ -1,0 +1,343 @@
+# WQ-LS 设计说明书 · 总览讲解视频（第 172b 轮 D-5；讲稿 讲稿.md，Eddie 11-18 18:38 审定“好”）。做法同首页简介第 127 轮：
+#   kind: page = 网页版 PPT（课件/ppt.html → tools/video/intro_ppt.py），kind: rec = 真页面录屏（录屏.yaml → tools/video/screenrec.py，三维页用虚拟时钟逐帧拍）。
+# 讲稿.md 的 15b（机头进数字工厂缝纫机厂装配线）没做：要起数字工厂缝纫机厂录，没核实三维工厂里看得到这条线，按讲稿的约定删掉。
+standalone: true
+langs:
+- zh
+- en
+title:
+- 问渠 AI 原生设计：工业直驱平缝机 WQ-LS
+- 'AI-native design at WenQuest: the WQ-LS industrial lockstitch machine'
+brand:
+- WQ-LS 设计说明书
+- WQ-LS design documentation
+deck_html:
+  en: 课件/index.html
+  zh: 课件/index.zh.html
+note:
+- 示例设计：经计算、三维和仿真校核，没有实物试制，所有数值是示例值；示意图不是系统界面。
+- Example design, checked by calculation, 3-D and simulation; no physical prototype built; diagrams are illustrations.
+tags:
+  zh:
+  - 平缝机
+  - 缝纫机设计
+  - AI 原生
+  - 虚拟样机
+  - 多体动力学
+  - 有限元
+  - 铸造仿真
+  - 数控
+  - FreeCAD
+  - MuJoCo
+  - 数字工厂
+  - 问渠
+  en:
+  - lockstitch machine
+  - sewing machine design
+  - AI-native
+  - virtual prototype
+  - multibody dynamics
+  - FEA
+  - casting simulation
+  - CNC
+  - FreeCAD
+  - MuJoCo
+  - digital factory
+  - WenQuest
+pace:
+  speed: 1.0
+  head: 0.5
+  pause: 0.15
+  tail: 0.6
+  hold: 0.3
+  xfade: 0.4
+shots:
+- id: s01
+  kind: page
+  page: 1
+  steps:
+  - show: 1
+  part:
+  - 开场
+  - Intro
+  say:
+    zh:
+    - '>这是问渠用 AI 从头设计的一台工业直驱平缝机 WQ-LS，'
+    - 从一张任务书，到一台能在网上“缝”的虚拟样机。
+    en:
+    - '>This is WQ-LS, an industrial direct-drive lockstitch machine designed from scratch with AI at WenQuest,'
+    - from a design brief to a virtual prototype that sews on the web.
+- id: s02
+  kind: rec
+  clip_zh: 录屏/proto.zh.mp4
+  clip_en: 录屏/proto.en.mp4
+  part:
+  - 虚拟样机
+  - Virtual prototype
+  say:
+    zh:
+    - 打开设计说明书，首页就是整机虚拟样机：
+    - 116 个零件都是真设计的实体，正在以每分钟 5000 针的节奏缝纫。
+    en:
+    - 'The documentation opens on the virtual prototype:'
+    - 116 parts, every one a real design solid, sewing at 5000 stitches a minute.
+- id: s03
+  kind: page
+  page: 2
+  steps:
+  - show: 1
+  part:
+  - 人定方向 · AI 做设计
+  - People decide · AI designs
+  say:
+    zh:
+    - '>怎么设计的？人只定方向、做选择：要多快、选哪个外观、要不要减重。'
+    - AI 写计算程序、建三维实体、跑仿真、出工程图和数控程序，
+    - 再用测试自己核对，改了一处，处处跟着重算。
+    en:
+    - '>How was it designed? People set the direction and make the choices: how fast, which look, whether to lighten it.'
+    - AI writes the calculations, builds the 3-D solids, runs the simulations, produces drawings and NC programs,
+    - and checks itself with tests — change one thing and everything downstream is recomputed.
+- id: s04
+  kind: page
+  page: 3
+  steps:
+  - show: 1
+  part:
+  - 问渠软件
+  - WenQuest software
+  say:
+    zh:
+    - '>用的全是问渠自己的软件：缝纫机设计软件算机构，'
+    - 数字工厂 CAE 做有限元、铸造和多体动力学，
+    - 数控编程出加工程序，问渠电子做控制器，网页三维把整机搬上网。
+    en:
+    - '>And it all runs on WenQuest''s own software: the sewing-machine design tool for the mechanisms,'
+    - digital-factory CAE for FEA, casting and multibody dynamics,
+    - WenQuest NC programming for machining, WenQuest Electronics for the controller, and web 3-D to put the machine online.
+- id: s05
+  kind: page
+  page: 4
+  steps:
+  - show: 1
+  part:
+  - 十关
+  - Ten gates
+  say:
+    zh:
+    - '>整个设计分十关：任务书、动力学、外观与机壳、零件与机构、机壳工艺、'
+    - 网页三维、工程图与物料、虚拟样机验证，再加控制器和企业标准。
+    en:
+    - '>The design runs through ten gates: brief, dynamics, styling and housing, parts and mechanisms, housing process,'
+    - web 3-D, drawings and BOM, virtual-prototype validation, plus the controller and a company standard.
+- id: s06
+  kind: rec
+  clip_zh: 录屏/mech.zh.mp4
+  clip_en: 录屏/mech.en.mp4
+  part:
+  - G1 方案
+  - G1 scheme
+  say:
+    zh:
+    - 第一关定方案：刺布、挑线、旋梭、送布四大机构，一转之内各在做什么。
+    en:
+    - 'Gate one fixes the scheme: what the needle, take-up, hook and feed mechanisms each do within one turn.'
+- id: s07
+  kind: rec
+  clip_zh: 录屏/timing.zh.mp4
+  clip_en: 录屏/timing.en.mp4
+  part:
+  - G1 时序
+  - G1 timing
+  say:
+    zh:
+    - 时序图和三维整机同步：梭尖在 206 度从针后掠过，钩住线环，
+    - 针的回升正好 2 毫米。
+    en:
+    - 'The timing diagram drives the 3-D machine: the hook point passes behind the needle at 206 degrees and catches the loop,'
+    - with exactly two millimetres of needle rise.
+- id: s08
+  kind: rec
+  clip_zh: 录屏/torque.zh.mp4
+  clip_en: 录屏/torque.en.mp4
+  part:
+  - G2 动力学
+  - G2 dynamics
+  say:
+    zh:
+    - 第二关算动力学：各运动件的惯性力矩，加上穿布、收线、送布的阻力，
+    - 叠成主轴一转的力矩，峰值不到 5 牛·米，平均功率不到 70 瓦。
+    en:
+    - 'Gate two is dynamics: the inertia of every moving part plus piercing, thread and feed resistance'
+    - add up to the shaft torque — peaking under five newton-metres, averaging under seventy watts.
+- id: s09
+  kind: rec
+  clip_zh: 录屏/balance.zh.mp4
+  clip_en: 录屏/balance.en.mp4
+  part:
+  - G2 平衡
+  - G2 balancing
+  say:
+    zh:
+    - 平衡块怎么定？拖平衡率，整机振动力从 690 牛降到 415 牛，0.6 是最好的那一点。
+    en:
+    - How big is the balance weight? Drag the ratio and the shaking force drops from 690 to 415 newtons; 0.6 is the sweet spot.
+- id: s10
+  kind: rec
+  clip_zh: 录屏/fea.zh.mp4
+  clip_en: 录屏/fea.en.mp4
+  part:
+  - G2 有限元
+  - G2 FEA
+  say:
+    zh:
+    - 上轴用有限元复核：最大应力 73 兆帕，在曲柄座的小圆角，
+    - 对屈服强度的安全系数近 5。
+    en:
+    - 'The upper shaft is checked by finite elements: 73 megapascals at the small fillet by the crank seat,'
+    - a safety factor of nearly five against yield.
+- id: s11
+  kind: rec
+  clip_zh: 录屏/look.zh.mp4
+  clip_en: 录屏/look.en.mp4
+  part:
+  - G3 外观与机壳
+  - G3 styling and housing
+  say:
+    zh:
+    - 第三关定外观，三个方案里选了流线型的 B；
+    - 机壳是两件 HT250 铸件，壁厚和筋按刚度目标一步步算出来。
+    en:
+    - Gate three picks the look — streamlined option B —
+    - and the housing becomes two HT250 castings, with walls and ribs sized step by step to a stiffness target.
+- id: s12
+  kind: rec
+  clip_zh: 录屏/takeup.zh.mp4
+  clip_en: 录屏/takeup.en.mp4
+  part:
+  - G4 零件与机构
+  - G4 parts and mechanisms
+  say:
+    zh:
+    - 第四关把每个零件都做成实体；挑线四连杆可以当场改尺寸，
+    - 三种布厚的供线、耗线马上重算。
+    en:
+    - Gate four turns every part into a solid; the take-up four-bar can be resized on the spot,
+    - and thread supply and demand for three fabrics are recomputed at once.
+- id: s13
+  kind: rec
+  clip_zh: 录屏/cast.zh.mp4
+  clip_en: 录屏/cast.en.mp4
+  part:
+  - G5 铸造
+  - G5 casting
+  say:
+    zh:
+    - 第五关是机壳工艺：凝固仿真看铁水怎么从外往里凝固，
+    en:
+    - 'Gate five is the housing process: a solidification simulation shows the iron freezing from the outside in,'
+- id: s14
+  kind: rec
+  clip_zh: 录屏/nc.zh.mp4
+  clip_en: 录屏/nc.en.mp4
+  part:
+  - G5 数控
+  - G5 NC machining
+  say:
+    zh:
+    - 8 个数控程序的刀具沿真实刀路走一遍。
+    en:
+    - and the tools of eight NC programs follow their real paths.
+- id: s15
+  kind: rec
+  clip_zh: 录屏/bom.zh.mp4
+  clip_en: 录屏/bom.en.mp4
+  part:
+  - G6 · G7 物料
+  - G6 · G7 BOM
+  say:
+    zh:
+    - 第六、七关把整机搬上网页，并由设计直接生成 8 个变型的物料清单和工程图，
+    - 点一行，零件就从整机里飞出来。
+    en:
+    - Gates six and seven put the machine on the web and generate the BOMs and drawings of eight variants straight from the design;
+    - click a line and the part flies out.
+- id: s16
+  kind: rec
+  clip_zh: 录屏/asm.zh.mp4
+  clip_en: 录屏/asm.en.mp4
+  part:
+  - G8 装配
+  - G8 assembly
+  say:
+    zh:
+    - 第八关是虚拟样机验证：19 步装配沿真实路线一件件装进去，
+    en:
+    - 'Gate eight validates the virtual prototype: nineteen assembly steps along real insertion paths,'
+- id: s17
+  kind: rec
+  clip_zh: 录屏/clash.zh.mp4
+  clip_en: 录屏/clash.en.mp4
+  part:
+  - G8 干涉
+  - G8 clearance
+  say:
+    zh:
+    - 全机 285 对零件一转一转查干涉。
+    en:
+    - and 285 part pairs checked for clearance turn by turn.
+- id: s18
+  kind: rec
+  clip_zh: 录屏/dyn.zh.mp4
+  clip_en: 录屏/dyn.en.mp4
+  part:
+  - G8 多体动力学
+  - G8 multibody dynamics
+  say:
+    zh:
+    - 多体动力学用 MuJoCo 整机复算，驱动力矩和功率法只差 0.14%，
+    en:
+    - Multibody dynamics re-solves the whole machine in MuJoCo, within 0.14 percent of the power method,
+- id: s19
+  kind: rec
+  clip_zh: 录屏/inertia.zh.mp4
+  clip_en: 录屏/inertia.en.mp4
+  part:
+  - G8 惯性力
+  - G8 inertia forces
+  say:
+    zh:
+    - 每个运动副的力、每个零件的惯性力都看得见。
+    en:
+    - with every joint force and every part's inertia force visible.
+- id: s20
+  kind: rec
+  clip_zh: 录屏/servo.zh.mp4
+  clip_en: 录屏/servo.en.mp4
+  part:
+  - GC 控制器
+  - GC controller
+  say:
+    zh:
+    - 控制器的固件在仿真器里真跑：起动到 5000 转只要 0.1 秒，
+    - 剪线、停上针位、拨线、抬压脚，一步不差。
+    en:
+    - 'The controller firmware really runs in a simulator: zero to 5000 in a tenth of a second,'
+    - then trim, needle-up stop, wipe and foot lift, step by step.
+- id: s21
+  kind: page
+  page: 5
+  steps:
+  - show: 1
+  part:
+  - 结尾
+  - Outro
+  say:
+    zh:
+    - '>一个人带着 AI 和问渠的软件，几天走完十关。'
+    - 每一个数都来自 AI 的设计计算，每一张图都能在说明书里打开、拖动、重算。
+    - 这就是问渠的 AI 原生设计。
+    en:
+    - '>One person with AI and WenQuest''s software, ten gates in days.'
+    - Every number comes from AI's design calculations, and every figure can be opened, dragged and recomputed in the documentation.
+    - That is AI-native design at WenQuest.

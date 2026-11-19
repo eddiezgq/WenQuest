@@ -1,0 +1,206 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WQ-LS设计说明书</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#07131f}
+body{font-family:"Noto Sans CJK SC","Source Han Sans SC","PingFang SC",Inter,Arial,sans-serif;color:#eaf1fb}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;
+  background:radial-gradient(1200px 700px at 85% -10%,#1d3f7a 0%,transparent 60%),radial-gradient(900px 600px at -10% 110%,#0f4a4a 0%,transparent 60%),#07131f}
+section.pg{position:absolute;inset:0;display:none}
+section.pg.on{display:block}
+.brand{position:absolute;left:56px;top:40px;font:600 24px/1 Inter,"Noto Sans CJK SC",sans-serif;letter-spacing:.18em;color:#7fb6ff}
+.brand b{color:#f5c344;letter-spacing:.05em;margin-right:14px}
+.kick{position:absolute;left:56px;top:84px;font-size:26px;color:#f5c344;font-weight:600}
+.title{position:absolute;left:56px;top:122px;width:1800px;font-size:56px;font-weight:800;line-height:1.2;color:#fff}
+.sub:not(svg *){font:500 34px/1.3 Inter,"Noto Sans CJK SC",sans-serif;color:#8fb3dd;display:block;margin-top:6px}
+svg .sub{font-family:Inter,"Noto Sans CJK SC",sans-serif}   /* SVG 里的英文小字：字号按 font-size 属性 */
+svg text{font-family:"Noto Sans CJK SC",Inter,sans-serif}
+.code{position:absolute;border-radius:16px;background:#0b1d30;border:1px solid #23415f;padding:26px 28px;
+  font:500 21px/1.6 "JetBrains Mono","DejaVu Sans Mono",monospace;color:#cfe2ff;white-space:pre;overflow:hidden}
+.code .k{color:#f5c344}.code .c{color:#6f8db0}.code .n{color:#7fe0c0}
+.cap{position:absolute;font-size:30px;font-weight:700;color:#fff}.cap .sub{font-size:21px;margin-top:4px}
+.tag{position:absolute;left:56px;bottom:118px;font-size:30px;color:#bcd0ea}.tag b{color:#f5c344}
+.card{position:absolute;border-radius:22px;background:linear-gradient(#14304f,#0c2038);border:2px solid #2f5d8a}
+.card.hot{border:3px solid #f5c344}
+.big{position:absolute;font-size:84px;font-weight:800;color:#fff;line-height:1.15}
+.url{position:absolute;font:600 46px/1.2 Inter,"Noto Sans CJK SC",sans-serif;color:#f5c344}
+html[lang=en] .sub,html[lang=en] .zh-only{display:none!important}
+html[lang=zh-CN] .en-only{display:none!important}
+html[lang=en] .title{font-family:Inter,"Noto Sans CJK SC",sans-serif}
+</style></head><body><div id="stage"><!-- WQ-LS 设计说明书 · 总览讲解视频 · 网页版 PPT（第 172b 轮 D-5）。tools/video/intro_ppt.py 套上样式写出 index.zh.html / index.html。
+     图都是示意；系统里真实的样子用录屏（录屏.yaml）。 -->
+<svg width="0" height="0" style="position:absolute"><defs>
+ <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f5c344"/></marker>
+ <linearGradient id="cardg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14304f"/><stop offset="1" stop-color="#0c2038"/></linearGradient>
+</defs></svg>
+
+<!-- p1 开场：针脚线画出来，缝出“AI 原生设计” -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST · WQ-LS</div>
+ <div class="kick" data-en="Industrial direct-drive lockstitch machine">工业直驱平缝机</div>
+ <div class="title"><span data-en="From a design brief to a virtual prototype that sews">从一张任务书，到一台会“缝”的虚拟样机</span><span class="sub">From a design brief to a virtual prototype that sews</span></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0">
+  <g data-k="1" data-a="draw" fill="none" stroke-linecap="round">
+   <path d="M120 640 H1800" stroke="#2a5fb8" stroke-width="8" stroke-dasharray="46 26"/>
+   <path d="M120 662 H1800" stroke="#c4531d" stroke-width="8" stroke-dasharray="46 26" stroke-dashoffset="36"/>
+  </g>
+  <g data-k="1" data-d="1200" data-a="pop">
+   <rect x="560" y="720" width="800" height="150" rx="26" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/>
+   <text x="960" y="812" text-anchor="middle" font-size="64" font-weight="800" fill="#f5c344" data-en="AI-native design">AI 原生设计</text>
+   <text x="960" y="852" text-anchor="middle" font-size="26" fill="#8fb3dd" class="sub">AI-native design</text>
+  </g>
+  <g data-k="1" data-d="2000" font-size="34" fill="#bcd0ea" text-anchor="middle">
+   <text x="400" y="520">5 000 r/min</text><text x="800" y="520" data-en="116 parts">116 个零件</text><text x="1200" y="520" data-en="8 variants">8 种变型</text><text x="1580" y="520" data-en="10 gates">10 关</text>
+  </g>
+ </svg>
+</section>
+
+<!-- p2 人定方向 · AI 做设计 -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST · WQ-LS</div>
+ <div class="kick" data-en="How it was designed">怎么设计的</div>
+ <div class="title"><span data-en="People set the direction · AI does the design">人定方向 · AI 做设计</span><span class="sub">People set the direction · AI does the design</span></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0">
+  <g data-k="1">
+   <rect x="80" y="300" width="560" height="660" rx="26" fill="url(#cardg)" stroke="#2f5d8a" stroke-width="2"/>
+   <text x="360" y="372" text-anchor="middle" font-size="44" font-weight="800" fill="#fff" data-en="People">人</text>
+   <text x="360" y="410" text-anchor="middle" font-size="24" fill="#8fb3dd" class="sub">People</text>
+  </g>
+  <g font-size="32" fill="#eaf1fb">
+   <g data-k="1" data-d="500"><circle cx="140" cy="488" r="9" fill="#f5c344"/><text x="168" y="499" data-en="How fast: 5000 r/min">要多快：5000 r/min</text></g>
+   <g data-k="1" data-d="1100"><circle cx="140" cy="568" r="9" fill="#f5c344"/><text x="168" y="579" data-en="Which look: option B">选哪个外观：方案 B</text></g>
+   <g data-k="1" data-d="1700"><circle cx="140" cy="648" r="9" fill="#f5c344"/><text x="168" y="659" data-en="Lighter housing">机壳要减重</text></g>
+   <g data-k="1" data-d="2300"><circle cx="140" cy="728" r="9" fill="#f5c344"/><text x="168" y="739" data-en="110–250 V wide input">110–250 V 宽电压</text></g>
+   <g data-k="1" data-d="2900"><circle cx="140" cy="808" r="9" fill="#f5c344"/><text x="168" y="819" data-en="Confirm each gate">每一关点头</text></g>
+  </g>
+  <g data-k="1" data-d="600" stroke="#f5c344" stroke-width="6" fill="none">
+   <path class="flow" d="M660 560 H860" stroke-dasharray="14 12" marker-end="url(#ar)"/>
+   <path class="flow" d="M860 720 H660" stroke-dasharray="14 12" marker-end="url(#ar)"/>
+  </g>
+  <g data-k="1" data-d="300">
+   <rect x="880" y="300" width="960" height="660" rx="26" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/>
+   <text x="1360" y="372" text-anchor="middle" font-size="44" font-weight="800" fill="#f5c344">AI</text>
+  </g>
+  <g font-size="32" fill="#eaf1fb">
+   <g data-k="1" data-d="900"><rect x="930" y="440" width="860" height="70" rx="14" fill="#0b1d30" stroke="#23415f"/><text x="960" y="487" data-en="Writes the calculation programs">写计算程序：机构、动力学、强度</text></g>
+   <g data-k="1" data-d="1500"><rect x="930" y="530" width="860" height="70" rx="14" fill="#0b1d30" stroke="#23415f"/><text x="960" y="577" data-en="Builds every part as a FreeCAD solid">建三维实体：每个零件都是 FreeCAD 实体</text></g>
+   <g data-k="1" data-d="2100"><rect x="930" y="620" width="860" height="70" rx="14" fill="#0b1d30" stroke="#23415f"/><text x="960" y="667" data-en="Runs FEA, casting and multibody simulation">跑仿真：有限元、铸造、多体动力学</text></g>
+   <g data-k="1" data-d="2700"><rect x="930" y="710" width="860" height="70" rx="14" fill="#0b1d30" stroke="#23415f"/><text x="960" y="757" data-en="Produces drawings, BOMs, NC programs">出图出程序：工程图、物料清单、数控程序</text></g>
+   <g data-k="1" data-d="3300"><rect x="930" y="800" width="860" height="70" rx="14" fill="#0b1d30" stroke="#7fe0c0"/><text x="960" y="847" fill="#7fe0c0" data-en="Checks itself with tests — change one, all recomputed">自己用测试核对：改一处，处处重算</text></g>
+  </g>
+ </svg>
+</section>
+
+<!-- p3 问渠自己的软件 -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST · WQ-LS</div>
+ <div class="kick" data-en="All on WenQuest's own software">全用问渠自己的软件</div>
+ <div class="title"><span data-en="Five WenQuest tools, one machine">五个问渠软件，一台机器</span><span class="sub">Five WenQuest tools, one machine</span></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0">
+  <g data-k="1" data-d="2600" data-a="pop">
+   <circle cx="960" cy="640" r="120" fill="url(#cardg)" stroke="#f5c344" stroke-width="4"/>
+   <text x="960" y="630" text-anchor="middle" font-size="46" font-weight="800" fill="#f5c344">WQ-LS</text>
+   <text x="960" y="676" text-anchor="middle" font-size="26" fill="#bcd0ea" data-en="the machine">整机</text>
+  </g>
+  <g stroke="#f5c344" stroke-width="5" fill="none" data-k="1" data-d="2400">
+   <path class="flow" d="M520 400 L850 560" stroke-dasharray="12 10"/><path class="flow" d="M1400 400 L1070 560" stroke-dasharray="12 10"/>
+   <path class="flow" d="M460 760 L840 680" stroke-dasharray="12 10"/><path class="flow" d="M1460 760 L1080 680" stroke-dasharray="12 10"/>
+   <path class="flow" d="M960 940 V760" stroke-dasharray="12 10"/>
+  </g>
+  <g data-k="1" data-d="0"><rect x="160" y="300" width="560" height="160" rx="22" fill="url(#cardg)" stroke="#7fb6ff" stroke-width="2"/>
+   <text x="440" y="370" text-anchor="middle" font-size="38" font-weight="800" fill="#fff" data-en="Sewing-machine design tool">缝纫机设计软件</text>
+   <text x="440" y="420" text-anchor="middle" font-size="26" fill="#bcd0ea" data-en="mechanisms · timing · take-up">机构 · 时序 · 挑线</text></g>
+  <g data-k="1" data-d="500"><rect x="1200" y="300" width="560" height="160" rx="22" fill="url(#cardg)" stroke="#7fe0c0" stroke-width="2"/>
+   <text x="1480" y="370" text-anchor="middle" font-size="38" font-weight="800" fill="#fff" data-en="Digital-factory CAE">数字工厂 CAE</text>
+   <text x="1480" y="420" text-anchor="middle" font-size="26" fill="#bcd0ea" data-en="FEA · casting · multibody">有限元 · 铸造 · 多体动力学</text></g>
+  <g data-k="1" data-d="1000"><rect x="100" y="700" width="560" height="160" rx="22" fill="url(#cardg)" stroke="#c9a2ff" stroke-width="2"/>
+   <text x="380" y="770" text-anchor="middle" font-size="38" font-weight="800" fill="#fff" data-en="WenQuest NC programming">问渠数控编程</text>
+   <text x="380" y="820" text-anchor="middle" font-size="26" fill="#bcd0ea" data-en="8 programs · tool checks">8 个加工程序 · 刀具通过检查</text></g>
+  <g data-k="1" data-d="1500"><rect x="1260" y="700" width="560" height="160" rx="22" fill="url(#cardg)" stroke="#f08c58" stroke-width="2"/>
+   <text x="1540" y="770" text-anchor="middle" font-size="38" font-weight="800" fill="#fff" data-en="WenQuest Electronics">问渠电子</text>
+   <text x="1540" y="820" text-anchor="middle" font-size="26" fill="#bcd0ea" data-en="controller board · firmware sim">控制器电路板 · 固件仿真</text></g>
+  <g data-k="1" data-d="2000"><rect x="680" y="900" width="560" height="140" rx="22" fill="url(#cardg)" stroke="#f5c344" stroke-width="2"/>
+   <text x="960" y="962" text-anchor="middle" font-size="38" font-weight="800" fill="#fff" data-en="WenQuest web 3-D">问渠网页三维</text>
+   <text x="960" y="1008" text-anchor="middle" font-size="26" fill="#bcd0ea" data-en="machine · prototype · labs">整机 · 虚拟样机 · 互动块</text></g>
+ </svg>
+</section>
+
+<!-- p4 十关路线图 -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST · WQ-LS</div>
+ <div class="kick" data-en="The design path">设计路线</div>
+ <div class="title"><span data-en="Ten gates, each one checked">十关，一关一关过</span><span class="sub">Ten gates, each one checked</span></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0">
+  <path data-k="1" data-a="draw" d="M150 520 H1770 M1770 520 Q1830 520 1830 600 Q1830 680 1770 680 H150" fill="none" stroke="#2f5d8a" stroke-width="6"/>
+  <g font-size="30" font-weight="700" text-anchor="middle">
+   <g data-k="1" data-d="200"><circle cx="230" cy="520" r="54" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/><text x="230" y="531" fill="#f5c344">G1</text><text x="230" y="620" font-size="26" font-weight="500" fill="#eaf1fb" data-en="Brief">任务书</text></g>
+   <g data-k="1" data-d="500"><circle cx="560" cy="520" r="54" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/><text x="560" y="531" fill="#f5c344">G2</text><text x="560" y="620" font-size="26" font-weight="500" fill="#eaf1fb" data-en="Dynamics">动力学与强度</text></g>
+   <g data-k="1" data-d="800"><circle cx="890" cy="520" r="54" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/><text x="890" y="531" fill="#f5c344">G3</text><text x="890" y="620" font-size="26" font-weight="500" fill="#eaf1fb" data-en="Styling, housing">外观与机壳</text></g>
+   <g data-k="1" data-d="1100"><circle cx="1220" cy="520" r="54" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/><text x="1220" y="531" fill="#f5c344">G4</text><text x="1220" y="620" font-size="26" font-weight="500" fill="#eaf1fb" data-en="Parts, mechanisms">零件与机构</text></g>
+   <g data-k="1" data-d="1400"><circle cx="1550" cy="520" r="54" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/><text x="1550" y="531" fill="#f5c344">G5</text><text x="1550" y="620" font-size="26" font-weight="500" fill="#eaf1fb" data-en="Housing process">机壳工艺</text></g>
+   <g data-k="1" data-d="1700"><circle cx="1550" cy="680" r="54" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/><text x="1550" y="691" fill="#f5c344">G6</text><text x="1550" y="780" font-size="26" font-weight="500" fill="#eaf1fb" data-en="Web 3-D">网页三维</text></g>
+   <g data-k="1" data-d="2000"><circle cx="1220" cy="680" r="54" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/><text x="1220" y="691" fill="#f5c344">G7</text><text x="1220" y="780" font-size="26" font-weight="500" fill="#eaf1fb" data-en="Drawings, BOM">工程图与物料</text></g>
+   <g data-k="1" data-d="2300"><circle cx="890" cy="680" r="54" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/><text x="890" y="691" fill="#f5c344">G8</text><text x="890" y="780" font-size="26" font-weight="500" fill="#eaf1fb" data-en="Virtual prototype">虚拟样机验证</text></g>
+   <g data-k="1" data-d="2600"><circle cx="560" cy="680" r="54" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/><text x="560" y="691" fill="#f5c344">GC</text><text x="560" y="780" font-size="26" font-weight="500" fill="#eaf1fb" data-en="Controller">控制器</text></g>
+   <g data-k="1" data-d="2900"><circle cx="230" cy="680" r="54" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/><text x="230" y="691" font-size="24" fill="#f5c344" data-en="Std">标准</text><text x="230" y="780" font-size="26" font-weight="500" fill="#eaf1fb" data-en="Company standard">企业标准</text></g>
+  </g>
+  <g data-k="1" data-d="3300"><rect x="560" y="860" width="800" height="90" rx="20" fill="#0b1d30" stroke="#7fe0c0" stroke-width="2"/>
+   <text x="960" y="918" text-anchor="middle" font-size="32" fill="#7fe0c0" data-en="Every gate: AI computes, people confirm">每一关：AI 计算，人确认</text></g>
+ </svg>
+</section>
+
+<!-- p5 结尾 -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST · WQ-LS</div>
+ <div class="kick" data-en="Open it, drag it, recompute it">打开、拖动、重算</div>
+ <div class="title"><span data-en="AI-native design at WenQuest">问渠的 AI 原生设计</span><span class="sub">AI-native design at WenQuest</span></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0">
+  <g data-k="1" data-a="draw" fill="none" stroke-linecap="round">
+   <path d="M260 470 H1660" stroke="#2a5fb8" stroke-width="8" stroke-dasharray="46 26"/>
+   <path d="M260 492 H1660" stroke="#c4531d" stroke-width="8" stroke-dasharray="46 26" stroke-dashoffset="36"/>
+  </g>
+  <g data-k="1" data-d="800" font-size="40" fill="#eaf1fb" text-anchor="middle">
+   <text x="960" y="600" data-en="One person + AI + WenQuest software">一个人 + AI + 问渠软件</text>
+   <text x="960" y="670" font-size="34" fill="#bcd0ea" data-en="every number computed · every figure interactive">每个数都算出来 · 每张图都能动</text>
+  </g>
+  <g data-k="1" data-d="1600">
+   <text x="960" y="800" text-anchor="middle" font-size="46" font-weight="700" fill="#f5c344">factory.wenquestrobotics.com/wqls/spec</text></g>
+  <g data-k="1" data-d="2200"><text x="960" y="960" text-anchor="middle" font-size="24" fill="#6f8db0" data-en="Example design, checked by calculation, 3-D and simulation; no physical prototype built.">示例设计：经计算、三维和仿真校核，没有实物试制，所有数值是示例值。</text></g>
+ </svg>
+</section>
+</div><script>
+(() => {
+  const en = document.documentElement.lang === 'en'
+  if (en) document.querySelectorAll('[data-en]').forEach((e) => { e.textContent = e.dataset.en })
+  const pages = [...document.querySelectorAll('section.pg')]
+  let cur = 0, frag = 0
+  const frags = (i) => [...pages[i].querySelectorAll('[data-k]')].reduce((m, e) => Math.max(m, +e.dataset.k), 0)
+  const prep = (p) => p.querySelectorAll('[data-a="draw"]').forEach((e) => {
+    if (e.dataset.len) return
+    const L = e.getTotalLength ? e.getTotalLength() : 1000
+    e.dataset.len = L; e.style.strokeDasharray = L + ' ' + L
+  })
+  function go(i, s) { pages.forEach((p, k) => p.classList.toggle('on', k === i)); cur = i; frag = 0; prep(pages[i])
+    pages[i].querySelectorAll('[data-k]').forEach((e) => { e.dataset.t = '' }); while (frag < s) next() }
+  function next() { if (frag >= frags(cur)) { if (cur < pages.length - 1) go(cur + 1, 0); return } frag++
+    const now = performance.now()
+    pages[cur].querySelectorAll(`[data-k="${frag}"]`).forEach((e) => { e.dataset.t = now + (+e.dataset.d || 0) }) }
+  const ease = (x) => x < 0 ? 0 : x > 1 ? 1 : 1 - Math.pow(1 - x, 3)
+  function tick() {
+    const now = performance.now(), p = pages[cur]; if (!p) return
+    p.querySelectorAll('[data-k]').forEach((e) => {
+      const a = e.dataset.t ? ease((now - +e.dataset.t) / 600) : 0, kind = e.dataset.a
+      if (kind === 'draw') { e.style.strokeDashoffset = (+e.dataset.len) * (1 - ease((now - +e.dataset.t) / 900) * (e.dataset.t ? 1 : 0)); e.style.opacity = e.dataset.t && now >= +e.dataset.t ? 1 : 0; return }
+      e.style.opacity = a
+      // 用 CSS 的 translate / scale 属性（不碰 transform）：SVG 分组自己的 transform 属性不被覆盖
+      if (e instanceof SVGElement) { e.style.transformBox = 'fill-box'; e.style.transformOrigin = 'center' }
+      if (kind === 'pop') e.style.scale = 0.85 + 0.15 * a; else e.style.translate = `0 ${(1 - a) * 18}px`
+    })
+    p.querySelectorAll('.flow').forEach((e) => { e.style.strokeDashoffset = -((now / 40) % 1000) })
+  }
+  setInterval(tick, 16)
+  function fit() { const k = Math.min(innerWidth / 1920, innerHeight / 1080); document.getElementById('stage').style.transform = `scale(${k})` }
+  addEventListener('resize', fit); fit()
+  addEventListener('keydown', (e) => { if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) next(); if (e.key === 'ArrowLeft') go(Math.max(0, cur - 1), 0) })
+  const h = +(location.hash.match(/#p(\d+)/) || [])[1]; go(h ? h - 1 : 0, 0)
+  window.__deck = { pages: pages.length, go: (i, s) => go(i, s ?? 0), next, fragments: frags, notes: () => '', state: () => ({ page: cur, frag }) }
+})()
+</script></body></html>

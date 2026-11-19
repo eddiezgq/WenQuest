@@ -13,6 +13,7 @@
       hub: 8141            # 数字工厂（本机教学版，端口）：先用 /api/login 拿令牌（教学模式、厂长）；界面语言按录的语言固定（wq-factory-lang），--lang en 另录英文界面
       url: /circuit
       # site: true         # 或者：官网 site/ 当网站打开（WQ_PROXY="eda=8150" 把 /eda/ 转给本机服务），按语言各录一段
+      # base: http://127.0.0.1:8765   # 或者：任意本机网址（第 172b 轮 WQ-LS 说明书：factory/digital/web/public 起静态服务）；url 里写 {lang} 按语言替换
       viewport: [1440, 810]  # 可选：页面按这个大小排版，放大到 1920×1080 录（文字更大、照样是矢量渲染）；不写 = 1920×1080 原大
       wait: 6000           # 打开后等多久再开录（毫秒）
       setup: [...]         # 开录前先做的动作（同下，不写 at）
@@ -26,6 +27,7 @@
         - {at: 6, js: "…"}                           # 页面里执行一段程序
         # ring / click / type / select / scroll 可以按语言分开写：{ring: {zh: "button:has-text('供应商')", en: "button:has-text('Suppliers')"}}
       langs: [zh, en]      # 官网、问渠电子这类有中英两版的页面
+      clock: true          # 第 172b 轮：三维页面用虚拟时钟逐帧拍（软件渲染太慢、screencast 收不到画面时）
       cut: [[1.5, 4.6]]    # 可选：剪掉开录后这几段（秒），比如等服务器算结果的几秒；片子相应变短
 """
 from __future__ import annotations
@@ -144,13 +146,15 @@ def record(b, c: dict, lang: str, site_port: int, out: Path):
         tok = hub_token(c["hub"], c.get("role", "manager"))
         ctx.add_init_script("localStorage.setItem('wq-df-session', " + json.dumps(json.dumps(tok)) + ")")
         base = f"http://127.0.0.1:{c['hub']}"
+    elif c.get("base"):                                  # 第 172b 轮：任意本机网址（例如 factory/digital/web/public 起的静态服务）
+        base = c["base"].rstrip("/")
     else:
         base = f"http://127.0.0.1:{site_port}"
     ctx.route("**/assist.js", lambda r: r.fulfill(body="", content_type="text/javascript"))   # 画面里不要客服按钮
     page = ctx.new_page()
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
-    page.goto(base + c["url"])
+    page.goto(base + c["url"].replace("{lang}", lang))     # url 里的 {lang} 换成正在录的语言
     page.wait_for_timeout(int(c.get("wait", 4000)))
     page.add_script_tag(content=OVERLAY)
     for a in c.get("setup") or []:
@@ -223,6 +227,109 @@ def record(b, c: dict, lang: str, site_port: int, out: Path):
     print(out, f"{len(frames)} 帧", f"{t_end - t0:.1f} 秒")
 
 
+VCLOCK = r"""
+(() => {                                   // 第 172b 轮：逐帧推进的虚拟时钟（每个框架各一份；iframe 里也装）
+  if (window.__vc) return
+  const rP = performance.now.bind(performance), rD = Date.now, sT = setTimeout, sI = setInterval
+  let T = 0, seq = 1, raf = [], timers = []
+  const D0 = rD()
+  performance.now = () => T
+  Date.now = () => D0 + T
+  window.requestAnimationFrame = (f) => { const id = seq++; raf.push([id, f]); return id }
+  window.cancelAnimationFrame = (id) => { raf = raf.filter((x) => x[0] !== id) }
+  window.setTimeout = (f, ms, ...a) => { if (typeof f !== 'function') return sT(f, ms); const id = seq++; timers.push({id, at: T + (+ms || 0), f, a}); return id }
+  window.setInterval = (f, ms, ...a) => { const id = seq++; timers.push({id, at: T + Math.max(1, +ms || 0), every: Math.max(1, +ms || 0), f, a}); return id }
+  window.clearTimeout = window.clearInterval = (id) => { timers = timers.filter((x) => x.id !== id) }
+  window.__vc = {
+    step(dt) {
+      const end = T + dt
+      for (;;) {                                         // 到期的定时器按时间顺序跑（间隔定时器重排）
+        timers.sort((a, b) => a.at - b.at)
+        const t = timers[0]
+        if (!t || t.at > end) break
+        T = Math.max(T, t.at)
+        if (t.every) t.at += t.every; else timers.shift()
+        try { t.f(...t.a) } catch (e) { console.error(e) }
+      }
+      T = end
+      const q = raf; raf = []                             // 每步只跑一次动画帧：三维页每帧只渲染一遍
+      for (const [, f] of q) { try { f(T) } catch (e) { console.error(e) } }
+    },
+  }
+})()
+"""
+
+
+def record_clock(b, c: dict, lang: str, site_port: int, out: Path):
+    """第 172b 轮：三维页面（WebGL）在这台机器上是软件渲染，每秒只有 10 帧左右，screencast 收不到画面，Playwright 的假时钟一步又会渲染好几遍。
+    clock: true 的段改用自己的虚拟时钟（VCLOCK，装进页面和所有 iframe）：每拍一帧，各框架的时间往前走 1/30 秒、动画帧只跑一次，
+    再用 CDP 截图——不管渲染多慢，片子都是平滑的 30 帧/秒。drag 按帧拆开做。"""
+    w, h = c.get("viewport") or (1920, 1080)
+    ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=1920 / w, locale="zh-CN" if lang == "zh" else "en-US")
+    ctx.add_init_script(f"try{{for (const k of ['wq-site-lang','eda.lang','wq-factory-lang']) localStorage.setItem(k,'{lang}')}}catch(e){{}}")
+    ctx.add_init_script(VCLOCK)
+    base = c["base"].rstrip("/") if c.get("base") else f"http://127.0.0.1:{site_port}"
+    page = ctx.new_page()
+    errors = []
+    page.on("pageerror", lambda e: errors.append(str(e)))
+
+    def tick(ms):
+        for f in page.frames:
+            try:
+                f.evaluate(f"window.__vc && window.__vc.step({ms})")
+            except Exception:  # noqa: BLE001 —— 正在载入的框架
+                pass
+
+    page.goto(base + c["url"].replace("{lang}", lang))
+    for _ in range(int(c.get("wait", 4000)) // 250):           # 载入：真时间等网络，虚拟时钟也跟着走（每步渲染一次）
+        page.wait_for_timeout(250)
+        tick(250)
+    page.add_script_tag(content=OVERLAY)
+    for a in c.get("setup") or []:
+        act(page, a, lang)
+        for _ in range(max(1, int(a.get("pause", 600)) // 100)):
+            tick(100)
+    for _ in range(max(1, int(c.get("settle", 800)) // 100)):
+        tick(100)
+    tmp = Path(tempfile.mkdtemp(prefix="screenrec-"))
+    cdp = ctx.new_cdp_session(page)
+    fps = int(c.get("fps", FPS))                                 # 三维页可以写 fps: 15（每帧渲染要一秒多），出片时补成 30 帧
+    n = int(round(float(c["dur"]) * fps))
+    todo = sorted(c.get("do") or [], key=lambda a: float(a["at"]))
+    drags = []                                                   # [起点, 终点, 开始帧, 帧数]
+    for i in range(n):
+        t = i / fps
+        while todo and float(todo[0]["at"]) <= t + 1e-6:
+            a = todo.pop(0)
+            if "drag" in a:
+                (x0, y0), (x1, y1) = a["drag"]
+                k = max(2, int(float(a.get("dur", 2)) * fps))
+                page.mouse.move(x0, y0)
+                page.mouse.down()
+                drags.append([(x0, y0), (x1, y1), i, k])
+                a = {k2: v for k2, v in a.items() if k2 != "drag"}
+            act(page, a, lang)
+        for d in list(drags):
+            (x0, y0), (x1, y1), i0, k = d
+            u = min(1.0, (i - i0 + 1) / k)
+            page.mouse.move(x0 + (x1 - x0) * u, y0 + (y1 - y0) * u)
+            if u >= 1.0:
+                page.mouse.up()
+                drags.remove(d)
+        tick(1000 / fps)
+        shot = cdp.send("Page.captureScreenshot", {"format": "jpeg", "quality": 92})
+        (tmp / f"{i:05d}.jpg").write_bytes(base64.b64decode(shot["data"]))
+    ctx.close()
+    if errors:
+        print(f"  （页面报错，照录：{'; '.join(errors[:2])}）", file=sys.stderr)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", str(tmp / "%05d.jpg"),
+                    "-vf", f"fps={FPS},scale=1920:1080:flags=lanczos,format=yuv420p", "-c:v", "libx264", "-crf", "18", "-preset", "slow",
+                    "-movflags", "+faststart", str(out)], check=True)
+    shutil.rmtree(tmp)
+    print(out, f"{n} 帧（虚拟时钟）")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("dir")
@@ -245,7 +352,7 @@ def main():
                 langs = [a.lang]
             for lang in langs:
                 name = f"{c['name']}.{lang}.mp4" if len(langs) > 1 or a.lang else f"{c['name']}.mp4"
-                record(b, c, lang, site_port, lec / "录屏" / name)
+                (record_clock if c.get("clock") else record)(b, c, lang, site_port, lec / "录屏" / name)
         b.close()
 
 
