@@ -33,8 +33,8 @@ for WQ_LANG in ${LANGS:-zh en}; do
   "$H/rec.sh" "$H/l10b.py" "$WQ_REC/l10b$sfx.mp4"      # 改了 10a 存的文件（高 22）；重录要先重录 10a
   "$H/rec.sh" "$H/l11a.py" "$WQ_REC/l11a$sfx.mp4"
   cp "$WQLS_TE/head.stl" "$WQ_REC/head.stl"; cp "$WQLS_TE/head.stl" "$WQ_REC/机头.stl"    # 第 12 课导入的网格
-  for c in l12a l12b l12c; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done     # 依次接着上一段存的“机头曲面”
-  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c l10a l10b l11a l12a l12b l12c; do
+  for c in l12a l12b l12c l13a l13b l13c l14a; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done     # 依次接着上一段存的“机头曲面”
+  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c l10a l10b l11a l12a l12b l12c l13a l13b l13c l14a; do
     ffmpeg -loglevel error -y -i "$WQ_REC/$c$sfx.mp4" -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart -an "$OUT/wqcad-$c$sfx.mp4"
     ffmpeg -loglevel error -y -sseof -2 -i "$WQ_REC/$c$sfx.mp4" -frames:v 1 -vf scale=960:-1 -q:v 4 "$OUT/wqcad-$c$sfx.jpg"
     cp "$WQ_REC/$c$sfx.vtt" "$OUT/wqcad-$c$sfx.vtt"

@@ -1,0 +1,13 @@
+WEBVTT
+
+00:00:07.461 --> 00:00:18.097
+Surfaces to solid: after the trimming and blends of the last lesson, the faces are sewn into one closed shell enclosing a solid (FreeCAD can compute its volume)
+
+00:00:18.097 --> 00:00:30.097
+The real head is a casting: 4 mm walls, open at the bottom. Turn to the bottom face, select it, and click Part Thickness
+
+00:00:33.172 --> 00:00:39.947
+A 4 mm shell, open at the bottom. A negative thickness grows inwards, so the outside size is unchanged
+
+00:00:39.947 --> 00:00:47.920
+Before it goes for machining or tooling, run Check geometry for bad faces and gaps (see the text)

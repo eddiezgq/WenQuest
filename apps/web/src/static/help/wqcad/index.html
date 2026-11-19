@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ 目录</button>
 <aside>
-  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–12 课）</small></div>
+  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–14 课）</small></div>
   <input class="find" placeholder="搜索帮助…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>课程怎么学</a>
 <a class="sub" href="#course-1" data-s="course">这套课程</a>
@@ -218,7 +218,24 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l12-do" data-s="l12">跟着做</a>
 <a class="sub" href="#l12-self" data-s="l12">自己做</a>
 <a class="sub" href="#l12-quiz" data-s="l12">小测</a>
-<a href="#appA" data-s="appA"><span class="n">13</span>附录 A 安装问渠 CAD</a>
+<a href="#l13" data-s="l13"><span class="n">13</span>第 13 课 曲面：修剪、连续性 G0 / G1 / G2、过渡面</a>
+<a class="sub" href="#l13-goal" data-s="l13">学完能做什么</a>
+<a class="sub" href="#l13-g" data-s="l13">连续性：G0、G1、G2</a>
+<a class="sub" href="#l13-trim" data-s="l13">修剪成形</a>
+<a class="sub" href="#l13-tangent" data-s="l13">G0 → G1：在轮廓里加相切</a>
+<a class="sub" href="#l13-blend" data-s="l13">过渡面：给尖棱做圆角</a>
+<a class="sub" href="#l13-do" data-s="l13">跟着做</a>
+<a class="sub" href="#l13-self" data-s="l13">自己做</a>
+<a class="sub" href="#l13-quiz" data-s="l13">小测</a>
+<a href="#l14" data-s="l14"><span class="n">14</span>第 14 课 曲面到实体：缝合、成实体、抽壳、检查几何</a>
+<a class="sub" href="#l14-goal" data-s="l14">学完能做什么</a>
+<a class="sub" href="#l14-ways" data-s="l14">三种做法</a>
+<a class="sub" href="#l14-shell" data-s="l14">机头：抽壳成铸件</a>
+<a class="sub" href="#l14-check" data-s="l14">检查几何</a>
+<a class="sub" href="#l14-do" data-s="l14">跟着做</a>
+<a class="sub" href="#l14-self" data-s="l14">自己做</a>
+<a class="sub" href="#l14-quiz" data-s="l14">小测</a>
+<a href="#appA" data-s="appA"><span class="n">15</span>附录 A 安装问渠 CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">下载和授权</a>
 <a class="sub" href="#appA-install" data-s="appA">安装</a>
 <a class="sub" href="#appA-fix" data-s="appA">排错</a></nav>
@@ -239,9 +256,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">课程表</h3>
-<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l12">第 12 课</a></td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机头外形的特征曲线（照网格逆向）</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td>第 13 课</td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的过渡曲面</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 14 课</td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>一块外壳变实体</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 15 课</td><td>装配工作台：插入零件、固定、关节、自由度</td><td>曲柄滑块</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 16 课</td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>挑线四连杆转一圈</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 17 课</td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l12">第 12 课</a></td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机头外形的特征曲线（照网格逆向）</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l13">第 13 课</a></td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的修剪和过渡曲面</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l14">第 14 课</a></td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>机头外壳抽壳成铸件</td><td>已上线</td></tr><tr><td>五 装配</td><td>第 15 课</td><td>装配工作台：插入零件、固定、关节、自由度</td><td>曲柄滑块</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 16 课</td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>挑线四连杆转一圈</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 17 课</td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
 
-<p>现在上线的是第 1–12 课，其余各课按模块陆续上线。</p>
+<p>现在上线的是第 1–14 课，其余各课按模块陆续上线。</p>
 <h3 id="course-3">录屏是怎么录的</h3>
 <p>录屏都是真软件在操作：云端电脑上装的 FreeCAD 1.1.4、问渠 CAD 的品牌和同一版 AI 工作台，中文界面；鼠标点哪里、键盘输什么，软件就真的执行（画草图、加约束、凸台都是软件自己算的）。和你电脑上的问渠 CAD 只差 27 个内核补丁——补丁不改界面；“检查几何”“展开面”两处结果不同，这两处不录屏，用书里的验收数据讲。</p>
 <p>录屏暂时没有配音，看字幕（视频右下角可以开关）。讲解配音以后补上。</p></section>
@@ -1284,7 +1301,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </tr>
 </tbody>
 </table>
-<p>描出来的轮廓和网格外形相比：侧面最大偏差 0.47 mm，正面 0.32 mm（程序沿轮廓每段取 60 个点，量到网格外形的距离）。铸件毛坯的公差一般在 ±1 mm 左右，够用。</p>
+<p>描出来的轮廓和网格外形相比（做完第 13 课的最终版本，程序沿轮廓每段取 60 个点量到网格外形的距离）：侧面最大 1.19 mm、平均 0.51 mm——最大的地方是第 13 课加相切时左边那条线挪了约 1 mm；正面最大 0.32 mm。铸件毛坯的公差一般在 ±1 mm 左右，够用。</p>
 <h3 id="l12-front">正面轮廓：锁定、圆角、半径</h3>
 <figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l12b.jpg"><source src="media/wqcad-l12b.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l12b.vtt"></video><figcaption>▶ 录屏：YZ 草图：多段线四个角 → 锁定两个角点 → 圆角 → 半径 14（约 60 秒）</figcaption></figure>
 <ul>
@@ -1316,7 +1333,162 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">照着网格描曲线，用哪种 B 样条最方便？</p><div class="opts"><button type="button" data-k="a">A. 控制点 B 样条</button><button type="button" data-k="b">B. 插值 B 样条（通过点）</button><button type="button" data-k="c">C. 圆弧</button><button type="button" data-k="d">D. 椭圆</button></div><p class="why" hidden>插值 B 样条经过你点的每个点，点在网格边上，曲线就贴着网格。</p></div>
 <div class="quiz" data-ok="b"><p class="q">拉伸时不勾“创建实体”，得到什么？</p><div class="opts"><button type="button" data-k="a">A. 实体</button><button type="button" data-k="b">B. 曲面（壳）</button><button type="button" data-k="c">C. 草图</button><button type="button" data-k="d">D. 什么都没有</button></div><p class="why" hidden>封闭轮廓不勾“创建实体”就只拉出侧面那一圈曲面。</p></div>
 <div class="quiz" data-ok="b"><p class="q">两张曲面“截面”的结果是？</p><div class="opts"><button type="button" data-k="a">A. 一个实体</button><button type="button" data-k="b">B. 两张曲面的交线</button><button type="button" data-k="c">C. 两张曲面合并</button><button type="button" data-k="d">D. 一个草图</button></div><p class="why" hidden>截面（Section）求的是形状表面的交线，常用来得到不在一个平面里的空间曲线。</p></div></section>
-<section id="appA"><h2><span class="n">13</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
+<section id="l13"><h2><span class="n">13</span>第 13 课 曲面：修剪、连续性 G0 / G1 / G2、过渡面</h2><p class="lead">学完能做：让几张曲面互相修剪成一个形状；看出哪里只有 G0（有折棱）；在轮廓里加相切把它变成 G1；在两张面交出的尖棱上做过渡面。接着第 12 课的机头。约 1.5 小时。</p><h3 id="l13-goal">学完能做什么</h3>
+<ul>
+<li>两张（或几张）曲面互相修剪：先让它们各自围成实体，再求交集。</li>
+<li>认出连续性：G0 只是接上（有折棱）、G1 方向也连续（相切，没有棱）、G2 曲率也连续（反光最顺）。</li>
+<li>折棱的来源常常在草图里：两段线在端点拐了角。加“相切”就变成 G1。</li>
+<li>两张各自光顺的面交在一起，交线是尖棱：用圆角或填充做过渡面。</li>
+</ul>
+
+<h3 id="l13-g">连续性：G0、G1、G2</h3>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>意思</th>
+<th>看上去</th>
+<th>怎么得到</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G0 位置连续</td>
+<td>接上了，没缝</td>
+<td>有折棱，高光在这里断开</td>
+<td>两条线只是端点重合</td>
+</tr>
+<tr>
+<td>G1 相切连续</td>
+<td>方向也一样</td>
+<td>没有棱，但高光在接缝处“拐一下”</td>
+<td>端点相切；圆角</td>
+</tr>
+<tr>
+<td>G2 曲率连续</td>
+<td>弯曲程度也一样</td>
+<td>高光一条线顺下来</td>
+<td>曲面工作台“填充”“混合”选曲率；高阶 B 样条</td>
+</tr>
+</tbody>
+</table>
+<p>机械零件多数到 G1 就够了（铸件、机加工圆角都是 G1）；外观件、手柄、汽车外壳讲究 G2。</p>
+<h3 id="l13-trim">修剪成形</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l13a.jpg"><source src="media/wqcad-l13a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l13a.vtt"></video><figcaption>▶ 录屏：两个拉伸的 Solid 改成“是” → 交集 → 看三处折棱（约 50 秒）</figcaption></figure>
+<p>交集以后，机头上部的外形体积 1902449.3 mm³。能看到三类折棱：左边（前上角弯面和左侧面）、前上角两侧（弯面和 R14 圆角面）、顶面两侧（斜的顶面和 R14 圆角面，网格里的顶面前低后高）。</p>
+<h3 id="l13-tangent">G0 → G1：在轮廓里加相切</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l13b.jpg"><source src="media/wqcad-l13b.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l13b.vtt"></video><figcaption>▶ 录屏：编辑侧面轮廓 → 删掉 B 样条端点的重合 → 端点相切（两头）→ 左边的折棱没了（约 65 秒）</figcaption></figure>
+<ul>
+<li>插值 B 样条只管穿过你点的点，端点的方向是算出来的，和相邻的直线一般不一样。</li>
+<li>“端点相切”本身就包含重合：先删掉原来的重合约束，不然是冗余约束，草图不会求解。</li>
+<li>加了相切，B 样条的形状会稍微动一下（端点方向被掰正了），左侧那条线也跟着挪了一点——逆向建模里，“光顺”和“贴网格”要取舍。</li>
+</ul>
+<p>左边那道棱两侧的面夹角：加相切前 35.0°，加相切后 0°。</p>
+<h3 id="l13-blend">过渡面：给尖棱做圆角</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l13c.jpg"><source src="media/wqcad-l13c.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l13c.vtt"></video><figcaption>▶ 录屏：选前上角两侧的两条尖棱 → Part 圆角 R8（约 50 秒）</figcaption></figure>
+<p>圆角面和两边都相切（G1）。做完体积 1887664.2 mm³。要 G2：曲面工作台“填充”（Surface_Filling），边界选这几条边，连续性选“曲率”——它不是从实体上“倒”出来的，而是用边界补一张新面，再和其他面缝合（第 14 课）。</p>
+<p>顶面两侧的折棱（斜顶面和 R14 圆角面）本课不处理。真要做对，R14 不该是一条直的圆柱，而是沿着斜顶边“扫掠”的圆角——见“自己做”。</p>
+<h3 id="l13-do">跟着做</h3>
+<ol class="steps">
+<li>打开第 12 课的文件，删掉截面；两个拉伸的属性 Solid 改成“是”。</li>
+<li>选两个拉伸，交集。转着看三类折棱。</li>
+<li>双击侧面轮廓的草图：约束列表里删掉 B 样条两头的重合；B 样条端点 + 直线端点，相切；另一头同样。关闭草图。</li>
+<li>选前上角两侧的两条尖棱，Part 圆角，半径 8。</li>
+</ol>
+
+<h3 id="l13-self">自己做</h3>
+<ol>
+<li>顶面两侧的折棱：把正面轮廓的 R14 圆角改成沿斜顶边扫掠（第 8 课的管道），再求交，看折棱还在不在。</li>
+<li>曲面工作台：在前上角挖掉一块，用“填充”补上，连续性分别选“位置”“相切”“曲率”，比较高光。</li>
+<li>视图里打开“斑马纹”（如果你装了曲线工作台插件），看 G1 和 G2 的区别。</li>
+</ol>
+<h3 id="l13-quiz">小测</h3>
+<div class="quiz" data-ok="a"><p class="q">两段线只在端点重合、方向不一样，这是几级连续？</p><div class="opts"><button type="button" data-k="a">A. G0</button><button type="button" data-k="b">B. G1</button><button type="button" data-k="c">C. G2</button><button type="button" data-k="d">D. 不连续</button></div><p class="why" hidden>只有位置连续（G0），方向不一样，所以有折棱。</p></div>
+<div class="quiz" data-ok="b"><p class="q">给 B 样条端点和直线端点加“端点相切”时报冗余，原因最可能是？</p><div class="opts"><button type="button" data-k="a">A. B 样条太短</button><button type="button" data-k="b">B. 原来的重合约束还在，端点相切本身就包含重合</button><button type="button" data-k="c">C. 直线没约束</button><button type="button" data-k="d">D. 要先锁定</button></div><p class="why" hidden>端点相切 = 重合 + 相切；原来那条重合要先删掉。</p></div>
+<div class="quiz" data-ok="b"><p class="q">倒圆角（固定半径）得到的过渡面和两边是几级连续？</p><div class="opts"><button type="button" data-k="a">A. G0</button><button type="button" data-k="b">B. G1</button><button type="button" data-k="c">C. G2</button><button type="button" data-k="d">D. G3</button></div><p class="why" hidden>圆角和两边相切，所以是 G1；曲率在接缝处突变，不是 G2。</p></div></section>
+<section id="l14"><h2><span class="n">14</span>第 14 课 曲面到实体：缝合、成实体、抽壳、检查几何</h2><p class="lead">学完能做：把几张曲面缝合成封闭的壳、再变成实体；单张曲面加厚成薄板；实体抽壳成铸件；交出去之前检查几何。把第 12、13 课的机头外形变成壁厚 4 mm 的铸件壳。约 1 小时。</p><h3 id="l14-goal">学完能做什么</h3>
+<ul>
+<li>分清面（Face）、壳（Shell）、实体（Solid）：壳是缝在一起的面；封闭的壳才能围成实体。</li>
+<li>缝合：Part“从形状生成”→“壳”（或“缝合”）把几张面连成壳；“实体”把封闭的壳变成实体。</li>
+<li>加厚：一张开口的曲面，Part“偏移 → 加厚”给它厚度。</li>
+<li>抽壳：实体选开口面，向里留一层壁。</li>
+<li>检查几何：坏面、缝隙、自相交。</li>
+</ul>
+
+<h3 id="l14-ways">三种做法</h3>
+<table>
+<thead>
+<tr>
+<th>手里有什么</th>
+<th>怎么变实体</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>几个实体（拉伸、旋转出来的）</td>
+<td>布尔运算直接得到实体（第 13 课的交集就是这样）</td>
+</tr>
+<tr>
+<td>几张曲面，围成封闭的一圈</td>
+<td>选这些面，“从形状生成 → 壳”，再“→ 实体”；有缝就先“精简形状”或调公差缝合</td>
+</tr>
+<tr>
+<td>一张开口的曲面（薄壁件）</td>
+<td>“偏移 → 加厚”，给厚度和方向</td>
+</tr>
+</tbody>
+</table>
+<p>本模块的机头走的是第一条路：轮廓拉成实体再求交、倒圆角，结果已经是封闭的实体。</p>
+<h3 id="l14-shell">机头：抽壳成铸件</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l14a.jpg"><source src="media/wqcad-l14a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l14a.vtt"></video><figcaption>▶ 录屏：翻到底面、选中 → Part 抽壳 −4 mm → 底面开口的铸件壳（约 50 秒）</figcaption></figure>
+<ul>
+<li>厚度填负数（−4）是向里长：外形尺寸不变，正好是铸件的壁。</li>
+<li>选中的面被挖开，其余面都留 4 mm。</li>
+<li>做完体积 282702.7 mm³。整机里的机头网格是 387738 mm³——网格还有下部的颈、里面的筋板和轴承座，本模块只做了上部箱体的外壳，两者不能直接比。</li>
+</ul>
+<h3 id="l14-check">检查几何</h3>
+<p>交出去加工、做模具或导出 STEP 之前，选中实体，Part“检查几何”：</p>
+<table>
+<thead>
+<tr>
+<th>查什么</th>
+<th>有问题时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>形状是否有效（BRep check）</td>
+<td>面的边界不闭合、面和边对不上；回到出问题的特征改参数</td>
+</tr>
+<tr>
+<td>自相交</td>
+<td>圆角、抽壳太厚最常见；减小半径或厚度</td>
+</tr>
+<tr>
+<td>体积、面积（勾“运行 BOP 检查”和“形状内容”）</td>
+<td>看实体数是不是 1、壳是不是封闭</td>
+</tr>
+</tbody>
+</table>
+<p>问渠 CAD 的“检查几何”和官方 FreeCAD 1.1 的结果不一样——这是问渠 CAD 的内核修正之一（第 20 课讲），所以这一步不录屏；你在问渠 CAD 里看到的结果为准。</p>
+<h3 id="l14-do">跟着做</h3>
+<ol class="steps">
+<li>打开第 13 课的文件。视图切到“底视图”，点中底面。</li>
+<li>Part“抽壳”（在“偏移工具”里），厚度 −4 mm，确定。</li>
+<li>选“抽壳”的结果，Part“检查几何”，看报告。</li>
+</ol>
+
+<h3 id="l14-self">自己做</h3>
+<ol>
+<li>不用布尔：把第 12 课两个拉伸的曲面各自修剪（Part“分割”或曲面工作台“修剪”），选剩下的面“从形状生成 → 壳 → 实体”，和交集的结果比体积。</li>
+<li>抽壳时多选一个面（比如右侧面），看两面都开口的样子。</li>
+<li>把机头下部收窄的那段（第 12 课“自己做”第 2 题）也做成实体，和上部合并后再抽壳。</li>
+</ol>
+<h3 id="l14-quiz">小测</h3>
+<div class="quiz" data-ok="b"><p class="q">几张曲面要变成实体，前提是？</p><div class="opts"><button type="button" data-k="a">A. 面越多越好</button><button type="button" data-k="b">B. 它们缝成的壳是封闭的</button><button type="button" data-k="c">C. 都是平面</button><button type="button" data-k="d">D. 都在一个草图里</button></div><p class="why" hidden>只有封闭的壳才围得出体积；有缝要先补上或缝合。</p></div>
+<div class="quiz" data-ok="b"><p class="q">抽壳厚度填 −4 mm 是什么意思？</p><div class="opts"><button type="button" data-k="a">A. 向外长 4 mm</button><button type="button" data-k="b">B. 向里长 4 mm，外形不变</button><button type="button" data-k="c">C. 删除 4 mm</button><button type="button" data-k="d">D. 报错</button></div><p class="why" hidden>负值向里，外形尺寸保持；正值向外，外形变大。</p></div>
+<div class="quiz" data-ok="b"><p class="q">一张开口的曲面（比如外观件的面板）要变成 2 mm 厚的零件，用？</p><div class="opts"><button type="button" data-k="a">A. 抽壳</button><button type="button" data-k="b">B. 加厚（偏移 → 加厚）</button><button type="button" data-k="c">C. 交集</button><button type="button" data-k="d">D. 旋转</button></div><p class="why" hidden>抽壳要从实体开始；单张曲面用“加厚”。</p></div></section>
+<section id="appA"><h2><span class="n">15</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
 <p>官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1.4 GB）。</p>
 <h3 id="appA-install">安装</h3>
 <ol class="steps">

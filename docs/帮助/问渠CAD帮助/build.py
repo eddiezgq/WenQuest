@@ -39,8 +39,8 @@ LESSONS = [
     ("三 零件建模", 10, "基准面、基准轴、附着方式；参数化设计", "针杆接头（改一个全跟着变）", "l10"),
     ("三 零件建模", 11, "Part 工作台：基本体、布尔运算、偏移、截面", "送布偏心轮", "l11"),
     ("四 曲线与曲面", 12, "曲线：B 样条、螺旋线、投影、相交线", "机头外形的特征曲线（照网格逆向）", "l12"),
-    ("四 曲线与曲面", 13, "曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2", "机头的过渡曲面", None),
-    ("四 曲线与曲面", 14, "曲面到实体：缝合、成实体、加厚；检查几何", "一块外壳变实体", None),
+    ("四 曲线与曲面", 13, "曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2", "机头的修剪和过渡曲面", "l13"),
+    ("四 曲线与曲面", 14, "曲面到实体：缝合、成实体、加厚；检查几何", "机头外壳抽壳成铸件", "l14"),
     ("五 装配", 15, "装配工作台：插入零件、固定、关节、自由度", "曲柄滑块", None),
     ("五 装配", 16, "运动与检查：驱动关节、测距离、干涉、爆炸视图", "挑线四连杆转一圈", None),
     ("六 工程图", 17, "TechDraw：图框、投影、剖视、局部放大、尺寸", "针杆零件图", None),
@@ -64,8 +64,8 @@ LESSONS_EN = [
     ("3 Part modelling", "Datum planes and axes, attachment; parametric design", "Needle-bar link (change one, all follow)"),
     ("3 Part modelling", "Part workbench: primitives, Booleans, offset, sections", "Feed eccentric"),
     ("4 Curves & surfaces", "Curves: B-splines, helices, projection, intersections", "Characteristic curves of the head (reverse-engineered from the mesh)"),
-    ("4 Curves & surfaces", "Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity", "Blend surfaces of the arm"),
-    ("4 Curves & surfaces", "Surfaces to solids: sew, make solid, thicken; check geometry", "A shell panel made solid"),
+    ("4 Curves & surfaces", "Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity", "Trimming and blends on the head"),
+    ("4 Curves & surfaces", "Surfaces to solids: sew, make solid, thicken; check geometry", "The head shell hollowed into a casting"),
     ("5 Assembly", "Assembly workbench: insert parts, ground, joints, degrees of freedom", "Slider-crank"),
     ("5 Assembly", "Motion and checks: drive joints, measure, interference, exploded views", "Take-up four-bar, one turn"),
     ("6 Drawings", "TechDraw: templates, projections, sections, details, dimensions", "Needle-bar part drawing"),
@@ -75,9 +75,9 @@ LESSONS_EN = [
     ("8 AI", "AI workbench: part selection and checks, company parts library, AI part design", "Pick a bearing; replay the upper-shaft design"),
 ]
 
-FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10", "l11", "l12", "appA-install"]
-EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–12 课）", other=("English", "en/"), files=FILES)
-EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–12)",
+FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10", "l11", "l12", "l13", "l14", "appA-install"]
+EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–14 课）", other=("English", "en/"), files=FILES)
+EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–14)",
                   other=("中文", "../"), files=FILES)
 
 
@@ -100,7 +100,10 @@ def numbers(en=False):
                "t": f"{nc['t']:g}", "v": f"{nc['volume']:.1f}"},
         "dep": {"v": f"{1000 - math.pi * 9 * 10:.2f}"},
         "cr": {"D": "33", "d": "22", "e": "15.5", "t": "10", "v1": "10710.93", "v2": "11360.1"},   # 录屏里软件算的（director.log：pad 10.0 10710.93；after 18 11360.1）
-        "l12": {"dev_side": "0.47", "dev_front": "0.32"},   # 描出的轮廓到网格外形的最大距离（中文版录屏的草图，程序量的）
+        "l12": {"dev_side": "1.19", "dev_side_mean": "0.51", "dev_front": "0.32"},   # 描出的轮廓到网格外形的距离（中文版录屏做完第 13 课的草图，程序量的）
+        "l13": {"common": "1889045.8", "before": "29.2", "fillet": "1873384.8"} if en else
+               {"common": "1902449.3", "before": "35.0", "fillet": "1887664.2"},   # 各自录屏的 director.log（中英描图点得不完全一样）
+        "l14": {"shell": "281291.4" if en else "282702.7", "mesh": "387738"},   # mesh：head.stl 的体积
         "l11": {"cut": "2638.94", "off": "4561.51"},   # 录屏里算的；整机 feed_ecc.step 也是 2638.94
         "l10": {"pin": "2364.42", "v22": "3070.82", "real": "2295.65"},   # 录屏里算的；real：整机 nb_link.step
         "l9": {"blank": "51845.70", "holes": "47133.31", "done": "46459.55", "real": "46381.01", "diff": "78.54"},   # 录屏里算的；real：整机 handwheel.step

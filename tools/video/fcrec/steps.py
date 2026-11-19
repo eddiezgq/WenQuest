@@ -477,3 +477,27 @@ def zoom_sk(d, mm, px, at=None):
         d.wheel(1 if cur < px else -1, at or d.center(d.vp()))
         yield 120
     log("zoom_sk gave up", cur)
+
+
+def prop_bool(d, obj, prop, value, *path):
+    """属性栏里的是/否：点值那一格，出来的勾选框（或下拉）改成 value；没接住就直接改属性（和点一样）"""
+    pe, p = prop_pt(d, *path)
+    yield d.move(p, 800)
+    d.click(p)
+    yield 700
+    w = QtWidgets.QApplication.focusWidget()
+    log("prop bool editor", path, w.metaObject().className() if w else None)
+    if isinstance(w, QtWidgets.QCheckBox):
+        if w.isChecked() != value:
+            q = d.center(w)
+            d.click(q)
+            yield 400
+            if w.isChecked() != value:
+                w.click()
+    elif isinstance(w, QtWidgets.QComboBox):
+        w.setCurrentIndex(1 if value else 0)
+    yield 500
+    if bool(getattr(obj, prop)) != value:
+        setattr(obj, prop, value)
+    d.key(QtCore.Qt.Key_Return, w) if w is not None else None
+    yield 600

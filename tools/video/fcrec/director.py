@@ -98,6 +98,22 @@ class Director:
     def tool(self, button, cmd=None, ms=800):
         """移到工具栏按钮 button，点它：普通按钮真点；下拉组按钮（Comp…）圈出按钮、运行组里的命令 cmd（和点按钮一样）"""
         w = self.action_widget(button)
+        if w is None:                         # 按钮名对不上：找下拉组里含这个命令的那个按钮
+            want = cmd or button
+            w = self.action_widget(want)
+            if w is not None:
+                cmd = None                    # 命令自己就是一个按钮：直接点
+            for tb in ([] if w is not None else  self.mw.findChildren(QtWidgets.QToolBar)):
+                if not tb.isVisible():
+                    continue
+                for a in tb.actions():
+                    m = a.menu()
+                    if m and any(x.objectName() == want or x.data() == want for x in m.actions()):
+                        w, cmd = tb.widgetForAction(a), want
+                        break
+                if w is not None:
+                    break
+            log("tool fallback", button, cmd, w is not None)
         p = self.center(w)
         t = self.move(p, ms)
 

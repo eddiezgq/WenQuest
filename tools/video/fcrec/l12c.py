@@ -46,8 +46,8 @@ def script(d):
     mesh = [o for o in doc.Objects if o.TypeId == "Mesh::Feature"][0]
     side, front = [o for o in doc.Objects if o.TypeId == "Sketcher::SketchObject"][:2]
     yield from steps.pick_workbench(d, "Part", "Part")
-    yield d.say("两条轮廓变成曲面：选侧面轮廓，点“拉伸”，沿法向往两边拉，盖住机头的宽度；不勾“创建实体”——要的是曲面")
-    e1 = yield from extrude(d, side, 48, 70)
+    yield d.say("两条轮廓变成曲面：选侧面轮廓，点“拉伸”，沿法向往两边拉，比机头宽度各多 2 mm；不勾“创建实体”——要的是曲面")
+    e1 = yield from extrude(d, side, 50, 72)      # 比机头宽度（−48…70）各多 2：侧面由正面轮廓的拉伸来定，交出来没有细缝
     yield d.say("正面轮廓同样拉伸，盖住机头的长度")
     e2 = yield from extrude(d, front, 75, 55)
     Gui.runCommand("Std_ViewIsometric"); Gui.SendMsgToActiveView("ViewFit"); yield 1200

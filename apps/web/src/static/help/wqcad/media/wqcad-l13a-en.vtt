@@ -1,0 +1,13 @@
+WEBVTT
+
+00:00:07.407 --> 00:00:18.779
+Surfaces: the two outline surfaces from the last lesson. To trim them against each other, first make them enclose solids: select an extrusion and set Solid to true
+
+00:00:18.779 --> 00:00:28.793
+Select both extrusions and click Common: only what both share remains—each surface trims away the other's excess
+
+00:00:28.793 --> 00:00:37.040
+There's the head's shape. Look at the edges: on the left, the curved front-top face meets the left face with a kink—a crease
+
+00:00:37.040 --> 00:00:48.920
+At both ends of the front-top corner the curved face meets the R14 rounds in a sharp edge. Wherever it kinks like this, there's only G0 (position continuity)

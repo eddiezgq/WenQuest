@@ -1,0 +1,10 @@
+WEBVTT
+
+00:00:09.314 --> 00:00:19.610
+Sharp edges remain at the ends of the front-top corner, where the curved front meets the R14 side rounds. Each face is smooth, but where they meet it's G0
+
+00:00:19.610 --> 00:00:31.610
+Make a transition face: select both edges (one is round the back), Part Fillet, radius 8
+
+00:00:33.740 --> 00:00:45.740
+The sharp edge becomes a rounded transition, tangent to both sides (G1). For G2 (curvature continuous, smoother reflections) use Surface workbench Filling with curvature boundary conditions

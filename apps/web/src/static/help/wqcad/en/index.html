@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–12)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–14)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -218,7 +218,24 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l12-do" data-s="l12">Follow along</a>
 <a class="sub" href="#l12-self" data-s="l12">On your own</a>
 <a class="sub" href="#l12-quiz" data-s="l12">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">13</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l13" data-s="l13"><span class="n">13</span>Lesson 13 Surfaces: trimming, G0 / G1 / G2 continuity, blends</a>
+<a class="sub" href="#l13-goal" data-s="l13">What you will be able to do</a>
+<a class="sub" href="#l13-g" data-s="l13">Continuity: G0, G1, G2</a>
+<a class="sub" href="#l13-trim" data-s="l13">Trimming into shape</a>
+<a class="sub" href="#l13-tangent" data-s="l13">G0 → G1: tangency in the outline</a>
+<a class="sub" href="#l13-blend" data-s="l13">Blend: a fillet on the sharp edges</a>
+<a class="sub" href="#l13-do" data-s="l13">Follow along</a>
+<a class="sub" href="#l13-self" data-s="l13">On your own</a>
+<a class="sub" href="#l13-quiz" data-s="l13">Quiz</a>
+<a href="#l14" data-s="l14"><span class="n">14</span>Lesson 14 Surfaces to solids: sew, make solid, thickness, check geometry</a>
+<a class="sub" href="#l14-goal" data-s="l14">What you will be able to do</a>
+<a class="sub" href="#l14-ways" data-s="l14">Three routes</a>
+<a class="sub" href="#l14-shell" data-s="l14">Head: hollowed into a casting</a>
+<a class="sub" href="#l14-check" data-s="l14">Check geometry</a>
+<a class="sub" href="#l14-do" data-s="l14">Follow along</a>
+<a class="sub" href="#l14-self" data-s="l14">On your own</a>
+<a class="sub" href="#l14-quiz" data-s="l14">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">15</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -239,9 +256,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l11">Lesson 11</a></td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l12">Lesson 12</a></td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the head (reverse-engineered from the mesh)</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l11">Lesson 11</a></td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l12">Lesson 12</a></td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the head (reverse-engineered from the mesh)</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l13">Lesson 13</a></td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Trimming and blends on the head</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l14">Lesson 14</a></td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>The head shell hollowed into a casting</td><td>Online</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
 
-<p>Lessons 1–12 are online now; the others follow module by module.</p>
+<p>Lessons 1–14 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
 <p>Every recording is the real software at work: FreeCAD 1.1.4 on a cloud computer with the WenQuest CAD branding and the same AI workbench, English interface. Where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. The only difference from WenQuest CAD on your computer is the 27 kernel fixes, which do not change the interface; “Check geometry” and “Unfold face” give different results, so those are not recorded and are taught with the book's verified data instead.</p>
 <p>The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.</p></section>
@@ -1284,7 +1301,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </tr>
 </tbody>
 </table>
-<p>Compared with the mesh outline, the traced side outline deviates at most 0.47 mm and the front outline 0.32 mm (60 sample points per segment, measured to the mesh outline). Cast blanks are typically toleranced around ±1 mm, so this is good enough.</p>
+<p>Compared with the mesh outline (the final version after lesson 13; 60 sample points per segment measured to the mesh outline), the side outline deviates at most 1.19 mm, 0.51 mm on average — the maximum is where the left line moved about 1 mm when tangency was added in lesson 13; the front outline at most 0.32 mm. Cast blanks are typically toleranced around ±1 mm, so this is good enough.</p>
 <h3 id="l12-front">Front outline: lock, fillet, radius</h3>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l12b-en.jpg"><source src="../media/wqcad-l12b-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l12b-en.vtt"></video><figcaption>▶ Recording: YZ sketch: polyline round four corners → lock two corner points → Fillet → radius 14 (about 60 s)</figcaption></figure>
 <ul>
@@ -1316,7 +1333,162 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">Which B-spline is easiest for tracing a mesh?</p><div class="opts"><button type="button" data-k="a">A. Control-point B-spline</button><button type="button" data-k="b">B. Interpolating B-spline (through points)</button><button type="button" data-k="c">C. Arc</button><button type="button" data-k="d">D. Ellipse</button></div><p class="why" hidden>An interpolating B-spline passes through each clicked point; click on the mesh edge and the curve follows it.</p></div>
 <div class="quiz" data-ok="b"><p class="q">Extrude with Create solid unticked gives?</p><div class="opts"><button type="button" data-k="a">A. A solid</button><button type="button" data-k="b">B. A surface (shell)</button><button type="button" data-k="c">C. A sketch</button><button type="button" data-k="d">D. Nothing</button></div><p class="why" hidden>A closed outline without Create solid gives just the surrounding surface.</p></div>
 <div class="quiz" data-ok="b"><p class="q">The result of Section on two surfaces?</p><div class="opts"><button type="button" data-k="a">A. A solid</button><button type="button" data-k="b">B. Their intersection curves</button><button type="button" data-k="c">C. The surfaces merged</button><button type="button" data-k="d">D. A sketch</button></div><p class="why" hidden>Section computes where the shapes&#x27; surfaces intersect — a common way to get 3D curves that lie in no single plane.</p></div></section>
-<section id="appA"><h2><span class="n">13</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l13"><h2><span class="n">13</span>Lesson 13 Surfaces: trimming, G0 / G1 / G2 continuity, blends</h2><p class="lead">You will be able to trim surfaces against each other into one shape; see where there is only G0 (a crease); make it G1 by adding tangency in the outline; and put a transition surface on a sharp edge where two faces meet. It continues lesson 12's head. About 1.5 hours.</p><h3 id="l13-goal">What you will be able to do</h3>
+<ul>
+<li>Trim two (or more) surfaces against each other: let each enclose a solid, then take their Common.</li>
+<li>Recognise continuity: G0 just touches (a crease), G1 also matches direction (tangent, no edge), G2 also matches curvature (smoothest reflections).</li>
+<li>A crease often starts in a sketch: two segments meet at an angle. Add Tangent and it becomes G1.</li>
+<li>Two faces that are each smooth can meet in a sharp edge: blend it with a fillet or a filling.</li>
+</ul>
+
+<h3 id="l13-g">Continuity: G0, G1, G2</h3>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Meaning</th>
+<th>Looks like</th>
+<th>How to get it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G0 position</td>
+<td>joined, no gap</td>
+<td>a crease; highlights break here</td>
+<td>segments only share an endpoint</td>
+</tr>
+<tr>
+<td>G1 tangent</td>
+<td>same direction too</td>
+<td>no edge, but highlights “kink” at the seam</td>
+<td>endpoint tangency; fillets</td>
+</tr>
+<tr>
+<td>G2 curvature</td>
+<td>same bending too</td>
+<td>highlights flow straight through</td>
+<td>Surface workbench Filling/Blend with curvature; higher-degree B-splines</td>
+</tr>
+</tbody>
+</table>
+<p>Most mechanical parts are fine at G1 (cast and machined fillets are G1); appearance parts, handles and car bodies care about G2.</p>
+<h3 id="l13-trim">Trimming into shape</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l13a-en.jpg"><source src="../media/wqcad-l13a-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l13a-en.vtt"></video><figcaption>▶ Recording: set Solid to true on both extrusions → Common → three kinds of crease (about 50 s)</figcaption></figure>
+<p>After Common the upper head is 1889045.8 mm³. Three kinds of crease show: on the left (the front-top curve meets the left face), at both ends of the front-top corner (the curve meets the R14 rounds), and along both sides of the top (the sloping top meets the R14 rounds; in the mesh the top rises towards the back).</p>
+<h3 id="l13-tangent">G0 → G1: tangency in the outline</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l13b-en.jpg"><source src="../media/wqcad-l13b-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l13b-en.vtt"></video><figcaption>▶ Recording: edit the side outline → delete the coincident at the B-spline ends → endpoint tangency at both ends → the left crease is gone (about 65 s)</figcaption></figure>
+<ul>
+<li>An interpolating B-spline only passes through the clicked points; its end direction is whatever the fit gives, usually not the neighbouring line's.</li>
+<li>Endpoint tangency already includes coincidence: delete the old coincident constraint first, or it's redundant and the sketch won't solve.</li>
+<li>With tangency, the B-spline shifts a little (its end direction is straightened) and the left line moves slightly too — in reverse engineering, smoothness and fit to the mesh are a trade-off.</li>
+</ul>
+<p>The angle between the faces at the left edge: 29.2° before tangency, 0° after.</p>
+<h3 id="l13-blend">Blend: a fillet on the sharp edges</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l13c-en.jpg"><source src="../media/wqcad-l13c-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l13c-en.vtt"></video><figcaption>▶ Recording: select the two sharp edges at the ends of the front-top corner → Part Fillet R8 (about 50 s)</figcaption></figure>
+<p>The fillet is tangent to both sides (G1). The result is 1873384.8 mm³. For G2: Surface workbench Filling (Surface_Filling), with these edges as the boundary and continuity set to curvature — it doesn't cut a fillet from the solid, it builds a new face from boundaries, which is then sewn to the others (lesson 14).</p>
+<p>The creases along the sides of the top (sloping top vs R14 rounds) are left as they are. Done properly, the R14 round wouldn't be a straight cylinder but a round swept along the sloping top edge — see On your own.</p>
+<h3 id="l13-do">Follow along</h3>
+<ol class="steps">
+<li>Open lesson 12's file and delete the Section; set Solid to true on both extrusions.</li>
+<li>Select both extrusions, Common. Look round for the three kinds of crease.</li>
+<li>Double-click the side outline: in the constraint list delete the coincident at each B-spline end; B-spline endpoint + line endpoint, Tangent; same at the other end. Close the sketch.</li>
+<li>Select the two sharp edges at the ends of the front-top corner, Part Fillet, radius 8.</li>
+</ol>
+
+<h3 id="l13-self">On your own</h3>
+<ol>
+<li>The creases along the top: replace the front outline's R14 rounds by a round swept along the sloping top edge (lesson 8's pipe), intersect again and see whether the crease remains.</li>
+<li>Surface workbench: cut away part of the front-top corner and fill it with Filling, trying position, tangent and curvature continuity; compare the highlights.</li>
+<li>If you have the Curves workbench add-on, turn on zebra stripes and compare G1 and G2.</li>
+</ol>
+<h3 id="l13-quiz">Quiz</h3>
+<div class="quiz" data-ok="a"><p class="q">Two segments share an endpoint but point different ways. What continuity is that?</p><div class="opts"><button type="button" data-k="a">A. G0</button><button type="button" data-k="b">B. G1</button><button type="button" data-k="c">C. G2</button><button type="button" data-k="d">D. Discontinuous</button></div><p class="why" hidden>Only position matches (G0); the direction differs, so there&#x27;s a crease.</p></div>
+<div class="quiz" data-ok="b"><p class="q">Adding endpoint tangency between a B-spline and a line reports redundancy. Most likely cause?</p><div class="opts"><button type="button" data-k="a">A. The B-spline is too short</button><button type="button" data-k="b">B. The old coincident is still there; endpoint tangency already includes it</button><button type="button" data-k="c">C. The line is unconstrained</button><button type="button" data-k="d">D. You must lock first</button></div><p class="why" hidden>Endpoint tangency = coincident + tangent; delete the original coincident first.</p></div>
+<div class="quiz" data-ok="b"><p class="q">A constant-radius fillet joins its neighbours with what continuity?</p><div class="opts"><button type="button" data-k="a">A. G0</button><button type="button" data-k="b">B. G1</button><button type="button" data-k="c">C. G2</button><button type="button" data-k="d">D. G3</button></div><p class="why" hidden>A fillet is tangent to both sides, so G1; curvature jumps at the seam, so not G2.</p></div></section>
+<section id="l14"><h2><span class="n">14</span>Lesson 14 Surfaces to solids: sew, make solid, thickness, check geometry</h2><p class="lead">You will be able to sew surfaces into a closed shell and make it a solid; thicken a single surface into a plate; hollow a solid into a casting; and check geometry before handing it on. Lessons 12–13's head shape becomes a 4 mm-wall casting shell. About 1 hour.</p><h3 id="l14-goal">What you will be able to do</h3>
+<ul>
+<li>Tell faces, shells and solids apart: a shell is faces sewn together; only a closed shell can enclose a solid.</li>
+<li>Sewing: Part Create from shape → Shell (or sew) joins faces into a shell; → Solid turns a closed shell into a solid.</li>
+<li>Thicken: give an open surface a thickness with Part Offset → Thickness.</li>
+<li>Thickness on a solid: pick the open faces and keep a wall inwards.</li>
+<li>Check geometry: bad faces, gaps, self-intersections.</li>
+</ul>
+
+<h3 id="l14-ways">Three routes</h3>
+<table>
+<thead>
+<tr>
+<th>What you have</th>
+<th>How it becomes a solid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Several solids (extrusions, revolutions)</td>
+<td>Booleans give a solid directly (lesson 13's Common)</td>
+</tr>
+<tr>
+<td>Several surfaces that close up</td>
+<td>select them, Create from shape → Shell, then → Solid; fix gaps first (refine, or sew with a tolerance)</td>
+</tr>
+<tr>
+<td>One open surface (a thin-walled part)</td>
+<td>Offset → Thickness, with thickness and direction</td>
+</tr>
+</tbody>
+</table>
+<p>The head in this module takes the first route: outlines extruded to solids, intersected and filleted — the result is already a closed solid.</p>
+<h3 id="l14-shell">Head: hollowed into a casting</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l14a-en.jpg"><source src="../media/wqcad-l14a-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l14a-en.vtt"></video><figcaption>▶ Recording: turn to the bottom face, select it → Part Thickness −4 → a casting shell open at the bottom (about 50 s)</figcaption></figure>
+<ul>
+<li>A negative thickness (−4) grows inwards: the outside stays the same and becomes the casting wall.</li>
+<li>The selected face is opened; every other face keeps 4 mm.</li>
+<li>The result is 281291.4 mm³. The head mesh in the machine is 387738 mm³ — it also has the narrower neck, internal ribs and bearing bosses, while this module made only the upper box's shell, so the two can't be compared directly.</li>
+</ul>
+<h3 id="l14-check">Check geometry</h3>
+<p>Before machining, tooling or STEP export, select the solid and run Part Check geometry:</p>
+<table>
+<thead>
+<tr>
+<th>What it checks</th>
+<th>If there's a problem</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shape validity (BRep check)</td>
+<td>face boundaries not closed, faces and edges don't match; go back to the feature and change its parameters</td>
+</tr>
+<tr>
+<td>Self-intersection</td>
+<td>most often fillets or thickness too large; reduce the radius or thickness</td>
+</tr>
+<tr>
+<td>Volume and area (tick Run BOP check and Shape content)</td>
+<td>check there is 1 solid and the shell is closed</td>
+</tr>
+</tbody>
+</table>
+<p>WenQuest CAD's Check geometry gives different results from official FreeCAD 1.1 — one of WenQuest CAD's kernel corrections (lesson 20) — so this step isn't recorded; go by what WenQuest CAD shows you.</p>
+<h3 id="l14-do">Follow along</h3>
+<ol class="steps">
+<li>Open lesson 13's file. Switch to the bottom view and click the bottom face.</li>
+<li>Part Thickness (under offset tools), −4 mm, OK.</li>
+<li>Select the Thickness result, Part Check geometry, and read the report.</li>
+</ol>
+
+<h3 id="l14-self">On your own</h3>
+<ol>
+<li>Without Booleans: trim the two lesson-12 surfaces against each other (Part Split, or Surface workbench trim), select the remaining faces, Create from shape → Shell → Solid, and compare the volume with the Common.</li>
+<li>Select one more face for Thickness (e.g. the right side) and see both opened.</li>
+<li>Model the narrow lower part of the head (lesson 12, On your own 2) as a solid too, fuse it to the upper part and then hollow it.</li>
+</ol>
+<h3 id="l14-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">What&#x27;s needed for several surfaces to become a solid?</p><div class="opts"><button type="button" data-k="a">A. As many faces as possible</button><button type="button" data-k="b">B. The shell they form must be closed</button><button type="button" data-k="c">C. All planar</button><button type="button" data-k="d">D. All in one sketch</button></div><p class="why" hidden>Only a closed shell encloses a volume; gaps must be filled or sewn first.</p></div>
+<div class="quiz" data-ok="b"><p class="q">Thickness −4 mm means?</p><div class="opts"><button type="button" data-k="a">A. Grow outwards 4 mm</button><button type="button" data-k="b">B. Grow inwards 4 mm, outside unchanged</button><button type="button" data-k="c">C. Delete 4 mm</button><button type="button" data-k="d">D. Error</button></div><p class="why" hidden>Negative grows inwards, keeping the outside size; positive grows outwards.</p></div>
+<div class="quiz" data-ok="b"><p class="q">An open surface (say an appearance panel) must become a 2 mm part. Use?</p><div class="opts"><button type="button" data-k="a">A. Thickness on a solid</button><button type="button" data-k="b">B. Thicken (Offset → Thickness on the surface)</button><button type="button" data-k="c">C. Common</button><button type="button" data-k="d">D. Revolve</button></div><p class="why" hidden>Solid hollowing starts from a solid; a single surface is thickened.</p></div></section>
+<section id="appA"><h2><span class="n">15</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">
