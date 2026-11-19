@@ -857,15 +857,32 @@ jobs:
           printf 'Host cn\n  HostName %s\n  User deploy\n  ServerAliveInterval 30\n  ServerAliveCountMax 6\n' "$HOST" > ~/.ssh/config
           ssh cn 'echo connected; free -m | head -2; df -h / | tail -1'
       # 2026-11-18：国内仓库里有内容不对的层（以前传到一半断了留下的），“只传缺的层”不会换掉它们，拉取时报 short read / unexpected EOF，
-      # 国内工厂一直停在旧版本。每次复制前按文件名（sha256）核对每一层，对不上的删掉，重启仓库清缓存，下一步就会重传。
-      - name: 国内仓库：核对每一层，坏的删掉重传
+      # 国内工厂一直停在旧版本。每次复制前核对仓库：
+      #  ① 每一层按文件名（sha256）核对内容，对不上的删掉；
+      #  ② 11-19 体检查到真正的原因：仓库里各镜像的“层登记”还在，层文件本身已经没了（以前清理旧版本时删掉的），
+      #     复制时问“这层有没有”回答有、就不传，拉的时候拿到 0 字节。登记了但文件不在的，把登记删掉。
+      #  删过任何东西就重启仓库清缓存，下一步“只传缺的层”就会把它们重传。
+      - name: 国内仓库：核对每一层，坏的、丢了文件的删掉重传
         if: env.SKIP != '1'
         run: |
           set -euo pipefail
-          out=$(ssh cn 'docker exec wq-registry sh -c '"'"'n=0; bad=0; for f in $(find /var/lib/registry/docker/registry/v2/blobs -name data -type f); do d=$(dirname "$f"); want=$(basename "$d"); n=$((n+1)); got=$(sha256sum "$f" | cut -d" " -f1); if [ "$got" != "$want" ]; then echo "bad $want $(stat -c %s "$f")"; rm -rf "$d"; bad=$((bad+1)); fi; done; echo "checked $n bad $bad"'"'"'')
-          echo "$out"
-          if echo "$out" | grep -q "^bad "; then
-            echo "::warning::国内仓库删掉了 $(echo "$out" | grep -c '^bad ') 个坏层，接下来重传"
+          out=$(ssh cn 'docker exec -i wq-registry sh' <<'SH'
+          R=/var/lib/registry/docker/registry/v2
+          n=0; bad=0; lost=0
+          for f in $(find $R/blobs -name data -type f); do
+            d=$(dirname "$f"); want=$(basename "$d"); n=$((n+1))
+            if [ "$(sha256sum "$f" | cut -d' ' -f1)" != "$want" ]; then echo "bad $want $(stat -c %s "$f")"; rm -rf "$d"; bad=$((bad+1)); fi
+          done
+          for l in $(find $R/repositories -path '*/_layers/sha256/*/link' -type f); do
+            h=$(sed 's/^sha256://' "$l")
+            if [ ! -s "$R/blobs/sha256/$(echo "$h" | cut -c1-2)/$h/data" ]; then echo "lost $h"; rm -rf "$(dirname "$l")"; lost=$((lost+1)); fi
+          done
+          echo "checked $n bad $bad lost $lost"
+          SH
+          )
+          echo "$out" | tail -40
+          if echo "$out" | grep -qE "^(bad|lost) "; then
+            echo "::warning::国内仓库删掉了 $(echo "$out" | grep -c '^bad ') 个坏层、$(echo "$out" | grep -c '^lost ') 个丢了文件的层登记，接下来重传"
             ssh cn 'docker restart wq-registry >/dev/null && for i in $(seq 1 30); do curl -sf http://127.0.0.1:5000/v2/ >/dev/null && exit 0; sleep 2; done; exit 1'
           fi
       - name: 复制镜像进国内服务器的仓库（经 SSH 隧道，只传缺的层）
