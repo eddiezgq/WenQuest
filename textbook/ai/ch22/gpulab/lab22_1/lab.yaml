@@ -1,0 +1,62 @@
+标题: ["GPU 实验 22.1 用公开气象数据训一个光伏功率预测模型，并用两种口径验收它", "GPU Lab 22.1 Train a PV power forecaster on open weather data and score it under two split conventions"]
+目的: ["用一段公开的逐小时气象再分析数据（辐照、云量、气温）训一个光伏功率预测模型，然后做比训练更要紧的两件事：**按时间划分**验收（拿过去预测未来），再**按天气型划分**验收（在晴天上训、到阴天上测）。两个数会差很远。最后把误差折成**调度成本**——同样的均方根误差，不同的方向代价差几倍，而这件事只有算成钱才看得见。",
+       "Train a PV power forecaster on an open hourly weather reanalysis (irradiance, cloud cover, temperature), then do the two things that matter more than training: score it with a time-ordered split (does the past predict the future) and with a weather-regime split (train on clear days, test on overcast ones). The two numbers differ widely. Finally convert the error into dispatch cost: the same RMSE costs very different amounts depending on its direction."]
+显卡: basic
+结果:
+  - {名: n_hours, 说明: ["取到的小时数", "hours of data"], 单位: "小时"}
+  - {名: source, 说明: ["数据来源（公开接口或合成）", "data source (open API or synthetic)"], 单位: "—"}
+  - {名: rmse_persist, 说明: ["持续法基线的均方根误差", "RMSE of the persistence baseline"], 单位: "kW"}
+  - {名: rmse_time, 说明: ["按时间划分的均方根误差", "RMSE, time-ordered split"], 单位: "kW"}
+  - {名: rmse_regime, 说明: ["按天气型划分的均方根误差", "RMSE, weather-regime split"], 单位: "kW"}
+  - {名: regime_ratio, 说明: ["按天气型比按时间差几倍", "how much worse the regime split is"], 单位: "倍"}
+  - {名: cover_nominal, 说明: ["分位数区间的名义覆盖率", "nominal coverage of the interval"], 单位: "%"}
+  - {名: cover_actual, 说明: ["实际覆盖率", "observed coverage"], 单位: "%"}
+  - {名: cost_ratio, 说明: ["同样大小的误差，往高报比往低报贵几倍", "cost ratio of over- versus under-declaring"], 单位: "倍"}
+  - {名: best_bias, 说明: ["成本最低的申报偏置", "cost-optimal declaration bias"], 单位: "kW"}
+  - {名: train_s, 说明: ["训练用时", "training wall time"], 单位: "秒"}
+文件: []
+实际问题:
+  标题: ["屋顶这片光伏，明天能发多少，敢不敢报上去", "How much will the roof produce tomorrow, and dare you declare it?"]
+  内容: ["问渠减速器厂屋顶装了一片光伏，车间里有一组储能。参加需求侧响应要**提前申报**每个时段从电网买多少电，实际与申报不符要按偏差结算。于是“明天能发多少”这个问题有了价钱：报高了，少发的那部分要按高价买回来；报低了，多发的电只能贱卖。本实验在公开气象数据上训一个预测模型，然后回答三个问题：它比最笨的基线强多少？换一种天气型还准不准？把它的误差折成钱是多少？",
+         "The workshop has rooftop PV and a battery in the hall. Taking part in demand response means declaring, ahead of time, how much will be drawn from the grid in each interval, with the difference settled afterwards. 'How much will it produce tomorrow' therefore has a price: declare too much and the shortfall is bought back dear; declare too little and the surplus is sold cheap. This lab trains a forecaster on open weather data and answers three questions: is it better than the dumbest baseline, does it hold on a different weather regime, and what is its error worth in money?"]
+原理:
+  - ["光伏出力 ≈ **晴空出力 × 云的遮挡 × 温度修正**。晴空那一项由太阳几何算出来，是确定的；难的全在云。所以气象预报的误差会**原样传进**功率预报，模型再大也补不上（22.1 节）。", "PV output is roughly clear-sky output times a cloud factor times a temperature correction. The clear-sky term follows from solar geometry and is deterministic; all the difficulty is in the clouds, so the weather forecast's own error passes straight into the power forecast."]
+  - ["**先打赢两个笨基线**：持续法（明天和今天一样）与气候法（历史同时刻平均）。打不赢它们的模型不要上线——它们一行特征工程都不需要（算例 22.1）。", "Beat two dumb baselines first: persistence and climatology. A model that cannot beat them should not be deployed; neither needs any feature engineering."]
+  - ["**划分口径第五次露面。** 时间序列必须按时间划分，而且要留间隔；此外还要单独报“换一种天气型还准不准”——在晴天上训、到阴天上测，这是现场最常见的失效方式（22.1 节、算例 22.3）。", "Time series must be split in time order, with a gap. Beyond that, report the weather-regime split separately: train on clear days, test on overcast ones, which is the most common way these models fail in service."]
+  - ["**调度要的是分位数，不是点预测。** 点预测回答“最可能是多少”，调度问“有多大把握不低于多少”。报区间必须同时报**名义覆盖率与实际覆盖率**（22.1 节）。", "Dispatch needs quantiles, not point forecasts: report both the nominal and the observed coverage of any interval you publish."]
+  - 式: "弹球损失 L_q(y, ŷ) = max(q(y−ŷ), (q−1)(y−ŷ))；偏差成本 = Σ[ max(申报−实际,0)×电价×少发倍数 + max(实际−申报,0)×电价×贱卖倍数 ]×Δt"
+步骤:
+  - ["运行第 1 节：装环境、确认显卡（任务 1）。", "Run section 1 to install the environment and confirm the GPU (task 1)."]
+  - ["运行第 2 节：取公开气象数据并折成光伏出力，记下小时数、来源与容量假设（任务 2），填表 1。", "Run section 2 to fetch the open weather data and convert it to PV output, recording the hours, the source and the capacity assumption (task 2) in Table 1."]
+  - ["运行第 3 节：算两个笨基线，记下它们的均方根误差（任务 3），填表 2 前两行。", "Run section 3 for the two baselines, recording their RMSE (task 3) in the first rows of Table 2."]
+  - ["运行第 4 节：按时间划分训一遍、按天气型划分再训一遍，记下两个均方根误差与训练用时（任务 4），填满表 2。", "Run section 4 to train under both split conventions, recording the two RMSE values and the wall time (task 4)."]
+  - ["运行第 5 节：训三个分位数，记下名义覆盖率与实际覆盖率（任务 5），填表 3。", "Run section 5 to fit three quantiles and record the nominal and observed coverage (task 5) in Table 3."]
+  - ["运行第 6 节：把误差折成偏差成本，记下两个方向的代价比与成本最低的申报偏置（任务 6），填表 4。", "Run section 6 to convert the error into imbalance cost, recording the direction ratio and the cost-optimal bias (task 6) in Table 4."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  数据与假设", "Table 1  Data and assumptions"]
+    表头: ["项", "值", "来源或假设"]
+    表头英文: ["item", "value", "source or assumption"]
+    行: [["小时数", "{n_hours}", ""], ["数据来源", "{source}", ""], ["装机容量", "", "本实验的显式假设"], ["温度修正系数", "", "本实验的显式假设"]]
+  - 标题: ["表 2  两个基线与两种划分口径", "Table 2  Two baselines and two split conventions"]
+    表头: ["做法", "均方根误差（kW）", "训练用时", "这个数回答的是什么问题"]
+    表头英文: ["method", "RMSE (kW)", "wall time", "which question it answers"]
+    行: [["持续法（昨天的今天）", "{rmse_persist}", "—", ""], ["气候法（历史同时刻平均）", "", "—", ""], ["模型，按时间划分", "{rmse_time}", "{train_s}", ""], ["模型，按天气型划分", "{rmse_regime}", "", ""]]
+  - 标题: ["表 3  区间报得准不准", "Table 3  Does the interval hold?"]
+    表头: ["区间", "名义覆盖率", "实际覆盖率", "平均宽度（kW）"]
+    表头英文: ["interval", "nominal coverage", "observed coverage", "mean width (kW)"]
+    行: [["10%—90%", "{cover_nominal}", "{cover_actual}", ""], ["25%—75%", "", "", ""]]
+  - 标题: ["表 4  误差折成钱", "Table 4  The error in money"]
+    表头: ["项", "值", "说明"]
+    表头英文: ["item", "value", "note"]
+    行: [["往高报 / 往低报的成本比", "{cost_ratio}", ""], ["成本最低的申报偏置", "{best_bias}", ""], ["均方根误差最低的申报偏置", "", ""], ["照成本调能省", "", ""]]
+注意:
+  - ["**公开气象数据是再分析值，不是预报值。** 用它当输入，相当于假设“气象预报完全准确”，所以本实验的误差是**下界**，真实业务里要更大。引用本实验的数时必须带这句话。", "The open weather data is a reanalysis, not a forecast. Using it as input assumes a perfect weather forecast, so the errors here are a lower bound and will be larger in service. Any number quoted from this lab must carry that sentence."]
+  - ["**辐照折成功率的那一步是本书的折算**（容量、温度系数、逆变器效率都是显式假设），不是任何厂家的实测曲线。换一套假设，表 1 以下的数全变。", "Converting irradiance into power uses this book's own assumptions for capacity, temperature coefficient and inverter efficiency, not any manufacturer's measured curve."]
+  - ["**不要把两种划分的误差平均。** 它们回答两个不同的问题：按时间划分问“拿过去预测未来准不准”，按天气型划分问“换一种天气还准不准”。报告里要分两行写。", "Do not average the two split results: one asks whether the past predicts the future, the other whether the model transfers to another weather regime."]
+  - ["夜里出力恒为零，**把夜间点算进均方根误差会把它压低一大截**。本实验的所有误差都只在白天的点上算，报告里也要写明这一条。", "Output is identically zero at night, and including those points flatters the RMSE. All errors here are computed on daylight hours only, and reports must say so."]
+  - ["电价、罚金倍数是**显式假设**，与第 22 章算例同一套，不代表任何地区的真实规则。", "The prices and penalty multipliers are explicit assumptions shared with the chapter's worked examples and represent no real market."]
+思考题:
+  - ["你的“按天气型划分”比“按时间划分”差几倍？如果供应商只给你第一个数，你会怎么把第二个数写成一条验收条款？", "How much worse is your regime split than your time split? If a supplier quotes only the first, how would you write the second into an acceptance clause?"]
+  - ["把气象输入换成带噪声的版本（给辐照加上 10% 的随机误差），四个数各会怎么变？哪一个变得最多？", "Add 10% random error to the irradiance input and rerun: which of the four numbers moves most, and why?"]
+  - ["本实验的成本最低偏置是在一套假设的电价规则下算的。把你们自己的结算条款代进去，这个偏置变成多少？预测精度每提高 1 kW，值多少钱？", "The cost-optimal bias here comes from one assumed set of rules. Substitute your own settlement clauses: what is the optimum then, and what is one kW of RMSE worth?"]
