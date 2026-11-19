@@ -10,6 +10,7 @@
   ::video{src=… title="…"}  录像（mp4 + 封面 jpg + 中文字幕 vtt）
   ::img{src=… caption="…"}  截图
   ::try{label="…" …}      “试一试”：带参数打开软件（地址由各软件的 try_url 给）
+  ::quiz{q="…" a="…" b="…" c="…" ok=b why="…"}  小测（点选项当场判对错、给出原因；版式与判分在 template.html）
   ::only{web} … ::end      只在某一份里出现
 """
 from __future__ import annotations
@@ -57,6 +58,10 @@ def directive(name, a, ed, media_prefix, try_url):
                 f'</video><figcaption>▶ {e(cap)}</figcaption></figure>')
     if name == "img":
         return f'<figure class="shot"><img loading="lazy" src="{media_prefix}{e(a["src"])}" alt="{e(a.get("caption", ""))}"><figcaption>{e(a.get("caption", ""))}</figcaption></figure>'
+    if name == "quiz":     # 小测：::quiz{q="题目" a="选项" b="…" c="…" d="…" ok=b why="为什么"}
+        opts = "".join(f'<button type="button" data-k="{k}">{k.upper()}. {e(a[k])}</button>' for k in "abcd" if k in a)
+        return (f'<div class="quiz" data-ok="{e(a["ok"])}"><p class="q">{e(a["q"])}</p><div class="opts">{opts}</div>'
+                f'<p class="why" hidden>{e(a.get("why", ""))}</p></div>')
     if name == "try":
         return f'<a class="try" href="{e(try_url(a, ed))}" target="_blank" rel="noopener">▶ 试一试：{e(a["label"])}</a>'
     raise ValueError("unknown directive " + name)

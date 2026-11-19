@@ -99,6 +99,13 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 .card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 18px}
 .tag{display:inline-block;font:600 12px/1 var(--mono);padding:4px 7px;border-radius:4px;background:var(--soft);color:var(--muted);vertical-align:middle}
 .top-other{font-size:13px}
+.quiz{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:14px 18px;margin:16px 0}
+.quiz .q{margin:0 0 10px;font-weight:600}
+.quiz .opts{display:grid;gap:8px}
+.quiz button{text-align:left;font:15px/1.6 var(--font);background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer}
+.quiz button.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--paper))}
+.quiz button.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--paper))}
+.quiz .why{margin:10px 0 0;color:var(--muted);font-size:14.5px}
 @media print{aside,.hamb,.try,.anim .bar,.calc{display:none}main{margin:0}section{padding:20px 0;break-inside:avoid-page}figure.vid{display:none}}
 </style>
 </head>
@@ -166,6 +173,13 @@ document.querySelectorAll("pre").forEach(p => {
   b.onclick = () => { navigator.clipboard.writeText(p.innerText.replace(/复制$|已复制$/, "").trim()).then(() => { b.textContent = "已复制"; b.classList.add("done"); setTimeout(() => { b.textContent = "复制"; b.classList.remove("done"); }, 1500); }); };
   p.appendChild(b);
 });
+// 小测：点一个选项，标对错、给原因
+document.querySelectorAll(".quiz").forEach(qz => qz.querySelectorAll("button").forEach(b => b.onclick = () => {
+  const ok = qz.dataset.ok;
+  qz.querySelectorAll("button").forEach(x => { x.classList.remove("right", "wrong"); if (x.dataset.k === ok) x.classList.add("right"); });
+  if (b.dataset.k !== ok) b.classList.add("wrong");
+  const w = qz.querySelector(".why"); w.hidden = false; w.textContent = (b.dataset.k === ok ? "✓ 对。" : "✗ 不对。") + w.textContent.replace(/^[✓✗] [^。]*。/, "");
+}));
 spy();
 </script>
 <script>

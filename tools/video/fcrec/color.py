@@ -15,7 +15,7 @@ def go():
                 vo = o.ViewObject
                 vo.ShapeColor = c
                 if o.Name in ("bed", "head"):
-                    vo.Transparency = 55; vo.DisplayMode = "Shaded"
+                    vo.Transparency = 55; vo.DisplayMode = "Shaded"; vo.Selectable = False   # 透明机壳不抢鼠标（录像里不会一指就整块变绿）
     doc.save()
     QtCore.QTimer.singleShot(1500, lambda: os._exit(0))
     return

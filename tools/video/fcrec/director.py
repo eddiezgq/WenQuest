@@ -1,89 +1,277 @@
+"""问渠 CAD 录屏导演（真操作）：剧本是一个生成器，每步 yield 要等的毫秒数。
+
+鼠标是真的：系统光标平滑移动（录像里看得见），同时把鼠标事件真发给鼠标下面的控件（三维视图、按钮、模型树……），
+FreeCAD 当真执行——画草图、点按钮、拖动视图都是软件自己做的，不是用 Python 直接改模型。
+点击处记到 clicks.txt（rings.py 事后叠黄圈）；字幕记到 subs.txt（时间 文字），make_vtt 转成字幕。
+"""
 import os
-"""问渠 CAD 录屏导演：在 FreeCAD 里按时间表做操作，鼠标平滑移动，点击处画黄圈。由录屏脚本 import。"""
-import math
-import FreeCAD as App, FreeCADGui as Gui
+import time
+import traceback
+
+import FreeCAD as App
+import FreeCADGui as Gui
 from PySide import QtCore, QtGui
+
 try:
     from PySide import QtWidgets
-except ImportError:
+except ImportError:  # pragma: no cover
     QtWidgets = QtGui
+from PySide6.QtTest import QTest
 
-R_LOG = os.path.join(os.environ.get('WQ_REC', '.'), 'clicks.txt')
+REC = os.environ.get("WQ_REC", ".")
+_LOG = open(os.path.join(REC, "director.log"), "w")
 
-class Ring(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__(None, QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.Tool | QtCore.Qt.WindowTransparentForInput)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground); self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
-        self.resize(90, 90); self.r = 0.0; self.hide()
-    def paintEvent(self, e):
-        p = QtGui.QPainter(self); p.setRenderHint(QtGui.QPainter.Antialiasing)
-        a = max(0.0, 1.0 - self.r)
-        p.setPen(QtGui.QPen(QtGui.QColor(242, 183, 5, int(255 * a)), 5)); p.setBrush(QtGui.QColor(242, 183, 5, int(50 * a)))
-        rad = 14 + 26 * self.r; p.drawEllipse(QtCore.QPointF(45, 45), rad, rad)
-    def flash(self, pt, done=None):
-        self.move(pt.x() - 45, pt.y() - 45); self.r = 0.0; self.show(); self.raise_()
-        t = QtCore.QTimer(self); n = [0]
-        def step():
-            n[0] += 1; self.r = n[0] / 18.0; self.update()
-            if n[0] >= 18:
-                t.stop(); self.hide(); done and done()
-        t.timeout.connect(step); t.start(40)
+
+def log(*a):
+    _LOG.write(" ".join(map(str, a)) + "\n")
+    _LOG.flush()
+
+
+Qt = QtCore.Qt
+
 
 class Director:
     def __init__(self):
-        self.mw = Gui.getMainWindow(); self.ring = Ring(); self.q = []; self.pos = QtCore.QPoint(800, 450)
-    # ---- 位置
+        self.mw = Gui.getMainWindow()
+        self.pos = QtCore.QPoint(800, 450)
+        QtGui.QCursor.setPos(self.pos)
+        for f in ("clicks.txt", "subs.txt"):
+            p = os.path.join(REC, f)
+            if os.path.exists(p):
+                os.remove(p)
+
+    # ------------------------------------------------------------ 找控件、算位置
+    def vp(self):
+        ws = [w for w in self.mw.findChildren(QtWidgets.QWidget) if "GL" in w.metaObject().className() and w.isVisible()]
+        return max(ws, key=lambda w: w.width() * w.height())
+
+    def model_pt(self, x, y, z=0.0):
+        """模型坐标 → 屏幕坐标（全局）"""
+        v = Gui.ActiveDocument.ActiveView
+        w = self.vp()
+        px, py = v.getPointOnViewport(App.Vector(x, y, z))
+        return w.mapToGlobal(QtCore.QPoint(int(round(px)), int(round(w.height() - py))))
+
     def center(self, w, rect=None):
-        r = rect if rect is not None else w.rect()
-        return w.mapToGlobal(r.center())
-    def action_pt(self, cmd):
+        return w.mapToGlobal((rect if rect is not None else w.rect()).center())
+
+    def action_widget(self, cmd):
         for tb in self.mw.findChildren(QtWidgets.QToolBar):
+            if not tb.isVisible():
+                continue
             for a in tb.actions():
                 if a.objectName() == cmd or a.data() == cmd:
                     w = tb.widgetForAction(a)
                     if w and w.isVisible():
-                        return self.center(w)
+                        return w
         return None
+
+    def tool(self, button, cmd=None, ms=800):
+        """移到工具栏按钮 button，点它：普通按钮真点；下拉组按钮（Comp…）圈出按钮、运行组里的命令 cmd（和点按钮一样）"""
+        w = self.action_widget(button)
+        p = self.center(w)
+        t = self.move(p, ms)
+
+        def go():
+            if cmd:
+                self.ring(p)
+                Gui.runCommand(cmd)
+            else:
+                self.click(p)
+        QtCore.QTimer.singleShot(t, go)
+        return t + 500
+
     def wb_combo(self):
         for c in self.mw.findChildren(QtWidgets.QComboBox):
-            if c.isVisible() and c.count() > 10 and c.mapTo(self.mw, QtCore.QPoint(0, 0)).y() < 60:
+            if c.isVisible() and c.count() > 10 and c.mapTo(self.mw, QtCore.QPoint(0, 0)).y() < 80:
                 return c
+
     def tree(self):
         for t in self.mw.findChildren(QtWidgets.QTreeWidget):
             if t.isVisible() and t.topLevelItemCount() and t.mapTo(self.mw, QtCore.QPoint(0, 0)).x() < 300:
                 return t
-    def tree_pt(self, label):
+
+    def tree_item(self, label):
         t = self.tree()
-        it = t.findItems(label, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)[0]
+        it = t.findItems(label, Qt.MatchExactly | Qt.MatchRecursive)[0]
         t.scrollToItem(it)
-        return t.viewport().mapToGlobal(t.visualItemRect(it).center()), it
-    # ---- 时间表
-    def at(self, ms, fn):
-        self.q.append((ms, fn)); return self
-    def run(self):
-        for ms, fn in self.q:
-            QtCore.QTimer.singleShot(int(ms), self._safe(fn))
-    def _safe(self, fn):
-        def f():
-            try:
-                fn()
-            except Exception:
-                import traceback; traceback.print_exc()
-        return f
-    # ---- 动作
-    def move(self, pt, ms=700):
-        a, b = QtCore.QPoint(self.pos), QtCore.QPoint(pt); self.pos = QtCore.QPoint(pt)
-        n = max(1, int(ms / 20)); t = QtCore.QTimer(self.mw); k = [0]
+        return t.viewport().mapToGlobal(t.visualItemRect(it).center())
+
+    def find(self, cls, text, exact=True):
+        for w in QtWidgets.QApplication.allWidgets():
+            if isinstance(w, cls) and w.isVisible():
+                t = w.text() if hasattr(w, "text") else ""
+                t = t.replace("&", "")
+                if (t == text) if exact else (text in t):
+                    return w
+        return None
+
+    def tab(self, text):
+        for tb in QtWidgets.QApplication.allWidgets():
+            if isinstance(tb, QtWidgets.QTabBar) and tb.isVisible():
+                for i in range(tb.count()):
+                    if tb.tabText(i).replace("&", "") == text:
+                        return tb, i
+        return None, None
+
+    # ------------------------------------------------------------ 真鼠标、真键盘
+    def _send(self, kind, gpt, button=Qt.NoButton, buttons=Qt.NoButton, mods=Qt.NoModifier):
+        w = QtWidgets.QApplication.widgetAt(gpt)
+        if w is None:
+            return None
+        lp = w.mapFromGlobal(gpt)
+        ev = QtGui.QMouseEvent(kind, QtCore.QPointF(lp), QtCore.QPointF(gpt), button, buttons, mods)
+        QtWidgets.QApplication.sendEvent(w, ev)
+        return w
+
+    def move(self, gpt, ms=700, buttons=Qt.NoButton, mods=Qt.NoModifier):
+        """平滑移到 gpt；一路发鼠标移动事件（三维视图、草图预览跟着动）。返回用时。"""
+        a, b = QtCore.QPoint(self.pos), QtCore.QPoint(gpt)
+        self.pos = QtCore.QPoint(gpt)
+        n = max(1, int(ms / 25))
+        k = [0]
+        t = QtCore.QTimer(self.mw)
+        if getattr(self, "_mt", None):
+            self._mt.stop()
+        self._mt = t
+
         def step():
-            k[0] += 1; s = k[0] / n; e = s * s * (3 - 2 * s)
-            QtGui.QCursor.setPos(int(a.x() + (b.x() - a.x()) * e), int(a.y() + (b.y() - a.y()) * e))
-            if k[0] >= n: t.stop()
-        t.timeout.connect(step); t.start(20)
-    def click(self, pt, then=None):
-        import time
-        with open(R_LOG, 'a') as f: f.write(f'{time.time():.3f} {pt.x()} {pt.y()}\n')
-        then and QtCore.QTimer.singleShot(250, self._safe(then))
-    def orbit(self, ms=6000, vel=1.0, axis=(0, 0, 1)):
-        v = Gui.ActiveDocument.ActiveView
-        v.startAnimating(axis[0], axis[1], axis[2], vel)
-        QtCore.QTimer.singleShot(int(ms), v.stopAnimating)
+            k[0] += 1
+            s = k[0] / n
+            e = s * s * (3 - 2 * s)
+            p = QtCore.QPoint(int(a.x() + (b.x() - a.x()) * e), int(a.y() + (b.y() - a.y()) * e))
+            QtGui.QCursor.setPos(p)
+            self._send(QtCore.QEvent.MouseMove, p, Qt.NoButton, buttons, mods)
+            if k[0] >= n:
+                t.stop()
+        t.timeout.connect(step)
+        t.start(25)
+        return ms + 60
+
+    def ring(self, gpt):
+        with open(os.path.join(REC, "clicks.txt"), "a") as f:
+            f.write(f"{time.time():.3f} {gpt.x()} {gpt.y()}\n")
+
+    def click(self, gpt=None, button=Qt.LeftButton, mods=Qt.NoModifier, ring=True, double=False):
+        gpt = gpt or self.pos
+        if getattr(self, "_mt", None):      # 还在移动（画面忙时定时器会慢）：直接到位再点
+            self._mt.stop()
+        QtGui.QCursor.setPos(gpt)
+        self._send(QtCore.QEvent.MouseMove, gpt)
+        if ring:
+            self.ring(gpt)
+        self._send(QtCore.QEvent.MouseButtonPress, gpt, button, button, mods)
+        self._send(QtCore.QEvent.MouseButtonRelease, gpt, button, Qt.NoButton, mods)
+        if double:
+            self._send(QtCore.QEvent.MouseButtonDblClick, gpt, button, button, mods)
+            self._send(QtCore.QEvent.MouseButtonRelease, gpt, button, Qt.NoButton, mods)
+
+    def press(self, button=Qt.LeftButton, mods=Qt.NoModifier):
+        self._send(QtCore.QEvent.MouseButtonPress, self.pos, button, button, mods)
+
+    def release(self, button=Qt.LeftButton, mods=Qt.NoModifier):
+        self._send(QtCore.QEvent.MouseButtonRelease, self.pos, button, Qt.NoButton, mods)
+
+    def wheel(self, steps, gpt=None):
+        gpt = gpt or self.pos
+        w = self.vp()
+        if w.rect().contains(w.mapFromGlobal(gpt)):
+            w = w.parentWidget()          # 三维视图的滚轮由外层 View3DInventorViewer 处理
+        else:
+            w = QtWidgets.QApplication.widgetAt(gpt)
+        lp = w.mapFromGlobal(gpt)
+        ev = QtGui.QWheelEvent(QtCore.QPointF(lp), QtCore.QPointF(gpt), QtCore.QPoint(0, 0), QtCore.QPoint(0, 120 * steps),
+                               Qt.NoButton, Qt.NoModifier, Qt.NoScrollPhase, False)
+        QtWidgets.QApplication.sendEvent(w, ev)
+
+    def keys(self, text, enter=False, w=None):
+        w = w or QtWidgets.QApplication.focusWidget() or self.vp()
+        QTest.keyClicks(w, text, Qt.NoModifier, 60)
+        if enter:
+            QTest.keyClick(w, Qt.Key_Return)
+
+    def key(self, k, w=None, mods=Qt.NoModifier):
+        w = w or QtWidgets.QApplication.focusWidget() or self.vp()
+        QTest.keyClick(w, k, mods)
+
+    def until(self, cond, timeout=15000, step=100):
+        """yield from d.until(...)：等到 cond() 为真（最多 timeout 毫秒）"""
+        t = 0
+        while t < timeout:
+            try:
+                if cond():
+                    return
+            except Exception:
+                pass
+            yield step
+            t += step
+        log("until timeout", cond)
+
+    def zoom_to(self, mm, px, at=None):
+        """滚轮真缩放，直到 mm 毫米在屏幕上约 px 像素（草图里用）"""
+        for _ in range(40):
+            a, b = self.model_pt(0, 0), self.model_pt(mm, 0)
+            cur = abs(b.x() - a.x())
+            if 0.85 * px <= cur <= 1.18 * px:
+                return
+            self.wheel(1 if cur < px else -1, at or self.center(self.vp()))
+            yield 120
+        log("zoom gave up")
+
+    # ------------------------------------------------------------ 字幕
+    def say(self, text):
+        with open(os.path.join(REC, "subs.txt"), "a", encoding="utf-8") as f:
+            f.write(f"{time.time():.3f}\t{text}\n")
+
+    # ------------------------------------------------------------ 运行剧本
+    def run(self, gen, end_flag=True):
+        def nxt():
+            try:
+                ms = next(gen)
+            except StopIteration:
+                if end_flag:
+                    open(os.path.join(REC, "end.flag"), "w").close()
+                return
+            except Exception:
+                log("EXC", traceback.format_exc())
+                open(os.path.join(REC, "end.flag"), "w").close()
+                return
+            QtCore.QTimer.singleShot(int(ms or 0), nxt)
+        nxt()
+
+
+def boot(script_main, delay=7000):
+    """FreeCAD 启动后：最大化、关开始页上的“首次启动”、告诉录像脚本可以开录"""
+    log("boot scheduled")
+
+    def go():
+        log("boot go")
+        Gui.getMainWindow().showMaximized()
+        QtCore.QTimer.singleShot(1200, lambda: (open(os.path.join(REC, "ready.flag"), "w").close(),
+                                                QtCore.QTimer.singleShot(800, script_main)))
+    QtCore.QTimer.singleShot(delay, go)
+
+
+def menu_path(d, *names):
+    """真点菜单：菜单栏上的“编辑”→ 弹出菜单里的“首选项…”（名字按开头匹配，忽略 & 和 …）"""
+    norm = lambda t: t.replace("&", "").replace("…", "").replace("...", "").strip()
+    mb = d.mw.menuBar()
+    act = [a for a in mb.actions() if norm(a.text()).startswith(names[0])][0]
+    p = mb.mapToGlobal(mb.actionGeometry(act).center())
+    yield d.move(p, 800)
+    d.click(p)
+    yield 700
+    for name in names[1:]:
+        menus = [m for m in QtWidgets.QApplication.topLevelWidgets() if isinstance(m, QtWidgets.QMenu) and m.isVisible()]
+        m = menus[-1]
+        a = [a for a in m.actions() if norm(a.text()).startswith(name)][0]
+        p = m.mapToGlobal(m.actionGeometry(a).center())
+        yield d.move(p, 600)
+        if name == names[-1]:
+            d.ring(p)
+            yield 250
+            m.close()
+            QtCore.QTimer.singleShot(0, a.trigger)     # 触发菜单项（模态对话框在下一轮事件里打开，剧本照常往下走）
+        else:
+            d.click(p)
+        yield 700
