@@ -12,3 +12,10 @@ for o in doc.Objects:
         o.Label = EN[o.Label]
 doc.saveAs(os.path.join(R, "model_en", "WQ-LS.FCStd"))
 print("OK", [o.Label for o in doc.Objects if o.TypeId == "App::DocumentObjectGroup"])
+
+# freecadcmd 存文件不写 GuiDocument.xml（颜色、显示/隐藏、透明度），英文版就全看不见了：从中文版原样拷过去（对象名一样）
+import zipfile
+src, dst = os.path.join(R, "model", "WQ-LS.FCStd"), os.path.join(R, "model_en", "WQ-LS.FCStd")
+with zipfile.ZipFile(src) as a, zipfile.ZipFile(dst, "a") as b:
+    if "GuiDocument.xml" not in b.namelist():
+        b.writestr("GuiDocument.xml", a.read("GuiDocument.xml"))

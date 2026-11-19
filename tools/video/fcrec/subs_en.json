@@ -55,5 +55,7 @@
  "“完全约束”，整个草图变绿：每条线在哪、多大都定了": "\"Fully constrained\" — the whole sketch turns green: every line's position and size is fixed",
  "关闭草图，凸台 8 mm：针夹就出来了（尺寸和 WQ-LS 设计里的针夹一样）": "Close the sketch and pad 8 mm: there is the needle clamp (same sizes as the WQ-LS design)",
  "点“新建草图”，选 XZ 平面": "Click \"Create sketch\" and choose the XZ plane",
- "点“新建草图”，选 YZ 平面": "Click \"Create sketch\" and choose the YZ plane"
+ "点“新建草图”，选 YZ 平面": "Click \"Create sketch\" and choose the YZ plane",
+ "打开上一课存的针夹草图，在模型树里双击草图，进入编辑": "Open the needle-clamp sketch saved in the last lesson and double-click the sketch in the model tree to edit it",
+ "打开 WQ-LS 整机，这一段练鼠标：平移、旋转、缩放，再看标准视图、选零件": "Open the WQ-LS machine. This clip practises the mouse: pan, rotate, zoom, then standard views and selecting parts"
 }

@@ -1,0 +1,34 @@
+WEBVTT
+
+00:00:00.759 --> 00:00:08.758
+Start page: new, open, examples. Click "Open" and open the WQ-LS lockstitch machine
+
+00:00:08.758 --> 00:00:13.657
+At the top is the menu bar: File, Edit, View, Tools… every command is here
+
+00:00:13.657 --> 00:00:19.757
+Below it, the toolbars: buttons for common commands. Hover over a button to see what it does
+
+00:00:19.757 --> 00:00:27.257
+The workbench selector: Part Design, Sketcher, Assembly, TechDraw, FEM… switch workbench and the toolbars change
+
+00:00:27.257 --> 00:00:33.257
+Top left, the model tree: every object in the file. WQ-LS is grouped into eight assemblies
+
+00:00:33.257 --> 00:00:39.182
+Bottom left, the properties: select an object to see its placement, colour and dimensions
+
+00:00:39.182 --> 00:00:44.182
+The big area in the middle is the 3D view, where you look at and pick parts
+
+00:00:44.182 --> 00:00:49.008
+Top right, the navigation cube: click a face to look from that direction
+
+00:00:49.008 --> 00:00:54.607
+Report view: messages, warnings and errors appear here (View → Panels → Report view)
+
+00:00:54.607 --> 00:01:00.332
+At the bottom, the status bar: what the mouse is over, the navigation style, the units
+
+00:01:00.332 --> 00:01:07.160
+That is the FreeCAD interface. WenQuest CAD is built on it, so it looks the same

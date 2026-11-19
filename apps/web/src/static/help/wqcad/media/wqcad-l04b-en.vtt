@@ -1,0 +1,28 @@
+WEBVTT
+
+00:00:00.648 --> 00:00:07.947
+Open the needle-clamp sketch saved in the last lesson and double-click the sketch in the model tree to edit it
+
+00:00:07.947 --> 00:00:17.646
+Geometric constraints: select first, then click the constraint. The centre line's lower end is free — pick that end point, then the bottom edge
+
+00:00:17.646 --> 00:00:22.221
+Click "Coincident / point on object": the end point snaps onto the edge
+
+00:00:22.221 --> 00:00:27.999
+Put the upper end point on the arc: again, select first, then click
+
+00:00:27.999 --> 00:00:35.249
+Symmetry: pick the lower-left and lower-right corners, then the vertical (Y) axis, and click "Symmetric"
+
+00:00:35.249 --> 00:00:44.646
+Red text "Redundant constraints": symmetry already makes the two corners level, so the bottom edge's "Horizontal" says the same thing again
+
+00:00:44.646 --> 00:00:50.646
+Undo the symmetry (Ctrl+Z), select that "Horizontal" in the constraint list and press Delete
+
+00:00:50.646 --> 00:00:58.052
+Add the symmetry again: lower-left corner, lower-right corner, Y axis, "Symmetric"
+
+00:00:58.052 --> 00:01:04.320
+Each constraint removes some freedom. The rest is fixed with dimensions

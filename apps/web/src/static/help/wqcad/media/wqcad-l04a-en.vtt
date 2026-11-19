@@ -1,0 +1,19 @@
+WEBVTT
+
+00:00:00.801 --> 00:00:08.101
+Open the needle-clamp sketch saved in the last lesson and double-click the sketch in the model tree to edit it
+
+00:00:08.101 --> 00:00:15.801
+The panel says "Under-constrained": some degrees of freedom are left — the shape can be dragged, sizes are not fixed
+
+00:00:15.801 --> 00:00:22.050
+Drag the bottom edge: the whole edge moves, because its distance from the origin is not fixed
+
+00:00:22.050 --> 00:00:26.801
+The arc can be dragged bigger or smaller: its radius is not fixed either
+
+00:00:26.801 --> 00:00:29.350
+Undo twice (Ctrl+Z) to go back
+
+00:00:29.350 --> 00:00:37.040
+The colours tell you too: white can still move; when fully constrained everything turns green

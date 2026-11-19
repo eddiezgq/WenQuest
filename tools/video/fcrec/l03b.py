@@ -9,7 +9,7 @@ import steps
 
 
 def script(d):
-    yield from steps.new_body_sketch(d, say=False, zoom=(10, 300))
+    yield from steps.new_body_sketch(d, zoom=(10, 300))
     yield d.say("针夹的轮廓：上面一段圆弧，下面一个方耳朵。先用“多段线”画三条直边")
     yield d.tool("Sketcher_CreatePolyline"); yield 300
     pts = [(3.5, -4.3), (3.5, -7), (-3.5, -7), (-3.5, -4.3)]

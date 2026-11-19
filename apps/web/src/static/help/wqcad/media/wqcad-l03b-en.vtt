@@ -1,0 +1,25 @@
+WEBVTT
+
+00:00:00.661 --> 00:00:06.160
+From the start page create a "Parametric Body": Part Design workbench with one Body
+
+00:00:06.160 --> 00:00:14.028
+Click "Create sketch" and choose the XY plane
+
+00:00:14.028 --> 00:00:20.917
+Needle-clamp outline: an arc on top, a square tab below. First draw three straight edges with Polyline
+
+00:00:20.917 --> 00:00:25.160
+Right-click to finish the polyline (press Esc to leave the tool)
+
+00:00:25.160 --> 00:00:32.862
+Arc tool: click the centre (origin), then the start point, go round over the top to the end point
+
+00:00:32.862 --> 00:00:38.261
+The bore: Circle tool, centre at the origin, diameter 8
+
+00:00:38.261 --> 00:00:45.961
+Draw a vertical centre line and toggle it to construction (blue dashed: for positioning only, not part of the shape)
+
+00:00:45.961 --> 00:00:56.920
+The outline is drawn, but by clicking, so the sizes are not exact — the panel still shows degrees of freedom. Lesson 4 fixes it with constraints

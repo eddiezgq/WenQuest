@@ -149,7 +149,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#appA-install" data-s="appA">安装</a>
 <a class="sub" href="#appA-fix" data-s="appA">排错</a></nav>
   <div class="tools">
-    <a href="https://wenquestrobotics.com/download/#tut-cad" class="top-other">看软件下载与安装</a>
+    <a href="en/" class="top-other">English</a>
     <button onclick="toggleTheme()">◐ 深浅色</button>
     <button onclick="window.print()">打印</button>
   </div>
@@ -549,6 +549,8 @@ spy();
   const css = (k) => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
   const C = () => ({ ink: css("--ink"), muted: css("--muted"), line: css("--line"), soft: css("--soft"), paper: css("--paper"),
     accent: css("--accent"), accent2: css("--accent2"), ok: css("--ok"), bad: css("--bad"), gold: css("--gold") });
+  const EN = (document.documentElement.lang || "").startsWith("en");
+  const T = (zh, en) => (EN ? en : zh);
   const FONT = '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif';
   function canvas(el, h) {
     const cv = document.createElement("canvas");
@@ -574,16 +576,16 @@ spy();
   // ---------------------------------------------------------------- 第 1 课：界面地图（网页画的示意，点一块看说明）
   A.uimap = function (el) {
     const R = [
-      ["menu", "菜单", 0, 0, 1, 0.045, "所有命令都在这里：文件、编辑、视图、工具、宏，以及当前工作台自己的菜单。"],
-      ["tool", "工具栏", 0, 0.045, 0.62, 0.11, "常用命令的按钮。鼠标停在按钮上会显示名字和说明；换工作台，这里跟着换。"],
-      ["wb", "工作台", 0.62, 0.045, 0.2, 0.055, "工作台下拉框：零件设计、草图、装配、工程图、有限元、AI Parts……换一个，工具就换一套。"],
-      ["tree", "模型树", 0, 0.155, 0.17, 0.42, "文件里的每个对象，按建模的先后排。选中、隐藏（空格）、改名、拖动换组都在这里。"],
-      ["prop", "属性", 0, 0.575, 0.17, 0.36, "选中对象的数据：位置、尺寸、颜色……能直接改数。"],
-      ["view", "三维视图", 0.17, 0.155, 0.6, 0.78, "看模型、点选的地方。CAD 导航：中键拖平移，中键 + 左键拖旋转，滚轮缩放。"],
-      ["cube", "导航立方体", 0.67, 0.165, 0.09, 0.16, "点面 = 正对那一面看；点角 = 轴测；箭头 = 转 45°。"],
-      ["task", "任务面板", 0.77, 0.155, 0.23, 0.78, "命令的参数在这里填：画草图时显示约束和自由度，凸台时填长度……做完点“确定”。"],
-      ["report", "报告视图", 0.17, 0.79, 0.6, 0.145, "提示、警告、出错写在这里（视图 → 面板 → 报告视图）。出了问题先看它。"],
-      ["status", "状态栏", 0, 0.935, 1, 0.065, "鼠标指着什么、坐标、当前导航方式（CAD）和单位。"],
+      ["menu", T("菜单", "Menu bar"), 0, 0, 1, 0.045, T("所有命令都在这里：文件、编辑、视图、工具、宏，以及当前工作台自己的菜单。", "Every command lives here: File, Edit, View, Tools, Macro, plus the current workbench's own menus.")],
+      ["tool", T("工具栏", "Toolbars"), 0, 0.045, 0.62, 0.11, T("常用命令的按钮。鼠标停在按钮上会显示名字和说明；换工作台，这里跟着换。", "Buttons for common commands. Hover to see a name and description; they change with the workbench.")],
+      ["wb", T("工作台", "Workbench"), 0.62, 0.045, 0.2, 0.055, T("工作台下拉框：零件设计、草图、装配、工程图、有限元、AI Parts……换一个，工具就换一套。", "Workbench selector: Part Design, Sketcher, Assembly, TechDraw, FEM, AI Parts… each brings its own set of tools.")],
+      ["tree", T("模型树", "Model tree"), 0, 0.155, 0.17, 0.42, T("文件里的每个对象，按建模的先后排。选中、隐藏（空格）、改名、拖动换组都在这里。", "Every object in the file, in modelling order. Select, hide (Space), rename and drag between groups here.")],
+      ["prop", T("属性", "Properties"), 0, 0.575, 0.17, 0.36, T("选中对象的数据：位置、尺寸、颜色……能直接改数。", "Data of the selected object: placement, sizes, colour… you can type new values.")],
+      ["view", T("三维视图", "3D view"), 0.17, 0.155, 0.6, 0.78, T("看模型、点选的地方。CAD 导航：中键拖平移，中键 + 左键拖旋转，滚轮缩放。", "Where you look at and pick the model. CAD navigation: middle-drag pans, middle + left drag rotates, wheel zooms.")],
+      ["cube", T("导航立方体", "Nav cube"), 0.67, 0.165, 0.09, 0.16, T("点面 = 正对那一面看；点角 = 轴测；箭头 = 转 45°。", "Click a face = look straight at it; a corner = isometric; arrows = turn 45°.")],
+      ["task", T("任务面板", "Tasks panel"), 0.77, 0.155, 0.23, 0.78, T("命令的参数在这里填：画草图时显示约束和自由度，凸台时填长度……做完点“确定”。", "Command parameters go here: constraints and degrees of freedom while sketching, the length of a pad… click OK when done.")],
+      ["report", T("报告视图", "Report view"), 0.17, 0.79, 0.6, 0.145, T("提示、警告、出错写在这里（视图 → 面板 → 报告视图）。出了问题先看它。", "Messages, warnings and errors (View → Panels → Report view). Look here first when something goes wrong.")],
+      ["status", T("状态栏", "Status bar"), 0, 0.935, 1, 0.065, T("鼠标指着什么、坐标、当前导航方式（CAD）和单位。", "What the mouse is over, coordinates, the navigation style (CAD) and units.")],
     ];
     const cv = canvas(el, 360);
     let cur = "view", hover = null;
@@ -598,7 +600,7 @@ spy();
         txt(g, r[1], x + w / 2, y + h / 2 + 5, on ? "#fff" : c.ink, 13.5, "center", on);
       }
       const r = R.find((x) => x[0] === cur);
-      info.innerHTML = `<b>${r[1]}</b>：${r[6]}`;
+      info.innerHTML = `<b>${r[1]}</b>${T("：", ": ")}${r[6]}`;
     }
     function hit(e) {
       const b = cv.cv.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top;
@@ -615,14 +617,15 @@ spy();
   // ---------------------------------------------------------------- 第 3 课：画圆的两下（模拟草图里的圆工具）
   A.circle = function (el) {
     const cv = canvas(el, 300);
-    const b = bar(el, '<button data-a="reset">重来</button> <label>键入直径 <input type="number" step="0.5" min="1" max="30" style="width:70px" placeholder="16"></label> <button data-a="enter">回车</button>');
+    const b = bar(el, `<button data-a="reset">${T("重来", "Reset")}</button> <label>${T("键入直径", "Type diameter")} <input type="number" step="0.5" min="1" max="30" style="width:70px" placeholder="16"></label> <button data-a="enter">${T("回车", "Enter")}</button>`);
     const info = cap(el, "");
     let st = { phase: 0, c: null, r: 0, cons: [] };
     const S = 9; // 像素 / mm
+    const COIN = T("重合（圆心在原点）", "Coincident (centre on origin)");
     const O = () => [cv.W() / 2, cv.H / 2];
     const toMM = (x, y) => { const [ox, oy] = O(); return [(x - ox) / S, (oy - y) / S]; };
     const toPx = (x, y) => { const [ox, oy] = O(); return [ox + x * S, oy - y * S]; };
-    function dof() { if (!st.c) return null; let n = 3; for (const k of st.cons) n -= k === "重合（圆心在原点）" ? 2 : 1; return n; }
+    function dof() { if (!st.c) return null; let n = 3; for (const k of st.cons) n -= k === COIN ? 2 : 1; return n; }
     function draw(mouse) {
       const c = C(), g = cv.g;
       cv.begin();
@@ -639,10 +642,10 @@ spy();
         if (r > 0) txt(g, `⌀${(2 * r).toFixed(st.phase === 2 ? 2 : 1)}`, cx + r * S * 0.72 + 6, cy - r * S * 0.72, c.bad, 13);
       }
       const d = dof();
-      const state = d === null ? "空草图" : d === 0 ? "<b style=\"color:var(--ok)\">完全约束</b>" : `约束不足：${d} 个自由度`;
-      info.innerHTML = (st.phase === 0 ? "第一下：在画布上点圆心（点在红绿两轴的交点 = 原点，软件会加“重合”）。" :
-        st.phase === 1 ? "第二下：点一下定半径（拖出来的不准），或者在上面键入直径再回车。" : "画好了。") +
-        `　右边会显示：${state}　约束：${st.cons.length ? st.cons.join("、") : "无"}`;
+      const state = d === null ? T("空草图", "Empty sketch") : d === 0 ? `<b style="color:var(--ok)">${T("完全约束", "Fully constrained")}</b>` : T(`约束不足：${d} 个自由度`, `Under-constrained: ${d} degrees of freedom`);
+      info.innerHTML = (st.phase === 0 ? T("第一下：在画布上点圆心（点在红绿两轴的交点 = 原点，软件会加“重合”）。", "First click: the centre (click where the red and green axes cross = the origin, and a Coincident is added).") :
+        st.phase === 1 ? T("第二下：点一下定半径（拖出来的不准），或者在上面键入直径再回车。", "Second click: click to set the radius (dragged = not exact), or type a diameter above and press Enter.") : T("画好了。", "Done.")) +
+        T(`　右边会显示：${state}　约束：${st.cons.length ? st.cons.join("、") : "无"}`, ` — the panel shows: ${state}; constraints: ${st.cons.length ? st.cons.join(", ") : "none"}`);
     }
     let mouse = null;
     cv.cv.addEventListener("mousemove", (e) => { const r = cv.cv.getBoundingClientRect(); mouse = toMM(e.clientX - r.left, e.clientY - r.top); if (st.phase === 1) draw(mouse); });
@@ -650,7 +653,7 @@ spy();
       const rr = cv.cv.getBoundingClientRect(), p = toMM(e.clientX - rr.left, e.clientY - rr.top);
       if (st.phase === 0) {
         st.c = p; st.phase = 1;
-        if (Math.hypot(p[0], p[1]) < 0.9) { st.c = [0, 0]; st.cons.push("重合（圆心在原点）"); }
+        if (Math.hypot(p[0], p[1]) < 0.9) { st.c = [0, 0]; st.cons.push(COIN); }
       } else if (st.phase === 1) { st.r = Math.hypot(p[0] - st.c[0], p[1] - st.c[1]); st.phase = 2; }
       draw(mouse);
     });
@@ -659,7 +662,7 @@ spy();
       if (a === "reset") st = { phase: 0, c: null, r: 0, cons: [] };
       if (a === "enter" && st.phase === 1) {
         const v = parseFloat(b.querySelector("input").value || "16");
-        if (v > 0) { st.r = v / 2; st.phase = 2; st.cons.push(`直径 ${v}`); }
+        if (v > 0) { st.r = v / 2; st.phase = 2; st.cons.push(T(`直径 ${v}`, `Diameter ${v}`)); }
       }
       draw(mouse);
     };
@@ -678,7 +681,7 @@ spy();
     const box = document.createElement("div");
     box.style.cssText = "height:320px;border-radius:10px;overflow:hidden;background:var(--soft);touch-action:none";
     el.appendChild(box);
-    const b = bar(el, '<button data-a="real" class="on">WQ-LS 真零件</button><button data-a="replay">回放：草图 → 凸台</button>');
+    const b = bar(el, `<button data-a="real" class="on">${T("WQ-LS 真零件", "Real WQ-LS part")}</button><button data-a="replay">${T("回放：草图 → 凸台", "Replay: sketch → pad")}</button>`);
     const info = cap(el, note);
     three().then((T) => {
       const W = () => box.clientWidth, H = 320;
@@ -725,7 +728,7 @@ spy();
           const s = Math.min(1, Math.max(0, ((t - t0) / 1000 - 1.2) / 2.2));
           pad.visible = s > 0;
           if (s > 0) { pad.geometry.dispose(); pad.geometry = new T.ExtrudeGeometry(shape, { depth: depth * s, bevelEnabled: false, curveSegments: 48 }); }
-          info.innerHTML = s <= 0 ? "草图：轮廓（红线）在 XY 平面上" : s < 1 ? `凸台：拉出 ${(depth * s).toFixed(1)} mm` : `凸台 ${depth} mm 完成。${note}`;
+          info.innerHTML = s <= 0 ? T("草图：轮廓（红线）在 XY 平面上", "Sketch: the outline (red) on the XY plane") : s < 1 ? T(`凸台：拉出 ${(depth * s).toFixed(1)} mm`, `Pad: ${(depth * s).toFixed(1)} mm`) : T(`凸台 ${depth} mm 完成。${note}`, `Pad ${depth} mm done. ${note}`);
           if ((t - t0) / 1000 > 6) t0 = t;
         } else info.innerHTML = note;
         place(); ren.render(sc, cam);
@@ -735,7 +738,7 @@ spy();
   A.collar = function (el) {
     const p = DATA.parts.presser_collar;
     viewer(el, p, (T) => { const s = new T.Shape(); s.absarc(0, 0, p.od / 2, 0, Math.PI * 2, false); const h = new T.Path(); h.absarc(0, 0, p.id / 2, 0, Math.PI * 2, true); s.holes.push(h); return s; },
-      p.t, `压脚杆套环：外径 ${p.od}、内孔 ${p.id}、厚 ${p.t} mm，体积 ${p.volume} mm³（拖动转，滚轮缩放）`);
+      p.t, T(`压脚杆套环：外径 ${p.od}、内孔 ${p.id}、厚 ${p.t} mm，体积 ${p.volume} mm³（拖动转，滚轮缩放）`, `Presser-bar collar: OD ${p.od}, bore ${p.id}, ${p.t} mm thick, volume ${p.volume} mm³ (drag to turn, wheel to zoom)`));
   };
   A.clamp = function (el) {
     const p = DATA.parts.needle_clamp, R = p.R, w = p.tab_w / 2, d = p.tab_d, y0 = -Math.sqrt(R * R - w * w);
@@ -743,20 +746,20 @@ spy();
       const s = new T.Shape(); s.moveTo(w, y0); s.lineTo(w, -d); s.lineTo(-w, -d); s.lineTo(-w, y0);
       s.absarc(0, 0, R, Math.atan2(y0, -w), Math.atan2(y0, w) + 2 * Math.PI, true);
       const h = new T.Path(); h.absarc(0, 0, p.bore / 2, 0, Math.PI * 2, true); s.holes.push(h); return s;
-    }, p.t, `针夹：圆弧 R${R}、耳朵宽 ${p.tab_w}、伸到中心下 ${d}、厚 ${p.t}；真零件还有两个小孔（穿线孔、夹紧螺钉孔），体积 ${p.volume} mm³`);
+    }, p.t, T(`针夹：圆弧 R${R}、耳朵宽 ${p.tab_w}、伸到中心下 ${d}、厚 ${p.t}；真零件还有两个小孔（穿线孔、夹紧螺钉孔），体积 ${p.volume} mm³`, `Needle clamp: arc R${R}, tab ${p.tab_w} wide reaching ${d} below the centre, ${p.t} thick; the real part also has two small holes (thread hole, clamp-screw hole), volume ${p.volume} mm³`));
   };
 
   // ---------------------------------------------------------------- 第 4 课：自由度实验（针夹轮廓，勾约束看还剩几个自由度、哪里还在动）
   A.dof = function (el) {
     const P = DATA.parts.needle_clamp;
     const L = [ // [名字, 吃掉几个自由度, 作用于哪个量]
-      ["中心线下端点在下边线上", 1, "cl1"], ["中心线上端点在圆弧上", 1, "cl2"],
-      ["左右下角关于 Y 轴对称", 1, "sym"], [`圆弧半径 ${P.R}`, 1, "R"], [`下边线水平距离 ${P.tab_w}`, 1, "w"], [`原点到下边线距离 ${P.tab_d}`, 1, "d"],
+      [T("中心线下端点在下边线上", "Centre line lower end on bottom edge"), 1, "cl1"], [T("中心线上端点在圆弧上", "Centre line upper end on arc"), 1, "cl2"],
+      [T("左右下角关于 Y 轴对称", "Lower corners symmetric about Y"), 1, "sym"], [T(`圆弧半径 ${P.R}`, `Arc radius ${P.R}`), 1, "R"], [T(`下边线水平距离 ${P.tab_w}`, `Bottom edge horizontal distance ${P.tab_w}`), 1, "w"], [T(`原点到下边线距离 ${P.tab_d}`, `Origin to bottom edge ${P.tab_d}`), 1, "d"],
     ];
     const on = {};
     const cv = canvas(el, 300);
     const b = bar(el, L.map((x, i) => `<label style="margin-right:12px;white-space:nowrap"><input type="checkbox" data-i="${i}"> ${x[0]}</label>`).join("") +
-      ' <button data-a="all">全勾上</button> <button data-a="none">全不勾</button>');
+      ` <button data-a="all">${T("全勾上", "Tick all")}</button> <button data-a="none">${T("全不勾", "Clear all")}</button>`);
     const info = cap(el, "");
     b.addEventListener("change", (e) => { const i = e.target.dataset.i; if (i !== undefined) on[L[i][2]] = e.target.checked; });
     b.addEventListener("click", (e) => {
@@ -782,10 +785,10 @@ spy();
       g.stroke();
       g.beginPath(); g.arc(X(0), Y(0), (P.bore / 2) * S, 0, 7); g.stroke();
       g.setLineDash([6, 4]); g.strokeStyle = free === 0 ? c.ok : c.accent; g.beginPath(); g.moveTo(X(0), Y(-d - 1.5 + cl1 * 1.5)); g.lineTo(X(0), Y(R + 1.5 + cl2)); g.stroke(); g.setLineDash([]);
-      txt(g, free === 0 ? "完全约束" : `约束不足：${free} 个自由度`, 14, 22, free === 0 ? c.ok : c.ink, 15, "left", true);
-      txt(g, "（几何上的竖直、重合、直径 8、圆心在原点已经有了）", 14, 42, c.muted, 12);
-      info.innerHTML = free === 0 ? "全绿：轮廓每一处都定了，拖不动。凸台 8 mm 就是针夹。" :
-        "还在动的部分 = 还没定住的量：" + L.filter((x) => !on[x[2]]).map((x) => x[0].replace(/ [\d.]+$/, "")).join("、") + "。";
+      txt(g, free === 0 ? T("完全约束", "Fully constrained") : T(`约束不足：${free} 个自由度`, `Under-constrained: ${free} degrees of freedom`), 14, 22, free === 0 ? c.ok : c.ink, 15, "left", true);
+      txt(g, T("（几何上的竖直、重合、直径 8、圆心在原点已经有了）", "(vertical, coincident, diameter 8 and centre on origin are already there)"), 14, 42, c.muted, 12);
+      info.innerHTML = free === 0 ? T("全绿：轮廓每一处都定了，拖不动。凸台 8 mm 就是针夹。", "All green: every part of the outline is fixed and cannot be dragged. Pad 8 mm and it is the needle clamp.") :
+        T("还在动的部分 = 还没定住的量：", "What still moves = what is not fixed yet: ") + L.filter((x) => !on[x[2]]).map((x) => x[0].replace(/ [\d.]+$/, "")).join(T("、", ", ")) + T("。", ".");
     });
   };
 
@@ -793,5 +796,6 @@ spy();
 })();
 
 </script>
+<script>if (location.hostname.endsWith("wenquestech.online")) document.querySelectorAll(".top-other").forEach(a => a.remove());</script>
 </body>
 </html>

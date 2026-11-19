@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00:00.702 --> 00:00:06.200
+From the start page create a "Parametric Body": Part Design workbench with one Body
+
+00:00:06.200 --> 00:00:13.500
+Click "Create sketch" and choose the XY plane
+
+00:00:13.500 --> 00:00:19.301
+Circle tool: click the centre (the origin), type diameter 16, press Enter
+
+00:00:19.301 --> 00:00:24.525
+The tool is still active: draw the bore, centre at the origin again, diameter 8
+
+00:00:24.525 --> 00:00:30.150
+The panel says "Fully constrained" (green): both circles are fixed in place and size
+
+00:00:30.150 --> 00:00:41.101
+Close the sketch, select it, click "Pad" and type a length of 3 mm
+
+00:00:41.101 --> 00:00:47.720
+Presser-bar collar: OD 16, bore 8, 3 thick — the same as in the WQ-LS design

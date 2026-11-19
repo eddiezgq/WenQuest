@@ -53,6 +53,7 @@ def dump(tag):
 
 def open_and_edit(d, path, sketch_label="Sketch", zoom=(10, 300)):
     """打开文件（同“文件 → 打开”），在模型树里双击草图进入编辑"""
+    yield d.say("打开上一课存的针夹草图，在模型树里双击草图，进入编辑")
     App.openDocument(path)
     Gui.SendMsgToActiveView("ViewFit")
     yield 1500

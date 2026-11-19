@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00:00.671 --> 00:00:07.969
+Open the needle-clamp sketch saved in the last lesson and double-click the sketch in the model tree to edit it
+
+00:00:07.969 --> 00:00:13.669
+3 degrees of freedom left: arc size, tab width, tab length. Fix them with dimensions
+
+00:00:13.669 --> 00:00:19.271
+Select the arc, click "Radius", type 5.5
+
+00:00:19.271 --> 00:00:24.639
+Select the bottom edge, click "Horizontal distance", type 7 (tab width 7)
+
+00:00:24.639 --> 00:00:31.275
+Select the origin and the bottom edge, click "Distance", type 7 (bottom edge 7 from the centre)
+
+00:00:31.275 --> 00:00:37.319
+"Fully constrained" — the whole sketch turns green: every line's position and size is fixed
+
+00:00:37.319 --> 00:00:49.319
+Close the sketch and pad 8 mm: there is the needle clamp (same sizes as the WQ-LS design)

@@ -14,6 +14,7 @@ def scale(d):
 
 
 def script(d):
+    yield d.say("打开 WQ-LS 整机，这一段练鼠标：平移、旋转、缩放，再看标准视图、选零件")
     App.openDocument(os.path.join(model_dir(), "WQ-LS.FCStd"))
     Gui.runCommand("Std_ViewIsometric"); Gui.SendMsgToActiveView("ViewFit")
     yield 2500
