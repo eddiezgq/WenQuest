@@ -303,7 +303,7 @@
 12,高斯混合模型,Gaussian mixture model (GMM),
 12,维特比解码,Viterbi decoding,
 12,连接时序分类,connectionist temporal classification (CTC),
-12,空白符,blank symbol,CTC 中"不输出"的符号
+12,空白符,blank symbol,"CTC 中""不输出""的符号"
 12,词错率,word error rate (WER),英文按词计
 12,字错率,character error rate (CER),中文按字计；公式与词错率相同
 12,声码器,vocoder,
@@ -552,3 +552,55 @@ M4,梯度裁剪,gradient clipping,
 22,再分析,reanalysis,不是预报；据此算出的误差是下界
 22,自由边界,free boundary,等离子体仿真器的一类
 22,撕裂模,tearing mode,一类等离子体不稳定性
+23,运行设计域,operational design domain (ODD),分级标准的配套定义；凡写等级必写它
+23,动态驾驶任务,dynamic driving task (DDT),实时操作与战术功能，拆成 6 项子任务
+23,鸟瞰图,bird's-eye view (BEV),把图像摊到俯视网格上
+23,标定,calibration,本章指相机外参；残差会随距离放大
+23,新息,innovation,观测与预测之差，门限按它的分布标
+23,野值,outlier,
+23,端到端,end-to-end,从传感器直接学到控制量
+23,分模块,modular pipeline,感知—预测—规划—控制
+23,冲击度,jerk,加速度的变化率，舒适性指标
+23,脱离,disengagement,加州测试法规的法定定义；判定权在厂家
+23,暴露量,exposure,事故率的分母；没有它就不能比
+23,前兆指标,leading indicator,事故之前就变坏的指标
+23,杠杆值,leverage,"线性模型里衡量一条样本有多""新"""
+23,分布外,out-of-distribution,训练数据没覆盖到的工况
+23,不确定性,uncertainty,
+24,模仿学习,imitation learning,
+24,行为克隆,behavior cloning,
+24,分布漂移,distribution shift,行为克隆的病根：策略自己走出来的状态分布与专家的不一样
+24,超线性,superlinear,本章算例里误差累积并不超线性
+24,遥操作,teleoperation,
+24,域随机化,domain randomization,训练时把物理参数在一个范围里随机抽
+24,正运动学,forward kinematics,
+24,工作空间,workspace,
+24,关节限位,joint limit,
+24,奖励塑形,reward shaping,会改变最优行为
+24,位姿,pose,
+24,质心,center of mass,
+24,力闭合,force closure,
+24,摩擦系数,coefficient of friction,
+24,重复定位精度,pose repeatability,按 ISO 9283 测的重复性，不是绝对定位精度
+25,下界,lower bound,可证明没有任何可行解比它更便宜
+25,上界,upper bound,找到过的解都是上界
+25,已证明最优,proven optimal,穷举或精确算法证明过没有更便宜的
+25,最好已知解,best known solution (BKS),自实例建立以来找到过的最好解；是上界、未经证明、会随时间变
+25,启发式,heuristic,不保证最优但快
+25,优先级法,prioritised planning,排定先后，先规划的当障碍，从不回头改
+25,冲突搜索,conflict-based search (CBS),上层冲突树、下层单车搜索；定理 1 只管最优性
+25,点冲突,vertex conflict,同一时刻占同一个格子
+25,换位冲突,edge conflict,同一时刻互换位置，窄道对穿
+25,车辆路径问题,vehicle routing problem (VRP),旅行商问题加载重约束
+25,装箱下界,bin-packing lower bound,总需求除以载重上限向上取整
+25,帕累托前沿,Pareto front,两种代价之间不可同时改进的那一组解
+25,利特尔法则,Little's law,L = λW，恒等式
+25,排队公式,queueing formula,只在假设成立时准
+25,严格平稳,strictly stationary,利特尔法则的第二条适用条件
+25,恒等式,identity,无条件成立，不是估算
+25,在制品,work in process (WIP),系统中未完成的任务数
+25,区域联锁,zone interlock,一处卡住、附近这一片一起停
+25,机会充电,opportunity charging,空闲顺路就充，不等阈值
+25,死锁,deadlock,互相堵住、不重规划就走不动
+25,巡检,inspection patrol,沿固定点位拍照、读表、查漏
+25,盘库,stocktaking,飞到垛位上方拍一圈点数

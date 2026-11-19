@@ -141,4 +141,57 @@ print(f"  2. 要“一次都不耗光”，就得把阈值提到 {v['busy_safe_t
 print(f"  3. 瓶颈在任务时，吞吐这一列是平的，差别只在超时与耗光两列——"
       f"**报表少一列，结论就反过来**。")
 
+# ================================================================ 四、车队加到多少台（与图 25.5.1 同一组扫描）
+# 第 174 轮交付时发现：这三行数原来只在 fig25_5.py 里算，正文取不到占位符。
+# 这里按同样的设置（1200 步、8 个种子）重算一遍，交给正文，图与正文从此是同一个数。
+FLEET_NS = [2, 4, 6, 8, 10, 12, 16, 20, 26, 32, 38, 44]
+FLEET_SEEDS, FLEET_STEPS = range(8), 1200
+
+
+def _sweep_fleet(zone: int) -> dict:
+    cfg = dict(FLEET)
+    cfg["zone_radius"] = zone
+    done, dead = [], []
+    for n in FLEET_NS:
+        rs = [run_fleet(grid, n, steps=FLEET_STEPS, seed=s, cfg=cfg) for s in FLEET_SEEDS]
+        done.append(float(np.mean([r["done"] for r in rs])))
+        dead.append(float(np.mean([r["deadlocks"] for r in rs])))
+    return {"done": done, "dead": dead, "per": [d / n for d, n in zip(done, FLEET_NS)]}
+
+
+_plain, _zoned = _sweep_fleet(0), _sweep_fleet(2)
+_i10 = FLEET_NS.index(10)
+v["fleet_n_min"], v["fleet_n_max"] = FLEET_NS[0], FLEET_NS[-1]
+v["fleet_steps"], v["fleet_seeds"] = FLEET_STEPS, len(list(FLEET_SEEDS))
+v["fleet_plain_done_10"] = _plain["done"][_i10]
+v["fleet_plain_done_max"] = _plain["done"][-1]
+v["fleet_plain_done_peak"] = max(_plain["done"])
+v["fleet_plain_per_10"] = _plain["per"][_i10]
+v["fleet_plain_per_max"] = _plain["per"][-1]
+v["fleet_plain_dead_10"] = _plain["dead"][_i10]
+v["fleet_plain_dead_max"] = _plain["dead"][-1]
+_ipk = int(np.argmax(_zoned["done"]))
+v["fleet_zone_peak_n"] = FLEET_NS[_ipk]
+v["fleet_zone_peak_done"] = _zoned["done"][_ipk]
+v["fleet_zone_done_max"] = _zoned["done"][-1]
+v["fleet_zone_drop_pct"] = 100.0 * (1 - _zoned["done"][-1] / _zoned["done"][_ipk])
+v["fleet_plain_drop_pct"] = 100.0 * (1 - _plain["done"][-1] / max(_plain["done"]))
+v["fleet_per_fall_x"] = _plain["per"][_i10] / _plain["per"][-1]
+
+print(f"\n四、车队加到多少台（{FLEET_STEPS} 步、{v['fleet_seeds']} 个种子，与图 25.5.1 同一组）")
+print(f"   一处卡住只停那一台车：{FLEET_NS[_i10]} 台 {v['fleet_plain_done_10']:.0f} 个任务，"
+      f"{FLEET_NS[-1]} 台 {v['fleet_plain_done_max']:.0f} 个——**总吞吐只是涨不动，没有掉下来**")
+print(f"   同一批里塌掉的是别的两列：单车吞吐 {v['fleet_plain_per_10']:.1f} → "
+      f"{v['fleet_plain_per_max']:.1f} 个（少 {v['fleet_per_fall_x']:.1f} 倍）、"
+      f"死锁 {v['fleet_plain_dead_10']:.0f} → {v['fleet_plain_dead_max']:.0f} 次")
+print(f"   加上“堵一处停一片”的区域联锁，才真出现先升后降：峰值 {v['fleet_zone_peak_n']} 台 "
+      f"{v['fleet_zone_peak_done']:.0f} 个，加到 {FLEET_NS[-1]} 台只剩 {v['fleet_zone_done_max']:.0f} 个"
+      f"（跌 {v['fleet_zone_drop_pct']:.0f}%）")
+assert v["fleet_plain_drop_pct"] < 5.0, \
+    "不联锁时总吞吐不应当明显下降——这条结论是本节的要点，变了就要改正文"
+assert v["fleet_zone_drop_pct"] > 30.0, "联锁时必须真出现先升后降"
+assert v["fleet_per_fall_x"] > 2.0, "单车吞吐必须明显塌下来"
+print("   **“车多了吞吐先升后降”不是定律，它取决于堵车怎么处理**——"
+      "报这条曲线必须把这个假设写在旁边")
+
 out(**v)
