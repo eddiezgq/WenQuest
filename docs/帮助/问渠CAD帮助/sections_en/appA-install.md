@@ -6,7 +6,7 @@ lead: One installer for Windows 10 / 11 (64-bit); ready to use when it finishes.
 
 ### Download and licence {#appA-dl}
 
-On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1 GB).
+On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).
 
 ### Install {#appA-install}
 

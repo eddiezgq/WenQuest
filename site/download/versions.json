@@ -34,5 +34,16 @@
   ],
   "date": "2026-11-19",
   "pyc": 26
+ },
+ "wqcad": {
+  "version": "0.3.0-beta",
+  "url": "https://github.com/eddiezgq/wenquest-cad/releases/download/v0.3.0-beta/WenQuestCAD-0.3.0-beta-Setup.exe",
+  "size": 1388151307,
+  "sha256": "5e6085b65b1e501cebbbdf6e614f221947ed064c564f87ecf43d76b19a30ef8a",
+  "name": [
+   "问渠 CAD",
+   "WenQuest CAD"
+  ],
+  "date": "2026-11-19"
  }
 }

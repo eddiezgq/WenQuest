@@ -6,7 +6,7 @@ lead: Windows 10 / 11（64 位）一个安装包，装完就能用。测试版�
 
 ### 下载和授权 {#appA-dl}
 
-官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1 GB）。
+官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1.4 GB）。
 
 ### 安装 {#appA-install}
 

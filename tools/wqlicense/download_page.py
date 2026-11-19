@@ -61,7 +61,7 @@ def tutorials(region: str) -> str:
       "Windows 10 / 11 (64-bit); 8 GB RAM or more (16 GB better); 8 GB free disk; internet for the AI features.")}</p>
 <h3>{T("安装", "Install")}</h3>
 <ol>
-<li>{T("下载 <b>WenQuestCAD-…-Setup.exe</b>（约 1 GB）。可以用页面上的校验码核对文件是否完整。", "Download <b>WenQuestCAD-…-Setup.exe</b> (about 1 GB); you can check it against the SHA-256 shown.")}</li>
+<li>{T("下载 <b>WenQuestCAD-…-Setup.exe</b>（约 1.4 GB）。可以用页面上的校验码核对文件是否完整。", "Download <b>WenQuestCAD-…-Setup.exe</b> (about 1.4 GB); you can check it against the SHA-256 shown.")}</li>
 <li>{T("双击运行。Windows 可能提示“已保护你的电脑 / 未知发布者”（测试版没有购买代码签名证书）：点<b>更多信息 → 仍要运行</b>。",
       "Run it. Windows may say “Windows protected your PC / unknown publisher” (the beta has no code-signing certificate): click <b>More info → Run anyway</b>.")}</li>
 <li>{T("选语言 → 同意使用说明与许可 → 选安装位置（默认即可）→ 安装，约 3–5 分钟。", "Pick a language → accept the terms → choose a folder (the default is fine) → Install, about 3–5 minutes.")}</li>
