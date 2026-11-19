@@ -19,6 +19,35 @@ except ImportError:  # pragma: no cover
 from PySide6.QtTest import QTest
 
 REC = os.environ.get("WQ_REC", ".")
+LANG = os.environ.get("WQ_LANG", "zh")        # zh：中文界面、中文字幕；en：英文界面、英文字幕（译文在 subs_en.json）
+EN = LANG == "en"
+_SUBS_EN = None
+
+
+def L(zh, en):
+    """按录屏语言取界面上的文字（找按钮、菜单、标签用）"""
+    return en if EN else zh
+
+
+def model_dir():
+    """整机、针夹草图等文件：中文版在 model/，英文版在 model_en/（部件组名、文件名是英文）"""
+    return os.path.join(REC, "model_en" if EN else "model")
+
+
+def model_file(zh_name, en_name):
+    return os.path.join(model_dir(), en_name if EN else zh_name)
+
+
+def subtitle(text):
+    global _SUBS_EN
+    if not EN:
+        return text
+    if _SUBS_EN is None:
+        import json
+        _SUBS_EN = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "subs_en.json"), encoding="utf-8"))
+    if text not in _SUBS_EN:
+        raise KeyError("subs_en.json 缺译文：" + text)
+    return _SUBS_EN[text]
 _LOG = open(os.path.join(REC, "director.log"), "w")
 
 
@@ -220,8 +249,25 @@ class Director:
 
     # ------------------------------------------------------------ 字幕
     def say(self, text):
-        with open(os.path.join(REC, "subs.txt"), "a", encoding="utf-8") as f:
-            f.write(f"{time.time():.3f}\t{text}\n")
+        """出字幕。用法 yield d.say("…")：上一条还没显示够读完的时间，就先等一等再出这一条（中文按每秒 4.5 字，至少 2.5 秒）。"""
+        text = subtitle(text)
+        now = time.time()
+        wait = max(0.0, getattr(self, "_say_until", 0.0) - now)
+        self._say_until = now + wait + max(2.5, len(text) / (15.0 if EN else 4.5))
+        self._say_text = text
+
+        def put():
+            with open(os.path.join(REC, "subs.txt"), "a", encoding="utf-8") as f:
+                f.write(f"{time.time():.3f}\t{text}\n")
+        if wait > 0:
+            QtCore.QTimer.singleShot(int(wait * 1000) - 30, put)
+        else:
+            put()
+        return int(wait * 1000)
+
+    def read_out(self):
+        """剧本结尾：yield d.read_out()，等最后一条字幕显示够"""
+        return int(max(0.0, getattr(self, "_say_until", 0.0) - time.time()) * 1000) + 300
 
     # ------------------------------------------------------------ 运行剧本
     def run(self, gen, end_flag=True):
@@ -229,8 +275,8 @@ class Director:
             try:
                 ms = next(gen)
             except StopIteration:
-                if end_flag:
-                    open(os.path.join(REC, "end.flag"), "w").close()
+                if end_flag:          # 最后一条字幕显示够了再停录
+                    QtCore.QTimer.singleShot(self.read_out(), lambda: open(os.path.join(REC, "end.flag"), "w").close())
                 return
             except Exception:
                 log("EXC", traceback.format_exc())

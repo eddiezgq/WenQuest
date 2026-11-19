@@ -2,7 +2,7 @@
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import FreeCAD as App, FreeCADGui as Gui
-from director import Director, boot, log, Qt, QtWidgets, QtCore, menu_path
+from director import Director, boot, log, Qt, QtWidgets, QtCore, menu_path, L
 
 
 def page(d, text):
@@ -25,8 +25,8 @@ def page(d, text):
 
 
 def script(d):
-    d.say("菜单“编辑 → 首选项”：软件的各种设置都在这里")
-    yield from menu_path(d, "编辑", "首选项")
+    yield d.say("菜单“编辑 → 首选项”：软件的各种设置都在这里")
+    yield from menu_path(d, L("编辑", "Edit"), L("首选项", "Preferences"))
     yield from d.until(lambda: QtWidgets.QApplication.activeModalWidget() is not None)
     dlg = QtWidgets.QApplication.activeModalWidget()
     log("dlg", dlg.objectName(), dlg.windowTitle())
@@ -36,12 +36,12 @@ def script(d):
         if w.isVisible():
             m = w.model(); names.append([m.data(m.index(r, 0)) for r in range(m.rowCount())])
     log("pages", names)
-    d.say("“常规”页的“语言和数字格式”：界面语言、默认单位系统（标准 mm / kg / s，或英制）、小数位数")
-    p = page(d, "常规")
+    yield d.say("“常规”页的“语言和数字格式”：界面语言、默认单位系统（标准 mm / kg / s，或英制）、小数位数")
+    p = page(d, L("常规", "General"))
     if p:
         yield d.move(p, 800); d.click(p); yield 1200
     log("groups", [w.title() for w in dlg.findChildren(QtWidgets.QGroupBox) if w.isVisible()])
-    for txt in ("语言",):
+    for txt in (L("语言", "Language"),):
         g = [w for w in dlg.findChildren(QtWidgets.QGroupBox) if w.isVisible() and txt in w.title()]
         log("group", txt, [x.title() for x in g])
         if g:
@@ -49,8 +49,8 @@ def script(d):
             cb = [c for c in g[0].findChildren(QtWidgets.QComboBox) if "mm" in c.currentText()]
             if cb:
                 p = d.center(cb[0]); yield d.move(p, 700); d.ring(p); yield 2600
-    d.say("“显示 → 导航栏”：导航方式（CAD、Blender、触摸板……）也可以在这里换")
-    p = page(d, "显示")
+    yield d.say("“显示 → 导航栏”：导航方式（CAD、Blender、触摸板……）也可以在这里换")
+    p = page(d, L("显示", "Display"))
     if p:
         yield d.move(p, 800); d.click(p); yield 900
     pg = None
@@ -61,20 +61,20 @@ def script(d):
                 for r in range(m.rowCount(par)):
                     ix = m.index(r, 0, par); out.append(m.data(ix)); walk(ix, out)
             allp = []; walk(QtCore.QModelIndex(), allp); log("allpages", allp)
-    p = page(d, "导航栏")
+    p = page(d, L("导航栏", "Navigation"))
     if p:
         yield d.move(p, 800); d.click(p); yield 1200
     tabs = [w for w in dlg.findChildren(QtWidgets.QTabBar) if w.isVisible()]
     for tb in tabs:
         for i in range(tb.count()):
-            if "导航" in tb.tabText(i):
+            if L("导航", "Navigation") in tb.tabText(i):
                 p = tb.mapToGlobal(tb.tabRect(i).center()); yield d.move(p, 700); d.click(p); yield 1500
     log("tabs", [[tb.tabText(i) for i in range(tb.count())] for tb in tabs], "combos", [c.currentText() for c in dlg.findChildren(QtWidgets.QComboBox) if c.isVisible()])
     combo = [w for w in dlg.findChildren(QtWidgets.QComboBox) if w.isVisible() and "CAD" in w.currentText()]
     log("combo", [c.currentText() for c in combo])
     if combo:
         p = d.center(combo[0]); yield d.move(p, 800); d.ring(p); yield 2400
-    d.say("看完按“取消”，什么都不改")
+    yield d.say("看完按“取消”，什么都不改")
     b = [w for w in dlg.findChildren(QtWidgets.QPushButton) if w.isVisible() and w.text().replace("&", "") in ("取消", "Cancel")]
     if b:
         p = d.center(b[0]); yield d.move(p, 800); d.click(p); yield 1500

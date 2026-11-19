@@ -110,6 +110,9 @@ def render(region: str = "us", footer: str = "", head: str = "") -> str:
     """footer/head：国内版传入 build.py 的页脚（备案号等）和它的样式表"""
     cn = region == "cn"
     home = "/"
+    learn = 'https://learn.{{env "SITE_DOMAIN"}}' if cn else "https://learn.wenquestrobotics.com"   # 国内页走 Caddy 模板，和国内官网其他页一样
+    course_btn = (f'<a class="btn" href="{learn}/static/help/wqcad/">培训课程</a>' if cn else
+                  f'<a class="btn" data-zh href="{learn}/static/help/wqcad/">培训课程</a><a class="btn" data-en href="{learn}/static/help/wqcad/en/">Training course</a>')
     cad_note = (T("· 国内下载地址开通后放在这里", "· download link for China coming soon") if cn else "")
     return f"""<!doctype html>
 <html lang="{'zh-CN' if cn else 'en'}">
@@ -147,7 +150,7 @@ def render(region: str = "us", footer: str = "", head: str = "") -> str:
 <p>{T("基于 FreeCAD 1.1.4 + 27 处内核修正 + 问渠 AI 工作台（AI 选零件、企业零件库、AI 设计零件）。一个安装包，装完就能用，不用装别的。",
       "FreeCAD 1.1.4 + 27 kernel fixes + the WenQuest AI workbench (AI part selection, enterprise parts library, AI part design). One installer, nothing else to install.")}</p>
 <div class="meta" data-meta>{T("安装包准备中", "Installer being built")} {cad_note}</div><div class="sha" data-sha></div>
-<div class="row"><a class="btn pri" data-dl hidden>{T("下载", "Download")}</a><a class="btn" href="#tut-cad">{T("安装教程", "Install guide")}</a></div></div>
+<div class="row"><a class="btn pri" data-dl hidden>{T("下载", "Download")}</a><a class="btn" href="#tut-cad">{T("安装教程", "Install guide")}</a>{course_btn}</div></div>
 <div class="card" data-key="sewing-freecad"><h3>{T("问渠缝纫机", "WenQuest Sewing")} <span class="tag">{T("FreeCAD 工作台", "FreeCAD workbench")}</span></h3>
 <p>{T("平缝、包缝、绷缝、花样、刺绣、横机的机构设计与校核，出三维零件、计算书；和网页版同一份计算核心。", "Mechanism design and checks for lockstitch, overlock, coverstitch, pattern, embroidery and flat-knitting machines; 3-D parts and reports; same core as the web app.")}</p>
 <div class="meta" data-meta></div><div class="sha" data-sha></div>

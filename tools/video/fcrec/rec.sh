@@ -1,6 +1,8 @@
 #!/bin/bash
 # 用法：rec.sh 剧本.py 输出.mp4    环境：WQ_REC 工作目录（home、clicks、subs）；FC 解开的 FreeCAD 1.1.4 AppImage（squashfs-root）
-export WQ_REC HOME=$WQ_REC/home LANG=zh_CN.UTF-8 DISPLAY=${DISPLAY:-:77}
+# WQ_LANG=en：英文界面（$WQ_REC/home_en 里的设置 Language=English）、英文字幕
+if [ "$WQ_LANG" = en ]; then export HOME=$WQ_REC/home_en LANG=en_US.UTF-8; else export HOME=$WQ_REC/home LANG=zh_CN.UTF-8; fi
+export WQ_REC WQ_LANG DISPLAY=${DISPLAY:-:77}
 rm -f $WQ_REC/ready.flag $WQ_REC/end.flag $WQ_REC/clicks.txt $WQ_REC/subs.txt
 pkill -f squashfs-root/usr/bin/freecad; sleep 1
 "$FC/AppRun" "$1" > $WQ_REC/run.log 2>&1 &

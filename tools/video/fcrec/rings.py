@@ -43,7 +43,7 @@ if subs.exists():
     for i, (t, txt) in enumerate(rows):
         a = float(t) - t0
         b = float(rows[i + 1][0]) - t0 if i + 1 < len(rows) else dur
-        b = min(b, a + 6.0, dur)
+        b = min(b, a + 12.0, dur)
         if txt.strip() and b > a:
             cues.append(f"{ts(a)} --> {ts(b)}\n{txt.strip()}")
     Path(out).with_suffix(".vtt").write_text("WEBVTT\n\n" + "\n\n".join(cues) + "\n", encoding="utf-8")

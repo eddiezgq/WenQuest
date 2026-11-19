@@ -2,14 +2,14 @@
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import FreeCAD as App, FreeCADGui as Gui
-from director import Director, boot, log, Qt, QtWidgets, QtCore
+from director import Director, boot, log, Qt, QtWidgets, QtCore, L, model_dir
 import steps
 
 M = os.path.join(os.environ.get("WQ_REC", "."), "model")
 
 
 def show(d, w, text, ms=2600, rect=None):
-    d.say(text)
+    yield d.say(text)
     p = d.center(w, rect)
     yield d.move(p, 800)
     d.ring(p)
@@ -17,12 +17,12 @@ def show(d, w, text, ms=2600, rect=None):
 
 
 def script(d):
-    d.say("开始页：新建、打开文件、示例。点“打开文件”，打开 WQ-LS 平缝机整机")
-    lab = d.find(QtWidgets.QLabel, "打开文件")
+    yield d.say("开始页：新建、打开文件、示例。点“打开文件”，打开 WQ-LS 平缝机整机")
+    lab = d.find(QtWidgets.QLabel, L("打开文件", "Open File"))
     p = d.center(lab)
     yield d.move(p, 900)
     d.ring(p)
-    App.openDocument(os.path.join(M, "WQ-LS.FCStd"))       # 同点“打开文件”后在对话框里选文件
+    App.openDocument(os.path.join(model_dir(), "WQ-LS.FCStd"))       # 同点“打开文件”后在对话框里选文件
     Gui.runCommand("Std_ViewIsometric"); Gui.SendMsgToActiveView("ViewFit")
     yield 2500
     mw = d.mw
@@ -38,7 +38,7 @@ def script(d):
     yield from show(d, d.vp(), "中间最大的是三维视图，零件在这里看、在这里点选")
     vp = d.vp()
     yield from show(d, vp, "右上角是导航立方体：点它的面，就转到那个方向看", rect=QtCore.QRect(vp.width() - 170, 0, 170, 170))
-    d.say("报告视图：软件的提示、警告、出错都写在这里（视图 → 面板 → 报告视图）")
+    yield d.say("报告视图：软件的提示、警告、出错都写在这里（视图 → 面板 → 报告视图）")
     docks = {w.objectName(): w for w in d.mw.findChildren(QtWidgets.QDockWidget)}
     log("docks", list(docks))
     rep = docks.get("Report view")
@@ -51,7 +51,7 @@ def script(d):
     yield from show(d, sb, "最下面是状态栏：鼠标指着什么、当前的导航方式、单位", rect=QtCore.QRect(sb.width() - 420, 0, 420, sb.height()))
     rep and rep.setVisible(False)
     yield 600
-    d.say("这就是 FreeCAD 的界面。问渠 CAD 是在它上面改的，界面一样")
+    yield d.say("这就是 FreeCAD 的界面。问渠 CAD 是在它上面改的，界面一样")
     yield 3000
 
 

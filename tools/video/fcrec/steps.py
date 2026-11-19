@@ -2,21 +2,21 @@
 import FreeCAD as App
 import FreeCADGui as Gui
 
-from director import QtCore, QtWidgets, log
+from director import L, QtCore, QtWidgets, log
 
 
 def new_body_sketch(d, plane="XY", say=True, zoom=(10, 170)):
     """开始页 → 参数实体 → 新建草图 → 选平面 → 确定 → 缩放到合适大小"""
     if say:
-        d.say("从开始页新建一个“参数实体”：零件设计工作台，一个实体（Body）")
-    lab = d.find(QtWidgets.QLabel, "参数实体")
+        yield d.say("从开始页新建一个“参数实体”：零件设计工作台，一个实体（Body）")
+    lab = d.find(QtWidgets.QLabel, L("参数实体", "Parametric Body"))
     p = d.center(lab)
     yield d.move(p, 900)
     d.click(p)
     yield from d.until(lambda: Gui.ActiveDocument is not None and Gui.activeWorkbench().name() == "PartDesignWorkbench")
     yield 800
     if say:
-        d.say(f"点“新建草图”，选 {plane} 平面")
+        yield d.say(f"点“新建草图”，选 {plane} 平面")
     yield from sketch_on(d, plane, zoom)
 
 
@@ -76,7 +76,8 @@ def dof_text(d):
     for w in QtWidgets.QApplication.allWidgets():
         if isinstance(w, QtWidgets.QLabel) and w.isVisible():
             t = w.text()
-            if "自由度" in t or "完全约束" in t or "过约束" in t or "冗余" in t or "空草图" in t:
+            lo = t.lower()
+            if any(k in t for k in ("自由度", "完全约束", "过约束", "冗余", "空草图")) or any(k in lo for k in ("degree", "fully constrained", "over-constrained", "redundant", "empty sketch", "conflicting")):
                 return " ".join(t.split())
     return "?"
 

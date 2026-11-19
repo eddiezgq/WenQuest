@@ -49,40 +49,100 @@ LESSONS = [
     ("八 AI", 21, "AI 工作台：零件选型与校验、企业零件库、AI 设计零件", "选一个轴承；上轴设计回放", None),
 ]
 
-EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（样课：第 1、3、4 课）",
-               other=("软件下载与安装", "https://wenquestrobotics.com/download/#tut-cad"),
-               files=["00-course", "l01", "l03", "l04", "appA-install"])
+# 英文课表（美国版中英双语，11-19 Eddie 定；顺序、录屏同 LESSONS）
+LESSONS_EN = [
+    ("1 Getting started", "The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units", "Open the WQ-LS machine and look around"),
+    ("1 Getting started", "Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies", "Export a part for someone else"),
+    ("2 Sketching", "Sketching basics: line, circle, arc, rectangle, polyline; construction geometry", "Presser-bar collar; needle-clamp outline"),
+    ("2 Sketching", "Constraints: geometric, dimensional, fully constrained, finding over-constraints", "Needle clamp (fully constrained)"),
+    ("2 Sketching", "Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes", "Crank outline (spreadsheet driven)"),
+    ("3 Part modelling", "Pad, pocket, revolve, groove, hole (threaded holes)", "Needle bar, crank pin"),
+    ("3 Part modelling", "Chamfer, fillet, draft, thickness", "Crank with counterweight"),
+    ("3 Part modelling", "Sweep, loft, helix", "Tension spring, thread guide"),
+    ("3 Part modelling", "Patterns, mirror, multi-transform", "Handwheel (spoke pattern)"),
+    ("3 Part modelling", "Datum planes and axes, attachment; parametric design", "Take-up lever (change one, all follow)"),
+    ("3 Part modelling", "Part workbench: primitives, Booleans, offset, sections", "Feed eccentric"),
+    ("4 Curves & surfaces", "Curves: B-splines, helices, projection, intersections", "Characteristic curves of the housing"),
+    ("4 Curves & surfaces", "Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity", "Blend surfaces of the arm"),
+    ("4 Curves & surfaces", "Surfaces to solids: sew, make solid, thicken; check geometry", "A shell panel made solid"),
+    ("5 Assembly", "Assembly workbench: insert parts, ground, joints, degrees of freedom", "Slider-crank"),
+    ("5 Assembly", "Motion and checks: drive joints, measure, interference, exploded views", "Take-up four-bar, one turn"),
+    ("6 Drawings", "TechDraw: templates, projections, sections, details, dimensions", "Needle-bar part drawing"),
+    ("6 Drawings", "Tolerances and notes, bill of materials, PDF / DXF export", "Take-up assembly drawing"),
+    ("7 Advanced", "FEM with CalculiX", "Crank stress at 5000 r/min"),
+    ("7 Advanced", "What is different in WenQuest CAD: the 27 patches", "Before/after the patches"),
+    ("8 AI", "AI workbench: part selection and checks, company parts library, AI part design", "Pick a bearing; replay the upper-shaft design"),
+]
+
+FILES = ["00-course", "l01", "l03", "l04", "appA-install"]
+EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（样课：第 1、3、4 课）", other=("English", "en/"), files=FILES)
+EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (sample lessons 1, 3, 4)",
+                  other=("中文", "../"), files=FILES)
 
 
-def numbers():
+def numbers(en=False):
     P = json.loads((HERE / "parts.json").read_text(encoding="utf-8"))
     pc, nc = P["presser_collar"], P["needle_clamp"]
     rows = []
-    for mod, n, what, make, sec in LESSONS:
-        link = f'<a href="#{sec}">第 {n} 课</a>' if sec else f"第 {n} 课"
-        state = "样课" if sec else "制作中"
+    for (mod, n, what, make, sec), (mod_en, what_en, make_en) in zip(LESSONS, LESSONS_EN):
+        if en:
+            mod, what, make = mod_en, what_en, make_en
+        name = f"Lesson {n}" if en else f"第 {n} 课"
+        link = f'<a href="#{sec}">{name}</a>' if sec else name
+        state = ("Sample" if sec else "In progress") if en else ("样课" if sec else "制作中")
         rows.append(f"<tr><td>{mod}</td><td>{link}</td><td>{what}</td><td>{make}</td><td>{state}</td></tr>")
+    head = ("<th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th>" if en else
+            "<th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th>")
     return {
         "pc": {"od": f"{pc['od']:g}", "id": f"{pc['id']:g}", "t": f"{pc['t']:g}", "v": f"{pc['volume']:.1f}"},
         "nc": {"R": f"{nc['R']:g}", "d": f"{nc['R'] * 2:g}", "bore": f"{nc['bore']:g}", "w": f"{nc['tab_w']:g}", "dep": f"{nc['tab_d']:g}",
                "t": f"{nc['t']:g}", "v": f"{nc['volume']:.1f}"},
-        "table": "<table class=\"plan\"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody>"
+        "table": f"<table class=\"plan\"><thead><tr>{head}</tr></thead><tbody>"
                  + "".join(rows) + "</tbody></table>",
     }
 
 
-def anim_data():
+def anim_data(prefix="media/"):
     P = json.loads((HERE / "parts.json").read_text(encoding="utf-8"))
-    return {"parts": P, "three": "media/three.min.js"}
+    return {"parts": P, "three": prefix + "three.min.js"}
+
+
+# 国内学习平台只出中文：去掉“English”切换
+HIDE_EN_CN = ('<script>if (location.hostname.endsWith("wenquestech.online")) '
+              'document.querySelectorAll(".top-other").forEach(a => a.remove());</script>')
+
+# 帮助模板里的中文按钮（英文页换掉）
+UI_EN = [('<html lang="zh-CN">', '<html lang="en">'), ("☰ 目录", "☰ Contents"), ("搜索帮助…", "Search help…"),
+         ("◐ 深浅色", "◐ Theme"), (">打印<", ">Print<"), ('b.textContent = "复制"', 'b.textContent = "Copy"'),
+         ('"已复制"', '"Copied"'), ("/复制$|已复制$/", "/Copy$|Copied$/"),
+         ('"✓ 对。" : "✗ 不对。"', '"✓ Correct. " : "✗ Not quite. "'), ("/^[✓✗] [^。]*。/", "/^[✓✗] [^.]*\\. /"),
+         ('srclang="zh" label="中文"', 'srclang="en" label="English"')]
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "media").mkdir(exist_ok=True)
     shutil.copy2(THREE, OUT / "media" / "three.min.js")
-    HG.build(HERE, BRAND, EDITION, "web", numbers(), anim_data(), OUT, "media/", lambda a, ed: "#",
-             (HERE / "anim.js").read_text(encoding="utf-8"))
-    print("wqcad help", (OUT / "index.html").stat().st_size // 1024, "KB")
+    js = (HERE / "anim.js").read_text(encoding="utf-8")
+    HG.build(HERE, BRAND, EDITION, "web", numbers(), anim_data(), OUT, "media/", lambda a, ed: "#", js)
+    p = OUT / "index.html"
+    p.write_text(p.read_text(encoding="utf-8").replace(">看English<", ">English<").replace("</body>", HIDE_EN_CN + "\n</body>"), encoding="utf-8")
+    # 英文页：sections_en/ 的课文 + 英文界面的录屏（-en）+ 英文字幕
+    import tempfile
+    src_en = Path(tempfile.mkdtemp())
+    shutil.copytree(HERE / "sections_en", src_en / "sections")
+    try:
+        HG.build(src_en, "WenQuest CAD", EDITION_EN, "web", numbers(en=True), anim_data("../media/"), OUT / "en", "../media/",
+                 lambda a, ed: "#", js)
+    finally:
+        shutil.rmtree(src_en)
+    p = OUT / "en" / "index.html"
+    t = p.read_text(encoding="utf-8").replace(">看中文<", ">中文<")
+    for a, b in UI_EN:
+        assert a in t, a
+        t = t.replace(a, b)
+    p.write_text(t, encoding="utf-8")
+    print("wqcad help", (OUT / "index.html").stat().st_size // 1024, "KB; en", p.stat().st_size // 1024, "KB")
 
 
 if __name__ == "__main__":
