@@ -54,7 +54,7 @@ function opts() { if (!w3) return; const o = B[V].options; w3.S.T = !!o.T; w3.S.
 let fly = [], k0 = 0, MC = null;
 function pick(code) {
   sel = code; table();
-  const x = B[V].lines.find(l => l.code === code), R = t('rd');
+  const x = B[V].lines.find(l => l.code === code), R = t('rd'); if (!x) return;
   const ks = w3 ? x.parts.filter(k => w3.P[k] && w3.P[k].mesh.visible) : [];
   $('rd').innerHTML = `<span>${R[0]}</span><b><code>${esc(code)}</code></b><span>${R[1]}</span><b>${esc(nm(x.name))}</b><span>${R[3]}</span><b>${x.qty}</b><span>${R[2]}</span><b>${ks.length || '—'}</b>` + (ks.length ? '' : `<span style="grid-column:1/-1">${t('none')}</span>`);
   if (!w3) return;

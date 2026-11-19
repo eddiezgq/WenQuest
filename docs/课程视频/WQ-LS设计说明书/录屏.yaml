@@ -122,7 +122,7 @@ clips:
       - {js: "window.__cast.at('upper',0)"}
     dur: 7
     do:
-      - {at: 0.1, js: "(()=>{let s=0;const id=setInterval(()=>{s+=4;window.__cast.at('upper',s);if(s>=300)clearInterval(id)},45)})()"}
+      - {at: 0.1, js: "(()=>{let s=0;const id=setInterval(()=>{s+=1.6;window.__cast.at('upper',s);if(s>=300)clearInterval(id)},45)})()"}
       - {at: 1.5, ring: "#curve", for: 4}
   - name: nc                        # s11 数控刀路：刀具沿刀路走
     base: http://127.0.0.1:8765
@@ -149,7 +149,7 @@ clips:
     do:
       - {at: 0.5, js: "window.__bom.pick('BUY-MOTOR-LS')"}
       - {at: 0.6, ring: "tr.sel", for: 2.5}
-      - {at: 4.0, js: "window.__bom.pick('LS-301')"}
+      - {at: 4.0, js: "window.__bom.pick('LS-301D')"}
       - {at: 4.1, ring: "tr.sel", for: 2.5}
   - name: asm                       # s13 19 步装配
     base: http://127.0.0.1:8765
