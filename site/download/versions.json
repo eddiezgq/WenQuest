@@ -1,0 +1,38 @@
+{
+ "sewing-freecad": {
+  "version": "2026.11.19",
+  "url": "files/wenquest-sewing-freecad-2026.11.19.zip",
+  "size": 6325044,
+  "sha256": "264b6c57b2b9cfda51123d51a4661bddf3be90df26798fbe9283a2991c48355c",
+  "name": [
+   "问渠缝纫机",
+   "WenQuest Sewing"
+  ],
+  "date": "2026-11-19",
+  "pyc": 23
+ },
+ "bearing-freecad": {
+  "version": "2026.11.19",
+  "url": "files/wenquest-bearing-freecad-2026.11.19.zip",
+  "size": 2675445,
+  "sha256": "a77013e7f67038a66c40372bf3d5f1dfc59917899a8b3c42beda51880e9a1e76",
+  "name": [
+   "问渠轴承",
+   "WenQuest Bearing"
+  ],
+  "date": "2026-11-19",
+  "pyc": 35
+ },
+ "cam-freecad": {
+  "version": "2026.11.19",
+  "url": "files/wenquest-cam-freecad-2026.11.19.zip",
+  "size": 2378018,
+  "sha256": "440d35a66333b9f83cef0fe89bae3d4f92b5ab3c49287c0294ab05dfaad3bf6a",
+  "name": [
+   "问渠凸轮",
+   "WenQuest Cam"
+  ],
+  "date": "2026-11-19",
+  "pyc": 26
+ }
+}

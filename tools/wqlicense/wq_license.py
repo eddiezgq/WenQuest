@@ -19,7 +19,7 @@ from pathlib import Path
 
 # 美国、国内学习平台的公钥（GET /api/v1/license/public-key）。换了服务器的 WQ_SECRET_KEY 要更新这里。
 KEYS = {
-    "us": "",
+    "us": "FoaROOa3yuG2wbCh1gZj1ufQ69PgNDb_qCkBLMWohCs",
     "cn": "",
 }
 DOWNLOAD = {"us": "https://wenquestrobotics.com/download/", "cn": "https://wenquestech.online/download/"}
