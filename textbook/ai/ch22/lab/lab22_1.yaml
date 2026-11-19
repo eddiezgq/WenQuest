@@ -1,0 +1,35 @@
+# 实验 22.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab22_1.js。
+原理:
+  - ["发电计划要**提前申报**，实际与申报不符要按偏差结算，而**两个方向的价钱不一样**：少发了按高价买电补上，多发了只能贱卖。于是“把预测原样报上去”未必最省——最优申报要往便宜的那一侧偏（22.2 节）。", "Generation is declared ahead of time and settled against what happened, and the two directions carry different prices: a shortfall is bought back dear, a surplus sold cheap. The cheapest declaration therefore leans toward the cheaper side of the error."]
+  - ["**均方根误差最小的申报，不是成本最低的申报。** 前者在误差为零处取极小，后者取决于两个方向的价钱比。本实验把两条曲线画在同一张图上，让你量出这两个最低点差多远。", "The RMSE-optimal declaration and the cost-optimal declaration are different points: the first sits where the error is zero, the second depends on the ratio of the two prices. The lab draws both curves together."]
+  - ["**预测越差，申报越要保守。** 误差分布越宽，同样的偏置能挡掉的缺口越少，于是最优偏置继续往低处走。这一条的用处是：预测精度与申报策略要一起定，不能分开。", "The worse the forecast, the more conservative the declaration: a wider error distribution pushes the optimum further down. Forecast accuracy and declaration strategy have to be decided together."]
+  - ["**报分位数，就是把“偏多少”换成一句能讲清楚的话**：报第 10 分位，意思是“有九成把握不低于这个数”。最优分位数由两个方向的价钱比决定——贱卖价越接近正常电价，多发越不吃亏，最优分位数就越低（22.1 节）。", "Declaring a quantile states the same conservatism in words a dispatcher can check: the 10th percentile means 'nine times out of ten we will not fall below this'. Which quantile is cheapest is decided by the price ratio."]
+  - 式: "偏差成本 = Σ[ max(申报−实际,0)×电价×少发倍数 + max(实际−申报,0)×电价×贱卖倍数 ] × Δt"
+步骤:
+  - ["第一个场景，罚金 1.6 倍、贱卖 0.5 倍、误差 35 kW：把申报偏置依次取 +40、0、−30、−60、−90、−120，每档记下偏差成本、均方根误差与缺口时段占比（任务 1），填表 1。", "In the first scene, with a 1.6× penalty, 0.5× surplus price and 35 kW error, step the bias through +40, 0, −30, −60, −90 and −120, recording cost, RMSE and the share of shortfall steps (task 1) in Table 1."]
+  - ["把少发的罚金依次取 1.2、1.6、2.5、4.0 倍，每档记下读数里的“成本最低的偏置”（任务 2），填表 2。", "Step the shortfall penalty through 1.2×, 1.6×, 2.5× and 4.0×, recording the cost-optimal bias at each (task 2) in Table 2."]
+  - ["罚金回到 1.6 倍，把预测误差依次取 5、35、80 kW，记下成本最低的偏置（任务 3），填表 2 下半部分。", "Back at 1.6×, step the forecast error through 5, 35 and 80 kW, recording the cost-optimal bias (task 3)."]
+  - ["切到第二个场景，把分位数依次取 90%、50%、25%、10%、5%，每档记下总成本与缺口时段占比（任务 4），填表 3。", "In the second scene step the quantile through 90%, 50%, 25%, 10% and 5%, recording the bill and the share of shortfall steps (task 4) in Table 3."]
+  - ["分位数留在 5%，把贱卖价从 0.5 倍拖到 1.0 倍，记下“最省的分位数”变成多少（任务 5），写进表 3 最后一行。", "With the quantile at 5%, raise the surplus price from 0.5× to 1.0× and record how the cheapest quantile changes (task 5)."]
+数据表:
+  - 标题: ["表 1  同一个预测，报多少的账不一样", "Table 1  One forecast, different declarations"]
+    表头: ["申报偏置（kW）", "偏差成本（元）", "均方根误差（kW）", "缺口时段占比"]
+    表头英文: ["declaration bias (kW)", "imbalance cost (CNY)", "RMSE (kW)", "share of shortfall steps"]
+    行: [["+40", "", "", ""], ["0", "", "", ""], ["−30", "", "", ""], ["−60", "", "", ""], ["−90", "", "", ""], ["−120", "", "", ""]]
+  - 标题: ["表 2  规则与预测精度怎样移动最优申报", "Table 2  How the rules and the forecast move the optimum"]
+    表头: ["条件", "成本最低的偏置（kW）", "误差最低的偏置（kW）", "照成本调能省"]
+    表头英文: ["setting", "cost-optimal bias (kW)", "RMSE-optimal bias (kW)", "saving by tuning on cost"]
+    行: [["罚金 1.2 倍", "", "", ""], ["罚金 1.6 倍", "", "", ""], ["罚金 2.5 倍", "", "", ""], ["罚金 4.0 倍", "", "", ""], ["误差 5 kW（罚金 1.6）", "", "", ""], ["误差 80 kW（罚金 1.6）", "", "", ""]]
+  - 标题: ["表 3  报哪个分位数", "Table 3  Which quantile to declare"]
+    表头: ["分位数", "总成本（元）", "缺口时段占比", "备注"]
+    表头英文: ["quantile", "total cost (CNY)", "share of shortfall steps", "note"]
+    行: [["90%", "", "", ""], ["50%", "", "", ""], ["25%", "", "", ""], ["10%", "", "", ""], ["5%", "", "", ""], ["贱卖价 1.0 倍时最省的分位数", "", "", ""]]
+注意:
+  - ["本实验的电价、罚金倍数与光伏曲线都是**显式假设**，不代表任何地区的真实规则。要带走的是**结构性的结论**（罚金不对称时最优申报要偏、最优分位数由价钱比决定），不是这里的具体数字。", "The prices, penalty multipliers and PV curve here are explicit assumptions and represent no real market. Take away the structural conclusions, not the particular numbers."]
+  - ["真实的结算规则往往比两个倍数复杂：有免考核带（偏差在百分之几以内不罚）、有按日或按月累计的口径、还可能分时段分档。**先把自己的规则抄下来，再决定怎么申报**。", "Real settlement rules are usually more complicated: dead bands, daily or monthly accumulation, tiered rates. Write your own rules down before deciding how to declare."]
+  - ["本实验把预测误差当成**零均值的正态噪声**。真实的光伏预测误差有偏、随天气型变化、而且云来时相邻时刻一起错。分位数在真实数据上要**直接拟合**（弹球损失），不能靠正态假设换算。", "The lab models the forecast error as zero-mean Gaussian noise. Real PV errors are biased, weather-dependent and strongly correlated in time; quantiles should be fitted directly with the pinball loss rather than converted from a normal assumption."]
+  - ["往低报不是没有代价的：本实验里它表现为贱卖的电更多。在有容量考核或可再生能源消纳考核的地方，**持续少报还可能另有处罚**——这一层本实验没有建模。", "Under-declaring is not free: here it shows up as more power dumped at the cheap price, and in some markets persistent under-declaration carries penalties of its own, which this lab does not model."]
+思考题:
+  - ["把你们合同里“少发怎么算、多发怎么算”两条抄下来，换算成本实验的两个倍数，找出最优偏置。它与你们现在的做法差多少？", "Copy your own two settlement clauses, convert them into the two multipliers here, and find the optimum. How far is it from what you do today?"]
+  - ["如果申报不是每 15 分钟一次，而是日前一次性申报 96 个点，实验里的结论哪些还成立、哪些要改？", "If the declaration is made once day-ahead for all 96 intervals rather than interval by interval, which conclusions still hold?"]
+  - ["预测团队的考核指标现在是均方根误差。按本实验的结果，你会建议改成什么？改了之后，怎么防止他们靠“一律往低报”刷分？", "The forecasting team is assessed on RMSE today. What would you change it to, and how would you stop the team from gaming the new metric by always declaring low?"]

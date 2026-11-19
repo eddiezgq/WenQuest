@@ -1,0 +1,31 @@
+# 实验 22.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab22_5.js。
+原理:
+  - ["储能的收益来自**分时电价的套利**与**消纳自家光伏**：谷电价时充、峰电价时放、有余电时存起来。四个参数（充电的电价门槛、放电的电价门槛、充电功率、放电时留多少）决定这套策略的性格（22.2 节）。", "A battery earns from time-of-use arbitrage and from soaking up the site's own PV. Four parameters — the charge and discharge price thresholds, the charging power and the share of power held back — decide the policy's character."]
+  - ["**荷电状态有上下限，越界不是免费的。** 策略要的功率一旦超出可行范围，电池管理系统会把它压回去：那一步不会真的出界，但它是一次报警、一次寿命损耗。**只报电费不报越界次数的结果不能信**（22.5 节）。", "The state of charge has hard limits, and violations are not free: when the policy asks for an infeasible power the battery management system clips it. Nothing goes out of bounds, but each clip is an alarm and a bite out of cell life. A result that reports only the bill cannot be trusted."]
+  - ["**仿真到现实有差距。** 真电池的往返效率比标称值低、可用容量也小一截。同一套参数搬过去，电费涨、越界也涨——这不是模型没调好，是标定没做准（22.5 节）。", "Simulation and reality differ: a real cell has lower round-trip efficiency and less usable capacity. The same parameters moved across cost more and violate more — not a tuning failure but a calibration one."]
+  - ["**安全不能靠学出来，要靠外面那层兜底。** 安全层按留出的余量把动作投影到一定不会越界的范围里。留余量要花钱，这笔钱就是它的价钱；而它买回来的是越界归零（22.3、22.5 节）。", "Safety is not learned, it is written: the safety layer projects every action into a range that cannot violate, keeping an explicit margin. The margin costs money — that is its price — and what it buys is zero violations."]
+  - 式: "越界次数 = 策略要的功率被压回可行范围的步数；安全层余量 = 在上下限之内再留出的那一段荷电状态"
+步骤:
+  - ["第一个场景、标称电池、默认参数（0.35 / 0.95 / 0.8 / 0.2）：记下不装储能的电费、这套参数的电费、省了百分之几、越界次数（任务 1），填表 1 第一行。", "In the first scene with the nominal battery and default parameters, record the bill without the battery, the bill with it, the saving and the violation count (task 1) in the first row of Table 1."]
+  - ["把充电功率拖到 1.0、放电留量拖到 0，再记同样四个数（任务 2）；然后自己试三组参数，把电费调得更低，每组都记下越界次数，填满表 1。", "Set the charging power to 1.0 and the held-back share to 0 and record the same four numbers (task 2); then try three settings of your own aiming for a lower bill, recording the violations each time."]
+  - ["切到第二个场景，保持刚才那套最凶的参数，把效率拖到 0.87、可用容量拖到 0.92：记下电费与越界（任务 3），填表 2 第一行。", "In the second scene keep the most aggressive parameters and drag the efficiency to 0.87 and usable capacity to 0.92, recording the bill and violations (task 3) in Table 2."]
+  - ["把安全层余量依次取 0、1%、3%、5%、10%，每档记下电费、越界次数与“安全层的价钱”（任务 4、5），填满表 2。", "Step the safety margin through 0, 1%, 3%, 5% and 10%, recording the bill, the violations and what the layer costs (tasks 4 and 5)."]
+  - ["在表 2 里找出**越界刚好归零的那一档余量**，把它和 10% 那一档的电费比一比，算出“多留的余量白花了多少钱”。", "Find the smallest margin that brings the violations to zero and compare its bill with the 10% row to see what the extra margin wasted."]
+数据表:
+  - 标题: ["表 1  只盯电费调，越界会怎样", "Table 1  Tuning on the bill alone"]
+    表头: ["参数（门槛/门槛/功率/留量）", "电费（元）", "比不装储能省", "越界次数"]
+    表头英文: ["parameters", "bill (CNY)", "saving vs no battery", "violations"]
+    行: [["0.35 / 0.95 / 0.8 / 0.2", "", "", ""], ["0.35 / 0.95 / 1.0 / 0.0", "", "", ""], ["自选 1", "", "", ""], ["自选 2", "", "", ""], ["自选 3", "", "", ""]]
+  - 标题: ["表 2  真设备与安全层", "Table 2  The real device and the safety layer"]
+    表头: ["安全层余量", "电费（元）", "越界次数", "安全层的价钱"]
+    表头英文: ["safety margin", "bill (CNY)", "violations", "what the layer costs"]
+    行: [["0（不加）", "", "", "—"], ["1%", "", "", ""], ["3%", "", "", ""], ["5%", "", "", ""], ["10%", "", "", ""]]
+注意:
+  - ["电价、电池容量、效率、光伏与负荷曲线都是**显式假设**，与第 22 章算例同一套，不代表任何真实站点。要带走的是**结构性的结论**，不是这里的具体元数。", "The prices, capacity, efficiency and the PV and load curves are explicit assumptions shared with the chapter's worked examples, and represent no real site. Take away the structure, not the yuan figures."]
+  - ["本实验把“越界”定义为**策略要的功率被压回可行范围**。真实站点上，这一步可能表现为报警、降功率运行、甚至保护跳闸，代价各不相同——报告里要写清楚你们那边它意味着什么。", "A violation here means the requested power had to be clipped. On a real site that may appear as an alarm, a derate or a protection trip, with very different costs. State what it means on yours."]
+  - ["真电池的效率与可用容量**还会随温度、荷电区间与循环次数变**。本实验只给了两个固定值；现场要做的是定期标定，而不是一次调好。", "A real cell's efficiency and usable capacity also drift with temperature, state-of-charge window and cycle count. The lab fixes two values; a real site recalibrates periodically."]
+  - ["安全层余量不是越大越好：表 2 的最后两行就是为了让你看见**多留的余量是实打实的钱**。合适的做法是量出越界刚好归零的那一档，再按标定误差留一点点。", "A bigger margin is not better: the last rows of Table 2 exist to show that extra margin is real money. Measure the smallest margin that reaches zero and add a little for calibration error."]
+思考题:
+  - ["你们那组储能，荷电状态越一次界，运维上实际发生什么？把它折成钱，用“电费 + 越界次数 × 这个钱”做目标再调一遍，参数差多少？", "What happens on your site when the state of charge hits a limit? Price it, retune with 'bill plus violations times that price', and see how different the parameters are."]
+  - ["如果电池的效率与可用容量每季度都要重新标定，安全层的余量该怎么定？固定值、按标定误差算，还是让它自己随运行数据收紧？", "If efficiency and usable capacity are recalibrated every quarter, how should the margin be set: a fixed value, a value derived from the calibration error, or one that tightens itself from operating data?"]
+  - ["验收一个储能控制策略，你会在合同里写哪两列数？为什么“比原来省 8%”这一句不够？", "Which two columns would you put in an acceptance clause for a storage controller, and why is 'saves 8%' not enough on its own?"]
