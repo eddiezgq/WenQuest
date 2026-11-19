@@ -1,0 +1,60 @@
+标题: ["GPU 实验 25.1 大规模车辆路径：启发式对已证明最优，与启发式对下界", "GPU Lab 25.1 Large-scale vehicle routing: a heuristic against proven optima and against a lower bound"]
+目的: ["在显卡上成批生成车辆路径实例，一路从 3 个点扫到几百个点，然后做本章最要紧的一件事：**把“对已证明最优的比值”与“对下界的比值”分两列报**。小规模上穷举出真正的最优解（全部客户次序 × 按容量的最优切分，GPU 上并行算），所以第一列是真值；规模一大就穷举不了，手上只剩第二列。两列并排放着，你会看见第二列随规模越来越难看——而其中有一部分并不是启发式变差了，是**下界变松了**。做完要能把这件事说清楚：没有最优解的时候，“最多差多少”是个**上界说法**，不是差距本身。",
+       "Generate vehicle-routing instances in batches on the GPU, from three customers up to several hundred, and then do the thing this chapter insists on: report the ratio to the proven optimum and the ratio to a lower bound in two separate columns. At small sizes the optimum is enumerated exactly (every customer order times the best capacity split, computed in parallel on the GPU), so the first column is ground truth; past that size only the second column exists. Side by side, the second column gets worse with size — and part of that is not the heuristic getting worse but the bound getting looser. You should be able to state the consequence: without an optimum, 'at most this far off' is an upper-bound statement, not the gap itself."]
+显卡: basic
+结果:
+  - {名: n_instances_small, 说明: ["小规模实例数（穷举出已证明最优的那一批）", "number of small instances solved to proven optimality"], 单位: "个"}
+  - {名: n_exact_max, 说明: ["能穷举出已证明最优的规模上限", "largest size solved to proven optimality"], 单位: "个客户"}
+  - {名: ratio_greedy_opt, 说明: ["贪心 / 已证明最优（规模上限那一档的平均）", "greedy over proven optimum, at that size"], 单位: "倍"}
+  - {名: ratio_greedy_lb, 说明: ["贪心 / 下界（同一批实例）", "greedy over the lower bound, same instances"], 单位: "倍"}
+  - {名: ratio_opt_lb, 说明: ["已证明最优 / 下界（这个下界有多松）", "proven optimum over the lower bound: how loose the bound is"], 单位: "倍"}
+  - {名: lb_overstates_pts, 说明: ["只看下界会把差距夸大多少个百分点", "how many points the bound overstates the gap by"], 单位: "百分点"}
+  - {名: n_big_max, 说明: ["本次跑到的最大规模", "largest size run"], 单位: "个客户"}
+  - {名: ratio_greedy_lb_big, 说明: ["最大规模下的贪心 / 下界", "greedy over the lower bound at the largest size"], 单位: "倍"}
+  - {名: extra_vehicles_big, 说明: ["最大规模下比装箱下界多用的车数", "vehicles above the bin-packing bound at the largest size"], 单位: "辆"}
+  - {名: wall_s, 说明: ["穷举 + 扫规模的总用时", "wall time for the enumeration and the sweep"], 单位: "秒"}
+文件: []
+实际问题:
+  标题: ["调度室手上那一版排线，到底差多少", "How far off is the routing the dispatch office actually uses?"]
+  内容: ["问渠减速器厂每天要从库房往各工位送料：一辆车、固定载重，装满了就回库房再装。调度室手上的排线是最朴素的一版——顺手送最近的那个点，装不下就回去。厂长问：这一版差多少？这个问题听起来要先有“最好的排法”才能回答，而“最好的排法”在大一点的规模上没人算得出来。本实验给出这个问题唯一诚实的答法：小规模上**穷举出已证明最优**，量出真实差距；大规模上只给**可证明的下界**，并且明说由它算出来的那个百分比是**上界说法**。两列分开报，差距随规模的变化画成曲线。",
+         "The plant delivers material from the store to the stations with one vehicle of fixed capacity: load up, run a round, come back. The dispatch office's routing is the plainest one there is — serve the nearest point next, go back when full. The manager asks how far off it is. That sounds as if it needs the best possible routing, which at any real size nobody can compute. This lab gives the only honest answer: at small sizes enumerate the proven optimum and measure the real gap; at large sizes give a provable lower bound and say plainly that the percentage derived from it is an upper-bound statement. Two separate columns, and the ratios plotted against size."]
+原理:
+  - ["**车辆路径问题**：一个库房、若干取送点，每个点有需求，车有载重。要的是总行程最短的一组回路。它是 NP 难的，所以“最优解”在大规模上不是算不准，是**算不出来**（25.2 节）。", "The capacitated vehicle routing problem: one depot, customers with demands, a vehicle with a capacity, and the objective of the shortest set of routes. It is NP-hard, so at scale the optimum is not merely hard to approximate — it cannot be produced at all."]
+  - ["**小规模的最优解可以穷举出来，而且是已证明最优。** 任何可行解的若干条回路首尾相接就是一个客户次序；反过来，给定一个次序，按容量做动态规划切分就能找到这个次序下最好的切法。于是“全部次序 × 最优切分”覆盖了全部可行解——穷举出来的那个值是**真值**，不是“最好已知解”。", "At small sizes the optimum can be enumerated and proved: any feasible solution's routes concatenate into one customer order, and for a given order a dynamic program finds the best capacity split, so 'all orders times the best split' covers every feasible solution. The resulting value is ground truth, not a best-known value."]
+  - ["**下界与最优解是两件事，不许混为一谈。** 本实验的下界是：每个客户取两条最便宜的邻边，各记一半求和。任何可行解里每个客户恰好连两条边，把边费在两端各记一半不超过全长，再换成最便宜的两条只会更小——所以它**不可能超过最优值**。但它很松：这就是为什么“对下界的比值”总比“对最优的比值”难看（25.2、25.3 节）。", "A lower bound is not an optimum. Here the bound takes each customer's two cheapest incident edges and sums half of each: every customer has exactly two incident edges in any feasible solution, charging half of each edge to each endpoint cannot exceed the total length, and replacing the actual edges with the cheapest two only lowers it. So it can never exceed the optimum — but it is loose, which is why the ratio to it always looks worse."]
+  - ["**另一个免费的下界是车数**：总需求除以载重向上取整。它回答“为什么至少要跑这么多趟”，而且与行程下界是两条独立的证据。", "A second free bound is the number of vehicles: total demand over capacity, rounded up. It answers why at least so many rounds are needed, and it is evidence independent of the distance bound."]
+  - ["**公开基准库的表头本身就把这两件事分开。** CVRPLIB 的列头是 |C|（客户数）、UB（上界）、Opt（是否已证明最优，取 yes/no）。Uchoa 等 2017 年提出的 X 集一百个实例，当年那篇论文证到最优的是 40 个，今天是 61 个——**“最好已知解”是会被下一篇论文改掉的**，所以引用它必须写明日期（25.3 节）。", "The public benchmark's own table separates them: CVRPLIB lists |C|, UB and an Opt column taking yes or no. Of the hundred X instances of Uchoa et al. (2017), that paper proved 40 optimal; today 61 are proven. A best-known solution is something the next paper changes, so any citation of one must carry its date."]
+  - 式: "贪心/最优（真实差距，只在小规模有）；贪心/下界 ≥ 贪心/最优（上界说法）；最优/下界 = 这个下界有多松；车数下界 = ⌈总需求 / 载重⌉"
+步骤:
+  - ["运行第 1 节：装环境、确认显卡（任务 1）。", "Run section 1 to set up the environment and confirm the GPU (task 1)."]
+  - ["运行第 2 节：生成实例（坐标、需求、载重都是合成的显式假设），记下每种规模的实例数与载重（任务 2），填表 1。", "Run section 2 to generate the instances — synthetic coordinates, demands and capacity, all explicit assumptions — recording the instance count and the capacity (task 2) in Table 1."]
+  - ["运行第 3 节：在 GPU 上穷举 3—8 个点的**已证明最优解**，记下用时与“贪心/最优”（任务 3），填表 2 的前几行。", "Run section 3 to enumerate the proven optima for 3 to 8 customers on the GPU, recording the wall time and the greedy-over-optimum ratio (task 3) in the first rows of Table 2."]
+  - ["运行第 4 节：同一批实例换成跟下界比，把“贪心/下界”与“最优/下界”两列一起记下来（任务 4），填满表 2。两列之差就是“只看下界会夸大多少”。", "Run section 4 to score the same instances against the lower bound, recording both the greedy-over-bound and optimum-over-bound columns (task 4). Their difference is how much the bound overstates."]
+  - ["运行第 5 节：把规模一路扫到几百个点（这一段**没有最优解，只有下界**），记下每档的“贪心/下界”与多用的车数（任务 5），填表 3。", "Run section 5 to sweep up to several hundred customers — a range with no optima, only bounds — recording the greedy-over-bound ratio and the extra vehicles at each size (task 5) in Table 3."]
+  - ["运行第 6 节：把两条比值曲线画在同一张图上（横轴规模）。把“哪一段是真值、哪一段只是上界说法”在图上标出来（任务 6）。", "Run section 6 to plot both ratio curves against size, marking which stretch is ground truth and which is only an upper-bound statement (task 6)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  实例与假设", "Table 1  Instances and assumptions"]
+    表头: ["项", "值", "来源或假设"]
+    表头英文: ["item", "value", "source or assumption"]
+    行: [["小规模实例数", "{n_instances_small}", ""], ["能穷举的规模上限", "{n_exact_max}", ""], ["载重", "", "本实验的显式假设"], ["坐标与需求", "", "合成数据，本实验的显式假设"], ["最大规模", "{n_big_max}", ""]]
+    行英文: [["small instances", "{n_instances_small}", ""], ["largest size enumerated", "{n_exact_max}", ""], ["capacity", "", "explicit assumption"], ["coordinates and demands", "", "synthetic, explicit assumption"], ["largest size run", "{n_big_max}", ""]]
+  - 标题: ["表 2  能穷举的规模：两列分开报", "Table 2  Sizes that can be enumerated: two separate columns"]
+    表头: ["客户数", "贪心 / 已证明最优", "贪心 / 下界", "最优 / 下界（下界有多松）", "只看下界夸大了"]
+    表头英文: ["customers", "greedy / proven optimum", "greedy / lower bound", "optimum / lower bound", "overstated by"]
+    行: [["3", "", "", "", ""], ["5", "", "", "", ""], ["7", "", "", "", ""], ["{n_exact_max}", "{ratio_greedy_opt}", "{ratio_greedy_lb}", "{ratio_opt_lb}", "{lb_overstates_pts}"]]
+  - 标题: ["表 3  穷举不了的规模：只剩下界这一列", "Table 3  Sizes beyond enumeration: only the bound is left"]
+    表头: ["客户数", "贪心 / 下界", "比装箱下界多用的车数", "这一行能说什么"]
+    表头英文: ["customers", "greedy / lower bound", "vehicles above the bin-packing bound", "what this row may claim"]
+    行: [["20", "", "", ""], ["60", "", "", ""], ["150", "", "", ""], ["{n_big_max}", "{ratio_greedy_lb_big}", "{extra_vehicles_big}", ""]]
+    行英文: [["20", "", "", ""], ["60", "", "", ""], ["150", "", "", ""], ["{n_big_max}", "{ratio_greedy_lb_big}", "{extra_vehicles_big}", ""]]
+注意:
+  - ["**下界不是最优解。** 用下界算出来的“最多差多少”是一个**上界说法**：真实差距一定不超过它，但不等于它。本实验在小规模上把两者同时量出来，正是为了让你看见这中间差了多少个百分点——到了大规模，这个差额还在，只是你看不见了。所以报告里不许把“贪心/下界”写成“贪心比最优差多少”。", "A lower bound is not an optimum: a gap computed from it is an upper-bound statement — the true gap is no larger, but it is not equal. The lab measures both at small sizes precisely to show how many points lie between them; at large sizes that difference is still there, only invisible. A report must never present greedy-over-bound as the gap to the optimum."]
+  - ["**“最好已知解”会随时间变。** 同一个 CVRPLIB X 集，已证明最优的实例数从 2017 年那篇论文的 40/100 变成今天的 61/100，而“最好已知解”本身也在被一篇篇论文改掉。引用任何一个“最好已知解”或“距最好已知解百分之几”，**必须写明日期与出处版本**；拿它当真值用，是本章不收的那种数。", "Best-known solutions move: of the hundred X instances, 40 were proven optimal in the 2017 paper and 61 are today, while the best-known values themselves keep being improved. Any citation of a best-known value, or of a percentage measured against one, must carry its date and source version; treating it as ground truth is exactly the kind of number this chapter rejects."]
+  - ["本实验的坐标、需求、载重都是**合成的显式假设**，不取自任何企业数据，也不从网上下载任何基准实例（云笔记本里不联网取数据）。所以这里的比值只能说明**趋势与方法**，不能当成“贪心在真实问题上差多少”。", "The coordinates, demands and capacity are synthetic explicit assumptions; no benchmark instance is downloaded. The ratios here show the trend and the method, not how far off a heuristic is on a real problem."]
+  - ["**穷举的规模上限是硬的。** 次数按 n! 增长，到 9 个点就吃不住了；程序顶到上限会直接报错，不会悄悄降格成启发式充当“最优”。看见“最优”两个字，先问是穷举出来的还是别人跑出来的。", "The enumeration limit is hard: the work grows as n!, and past nine customers it is gone. The program raises an error rather than quietly substituting a heuristic for the optimum. Whenever a number is called optimal, ask whether it was enumerated or merely obtained."]
+  - ["比值随规模变大，**有三个互相纠缠的原因**：启发式确实变差、下界确实变松、实例的几何随规模变化。小规模上第三列（最优/下界）能把第二个原因量出来，大规模上量不出来——所以大规模的曲线只能用来看趋势，不能用来给启发式定罪。", "Three causes are tangled in a ratio that grows with size: the heuristic really does get worse, the bound really does get looser, and the instance geometry changes with size. The third column measures the second cause at small sizes only, so the large-size curve shows a trend and cannot convict the heuristic on its own."]
+思考题:
+  - ["你们现在怎么评价自己的排线？是跟上个月比、跟另一套软件比，还是跟最优解或下界比？按本章口径，前两种比法得出的百分比说明什么、不说明什么？", "How is your own routing assessed today: against last month, against another package, or against an optimum or bound? Under this chapter's rules, what do the first two kinds of percentage establish, and what do they not?"]
+  - ["把本实验的下界换成更紧的一个（例如把“每个客户两条最便宜邻边之半”换成最小生成树类的下界），表 2 的第三列会怎么变？第二列会怎么变？哪一列的变化说明“启发式变好了”？", "Replace the bound with a tighter one, for instance a spanning-tree-based bound: how do the second and third columns of Table 2 move, and which movement would mean the heuristic itself improved?"]
+  - ["厂长要一句话的结论：“我们这版排线最多比最优差百分之几”。按本实验的结果，这句话在什么规模下能说、怎么说才不算夸大？把它写成一段可以进验收文件的话。", "The manager wants one sentence: 'our routing is at most this far from optimal'. At what sizes can that be said, and how should it be worded so as not to overstate? Write the sentence as it would appear in an acceptance document."]
