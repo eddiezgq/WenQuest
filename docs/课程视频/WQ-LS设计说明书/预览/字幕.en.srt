@@ -1,0 +1,243 @@
+1
+00:00:00,500 --> 00:00:01,218
+This is WQ-LS,
+
+2
+00:00:01,238 --> 00:00:05,169
+an industrial direct-drive lockstitch machine designed from scratch with AI
+
+3
+00:00:05,189 --> 00:00:05,801
+at WenQuest,
+
+4
+00:00:06,271 --> 00:00:10,006
+from a design brief to a virtual prototype that sews on the web.
+
+5
+00:00:10,726 --> 00:00:13,444
+The documentation opens on the virtual prototype:
+
+6
+00:00:13,614 --> 00:00:19,380
+116 parts, every one a real design solid, sewing at 5000 stitches a minute.
+
+7
+00:00:20,100 --> 00:00:24,416
+How was it designed? People set the direction and make the choices: how fast,
+
+8
+00:00:24,436 --> 00:00:26,331
+which look, whether to lighten it.
+
+9
+00:00:26,801 --> 00:00:29,335
+AI writes the calculations, builds the 3-D solids, runs the simulations,
+
+10
+00:00:29,355 --> 00:00:30,541
+produces drawings and NC programs,
+
+11
+00:00:30,711 --> 00:00:34,484
+and checks itself with tests — change one thing and everything downstream is
+
+12
+00:00:34,504 --> 00:00:35,032
+recomputed.
+
+13
+00:00:35,752 --> 00:00:38,111
+And it all runs on WenQuest's own software:
+
+14
+00:00:38,131 --> 00:00:40,877
+the sewing-machine design tool for the mechanisms,
+
+15
+00:00:41,347 --> 00:00:43,929
+digital-factory CAE for FEA, casting and multibody dynamics,
+
+16
+00:00:44,099 --> 00:00:48,110
+WenQuest NC programming for machining, WenQuest Electronics for the controller,
+
+17
+00:00:48,130 --> 00:00:50,049
+and web 3-D to put the machine online.
+
+18
+00:00:50,769 --> 00:00:55,112
+The design runs through ten gates: brief, dynamics, styling and housing,
+
+19
+00:00:55,132 --> 00:00:57,415
+parts and mechanisms, housing process,
+
+20
+00:00:57,885 --> 00:01:01,115
+web 3-D, drawings and BOM, virtual-prototype validation,
+
+21
+00:01:01,135 --> 00:01:03,611
+plus the controller and a company standard.
+
+22
+00:01:04,331 --> 00:01:07,593
+Gate one fixes the scheme: what the needle, take-up,
+
+23
+00:01:07,613 --> 00:01:10,686
+hook and feed mechanisms each do within one turn.
+
+24
+00:01:11,406 --> 00:01:13,901
+The timing diagram drives the 3-D machine:
+
+25
+00:01:13,921 --> 00:01:18,451
+the hook point passes behind the needle at 206 degrees and catches the loop,
+
+26
+00:01:18,621 --> 00:01:20,792
+with exactly two millimetres of needle rise.
+
+27
+00:01:21,512 --> 00:01:25,868
+Gate two is dynamics: the inertia of every moving part plus piercing,
+
+28
+00:01:25,888 --> 00:01:27,518
+thread and feed resistance
+
+29
+00:01:27,688 --> 00:01:31,126
+add up to the shaft torque — peaking under five newton-metres,
+
+30
+00:01:31,146 --> 00:01:32,799
+averaging under seventy watts.
+
+31
+00:01:33,519 --> 00:01:35,576
+How big is the balance weight?
+
+32
+00:01:35,596 --> 00:01:40,215
+Drag the ratio and the shaking force drops from 690 to 415 newtons;
+
+33
+00:01:40,235 --> 00:01:41,738
+0.6 is the sweet spot.
+
+34
+00:01:42,458 --> 00:01:44,648
+The upper shaft is checked by finite elements:
+
+35
+00:01:44,668 --> 00:01:47,195
+73 megapascals at the small fillet by the crank seat,
+
+36
+00:01:47,365 --> 00:01:50,120
+a safety factor of nearly five against yield.
+
+37
+00:01:50,840 --> 00:01:53,528
+Gate three picks the look — streamlined option B —
+
+38
+00:01:53,698 --> 00:01:56,173
+and the housing becomes two HT250 castings,
+
+39
+00:01:56,193 --> 00:01:59,712
+with walls and ribs sized step by step to a stiffness target.
+
+40
+00:02:00,432 --> 00:02:02,558
+Gate four turns every part into a solid;
+
+41
+00:02:02,578 --> 00:02:05,134
+the take-up four-bar can be resized on the spot,
+
+42
+00:02:05,304 --> 00:02:08,929
+and thread supply and demand for three fabrics are recomputed at once.
+
+43
+00:02:09,649 --> 00:02:11,702
+Gate five is the housing process:
+
+44
+00:02:11,722 --> 00:02:16,224
+a solidification simulation shows the iron freezing from the outside in,
+
+45
+00:02:16,943 --> 00:02:19,420
+and the tools of eight NC programs follow their real paths.
+
+46
+00:02:20,140 --> 00:02:23,644
+Gates six and seven put the machine on the web and generate the BOMs and
+
+47
+00:02:23,664 --> 00:02:26,189
+drawings of eight variants straight from the design;
+
+48
+00:02:26,359 --> 00:02:28,308
+click a line and the part flies out.
+
+49
+00:02:29,028 --> 00:02:31,385
+Gate eight validates the virtual prototype:
+
+50
+00:02:31,405 --> 00:02:34,204
+nineteen assembly steps along real insertion paths,
+
+51
+00:02:34,924 --> 00:02:38,470
+and 285 part pairs checked for clearance turn by turn.
+
+52
+00:02:39,190 --> 00:02:42,305
+Multibody dynamics re-solves the whole machine in MuJoCo,
+
+53
+00:02:42,325 --> 00:02:44,505
+within 0.14 percent of the power method,
+
+54
+00:02:45,225 --> 00:02:48,685
+with every joint force and every part's inertia force visible.
+
+55
+00:02:49,405 --> 00:02:52,695
+The controller firmware really runs in a simulator:
+
+56
+00:02:52,715 --> 00:02:55,031
+zero to 5000 in a tenth of a second,
+
+57
+00:02:55,201 --> 00:02:59,077
+then trim, needle-up stop, wipe and foot lift, step by step.
+
+58
+00:02:59,797 --> 00:03:03,497
+One person with AI and WenQuest's software, ten gates in days.
+
+59
+00:03:03,967 --> 00:03:06,181
+Every number comes from AI's design calculations,
+
+60
+00:03:06,201 --> 00:03:09,645
+and every figure can be opened, dragged and recomputed in the documentation.
+
+61
+00:03:09,815 --> 00:03:11,670
+That is AI-native design at WenQuest.
