@@ -150,4 +150,24 @@ print(f"折成单价：**预测均方根误差每降 1 kW，{TEST_DAYS} 天省�
 print("**所以“预测值多少钱”这个问题，答案在结算规则里，不在模型里**——"
       "换一套规则，同一个模型的价值能差几十倍")
 
+# ---------- 五、案例要印的那一天（22.6 节）
+# 取测试段里的第 3 天，分别算峰段与谷段从电网买了多少电
+D = 2
+sl = slice(D * STEPS_PER_DAY, (D + 1) * STEPS_PER_DAY)
+peak_mask = P[sl] >= P.max() - 1e-9
+valley_mask = P[sl] <= P.min() + 1e-9
+plan_fc = np.empty(len(truth))
+for d in range(TEST_DAYS):
+    s2 = slice(d * STEPS_PER_DAY, (d + 1) * STEPS_PER_DAY)
+    _, p = optimal_dispatch(np.maximum(fc["mid"][s2], 0.0), L[s2], P[s2])
+    plan_fc[s2] = p
+plan_fc = safe_layer(plan_fc, truth, L)
+grid_none = (L - truth)[sl]
+grid_fc = (L - truth + plan_fc)[sl]
+for tag, mask in (("peak", peak_mask), ("valley", valley_mask)):
+    v[f"{tag}_kwh_none"] = float(np.sum(np.maximum(grid_none, 0.0)[mask]) * DT_H)
+    v[f"{tag}_kwh_fc"] = float(np.sum(np.maximum(grid_fc, 0.0)[mask]) * DT_H)
+print(f"\n案例那一天：峰段购电 {v['peak_kwh_none']:.0f} → {v['peak_kwh_fc']:.0f} kWh，"
+      f"谷段 {v['valley_kwh_none']:.0f} → {v['valley_kwh_fc']:.0f} kWh")
+
 out(**v)
