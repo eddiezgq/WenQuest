@@ -154,5 +154,12 @@
  "双击凸台：长度框里先打等号，写 Spreadsheet.B1": "Double-click the pad: type = in the length box, then Spreadsheet.B1",
  "再双击侧销的草图，双击“竖直距离 8”那条约束，改成 =Spreadsheet.B1 / 2": "Double-click the pin's sketch, double-click the vertical distance 8 constraint, and make it =Spreadsheet.B1 / 2",
  "现在改表：高 16 改成 22，重新计算": "Now edit the sheet: height 16 → 22, recompute",
- "方块高了 6，销自己跟到了新的正中。这就是参数化：设计意图写进模型，改一个数，相关的都跟着变": "The block grew by 6 and the pin moved to the new middle by itself. That's parametric design: the intent is in the model, so change one number and everything related follows"
+ "方块高了 6，销自己跟到了新的正中。这就是参数化：设计意图写进模型，改一个数，相关的都跟着变": "The block grew by 6 and the pin moved to the new middle by itself. That's parametric design: the intent is in the model, so change one number and everything related follows",
+ "送布偏心轮：一个直径 26 的圆盘，套在直径 16 的轴上，圆盘中心偏出 3。这种“几个基本体拼起来”的零件，用 Part 工作台最快": "The feed eccentric: a Ø26 disc on a Ø16 shaft, its centre offset by 3. For a part built from a few primitives, the Part workbench is quickest",
+ "点“圆柱体”，在属性里改：半径 13、高 8、位置 x = 3": "Click Cylinder and set its properties: radius 13, height 8, position x = 3",
+ "再一个圆柱：半径 8、高 8，留在原点——这是轴孔": "Another cylinder: radius 8, height 8, left at the origin—this is the bore",
+ "先点大圆柱，按住 Ctrl 再点小圆柱，点“剪切”：大的减去小的": "Click the large cylinder, Ctrl-click the small one, then Cut: large minus small",
+ "偏心轮做好了，体积和整机里的真零件一样。轴一转，圆盘中心绕着轴画圈，推着送布叉上下动": "Done, with the same volume as the real part. As the shaft turns, the disc centre circles the axis and drives the feed fork",
+ "“偏移”：选剪切的结果，点“三维偏移”，距离 1——得到一个大 1 mm 的外包络，查间隙时常用": "Offset: select the Cut, click 3D Offset, distance 1—a 1 mm larger envelope, handy for clearance checks",
+ "偏移以后，原来的剪切收在它下面——还是依赖关系：改圆柱，剪切、偏移一路跟着重算": "The Cut now sits under the Offset—a dependency again: change a cylinder and the Cut and Offset recompute"
 }

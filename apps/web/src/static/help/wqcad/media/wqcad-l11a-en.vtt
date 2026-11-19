@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00:06.130 --> 00:00:15.729
+The feed eccentric: a Ø26 disc on a Ø16 shaft, its centre offset by 3. For a part built from a few primitives, the Part workbench is quickest
+
+00:00:15.729 --> 00:00:27.729
+Click Cylinder and set its properties: radius 13, height 8, position x = 3
+
+00:00:30.728 --> 00:00:42.367
+Another cylinder: radius 8, height 8, left at the origin—this is the bore
+
+00:00:42.367 --> 00:00:49.928
+Click the large cylinder, Ctrl-click the small one, then Cut: large minus small
+
+00:00:49.928 --> 00:00:58.028
+Done, with the same volume as the real part. As the shaft turns, the disc centre circles the axis and drives the feed fork
+
+00:00:58.028 --> 00:01:10.028
+Offset: select the Cut, click 3D Offset, distance 1—a 1 mm larger envelope, handy for clearance checks
+
+00:01:10.128 --> 00:01:18.600
+The Cut now sits under the Offset—a dependency again: change a cylinder and the Cut and Offset recompute

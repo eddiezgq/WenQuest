@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ 目录</button>
 <aside>
-  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–10 课）</small></div>
+  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–11 课）</small></div>
   <input class="find" placeholder="搜索帮助…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>课程怎么学</a>
 <a class="sub" href="#course-1" data-s="course">这套课程</a>
@@ -201,7 +201,15 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l10-do" data-s="l10">跟着做</a>
 <a class="sub" href="#l10-self" data-s="l10">自己做</a>
 <a class="sub" href="#l10-quiz" data-s="l10">小测</a>
-<a href="#appA" data-s="appA"><span class="n">11</span>附录 A 安装问渠 CAD</a>
+<a href="#l11" data-s="l11"><span class="n">11</span>第 11 课 Part 工作台：基本体、布尔运算、偏移、截面</a>
+<a class="sub" href="#l11-goal" data-s="l11">学完能做什么</a>
+<a class="sub" href="#l11-which" data-s="l11">Part 和零件设计（Part Design）怎么选</a>
+<a class="sub" href="#l11-ecc" data-s="l11">送布偏心轮：两个圆柱一剪</a>
+<a class="sub" href="#l11-bool" data-s="l11">布尔运算</a>
+<a class="sub" href="#l11-do" data-s="l11">跟着做</a>
+<a class="sub" href="#l11-self" data-s="l11">自己做</a>
+<a class="sub" href="#l11-quiz" data-s="l11">小测</a>
+<a href="#appA" data-s="appA"><span class="n">12</span>附录 A 安装问渠 CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">下载和授权</a>
 <a class="sub" href="#appA-install" data-s="appA">安装</a>
 <a class="sub" href="#appA-fix" data-s="appA">排错</a></nav>
@@ -222,9 +230,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">课程表</h3>
-<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td>第 11 课</td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 12 课</td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机壳外形的特征曲线</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 13 课</td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的过渡曲面</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 14 课</td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>一块外壳变实体</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 15 课</td><td>装配工作台：插入零件、固定、关节、自由度</td><td>曲柄滑块</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 16 课</td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>挑线四连杆转一圈</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 17 课</td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td>第 12 课</td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机壳外形的特征曲线</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 13 课</td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的过渡曲面</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 14 课</td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>一块外壳变实体</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 15 课</td><td>装配工作台：插入零件、固定、关节、自由度</td><td>曲柄滑块</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 16 课</td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>挑线四连杆转一圈</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 17 课</td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
 
-<p>现在上线的是第 1–10 课，其余各课按模块陆续上线。</p>
+<p>现在上线的是第 1–11 课，其余各课按模块陆续上线。</p>
 <h3 id="course-3">录屏是怎么录的</h3>
 <p>录屏都是真软件在操作：云端电脑上装的 FreeCAD 1.1.4、问渠 CAD 的品牌和同一版 AI 工作台，中文界面；鼠标点哪里、键盘输什么，软件就真的执行（画草图、加约束、凸台都是软件自己算的）。和你电脑上的问渠 CAD 只差 27 个内核补丁——补丁不改界面；“检查几何”“展开面”两处结果不同，这两处不录屏，用书里的验收数据讲。</p>
 <p>录屏暂时没有配音，看字幕（视频右下角可以开关）。讲解配音以后补上。</p></section>
@@ -1133,7 +1141,108 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">基准面附着在 YZ 平面上，附着偏移的“Z 方向”填 6，基准面在哪？</p><div class="opts"><button type="button" data-k="a">A. 整体 Z = 6 的水平面</button><button type="button" data-k="b">B. 整体 X = 6、平行于 YZ 平面</button><button type="button" data-k="c">C. 整体 Y = 6</button><button type="button" data-k="d">D. 不动</button></div><p class="why" hidden>附着偏移在参照自己的坐标系里，YZ 平面的“Z”是它的法向，即整体 X 方向。</p></div>
 <div class="quiz" data-ok="b"><p class="q">为什么把草图画在基准面上，而不是直接点实体的面？</p><div class="opts"><button type="button" data-k="a">A. 基准面更好看</button><button type="button" data-k="b">B. 不依赖面的编号，前面的特征改了也不会丢参照</button><button type="button" data-k="c">C. 实体的面不能画草图</button><button type="button" data-k="d">D. 基准面算得更快</button></div><p class="why" hidden>实体的面编号会随前面的特征变化；基准面附着在原点平面或稳定的参照上，更稳。</p></div>
 <div class="quiz" data-ok="c"><p class="q">凸台长度写 =Spreadsheet.B1，销的高度写 =Spreadsheet.B1 / 2。把 B1 从 16 改成 22，销的高度是？</p><div class="opts"><button type="button" data-k="a">A. 8</button><button type="button" data-k="b">B. 16</button><button type="button" data-k="c">C. 11</button><button type="button" data-k="d">D. 22</button></div><p class="why" hidden>表达式跟着表格算：22 / 2 = 11。</p></div></section>
-<section id="appA"><h2><span class="n">11</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
+<section id="l11"><h2><span class="n">11</span>第 11 课 Part 工作台：基本体、布尔运算、偏移、截面</h2><p class="lead">学完能做：用 Part 工作台的基本体（立方体、圆柱、球、圆锥、圆环）和布尔运算（剪切、并集、交集）很快拼出零件；用偏移得到外包络；用截面看剖面；知道什么时候用 Part、什么时候用零件设计。做出 WQ-LS 的送布偏心轮。约 1 小时。</p><h3 id="l11-goal">学完能做什么</h3>
+<ul>
+<li>建基本体，在属性里改尺寸和位置。</li>
+<li>布尔运算：剪切（A − B）、并集（A + B）、交集（A ∩ B）；选择的先后决定谁减谁。</li>
+<li>三维偏移：整个形状向外（或向里）长一层。</li>
+<li>截面、剖面：两个形状相交得到交线，或按平面切出一组剖面。</li>
+</ul>
+
+<h3 id="l11-which">Part 和零件设计（Part Design）怎么选</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Part 工作台</th>
+<th>零件设计工作台</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>思路</td>
+<td>几个形状拼、减（构造实体几何，CSG）</td>
+<td>一个实体，按特征一步步加、减</td>
+</tr>
+<tr>
+<td>起点</td>
+<td>基本体、拉伸、旋转</td>
+<td>草图</td>
+</tr>
+<tr>
+<td>适合</td>
+<td>由几个规则体组成的简单零件；夹具、工装；对已有形状做布尔、偏移</td>
+<td>绝大多数机械零件：要约束、要参数化、要出图</td>
+</tr>
+<tr>
+<td>结果</td>
+<td>可以是多个实体</td>
+<td>一个 Body 里只有一个实体</td>
+</tr>
+</tbody>
+</table>
+<p>两种可以配合：零件设计里的“添加式图元”“减料图元”就是 Part 的基本体；Part 的形状也能拿进零件设计当基础特征。</p>
+<h3 id="l11-ecc">送布偏心轮：两个圆柱一剪</h3>
+<p>WQ-LS 的送布偏心轮：Ø26 的圆盘、厚 8，圆盘中心偏离轴线 3；中间 Ø16 的孔套在下轴上。</p>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l11a.jpg"><source src="media/wqcad-l11a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l11a.vtt"></video><figcaption>▶ 录屏：圆柱 R13 × 8、x = 3 → 圆柱 R8 × 8 → 剪切 → 三维偏移 1（约 85 秒）</figcaption></figure>
+<p>剪切后体积 2638.94 mm³，和整机 STEP 里的偏心轮完全一样（整机里偏心方向是斜的，偏心距同样是 3）。三维偏移 1 mm 后 4561.51 mm³。</p>
+<h3 id="l11-bool">布尔运算</h3>
+<table>
+<thead>
+<tr>
+<th>运算</th>
+<th>选法</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>剪切 Cut</td>
+<td>先选被剪的，Ctrl 再选刀具</td>
+<td>第一个减去第二个</td>
+</tr>
+<tr>
+<td>并集 Fuse</td>
+<td>选两个或多个</td>
+<td>合成一个；勾“精简”去掉多余的接缝线</td>
+</tr>
+<tr>
+<td>交集 Common</td>
+<td>选两个或多个</td>
+<td>只留大家都有的部分</td>
+</tr>
+<tr>
+<td>截面 Section</td>
+<td>选两个</td>
+<td>两个形状表面的交线（不是实体）</td>
+</tr>
+<tr>
+<td>剖面 Cross sections</td>
+<td>选一个</td>
+<td>按平面、间距切出一组截面线，看形状变化</td>
+</tr>
+</tbody>
+</table>
+<p>布尔运算的输入会收到结果下面、自动隐藏；改输入（基本体的尺寸、位置），结果自动重算。</p>
+<h3 id="l11-do">跟着做</h3>
+<ol class="steps">
+<li>新建文件，切到 Part 工作台。圆柱：半径 13、高 8、位置 x = 3。</li>
+<li>再一个圆柱：半径 8、高 8，在原点。</li>
+<li>先选大圆柱，Ctrl 选小圆柱，剪切。体积应是 2638.94 mm³。</li>
+<li>选剪切，三维偏移 1 mm。</li>
+</ol>
+
+<h3 id="l11-self">自己做</h3>
+<ol>
+<li>把大圆柱的位置改成 x = 0、y = 3，偏心方向变了，体积不变。</li>
+<li>用交集：一个立方体和一个球，做一个“球面立方体”。</li>
+<li>选偏心轮，“剖面”：平面 XY、间隔 2、个数 4，看看截出的线。</li>
+</ol>
+<h3 id="l11-quiz">小测</h3>
+<div class="quiz" data-ok="b"><p class="q">剪切时先选 A、再选 B，结果是？</p><div class="opts"><button type="button" data-k="a">A. A + B</button><button type="button" data-k="b">B. A − B</button><button type="button" data-k="c">C. B − A</button><button type="button" data-k="d">D. A ∩ B</button></div><p class="why" hidden>第一个是被剪的，第二个是刀具。</p></div>
+<div class="quiz" data-ok="b"><p class="q">偏心轮的外圆中心偏离轴线 3。轴转一圈，外圆上一点的径向跳动是？</p><div class="opts"><button type="button" data-k="a">A. 3</button><button type="button" data-k="b">B. 6</button><button type="button" data-k="c">C. 13</button><button type="button" data-k="d">D. 0</button></div><p class="why" hidden>外圆中心绕轴画半径 3 的圆，外圆上一点离轴最远 13 + 3、最近 13 − 3，跳动 6。</p></div>
+<div class="quiz" data-ok="b"><p class="q">要做一个要出工程图、尺寸要能改的轴承座，首选？</p><div class="opts"><button type="button" data-k="a">A. Part 工作台，几个立方体拼</button><button type="button" data-k="b">B. 零件设计：草图 + 特征</button><button type="button" data-k="c">C. 网格工作台</button><button type="button" data-k="d">D. 都行，没区别</button></div><p class="why" hidden>零件设计用约束和参数，改尺寸、出图都方便；Part 适合简单、规则体组成的东西。</p></div></section>
+<section id="appA"><h2><span class="n">12</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
 <p>官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1.4 GB）。</p>
 <h3 id="appA-install">安装</h3>
 <ol class="steps">
