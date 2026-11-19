@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–8)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–9)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -184,7 +184,16 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l08-do" data-s="l08">Follow along</a>
 <a class="sub" href="#l08-self" data-s="l08">On your own</a>
 <a class="sub" href="#l08-quiz" data-s="l08">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">09</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l09" data-s="l09"><span class="n">09</span>Lesson 9 Patterns, mirror, multi-transform</a>
+<a class="sub" href="#l09-goal" data-s="l09">What you will be able to do</a>
+<a class="sub" href="#l09-four" data-s="l09">Four transformation features</a>
+<a class="sub" href="#l09-polar" data-s="l09">Handwheel: two polar patterns</a>
+<a class="sub" href="#l09-linear" data-s="l09">Needle bar: linear pattern</a>
+<a class="sub" href="#l09-mirror" data-s="l09">Mirror and multi-transform</a>
+<a class="sub" href="#l09-do" data-s="l09">Follow along</a>
+<a class="sub" href="#l09-self" data-s="l09">On your own</a>
+<a class="sub" href="#l09-quiz" data-s="l09">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">10</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -205,9 +214,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 9</td><td>Patterns, mirror, multi-transform</td><td>Handwheel (spoke pattern)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td>Lesson 10</td><td>Datum planes and axes, attachment; parametric design</td><td>Take-up lever (change one, all follow)</td><td>In progress</td></tr><tr><td>3 Part modelling</td><td>Lesson 11</td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
 
-<p>Lessons 1–8 are online now; the others follow module by module.</p>
+<p>Lessons 1–9 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
 <p>Every recording is the real software at work: FreeCAD 1.1.4 on a cloud computer with the WenQuest CAD branding and the same AI workbench, English interface. Where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. The only difference from WenQuest CAD on your computer is the 27 kernel fixes, which do not change the interface; “Check geometry” and “Unfold face” give different results, so those are not recorded and are taught with the book's verified data instead.</p>
 <p>The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.</p></section>
@@ -970,7 +979,82 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">The helix section circle is 7 from the axis with diameter 1.8. What is the spring&#x27;s outside diameter?</p><div class="opts"><button type="button" data-k="a">A. 14</button><button type="button" data-k="b">B. 15.8</button><button type="button" data-k="c">C. 8.8</button><button type="button" data-k="d">D. 17.6</button></div><p class="why" hidden>Outside diameter = 2 × (7 + 0.9) = 15.8; mean 14, inside 12.2.</p></div>
 <div class="quiz" data-ok="b"><p class="q">Where should a sweep section be?</p><div class="opts"><button type="button" data-k="a">A. Anywhere</button><button type="button" data-k="b">B. At the start of the path, perpendicular to it</button><button type="button" data-k="c">C. At the end of the path</button><button type="button" data-k="d">D. In the plane of the path</button></div><p class="why" hidden>At the start and perpendicular, the sweep is a uniform tube; placed askew it twists or self-intersects.</p></div>
 <div class="quiz" data-ok="b"><p class="q">Why are springs often drawn as plain tubes in a machine model?</p><div class="opts"><button type="button" data-k="a">A. FreeCAD can&#x27;t do helices</button><button type="button" data-k="b">B. Assembly and motion don&#x27;t need every coil; tubes are light and fast</button><button type="button" data-k="c">C. Tubes are more accurate</button><button type="button" data-k="d">D. To save material</button></div><p class="why" hidden>Hundreds of parts move together; helical faces are many and slow. Use the real helix for part drawings and stiffness.</p></div></section>
-<section id="appA"><h2><span class="n">09</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l09"><h2><span class="n">09</span>Lesson 9 Patterns, mirror, multi-transform</h2><p class="lead">You will be able to draw one feature and copy it around a circle, along a line or across a mirror plane; and know that patterns follow the original. You make the WQ-LS handwheel (5 lightening holes, 48 grip grooves) and use a linear pattern for the needle bar's second oil groove. About 1.5 hours.</p><h3 id="l09-goal">What you will be able to do</h3>
+<ul>
+<li>Polar pattern: n copies evenly around an axis; Linear pattern: n copies along a direction; Mirrored: one copy across a plane.</li>
+<li>Multi-transform: several transformations stacked (e.g. linear, then polar).</li>
+<li>Patterns copy <b>features</b> (pocket, pad, hole…), not sketches; change the original and all copies change.</li>
+<li>Through-all pockets: when the sketch is on a datum plane outside the material, watch the direction (Reversed).</li>
+</ul>
+
+<h3 id="l09-four">Four transformation features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Parameters</th>
+<th>Typical use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PolarPattern</td>
+<td>axis, angle (extent or spacing), occurrences</td>
+<td>flange holes, spokes, teeth, knurling</td>
+</tr>
+<tr>
+<td>LinearPattern</td>
+<td>direction, length (extent or spacing), occurrences</td>
+<td>rows of holes, fins, grooves</td>
+</tr>
+<tr>
+<td>Mirrored</td>
+<td>mirror plane</td>
+<td>symmetric bosses and holes</td>
+</tr>
+<tr>
+<td>MultiTransform</td>
+<td>the above, stacked in order</td>
+<td>hole grids, several rings of holes</td>
+</tr>
+</tbody>
+</table>
+<p>In Extent mode the length (angle) is from the first copy to the last; in Spacing mode it is between neighbours. A polar pattern over 360° wraps round, so 5 occurrences means one every 72°.</p>
+<h3 id="l09-polar">Handwheel: two polar patterns</h3>
+<p>The handwheel blank (hub, 3 mm web, 16 mm rim) is a Revolution as in lesson 6, prepared before the recording. The web has 5 Ø20 lightening holes on a Ø60 circle:</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l09a-en.jpg"><source src="../media/wqcad-l09a-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l09a-en.vtt"></video><figcaption>▶ Recording: Ø20 circle on XY, 30 from the centre → Pocket through all + Reversed → Polar pattern 5 (about 65 s)</figcaption></figure>
+<p>The rim has 48 grip grooves: a Ø2.4 circle 52.6 from the centre (rim radius 52), half outside, leaving a half-round groove:</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l09b-en.jpg"><source src="../media/wqcad-l09b-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l09b-en.vtt"></video><figcaption>▶ Recording: Ø2.4 circle 52.6 from the centre → pocket through → Polar pattern 48 (about 60 s)</figcaption></figure>
+<p>Volumes: blank 51845.70 mm³, after the holes 47133.31, after the grooves 46459.55. The handwheel in the machine STEP is 46381.01 mm³; the 78.54 mm³ difference is exactly a Ø10 × 1 slice — the machine model has a small extra cavity in the hub that this lesson leaves out.</p>
+<h3 id="l09-linear">Needle bar: linear pattern</h3>
+<p>Lesson 6 cut the first oil groove and lesson 7 added the second before recording. A linear pattern is quicker:</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l09c-en.jpg"><source src="../media/wqcad-l09c-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l09c-en.vtt"></video><figcaption>▶ Recording: select the Groove → Linear pattern: vertical sketch axis, length 2, 2 occurrences (about 40 s)</figcaption></figure>
+<p>Volume 9042.89 mm³, the same as cutting both grooves separately.</p>
+<h3 id="l09-mirror">Mirror and multi-transform</h3>
+<ul>
+<li><strong>Mirrored</strong>: select a feature, click Mirrored, choose the horizontal/vertical sketch axis or a datum plane. The two ears of the WQ-LS needle clamp (lessons 3–4) could be one drawn and one mirrored.</li>
+<li><strong>MultiTransform</strong>: select a feature, click MultiTransform, right-click Add linear pattern / polar pattern / mirrored in the panel and stack them. For example a ring of 6 holes, repeated 3 times along the axis.</li>
+<li>If a copy fails (outside the solid, not touching the original) it shows red and OK reports an error: reduce the spacing or the count.</li>
+</ul>
+<h3 id="l09-do">Follow along</h3>
+<ol class="steps">
+<li>Make the handwheel blank to this lesson's sizes: half section on XZ (hub Ø22 × 10 with a Ø10 blind bore 4 deep; web 3 thick at 4–7; rim Ø92–Ø104, 16 wide), Revolution 360°.</li>
+<li>On XY: Ø20 circle, centre on the vertical axis 30 from the centre; Pocket through all, Reversed; Polar pattern 5.</li>
+<li>On XY: Ø2.4 circle, centre on the horizontal axis 52.6 from the centre; pocket through; Polar pattern 48. The volume should be 46459.55 mm³.</li>
+<li>Open lesson 6's needle bar (one groove), select the Groove, Linear pattern: vertical sketch axis, length 2, 2 occurrences.</li>
+</ol>
+
+<h3 id="l09-self">On your own</h3>
+<ol>
+<li>Change to 6 holes of Ø16: edit only the pattern count and the original circle, and watch all six change.</li>
+<li>Make the grip grooves in Spacing mode: 7.5° spacing, 48 occurrences; compare with Extent 360°.</li>
+<li>With MultiTransform make a 3 × 4 hole grid at 10 pitch: linear X 4, then linear Y 3.</li>
+</ol>
+<h3 id="l09-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">Polar pattern, extent 360°, 5 occurrences: the angle between neighbours?</p><div class="opts"><button type="button" data-k="a">A. 90°</button><button type="button" data-k="b">B. 72°</button><button type="button" data-k="c">C. 60°</button><button type="button" data-k="d">D. 75°</button></div><p class="why" hidden>At 360° the ends coincide: 360 ÷ 5 = 72°.</p></div>
+<div class="quiz" data-ok="b"><p class="q">After patterning, you change the original hole from Ø20 to Ø16. What happens?</p><div class="opts"><button type="button" data-k="a">A. Only the original changes</button><button type="button" data-k="b">B. All copies change</button><button type="button" data-k="c">C. The pattern fails</button><button type="button" data-k="d">D. The copies vanish</button></div><p class="why" hidden>The pattern copies the feature, so copies follow the original.</p></div>
+<div class="quiz" data-ok="b"><p class="q">The sketch is on the datum plane at the handwheel&#x27;s bottom face and a through-all pocket removes nothing. Most likely cause?</p><div class="opts"><button type="button" data-k="a">A. Sketch not fully constrained</button><button type="button" data-k="b">B. It cuts outwards; tick Reversed</button><button type="button" data-k="c">C. Circle too small</button><button type="button" data-k="d">D. Pattern it first</button></div><p class="why" hidden>A pocket cuts opposite to the sketch normal by default; on an outer face that points away from the material, so Reversed is needed.</p></div></section>
+<section id="appA"><h2><span class="n">10</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">

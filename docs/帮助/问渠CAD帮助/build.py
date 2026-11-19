@@ -35,7 +35,7 @@ LESSONS = [
     ("三 零件建模", 6, "凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）", "针杆、曲柄销", "l06"),
     ("三 零件建模", 7, "倒角、圆角、拔模、抽壳、加厚", "针杆倒角；梭壳（抽壳）", "l07"),
     ("三 零件建模", 8, "扫掠、放样、螺旋", "压脚簧（螺旋）、挑线簧（扫掠）", "l08"),
-    ("三 零件建模", 9, "阵列、镜像、多重变换", "手轮（辐条阵列）", None),
+    ("三 零件建模", 9, "阵列、镜像、多重变换", "手轮（减重孔、防滑槽）；针杆第二圈油槽", "l09"),
     ("三 零件建模", 10, "基准面、基准轴、附着方式；参数化设计", "挑线杆（改一个全跟着变）", None),
     ("三 零件建模", 11, "Part 工作台：基本体、布尔运算、偏移、截面", "送布偏心轮", None),
     ("四 曲线与曲面", 12, "曲线：B 样条、螺旋线、投影、相交线", "机壳外形的特征曲线", None),
@@ -60,7 +60,7 @@ LESSONS_EN = [
     ("3 Part modelling", "Pad, pocket, revolve, groove, hole (threaded holes)", "Needle bar, crank pin"),
     ("3 Part modelling", "Chamfer, fillet, draft, thickness", "Needle-bar chamfers; bobbin case (thickness)"),
     ("3 Part modelling", "Sweep, loft, helix", "Presser spring (helix), check spring (sweep)"),
-    ("3 Part modelling", "Patterns, mirror, multi-transform", "Handwheel (spoke pattern)"),
+    ("3 Part modelling", "Patterns, mirror, multi-transform", "Handwheel (holes, grip grooves); needle-bar groove"),
     ("3 Part modelling", "Datum planes and axes, attachment; parametric design", "Take-up lever (change one, all follow)"),
     ("3 Part modelling", "Part workbench: primitives, Booleans, offset, sections", "Feed eccentric"),
     ("4 Curves & surfaces", "Curves: B-splines, helices, projection, intersections", "Characteristic curves of the housing"),
@@ -75,9 +75,9 @@ LESSONS_EN = [
     ("8 AI", "AI workbench: part selection and checks, company parts library, AI part design", "Pick a bearing; replay the upper-shaft design"),
 ]
 
-FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "appA-install"]
-EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–8 课）", other=("English", "en/"), files=FILES)
-EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–8)",
+FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "appA-install"]
+EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–9 课）", other=("English", "en/"), files=FILES)
+EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–9)",
                   other=("中文", "../"), files=FILES)
 
 
@@ -100,6 +100,7 @@ def numbers(en=False):
                "t": f"{nc['t']:g}", "v": f"{nc['volume']:.1f}"},
         "dep": {"v": f"{1000 - math.pi * 9 * 10:.2f}"},
         "cr": {"D": "33", "d": "22", "e": "15.5", "t": "10", "v1": "10710.93", "v2": "11360.1"},   # 录屏里软件算的（director.log：pad 10.0 10710.93；after 18 11360.1）
+        "l9": {"blank": "51845.70", "holes": "47133.31", "done": "46459.55", "real": "46381.01", "diff": "78.54"},   # 录屏里算的；real：整机 handwheel.step
         "l8": {"helix": "1678.82", "pipe": "22.36", "tube": "4971.25", "check_real": "27.37"},   # 录屏里算的；tube、check_real：整机 presser_spring.step、check_spring.step
         "l7": {"shell": "787.08", "real": "1104.77"},   # 录屏里抽壳 0.6 的体积（director.log）；real：整机 bobbin_case.step 杯体
         "nb": {"v": f"{P['needle_bar']['volume']:.2f}"},

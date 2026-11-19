@@ -130,5 +130,17 @@
  "路径完全约束了。关闭草图": "The path is fully constrained. Close the sketch",
  "再画截面：XZ 平面，圆心在圆弧的起点（横轴上、离原点 9.35）；放大，加直径 0.7、水平距离 9.35": "Now the section on the XZ plane: centre at the start of the arc (on the horizontal axis, 9.35 out); zoom in, add diameter 0.7 and horizontal distance 9.35",
  "选中截面草图，点“添加式管道”；在面板里点路径旁的“对象”，再到视图里点一下路径": "Select the section sketch, click Additive pipe; in the panel click Object next to the path, then click the path in the view",
- "钢丝沿着路径弯出来了。路径和截面分开画：改路径，弹簧形状跟着变": "The wire follows the path. Path and section are separate sketches: change the path and the spring follows"
+ "钢丝沿着路径弯出来了。路径和截面分开画：改路径，弹簧形状跟着变": "The wire follows the path. Path and section are separate sketches: change the path and the spring follows",
+ "手轮：轮毂、薄腹板、外缘。毛坯用第 6 课的“旋转”做好了。腹板上要挖 5 个减重孔": "The handwheel: hub, thin web, rim. The blank was made with Revolution as in lesson 6. The web needs 5 lightening holes",
+ "画一个就够：XY 平面开草图，圆心点在竖轴上，直径 20；再锁住离中心 30": "Draw just one: sketch on XY, centre on the vertical axis, diameter 20; then lock it 30 from the centre",
+ "凹槽：类型“通过所有”，勾“反转”——草图在手轮底面上，反转才是往里挖": "Pocket: type Through all, tick Reversed—the sketch is on the bottom face, so reversed cuts into the part",
+ "选中这个凹槽，点“环形阵列”：轴默认是草图的法向（手轮的轴），次数 5，360° 均布": "Select the pocket and click Polar pattern: the axis defaults to the sketch normal (the wheel axis); 5 occurrences over 360°",
+ "5 个孔一圈均布。改次数，孔数跟着变；改原来那个孔，5 个一起变": "Five holes evenly spaced. Change the count and the holes follow; change the original hole and all five change",
+ "手轮外缘一圈防滑槽：48 道。还是只画一道：XY 平面上一个直径 2.4 的圆，圆心在横轴上、离中心 52.6": "The rim has 48 grip grooves. Again draw only one: a Ø2.4 circle on XY, centre on the horizontal axis, 52.6 from the centre",
+ "圆有一半在外圆以外：挖穿以后，外缘上就是一道半圆槽": "Half the circle lies outside the rim: cut through, it leaves a half-round groove",
+ "环形阵列：次数 48": "Polar pattern: 48 occurrences",
+ "一道槽变 48 道，每道 7.5°。两次阵列，手轮就和整机里的一样了": "One groove becomes 48, every 7.5°. Two patterns, and the handwheel matches the one in the machine",
+ "第 6 课的针杆只挖了一圈油槽。第二圈在上面 2 mm：不用再画草图，用“线性阵列”": "Lesson 6's needle bar has one oil groove. The second is 2 mm higher: no new sketch, use Linear pattern",
+ "方向选“垂直草图轴”（沿着针杆），长度 2，次数 2": "Direction: Vertical sketch axis (along the bar), length 2, 2 occurrences",
+ "第二圈出来了，体积和第 7 课补的那圈一样。阵列跟着原特征走：改第一圈的槽宽，两圈一起变": "There's the second groove, same volume as the one added in lesson 7. A pattern follows its original: change the first groove's width and both change"
 }

@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ 目录</button>
 <aside>
-  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–8 课）</small></div>
+  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–9 课）</small></div>
   <input class="find" placeholder="搜索帮助…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>课程怎么学</a>
 <a class="sub" href="#course-1" data-s="course">这套课程</a>
@@ -184,7 +184,16 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l08-do" data-s="l08">跟着做</a>
 <a class="sub" href="#l08-self" data-s="l08">自己做</a>
 <a class="sub" href="#l08-quiz" data-s="l08">小测</a>
-<a href="#appA" data-s="appA"><span class="n">09</span>附录 A 安装问渠 CAD</a>
+<a href="#l09" data-s="l09"><span class="n">09</span>第 9 课 阵列、镜像、多重变换</a>
+<a class="sub" href="#l09-goal" data-s="l09">学完能做什么</a>
+<a class="sub" href="#l09-four" data-s="l09">四个变换特征</a>
+<a class="sub" href="#l09-polar" data-s="l09">手轮：两次环形阵列</a>
+<a class="sub" href="#l09-linear" data-s="l09">针杆：线性阵列</a>
+<a class="sub" href="#l09-mirror" data-s="l09">镜像和多重变换</a>
+<a class="sub" href="#l09-do" data-s="l09">跟着做</a>
+<a class="sub" href="#l09-self" data-s="l09">自己做</a>
+<a class="sub" href="#l09-quiz" data-s="l09">小测</a>
+<a href="#appA" data-s="appA"><span class="n">10</span>附录 A 安装问渠 CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">下载和授权</a>
 <a class="sub" href="#appA-install" data-s="appA">安装</a>
 <a class="sub" href="#appA-fix" data-s="appA">排错</a></nav>
@@ -205,9 +214,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">课程表</h3>
-<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td>第 9 课</td><td>阵列、镜像、多重变换</td><td>手轮（辐条阵列）</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 10 课</td><td>基准面、基准轴、附着方式；参数化设计</td><td>挑线杆（改一个全跟着变）</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 11 课</td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 12 课</td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机壳外形的特征曲线</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 13 课</td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的过渡曲面</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 14 课</td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>一块外壳变实体</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 15 课</td><td>装配工作台：插入零件、固定、关节、自由度</td><td>曲柄滑块</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 16 课</td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>挑线四连杆转一圈</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 17 课</td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td>第 10 课</td><td>基准面、基准轴、附着方式；参数化设计</td><td>挑线杆（改一个全跟着变）</td><td>制作中</td></tr><tr><td>三 零件建模</td><td>第 11 课</td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 12 课</td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机壳外形的特征曲线</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 13 课</td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的过渡曲面</td><td>制作中</td></tr><tr><td>四 曲线与曲面</td><td>第 14 课</td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>一块外壳变实体</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 15 课</td><td>装配工作台：插入零件、固定、关节、自由度</td><td>曲柄滑块</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 16 课</td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>挑线四连杆转一圈</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 17 课</td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
 
-<p>现在上线的是第 1–8 课，其余各课按模块陆续上线。</p>
+<p>现在上线的是第 1–9 课，其余各课按模块陆续上线。</p>
 <h3 id="course-3">录屏是怎么录的</h3>
 <p>录屏都是真软件在操作：云端电脑上装的 FreeCAD 1.1.4、问渠 CAD 的品牌和同一版 AI 工作台，中文界面；鼠标点哪里、键盘输什么，软件就真的执行（画草图、加约束、凸台都是软件自己算的）。和你电脑上的问渠 CAD 只差 27 个内核补丁——补丁不改界面；“检查几何”“展开面”两处结果不同，这两处不录屏，用书里的验收数据讲。</p>
 <p>录屏暂时没有配音，看字幕（视频右下角可以开关）。讲解配音以后补上。</p></section>
@@ -970,7 +979,82 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">螺旋的截面圆心离轴 7、直径 1.8，弹簧外径是多少？</p><div class="opts"><button type="button" data-k="a">A. 14</button><button type="button" data-k="b">B. 15.8</button><button type="button" data-k="c">C. 8.8</button><button type="button" data-k="d">D. 17.6</button></div><p class="why" hidden>外径 = 2 × (7 + 0.9) = 15.8；中径 14，内径 12.2。</p></div>
 <div class="quiz" data-ok="b"><p class="q">扫掠时截面应该放在哪？</p><div class="opts"><button type="button" data-k="a">A. 哪里都行</button><button type="button" data-k="b">B. 路径起点，和路径垂直</button><button type="button" data-k="c">C. 路径终点</button><button type="button" data-k="d">D. 和路径在同一个平面里</button></div><p class="why" hidden>截面在路径起点、垂直于路径，扫出来才是均匀的管子；放歪了会扭或自相交。</p></div>
 <div class="quiz" data-ok="b"><p class="q">整机模型里弹簧常常画成一根管子，为什么？</p><div class="opts"><button type="button" data-k="a">A. 软件画不了螺旋</button><button type="button" data-k="b">B. 装配和运动仿真不需要每一圈，管子轻、算得快</button><button type="button" data-k="c">C. 管子更准</button><button type="button" data-k="d">D. 为了省材料</button></div><p class="why" hidden>整机几百个零件一起转，螺旋面很多、很慢；出零件图、算刚度时再用真螺旋。</p></div></section>
-<section id="appA"><h2><span class="n">09</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
+<section id="l09"><h2><span class="n">09</span>第 9 课 阵列、镜像、多重变换</h2><p class="lead">学完能做：画一个特征，用环形阵列、线性阵列、镜像复制出一圈、一排、对称的一份；知道阵列跟着原特征变。做出 WQ-LS 的手轮（5 个减重孔、48 道防滑槽），用线性阵列补针杆的第二圈油槽。约 1.5 小时。</p><h3 id="l09-goal">学完能做什么</h3>
+<ul>
+<li>环形阵列：绕一根轴均布 n 份；线性阵列：沿一个方向排 n 份；镜像：对一个平面复制一份。</li>
+<li>多重变换：几种变换叠起来（比如先线性再环形）。</li>
+<li>阵列的对象是<b>特征</b>（凹槽、凸台、孔……），不是草图；改原特征，所有副本一起变。</li>
+<li>“通过所有”的凹槽：草图在实体外面的基准面上时，注意方向（“反转”）。</li>
+</ul>
+
+<h3 id="l09-four">四个变换特征</h3>
+<table>
+<thead>
+<tr>
+<th>特征</th>
+<th>参数</th>
+<th>典型用法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>环形阵列 PolarPattern</td>
+<td>轴、角度（范围或间隔）、次数</td>
+<td>法兰孔、辐条、齿、滚花</td>
+</tr>
+<tr>
+<td>线性阵列 LinearPattern</td>
+<td>方向、长度（范围或间隔）、次数</td>
+<td>一排孔、散热片、油槽</td>
+</tr>
+<tr>
+<td>镜像 Mirrored</td>
+<td>镜像平面</td>
+<td>左右对称的凸台、孔</td>
+</tr>
+<tr>
+<td>多重变换 MultiTransform</td>
+<td>上面几种按顺序叠加</td>
+<td>矩阵孔、几圈孔</td>
+</tr>
+</tbody>
+</table>
+<p>“范围”模式下，长度（角度）是第一个到最后一个的总距离；“间隔”模式下是相邻两个的距离。环形阵列 360° 时首尾重合，所以 5 次就是每 72° 一个。</p>
+<h3 id="l09-polar">手轮：两次环形阵列</h3>
+<p>手轮的毛坯（轮毂、厚 3 的腹板、宽 16 的外缘）是第 6 课的“旋转”，录屏前做好了。腹板上 5 个 Ø20 减重孔，孔心在 Ø60 的圆上：</p>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l09a.jpg"><source src="media/wqcad-l09a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l09a.vtt"></video><figcaption>▶ 录屏：XY 平面画 Ø20 的圆、离中心 30 → 凹槽“通过所有”+反转 → 环形阵列 5（约 65 秒）</figcaption></figure>
+<p>外缘上 48 道防滑槽：Ø2.4 的圆、圆心离中心 52.6（外圆半径 52），一半在外面，挖穿后是半圆槽：</p>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l09b.jpg"><source src="media/wqcad-l09b.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l09b.vtt"></video><figcaption>▶ 录屏：Ø2.4 的圆、离中心 52.6 → 凹槽挖穿 → 环形阵列 48（约 60 秒）</figcaption></figure>
+<p>体积：毛坯 51845.70 mm³，5 孔后 47133.31，48 槽后 46459.55。整机 STEP 里的手轮 46381.01 mm³，差 78.54 mm³ 正好是 Ø10 × 1 的一小段——整机模型的轮毂里多了这么一个小空腔，本课不做。</p>
+<h3 id="l09-linear">针杆：线性阵列</h3>
+<p>第 6 课只挖了第一圈油槽，第 7 课录屏前补了第二圈。用线性阵列更省事：</p>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l09c.jpg"><source src="media/wqcad-l09c.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l09c.vtt"></video><figcaption>▶ 录屏：选挖槽旋转 → 线性阵列：垂直草图轴、长度 2、次数 2（约 40 秒）</figcaption></figure>
+<p>体积 9042.89 mm³，和两圈分别挖的一样。</p>
+<h3 id="l09-mirror">镜像和多重变换</h3>
+<ul>
+<li><strong>镜像</strong>：选特征，点“镜像”，平面选“水平草图轴 / 垂直草图轴”或一个基准面。WQ-LS 的针夹（第 3、4 课）左右两个耳朵，可以画一个、镜像另一个。</li>
+<li><strong>多重变换</strong>：选特征，点“多重变换”，在面板里右键“添加”线性阵列、环形阵列、镜像，按顺序叠。比如一圈 6 个孔、再沿轴线排 3 圈。</li>
+<li>阵列出错（副本跑到实体外面、和原特征不相交）时，那一份会显示红色，按“确定”会报错：缩小间距或减少次数。</li>
+</ul>
+<h3 id="l09-do">跟着做</h3>
+<ol class="steps">
+<li>按本课的尺寸做手轮毛坯：XZ 平面画半截面（轮毂 Ø22 × 10、盲孔 Ø10 深 4；腹板厚 3、在 4–7；外缘 Ø92–Ø104、宽 16），旋转 360°。</li>
+<li>XY 平面：Ø20 的圆，圆心在竖轴上、离中心 30；凹槽“通过所有”，勾反转；环形阵列 5。</li>
+<li>XY 平面：Ø2.4 的圆，圆心在横轴上、离中心 52.6；凹槽挖穿；环形阵列 48。体积应是 46459.55 mm³。</li>
+<li>打开第 6 课的针杆（一圈槽），选“挖槽旋转”，线性阵列：垂直草图轴、长度 2、次数 2。</li>
+</ol>
+
+<h3 id="l09-self">自己做</h3>
+<ol>
+<li>把减重孔改成 6 个，Ø16：只改阵列次数和原来的圆，看 6 个孔一起变。</li>
+<li>防滑槽用“间隔”模式做：角度间隔 7.5°、次数 48，和“范围 360°”比较。</li>
+<li>用多重变换做一块 3 × 4 的孔阵（间距 10）：先线性 X 方向 4 个，再线性 Y 方向 3 个。</li>
+</ol>
+<h3 id="l09-quiz">小测</h3>
+<div class="quiz" data-ok="b"><p class="q">环形阵列“范围”360°、次数 5，相邻两个之间是多少度？</p><div class="opts"><button type="button" data-k="a">A. 90°</button><button type="button" data-k="b">B. 72°</button><button type="button" data-k="c">C. 60°</button><button type="button" data-k="d">D. 75°</button></div><p class="why" hidden>360° 时首尾重合，360 ÷ 5 = 72°。</p></div>
+<div class="quiz" data-ok="b"><p class="q">阵列以后，把原来那个孔从 Ø20 改成 Ø16，会怎样？</p><div class="opts"><button type="button" data-k="a">A. 只有原来那个变</button><button type="button" data-k="b">B. 所有副本一起变</button><button type="button" data-k="c">C. 阵列报错</button><button type="button" data-k="d">D. 副本消失</button></div><p class="why" hidden>阵列复制的是特征，副本跟着原特征。</p></div>
+<div class="quiz" data-ok="b"><p class="q">草图在手轮底面的基准面上，凹槽“通过所有”什么都没挖掉，最可能的原因？</p><div class="opts"><button type="button" data-k="a">A. 草图没完全约束</button><button type="button" data-k="b">B. 方向朝外，要勾“反转”</button><button type="button" data-k="c">C. 圆太小</button><button type="button" data-k="d">D. 要先阵列</button></div><p class="why" hidden>凹槽默认沿草图法向的反方向挖；草图在实体外表面时，这个方向朝外，勾“反转”才往里挖。</p></div></section>
+<section id="appA"><h2><span class="n">10</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
 <p>官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1.4 GB）。</p>
 <h3 id="appA-install">安装</h3>
 <ol class="steps">

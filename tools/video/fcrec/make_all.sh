@@ -26,7 +26,10 @@ for WQ_LANG in ${LANGS:-zh en}; do
   "$H/rec.sh" "$H/l07b.py" "$WQ_REC/l07b$sfx.mp4"
   "$H/rec.sh" "$H/l08a.py" "$WQ_REC/l08a$sfx.mp4"
   "$H/rec.sh" "$H/l08b.py" "$WQ_REC/l08b$sfx.mp4"
-  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b; do
+  "$H/rec.sh" "$H/l09a.py" "$WQ_REC/l09a$sfx.mp4"
+  "$H/rec.sh" "$H/l09b.py" "$WQ_REC/l09b$sfx.mp4"
+  "$H/rec.sh" "$H/l09c.py" "$WQ_REC/l09c$sfx.mp4"      # 用第 7 课存的 ${B}_L6（只有一圈槽）
+  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c; do
     ffmpeg -loglevel error -y -i "$WQ_REC/$c$sfx.mp4" -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart -an "$OUT/wqcad-$c$sfx.mp4"
     ffmpeg -loglevel error -y -sseof -2 -i "$WQ_REC/$c$sfx.mp4" -frames:v 1 -vf scale=960:-1 -q:v 4 "$OUT/wqcad-$c$sfx.jpg"
     cp "$WQ_REC/$c$sfx.vtt" "$OUT/wqcad-$c$sfx.vtt"

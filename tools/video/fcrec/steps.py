@@ -3,6 +3,7 @@ import FreeCAD as App
 import FreeCADGui as Gui
 
 from director import L, QtCore, QtWidgets, log
+from director import L as _L
 
 
 def new_body_sketch(d, plane="XY", say=True, zoom=(10, 170)):
@@ -349,3 +350,87 @@ def pick_sp(d, *pts):
     for u, v in pts:
         yield d.move(sp(d, u, v), 800)
         d.click(); yield 500
+
+
+# ------------------------------------------------------------ 第 9 课起（手轮：圆、挖穿、环形阵列）
+def circle_on_axis(d, x, y, dia, axis_tool, value):
+    """圆心点在坐标轴上，键入直径；选圆心，加水平 / 竖直距离"""
+    yield d.tool("Sketcher_CompCreateConic", "Sketcher_CreateCircle"); yield 300
+    yield d.move(d.model_pt(x, y), 900)
+    d.click(); yield 500
+    yield d.move(d.model_pt(x + dia * 0.4, y + dia * 0.3), 700)
+    n0 = len(sketch().Geometry)
+    d.keys(str(dia), enter=True); yield 1000
+    if len(sketch().Geometry) == n0:     # 小圆键入的直径有时接不住：点第二下定大概，后面补直径约束
+        yield d.move(d.model_pt(x + dia * 0.4, y + dia * 0.3), 300)
+        d.click(); yield 700
+    d.key(QtCore.Qt.Key_Escape); yield 600
+    sk = sketch()
+    c = sk.Geometry[-1].Center
+    p = d.model_pt(c.x, c.y)
+    yield d.move(p, 700)
+    d.ring(p)                      # 圆心压在坐标轴上，点下去会选中轴：直接选圆心那个点
+    Gui.Selection.clearSelection()
+    Gui.Selection.addSelection(App.ActiveDocument.Name, sk.Name, "Vertex1")
+    yield 500
+    yield d.tool("Sketcher_CompDimensionTools", axis_tool)
+    yield from datum(d, value)
+    App.ActiveDocument.recompute(); yield 500
+    sk = sketch()
+    if not any(c.Type in ("Diameter", "Radius") for c in sk.Constraints):
+        Gui.Selection.clearSelection()
+        g = sk.Geometry[-1]
+        yield d.move(d.model_pt(g.Center.x, g.Center.y + g.Radius), 800)
+        d.click(); yield 500
+        yield d.tool("Sketcher_CompDimensionTools", "Sketcher_ConstrainDiameter")
+        yield from datum(d, dia)
+        App.ActiveDocument.recompute(); yield 500
+    dump("circle")
+    log("dof", dof_text(d))
+
+
+def pocket_through(d):
+    """凹槽：通过所有 + 反转（草图在 XY 基准面上 = 手轮的底面，默认往外挖，反转才往里）"""
+    yield d.tool("Sketcher_LeaveSketch")
+    yield from d.until(lambda: Gui.ActiveDocument.getInEdit() is None)
+    yield 900
+    yield d.tool("PartDesign_Pocket")
+    yield from d.until(lambda: named(QtWidgets.QComboBox, "changeMode") is not None, 8000)
+    yield 1000
+    yield from combo_pick(d, named(QtWidgets.QComboBox, "changeMode"), _L("通过所有", "Through all"))
+    log("pocket boxes", [(w.objectName(), w.text(), w.isChecked()) for w in QtWidgets.QApplication.allWidgets()
+                         if w.isVisible() and isinstance(w, QtWidgets.QCheckBox)])
+    cb = named(QtWidgets.QCheckBox, "checkBoxReversed")
+    if cb is not None and not cb.isChecked():
+        p = d.center(cb)
+        yield d.move(p, 700)
+        d.click(p); yield 300
+        if not cb.isChecked():
+            cb.click()
+        yield 800
+    yield from task_ok(d)
+    pk = [o for o in App.ActiveDocument.Objects if o.TypeId == "PartDesign::Pocket"][-1]
+    log("pocket", pk.Type, pk.Reversed, round(pk.Shape.Volume, 2))
+    return pk
+
+
+def polar(d, feat, n):
+    """在模型树里选特征，点“环形阵列”，次数 n，确定"""
+    p = d.tree_item(feat.Label)
+    yield d.move(p, 800)
+    d.click(p); yield 600
+    yield d.tool("PartDesign_PolarPattern")
+    find = lambda: [w for w in QtWidgets.QApplication.allWidgets() if w.isVisible() and isinstance(w, QtWidgets.QAbstractSpinBox)
+                    and "ccurrence" in w.objectName()]
+    yield from d.until(find, 8000)
+    yield 1200
+    log("polar widgets", [(w.objectName(), w.currentText() if isinstance(w, QtWidgets.QComboBox) else w.text()) for w in QtWidgets.QApplication.allWidgets() if w.isVisible()
+                          and isinstance(w, (QtWidgets.QAbstractSpinBox, QtWidgets.QComboBox)) and w.objectName()])
+    w = find()[0]
+    yield from type_into(d, w, str(n))
+    yield 1200
+    yield from task_ok(d)
+    pp = [o for o in App.ActiveDocument.Objects if o.TypeId == "PartDesign::PolarPattern"][-1]
+    log("polar", pp.Occurrences, pp.Angle.Value, pp.Axis, round(pp.Shape.Volume, 2))
+
+
