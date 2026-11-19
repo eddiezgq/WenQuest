@@ -147,7 +147,7 @@ def footer():
       </div>
       <div><h3>企业服务</h3><ul>{''.join(f'<li><a href="{h}">{t}</a></li>' for h, t, _ in ENTERPRISE)}</ul></div>
       <div><h3>服务</h3><ul><li><a href="/services/">技术服务</a></li><li><a href="/education/">教育服务</a></li>
-        <li><a href="/education/platform/">问渠 AI 学习平台</a></li><li><a href="/consulting/">咨询</a></li><li><a href="/cases/">案例</a></li></ul></div>
+        <li><a href="/education/platform/">问渠 AI 学习平台</a></li><li><a href="/consulting/">咨询</a></li><li><a href="/cases/">案例</a></li><li><a href="/download/">软件下载（测试版）</a></li></ul></div>
       <div><h3>关于</h3><ul><li><a href="/about/">关于我们</a></li><li><a href="/contact/">预约演示 / 联系我们</a></li>
         <li><a href="/privacy/">隐私政策</a></li><li><a href="/terms/">用户协议</a></li><li><a href="/ai/">AI 服务说明</a></li>
         <li><a href="/report/">投诉与举报</a></li></ul></div>
