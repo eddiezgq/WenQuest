@@ -30,11 +30,11 @@ PY311 = "python3.11"
 LICENSE_NOTE = """
 
 —— 授权（测试版）——
-第一次在 FreeCAD 里打开这个工作台会弹窗要“测试授权码”：登录问渠官网下载页，点“领取一年测试授权”，把授权码粘贴进去。
+装好后第一次启动 FreeCAD 会弹窗要“测试授权码”：登录问渠官网下载页，点“领取一年测试授权”，把授权码粘贴进去。
 授权一年有效，存在本机（Windows：%APPDATA%\\WenQuest\\license.txt）；到期后在下载页续期。软件联网时会提示有没有新版本。
 
 —— Licence (beta) ——
-The first time you open this workbench, FreeCAD asks for a beta licence code: sign in on the WenQuest download page, click
+The first time FreeCAD starts after installing, it asks for a beta licence code: sign in on the WenQuest download page, click
 "Get a one-year beta licence" and paste the code. It is valid for one year and stored on this computer; renew it on the download page.
 """
 

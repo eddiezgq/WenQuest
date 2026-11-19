@@ -72,8 +72,8 @@ def tutorials(region: str) -> str:
 <h3>{T("输入授权码", "Enter the licence code")}</h3>
 <ol>
 <li>{T("在本页“领取一年测试授权”里复制授权码。", "Copy your code from “Get a one-year beta licence” on this page.")}</li>
-<li>{T("首次打开问渠的工作台（工作台下拉框里选 <b>AI Parts</b>、<b>问渠</b> 或 <b>问渠缝纫机</b>）时会弹窗，粘贴进去点确定；以后不再问，到期前 30 天提醒续期。",
-      "The first time you open a WenQuest workbench (<b>AI Parts</b>, <b>WenQuest</b> or <b>WenQuest Sewing</b> in the workbench list) a box asks for it; paste and OK. It is not asked again; you are reminded 30 days before it ends.")}</li>
+<li>{T("装好后首次启动时会弹窗要授权码（问渠的工作台：<b>AI Parts</b>、<b>问渠</b>、<b>问渠缝纫机</b>），粘贴进去点确定；以后不再问，到期前 30 天提醒续期。",
+      "The first time you start it after installing, a box asks for the code (for the WenQuest workbenches <b>AI Parts</b>, <b>WenQuest</b>, <b>WenQuest Sewing</b>); paste and OK. It is not asked again; you are reminded 30 days before it ends.")}</li>
 <li>{ai_key}</li>
 </ol>
 <h3>{T("更新与卸载", "Update and uninstall")}</h3>
