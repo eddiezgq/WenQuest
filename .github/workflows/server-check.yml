@@ -157,14 +157,17 @@ jobs:
         run: |
           ssh "deploy@$HOST" 'docker image prune -af 2>&1 | tail -1; docker builder prune -af 2>&1 | tail -1; df -h / | tail -1' \
             | sed 's/^/clean: /' | while IFS= read -r l; do echo "::notice::$l"; done
-      - name: 国内拉镜像报 short read 的原因（11-18：国内数字工厂更新时拉新版本断，仓库里每一层核对都没坏）
+      - name: 国内拉镜像报 short read 的原因（11-18：国内数字工厂更新时拉新版本断，仓库里每一层核对都没坏；逐个拉也断）
         if: always() && inputs.server == 'cn'
         run: |
-          ssh "deploy@$HOST" 'docker info --format "driver={{.Driver}} root={{.DockerRootDir}} snapshotter={{index .DriverStatus 0}}" 2>&1
-            tag=$(grep -E "^FACTORY_APP_IMAGE=|^APP_IMAGE=" /opt/wenquest/factory/.env 2>/dev/null | tail -1 | cut -d= -f2-); echo "env image: $tag"
-            last=$(curl -s http://127.0.0.1:5000/v2/factory-app/tags/list); echo "registry tags: $last"
-            t=$(echo "$last" | tr -d "[]\"{}" | tr "," "\n" | grep -v name | grep -v tags | tail -1 | sed "s/.*://")
-            echo "single pull 127.0.0.1:5000/factory-app:$t"; timeout 600 docker pull 127.0.0.1:5000/factory-app:$t 2>&1 | tail -8
-            docker logs --since 30m wq-registry 2>&1 | grep -iE "error|warn|broken|EOF|reset" | tail -10 | cut -c1-250
-            ls /var/lib/containerd/io.containerd.content.v1.content/ingest 2>/dev/null | head; df -h /var/lib/docker / | tail -2; dmesg 2>/dev/null | grep -iE "I/O error|EXT4-fs error" | tail -3' 2>&1 \
+          ssh "deploy@$HOST" 'docker info --format "driver={{.Driver}} root={{.DockerRootDir}} status={{.DriverStatus}}" 2>&1
+            t=$(grep -E "^FACTORY_APP_IMAGE=" /opt/wenquest/factory/.env | tail -1 | sed "s/.*://"); echo "tag $t"
+            m=$(curl -s -H "Accept: application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json" http://127.0.0.1:5000/v2/factory-app/manifests/$t)
+            echo "$m" | head -c 300; echo
+            for d in $(echo "$m" | grep -o "sha256:[0-9a-f]*" | sort -u | head -40); do
+              n=$(curl -s -o /dev/null -w "%{size_download} %{http_code}" http://127.0.0.1:5000/v2/factory-app/blobs/$d); echo "blob $d $n"
+            done | awk "{print}" | head -45
+            sudo -n ls -la /var/lib/docker/containerd/daemon/io.containerd.content.v1.content/ingest 2>&1 | head -12
+            sudo -n du -sh /var/lib/docker/containerd 2>&1 | tail -1
+            journalctl -u docker --since "2 hours ago" --no-pager 2>/dev/null | grep -iE "short read|EOF|error" | tail -8 | cut -c1-250' 2>&1 \
             | sed 's/^/pull: /' | while IFS= read -r l; do echo "::notice::$l"; done
