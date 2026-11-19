@@ -161,5 +161,21 @@
  "先点大圆柱，按住 Ctrl 再点小圆柱，点“剪切”：大的减去小的": "Click the large cylinder, Ctrl-click the small one, then Cut: large minus small",
  "偏心轮做好了，体积和整机里的真零件一样。轴一转，圆盘中心绕着轴画圈，推着送布叉上下动": "Done, with the same volume as the real part. As the shaft turns, the disc centre circles the axis and drives the feed fork",
  "“偏移”：选剪切的结果，点“三维偏移”，距离 1——得到一个大 1 mm 的外包络，查间隙时常用": "Offset: select the Cut, click 3D Offset, distance 1—a 1 mm larger envelope, handy for clearance checks",
- "偏移以后，原来的剪切收在它下面——还是依赖关系：改圆柱，剪切、偏移一路跟着重算": "The Cut now sits under the Offset—a dependency again: change a cylinder and the Cut and Offset recompute"
+ "偏移以后，原来的剪切收在它下面——还是依赖关系：改圆柱，剪切、偏移一路跟着重算": "The Cut now sits under the Offset—a dependency again: change a cylinder and the Cut and Offset recompute",
+ "曲线：先照着真机头描轮廓。整机里的机头只有三角网格（STL）——新建文件，“文件 → 导入”机头的网格": "Curves: first trace the real head. The machine's head exists only as a triangle mesh (STL)—new file, File → Import the head mesh",
+ "机头的铸件：四面开着检修窗。我们只要它的外形——上半部的箱体。先把网格设成半透明，好在后面描图": "The head casting, with access windows all round. We only want its outer shape—the upper box. Make the mesh semi-transparent so we can trace behind it",
+ "新建草图，方向选 XZ 平面（从正面看机头的侧面）": "New sketch, orientation XZ plane (the head's side, seen from the front)",
+ "多段线：沿网格的外沿点——左下、右下、右上，到顶上前角开始弯的地方": "Polyline: click along the mesh outline—bottom left, bottom right, top right, to where the top starts to curve at the front",
+ "前上角是一段光滑的曲面：用“插值 B 样条”——曲线穿过你点的每一个点。从顶边的端点起，沿网格点 6 个点到左边的端点": "The front-top corner is a smooth curve: use the interpolating B-spline—it passes through every point you click. From the end of the top edge, click 6 points along the mesh to the end of the left edge",
+ "一圈侧面轮廓闭合了：五段直线 + 一段 B 样条。逆向描出来的轮廓不必完全约束，和网格贴得够近就行": "The side outline is closed: lines plus one B-spline. A traced outline needn't be fully constrained; it just has to follow the mesh closely",
+ "再描正面轮廓：新建草图，方向选 YZ 平面": "Now the front outline: new sketch on the YZ plane",
+ "多段线沿网格的外沿点四个角：左下、右下、右上、左上，再点回左下闭合（y 从 −48 到 70，z 从 120 到 248）": "Polyline round the four corners of the mesh outline: bottom left, bottom right, top right, top left, back to bottom left (y −48 to 70, z 120 to 248)",
+ "描出来的线没有约束，加半径时会整体跑掉。选左下角点，点“锁定”；右上角点也锁定：位置钉死": "Traced lines have no constraints and would drift when we add radii. Select the bottom-left point and Lock it; lock the top-right point too",
+ "上面两个角是铸件的圆角：点“圆角”工具，点左上角的角点，再点右上角的角点": "The two top corners are cast fillets: Fillet tool, click the top-left corner point, then the top-right one",
+ "两个圆弧的半径都约成 14：选圆弧，点“半径”，键入 14": "Constrain both arcs to radius 14: select an arc, Radius, type 14",
+ "正面轮廓也描好了：一个上角倒圆的矩形": "The front outline is done: a rectangle with rounded top corners",
+ "两条轮廓变成曲面：选侧面轮廓，点“拉伸”，沿法向往两边拉，盖住机头的宽度；不勾“创建实体”——要的是曲面": "Turn the outlines into surfaces: select the side outline, Extrude along the normal both ways to cover the head's width; untick Create solid—we want surfaces",
+ "正面轮廓同样拉伸，盖住机头的长度": "Extrude the front outline the same way, covering the head's length",
+ "两张曲面互相穿插。选这两个拉伸，点“截面”：得到它们的交线": "The two surfaces cut through each other. Select both extrusions and click Section: their intersection curves",
+ "只看交线：机头外形的空间棱线，包括前上角那段弯过来的 B 样条——它不在任何一个平面里，是两张曲面交出来的": "Only the curves: the 3D edges of the head's shape, including the curved front-top corner—it lies in no single plane; it comes from intersecting two surfaces"
 }

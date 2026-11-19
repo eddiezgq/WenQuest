@@ -43,6 +43,10 @@ def sketch_on(d, plane="XY", zoom=(10, 170)):
 
 
 def sketch():
+    """正在编辑的草图；没在编辑就是最后一个草图"""
+    vp = Gui.ActiveDocument.getInEdit() if Gui.ActiveDocument else None
+    if vp is not None and getattr(vp, "Object", None) is not None and vp.Object.TypeId == "Sketcher::SketchObject":
+        return vp.Object
     return [o for o in App.ActiveDocument.Objects if o.TypeId == "Sketcher::SketchObject"][-1]
 
 

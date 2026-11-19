@@ -1,0 +1,13 @@
+WEBVTT
+
+00:00:07.573 --> 00:00:19.573
+Turn the outlines into surfaces: select the side outline, Extrude along the normal both ways to cover the head's width; untick Create solid—we want surfaces
+
+00:00:22.472 --> 00:00:34.472
+Extrude the front outline the same way, covering the head's length
+
+00:00:39.172 --> 00:00:47.753
+The two surfaces cut through each other. Select both extrusions and click Section: their intersection curves
+
+00:00:47.753 --> 00:00:59.640
+Only the curves: the 3D edges of the head's shape, including the curved front-top corner—it lies in no single plane; it comes from intersecting two surfaces

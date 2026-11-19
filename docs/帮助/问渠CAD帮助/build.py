@@ -38,7 +38,7 @@ LESSONS = [
     ("三 零件建模", 9, "阵列、镜像、多重变换", "手轮（减重孔、防滑槽）；针杆第二圈油槽", "l09"),
     ("三 零件建模", 10, "基准面、基准轴、附着方式；参数化设计", "针杆接头（改一个全跟着变）", "l10"),
     ("三 零件建模", 11, "Part 工作台：基本体、布尔运算、偏移、截面", "送布偏心轮", "l11"),
-    ("四 曲线与曲面", 12, "曲线：B 样条、螺旋线、投影、相交线", "机壳外形的特征曲线", None),
+    ("四 曲线与曲面", 12, "曲线：B 样条、螺旋线、投影、相交线", "机头外形的特征曲线（照网格逆向）", "l12"),
     ("四 曲线与曲面", 13, "曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2", "机头的过渡曲面", None),
     ("四 曲线与曲面", 14, "曲面到实体：缝合、成实体、加厚；检查几何", "一块外壳变实体", None),
     ("五 装配", 15, "装配工作台：插入零件、固定、关节、自由度", "曲柄滑块", None),
@@ -63,7 +63,7 @@ LESSONS_EN = [
     ("3 Part modelling", "Patterns, mirror, multi-transform", "Handwheel (holes, grip grooves); needle-bar groove"),
     ("3 Part modelling", "Datum planes and axes, attachment; parametric design", "Needle-bar link (change one, all follow)"),
     ("3 Part modelling", "Part workbench: primitives, Booleans, offset, sections", "Feed eccentric"),
-    ("4 Curves & surfaces", "Curves: B-splines, helices, projection, intersections", "Characteristic curves of the housing"),
+    ("4 Curves & surfaces", "Curves: B-splines, helices, projection, intersections", "Characteristic curves of the head (reverse-engineered from the mesh)"),
     ("4 Curves & surfaces", "Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity", "Blend surfaces of the arm"),
     ("4 Curves & surfaces", "Surfaces to solids: sew, make solid, thicken; check geometry", "A shell panel made solid"),
     ("5 Assembly", "Assembly workbench: insert parts, ground, joints, degrees of freedom", "Slider-crank"),
@@ -75,9 +75,9 @@ LESSONS_EN = [
     ("8 AI", "AI workbench: part selection and checks, company parts library, AI part design", "Pick a bearing; replay the upper-shaft design"),
 ]
 
-FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10", "l11", "appA-install"]
-EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–11 课）", other=("English", "en/"), files=FILES)
-EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–11)",
+FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10", "l11", "l12", "appA-install"]
+EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–12 课）", other=("English", "en/"), files=FILES)
+EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–12)",
                   other=("中文", "../"), files=FILES)
 
 
@@ -100,6 +100,7 @@ def numbers(en=False):
                "t": f"{nc['t']:g}", "v": f"{nc['volume']:.1f}"},
         "dep": {"v": f"{1000 - math.pi * 9 * 10:.2f}"},
         "cr": {"D": "33", "d": "22", "e": "15.5", "t": "10", "v1": "10710.93", "v2": "11360.1"},   # 录屏里软件算的（director.log：pad 10.0 10710.93；after 18 11360.1）
+        "l12": {"dev_side": "0.47", "dev_front": "0.32"},   # 描出的轮廓到网格外形的最大距离（中文版录屏的草图，程序量的）
         "l11": {"cut": "2638.94", "off": "4561.51"},   # 录屏里算的；整机 feed_ecc.step 也是 2638.94
         "l10": {"pin": "2364.42", "v22": "3070.82", "real": "2295.65"},   # 录屏里算的；real：整机 nb_link.step
         "l9": {"blank": "51845.70", "holes": "47133.31", "done": "46459.55", "real": "46381.01", "diff": "78.54"},   # 录屏里算的；real：整机 handwheel.step

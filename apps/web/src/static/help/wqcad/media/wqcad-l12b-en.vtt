@@ -1,0 +1,19 @@
+WEBVTT
+
+00:00:07.574 --> 00:00:14.226
+Now the front outline: new sketch on the YZ plane
+
+00:00:14.226 --> 00:00:24.073
+Polyline round the four corners of the mesh outline: bottom left, bottom right, top right, top left, back to bottom left (y −48 to 70, z 120 to 248)
+
+00:00:24.073 --> 00:00:33.274
+Traced lines have no constraints and would drift when we add radii. Select the bottom-left point and Lock it; lock the top-right point too
+
+00:00:33.274 --> 00:00:40.874
+The two top corners are cast fillets: Fillet tool, click the top-left corner point, then the top-right one
+
+00:00:40.874 --> 00:00:52.066
+Constrain both arcs to radius 14: select an arc, Radius, type 14
+
+00:00:52.066 --> 00:00:58.040
+The front outline is done: a rectangle with rounded top corners

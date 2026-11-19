@@ -1,0 +1,19 @@
+WEBVTT
+
+00:00:00.646 --> 00:00:12.646
+Curves: first trace the real head. The machine's head exists only as a triangle mesh (STL)—new file, File → Import the head mesh
+
+00:00:14.300 --> 00:00:24.195
+The head casting, with access windows all round. We only want its outer shape—the upper box. Make the mesh semi-transparent so we can trace behind it
+
+00:00:24.195 --> 00:00:31.045
+New sketch, orientation XZ plane (the head's side, seen from the front)
+
+00:00:31.045 --> 00:00:40.746
+Polyline: click along the mesh outline—bottom left, bottom right, top right, to where the top starts to curve at the front
+
+00:00:40.746 --> 00:00:52.746
+The front-top corner is a smooth curve: use the interpolating B-spline—it passes through every point you click. From the end of the top edge, click 6 points along the mesh to the end of the left edge
+
+00:00:53.991 --> 00:01:04.920
+The side outline is closed: lines plus one B-spline. A traced outline needn't be fully constrained; it just has to follow the mesh closely

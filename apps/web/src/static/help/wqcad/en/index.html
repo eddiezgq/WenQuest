@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–11)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–12)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -209,7 +209,16 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l11-do" data-s="l11">Follow along</a>
 <a class="sub" href="#l11-self" data-s="l11">On your own</a>
 <a class="sub" href="#l11-quiz" data-s="l11">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">12</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l12" data-s="l12"><span class="n">12</span>Lesson 12 Curves: B-splines, intersections, projection</a>
+<a class="sub" href="#l12-goal" data-s="l12">What you will be able to do</a>
+<a class="sub" href="#l12-why" data-s="l12">Why reverse-engineer</a>
+<a class="sub" href="#l12-side" data-s="l12">Side outline: polyline + interpolating B-spline</a>
+<a class="sub" href="#l12-front" data-s="l12">Front outline: lock, fillet, radius</a>
+<a class="sub" href="#l12-section" data-s="l12">3D curves: intersecting two surfaces</a>
+<a class="sub" href="#l12-do" data-s="l12">Follow along</a>
+<a class="sub" href="#l12-self" data-s="l12">On your own</a>
+<a class="sub" href="#l12-quiz" data-s="l12">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">13</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -230,9 +239,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l11">Lesson 11</a></td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 12</td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the housing</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l11">Lesson 11</a></td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l12">Lesson 12</a></td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the head (reverse-engineered from the mesh)</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 13</td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Blend surfaces of the arm</td><td>In progress</td></tr><tr><td>4 Curves & surfaces</td><td>Lesson 14</td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>A shell panel made solid</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 15</td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Slider-crank</td><td>In progress</td></tr><tr><td>5 Assembly</td><td>Lesson 16</td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Take-up four-bar, one turn</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
 
-<p>Lessons 1–11 are online now; the others follow module by module.</p>
+<p>Lessons 1–12 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
 <p>Every recording is the real software at work: FreeCAD 1.1.4 on a cloud computer with the WenQuest CAD branding and the same AI workbench, English interface. Where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. The only difference from WenQuest CAD on your computer is the 27 kernel fixes, which do not change the interface; “Check geometry” and “Unfold face” give different results, so those are not recorded and are taught with the book's verified data instead.</p>
 <p>The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.</p></section>
@@ -1242,7 +1251,72 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">Cut with A selected first, then B. The result?</p><div class="opts"><button type="button" data-k="a">A. A + B</button><button type="button" data-k="b">B. A − B</button><button type="button" data-k="c">C. B − A</button><button type="button" data-k="d">D. A ∩ B</button></div><p class="why" hidden>The first is the part being cut, the second the tool.</p></div>
 <div class="quiz" data-ok="b"><p class="q">The eccentric&#x27;s outer circle is 3 off the axis. Over one turn, the radial runout of a point on it is?</p><div class="opts"><button type="button" data-k="a">A. 3</button><button type="button" data-k="b">B. 6</button><button type="button" data-k="c">C. 13</button><button type="button" data-k="d">D. 0</button></div><p class="why" hidden>The centre circles at radius 3; the outer surface is at most 13 + 3 and at least 13 − 3 from the axis: runout 6.</p></div>
 <div class="quiz" data-ok="b"><p class="q">For a bearing housing that needs drawings and editable dimensions, start with?</p><div class="opts"><button type="button" data-k="a">A. Part workbench, a few cubes</button><button type="button" data-k="b">B. Part Design: sketches + features</button><button type="button" data-k="c">C. Mesh workbench</button><button type="button" data-k="d">D. Either, no difference</button></div><p class="why" hidden>Part Design gives constraints and parameters, easy changes and drawings; Part suits simple shapes made of regular solids.</p></div></section>
-<section id="appA"><h2><span class="n">12</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l12"><h2><span class="n">12</span>Lesson 12 Curves: B-splines, intersections, projection</h2><p class="lead">You will be able to import a mesh (STL) as a tracing reference and follow its outline; trace smooth curves with an interpolating B-spline; extrude planar outlines into surfaces and intersect them—getting 3D curves that lie in no single plane. This module (lessons 12–14) reverse-engineers the WQ-LS head's outer shell from its mesh. About 1.5 hours.</p><h3 id="l12-goal">What you will be able to do</h3>
+<ul>
+<li>Import an STL mesh and make it semi-transparent to trace over.</li>
+<li>The difference between a polyline, an interpolating B-spline (through every point) and a control-point B-spline (pulled by the points).</li>
+<li>Lock a few points of an unconstrained trace before adding dimensions, so it doesn't drift.</li>
+<li>Extrude to a surface (Create solid unticked); Section of two surfaces = their intersection curve.</li>
+</ul>
+
+<h3 id="l12-why">Why reverse-engineer</h3>
+<p>The machine's head exists only as a triangle mesh (<code>head.stl</code>, 36 000 triangles): you can see it, assemble it and get its volume, but you can't change dimensions, add fillets or make machining drawings. Reverse engineering rebuilds real surfaces and solids from a mesh (or a 3D-scan point cloud). This module does only the outer shape of the head's upper box (z ≥ 120); the access windows and internal ribs are left out.</p>
+<h3 id="l12-side">Side outline: polyline + interpolating B-spline</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l12a-en.jpg"><source src="../media/wqcad-l12a-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l12a-en.vtt"></video><figcaption>▶ Recording: import head.stl → semi-transparent → XZ sketch: polyline + interpolating B-spline for the front-top corner (about 65 s)</figcaption></figure>
+<table>
+<thead>
+<tr>
+<th>B-spline</th>
+<th>How it is drawn</th>
+<th>Good for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Interpolating (through points)</td>
+<td>every clicked point lies on the curve</td>
+<td>tracing scan points and meshes</td>
+</tr>
+<tr>
+<td>Control points</td>
+<td>the curve doesn't pass through the inner points; they pull it</td>
+<td>designing your own fair shapes (continuity, lesson 13)</td>
+</tr>
+</tbody>
+</table>
+<p>Compared with the mesh outline, the traced side outline deviates at most 0.47 mm and the front outline 0.32 mm (60 sample points per segment, measured to the mesh outline). Cast blanks are typically toleranced around ±1 mm, so this is good enough.</p>
+<h3 id="l12-front">Front outline: lock, fillet, radius</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l12b-en.jpg"><source src="../media/wqcad-l12b-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l12b-en.vtt"></video><figcaption>▶ Recording: YZ sketch: polyline round four corners → lock two corner points → Fillet → radius 14 (about 60 s)</figcaption></figure>
+<ul>
+<li>The sketch Fillet tool: click the point where two lines meet and it rounds the corner, keeping the old corner as a construction point (“Preserve corner”).</li>
+<li>Locking a point adds a horizontal and a vertical distance from the origin. It only pins the traced position; it doesn't move it.</li>
+</ul>
+<h3 id="l12-section">3D curves: intersecting two surfaces</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l12c-en.jpg"><source src="../media/wqcad-l12c-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l12c-en.vtt"></video><figcaption>▶ Recording: extrude both outlines into surfaces → select both → Section → show only the curves (about 60 s)</figcaption></figure>
+<p>The side outline extruded along Y and the front outline along X intersect in the 3D edges of the head's shape. The front-top corner is a B-spline seen from the side and an arc seen from the front; together they make a 3D curve that can't be drawn in any single sketch.</p>
+<p>Two other ways to get 3D curves (described, not recorded):
+- <strong>Projection</strong>: Part workbench Projection on surface, projecting a sketch curve onto a surface along a direction (e.g. a nameplate outline on the housing).
+- <strong>Helix</strong>: the Part Helix primitive with pitch, height and radius — the basis of lesson 8's spring.</p>
+<h3 id="l12-do">Follow along</h3>
+<ol class="steps">
+<li>New file, File → Import `head.stl`; set the mesh's transparency to 70.</li>
+<li>Sketcher, new sketch, XZ: polyline (−55, 227.6) → (−55, 120) → (75, 120) → (75, 248) → (−28.5, 243.4); interpolating B-spline from (−28.5, 243.4) along the mesh to (−55, 227.6).</li>
+<li>New sketch, YZ: polyline round (−48, 120), (70, 120), (70, 248), (−48, 248); lock the bottom-left and top-right points; fillet the two top corners, radius 14.</li>
+<li>Part workbench: extrude both sketches (side: forward 48, reverse 70; front: forward 75, reverse 55), Create solid unticked.</li>
+<li>Select both extrusions, Section.</li>
+</ol>
+
+<h3 id="l12-self">On your own</h3>
+<ol>
+<li>Trace the front-top corner with a control-point B-spline instead: where do the control points have to go for the curve to follow the mesh?</li>
+<li>Trace the narrower lower part of the head (z from 40 to 120) and join it to the upper part.</li>
+<li>Project a 30 × 10 rounded rectangle (a nameplate) onto the side surface.</li>
+</ol>
+<h3 id="l12-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">Which B-spline is easiest for tracing a mesh?</p><div class="opts"><button type="button" data-k="a">A. Control-point B-spline</button><button type="button" data-k="b">B. Interpolating B-spline (through points)</button><button type="button" data-k="c">C. Arc</button><button type="button" data-k="d">D. Ellipse</button></div><p class="why" hidden>An interpolating B-spline passes through each clicked point; click on the mesh edge and the curve follows it.</p></div>
+<div class="quiz" data-ok="b"><p class="q">Extrude with Create solid unticked gives?</p><div class="opts"><button type="button" data-k="a">A. A solid</button><button type="button" data-k="b">B. A surface (shell)</button><button type="button" data-k="c">C. A sketch</button><button type="button" data-k="d">D. Nothing</button></div><p class="why" hidden>A closed outline without Create solid gives just the surrounding surface.</p></div>
+<div class="quiz" data-ok="b"><p class="q">The result of Section on two surfaces?</p><div class="opts"><button type="button" data-k="a">A. A solid</button><button type="button" data-k="b">B. Their intersection curves</button><button type="button" data-k="c">C. The surfaces merged</button><button type="button" data-k="d">D. A sketch</button></div><p class="why" hidden>Section computes where the shapes&#x27; surfaces intersect — a common way to get 3D curves that lie in no single plane.</p></div></section>
+<section id="appA"><h2><span class="n">13</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">
