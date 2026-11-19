@@ -532,3 +532,23 @@ M4,梯度裁剪,gradient clipping,
 21,阶次分析,order analysis,把频率轴按转速归一化
 21,设计确认,design validation,与设计验证相区别
 21,设计验证,design verification,
+22,持续法,persistence forecast,最笨的基线：明天和今天一样
+22,气候法,climatology forecast,历史同时刻平均
+22,分位数预测,quantile forecast,回答“有多大把握不低于多少”
+22,弹球损失,pinball loss,拟合分位数用的损失函数
+22,实际覆盖率,observed coverage,与名义覆盖率相区别
+22,名义覆盖率,nominal coverage,
+22,滚动优化,rolling horizon optimisation,每拍重解、只执行第一步
+22,模型预测控制,model predictive control (MPC),
+22,安全层,safety layer,把动作投影到不会越界的范围
+22,仿真到现实,sim-to-real,仿真里训、真设备上用
+22,荷电状态,state of charge (SoC),
+22,往返效率,round-trip efficiency,
+22,分时电价,time-of-use tariff,峰平谷三段
+22,偏差考核,imbalance settlement,实际与申报不符的结算
+22,申报偏置,declaration bias,成本最优与误差最优不在同一处
+22,经济调度,economic dispatch,
+22,能效比,coefficient of performance (COP),制冷量与耗电之比
+22,再分析,reanalysis,不是预报；据此算出的误差是下界
+22,自由边界,free boundary,等离子体仿真器的一类
+22,撕裂模,tearing mode,一类等离子体不稳定性
