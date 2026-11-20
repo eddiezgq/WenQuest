@@ -208,5 +208,17 @@
  "关节选上轴的旋转关节，公式写 2*pi*time：角度按弧度，1 秒转一圈": "Pick the shaft's revolute joint and enter 2*pi*time: the angle is in radians, one turn per second",
  "点“运行运动学”算一遍，再点“向前播放”": "Click Run kinematics, then Play forward",
  "拖时间条：曲柄销在最上面时针杆在上止点，转半圈到下止点——针杆走了一个行程": "Move the time slider: with the crank pin at the top the needle bar is at top dead centre; half a turn later, bottom dead centre—one stroke",
- "针杆行程 31 mm = 曲柄半径 15.5 × 2：滑块正对着曲柄轴心时，行程就是两倍曲柄半径": "Needle-bar stroke 31 mm = 2 × the 15.5 crank radius: when the slider is in line with the crank axis, the stroke is twice the crank radius"
+ "针杆行程 31 mm = 曲柄半径 15.5 × 2：滑块正对着曲柄轴心时，行程就是两倍曲柄半径": "Needle-bar stroke 31 mm = 2 × the 15.5 crank radius: when the slider is in line with the crank axis, the stroke is twice the crank radius",
+ "工程图：TechDraw 工作台。先插一张图纸：点“插入模板页”，选国标 A4 横的图框": "Drawings: the TechDraw workbench. First a sheet: Insert page using template, an A4 landscape ISO 5457 frame",
+ "回到三维，选中针杆，点“插入视图”。默认是主视图（从前往后看），针杆竖着；点“顺时针转”让它横过来，确定": "Select the needle bar and click Insert view. The default is the front view with the bar upright; click Rotate clockwise to lay it horizontal, OK",
+ "视图往左上挪一点，右边留地方放局部放大图：属性里 X = 125、Y = 140": "Move the view up and left to leave room for the detail: X = 125, Y = 140 in the properties",
+ "标总长：点左端那条短线，按住 Ctrl 点右端那条，点“水平尺寸”——180；属性里 Y 挪到上面": "Overall length: click the short line at the left end, Ctrl-click the one at the right end, Horizontal dimension—180; move it up with Y",
+ "标直径：点上面一条轮廓线，Ctrl 点下面一条，点“竖直尺寸”——8；再加“⌀”前缀": "Diameter: click the top outline, Ctrl-click the bottom one, Vertical dimension—8; then add the ⌀ prefix",
+ "局部放大：选中视图，点“局部视图”，圆心放在第一道油槽上，半径 4，比例 5:1": "Detail: select the view, Detail view, centre on the first oil groove, radius 4, scale 5:1",
+ "一张零件图的骨架有了：主视图横放、总长、直径，油槽单独放大。下一段在放大图上标油槽的尺寸，填标题栏，导出 PDF": "The drawing's skeleton: the view laid horizontal, length, diameter, and a detail of the grooves. Next: groove dimensions on the detail and the title block",
+ "接着标油槽。局部放大图上：点一道槽底的短线，点“水平尺寸”——槽宽 0.5（放大图上的尺寸按真实大小标）": "Now the grooves. On the detail: click the short line at a groove bottom, Horizontal dimension—width 0.5 (detail dimensions show true size)",
+ "两道槽之间那段：1.5；槽深：外圆那条线 + 槽底那条线，“竖直尺寸”——0.2": "The land between the grooves: 1.5; depth: the outer line + the groove bottom, Vertical dimension—0.2",
+ "主视图上标槽的位置：左端线 + 第一道槽的左边线——39.25": "On the main view, the groove position: left end + the first groove's left side—39.25",
+ "最后填标题栏：点图框上的字段，输入。零件名称“针杆”、材料“GCr15”、图号“LS-201”、比例“1:1”": "Finally the title block: click a field and type. Title “Needle bar”, material “GCr15 (AISI 52100)”, drawing number “LS-201”, scale “1:1”",
+ "一张能看懂的零件图：视图、尺寸、放大图、标题栏。下一课加公差、粗糙度和技术要求，再导出 PDF": "A readable part drawing: view, dimensions, detail, title block. Next lesson adds tolerances, surface finish and notes, and exports a PDF"
 }

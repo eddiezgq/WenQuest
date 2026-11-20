@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00:12.665 --> 00:00:24.665
+Now the grooves. On the detail: click the short line at a groove bottom, Horizontal dimension—width 0.5 (detail dimensions show true size)
+
+00:00:26.821 --> 00:00:38.821
+The land between the grooves: 1.5; depth: the outer line + the groove bottom, Vertical dimension—0.2
+
+00:00:56.691 --> 00:01:08.691
+On the main view, the groove position: left end + the first groove's left side—39.25
+
+00:01:22.291 --> 00:01:34.291
+Finally the title block: click a field and type. Title “Needle bar”, material “GCr15 (AISI 52100)”, drawing number “LS-201”, scale “1:1”
+
+00:01:53.272 --> 00:02:04.200
+A readable part drawing: view, dimensions, detail, title block. Next lesson adds tolerances, surface finish and notes, and exports a PDF

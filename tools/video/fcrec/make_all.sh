@@ -5,6 +5,7 @@ set -e
 H=$(cd "$(dirname "$0")" && pwd)
 OUT=${OUT:-$H/../../../apps/web/src/static/help/wqcad/media}
 mkdir -p "$OUT" "$WQ_REC/model" "$WQ_REC/model_en"
+LC_ALL=C.UTF-8 "$FC/usr/bin/freecadcmd" "$H/prep_slider.py"            # 第 15、16 课的零件
 for WQ_LANG in ${LANGS:-zh en}; do
   export WQ_LANG
   if [ $WQ_LANG = en ]; then sfx=-en; M=$WQ_REC/model_en; F=NeedleClampSketch; else sfx=; M=$WQ_REC/model; F=针夹草图; fi
@@ -33,8 +34,14 @@ for WQ_LANG in ${LANGS:-zh en}; do
   "$H/rec.sh" "$H/l10b.py" "$WQ_REC/l10b$sfx.mp4"      # 改了 10a 存的文件（高 22）；重录要先重录 10a
   "$H/rec.sh" "$H/l11a.py" "$WQ_REC/l11a$sfx.mp4"
   cp "$WQLS_TE/head.stl" "$WQ_REC/head.stl"; cp "$WQLS_TE/head.stl" "$WQ_REC/机头.stl"    # 第 12 课导入的网格
-  for c in l12a l12b l12c l13a l13b l13c l14a l15a l15b l16a; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done     # 依次接着上一段存的“机头曲面”
-  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c l10a l10b l11a l12a l12b l12c l13a l13b l13c l14a l15a l15b l16a; do
+  for c in l12a l12b l12c l13a l13b l13c l14a; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done     # 依次接着上一段存的“机头曲面”
+  rm -f "$M/slider/曲柄滑块.FCStd" "$M/slider/SliderCrank.FCStd"
+  for c in l15a l15b l16a; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done
+  cp "$FC"/usr/share/Mod/TechDraw/Templates/ISO/localized/zh-CN/landscape/A4_Landscape_CN_CLIP.svg "$WQ_REC/" 2>/dev/null
+  cp "$FC"/usr/share/Mod/TechDraw/Templates/ISO/A4_Landscape_ISO5457_minimal.svg "$WQ_REC/" 2>/dev/null
+  LC_ALL=C.UTF-8 "$FC/usr/bin/freecadcmd" "$H/prep_needle_drawing.py"   # 第 17 课的针杆（两种语言的文件都重做）
+  for c in l17a l17b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done
+  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c l10a l10b l11a l12a l12b l12c l13a l13b l13c l14a l15a l15b l16a l17a l17b; do
     ffmpeg -loglevel error -y -i "$WQ_REC/$c$sfx.mp4" -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart -an "$OUT/wqcad-$c$sfx.mp4"
     ffmpeg -loglevel error -y -sseof -2 -i "$WQ_REC/$c$sfx.mp4" -frames:v 1 -vf scale=960:-1 -q:v 4 "$OUT/wqcad-$c$sfx.jpg"
     cp "$WQ_REC/$c$sfx.vtt" "$OUT/wqcad-$c$sfx.vtt"

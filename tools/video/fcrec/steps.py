@@ -169,6 +169,8 @@ def prop_set(d, value, *path):
     yield 600
     w = QtWidgets.QApplication.focusWidget()
     log("prop editor", path, w.metaObject().className() if w else None)
+    if w is None or w.metaObject().className() in ("Gui::PropertyEditor::PropertyEditor", "Gui::TreeWidget"):
+        return                              # 编辑框没打开：不键入（空格会去切换模型树里的显示），由调用的人直接改
     d.key(QtCore.Qt.Key_A, w, QtCore.Qt.ControlModifier)
     d.keys(str(value), w=w)
     yield 500

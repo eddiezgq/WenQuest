@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00:06.742 --> 00:00:17.377
+Drawings: the TechDraw workbench. First a sheet: Insert page using template, an A4 landscape ISO 5457 frame
+
+00:00:17.377 --> 00:00:26.938
+Select the needle bar and click Insert view. The default is the front view with the bar upright; click Rotate clockwise to lay it horizontal, OK
+
+00:00:26.938 --> 00:00:36.941
+Move the view up and left to leave room for the detail: X = 125, Y = 140 in the properties
+
+00:00:36.941 --> 00:00:48.941
+Overall length: click the short line at the left end, Ctrl-click the one at the right end, Horizontal dimension—180; move it up with Y
+
+00:01:03.111 --> 00:01:15.111
+Diameter: click the top outline, Ctrl-click the bottom one, Vertical dimension—8; then add the ⌀ prefix
+
+00:01:28.337 --> 00:01:40.337
+Detail: select the view, Detail view, centre on the first oil groove, radius 4, scale 5:1
+
+00:02:05.737 --> 00:02:17.600
+The drawing's skeleton: the view laid horizontal, length, diameter, and a detail of the grooves. Next: groove dimensions on the detail and the title block

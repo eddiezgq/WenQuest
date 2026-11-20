@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–16)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–17)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -250,7 +250,15 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l16-do" data-s="l16">Follow along</a>
 <a class="sub" href="#l16-self" data-s="l16">On your own</a>
 <a class="sub" href="#l16-quiz" data-s="l16">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">17</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l17" data-s="l17"><span class="n">17</span>Lesson 17 Drawings: templates, views, details, dimensions, title block</a>
+<a class="sub" href="#l17-goal" data-s="l17">What you will be able to do</a>
+<a class="sub" href="#l17-template" data-s="l17">Frame templates</a>
+<a class="sub" href="#l17-view" data-s="l17">The view and first dimensions</a>
+<a class="sub" href="#l17-dims" data-s="l17">Groove dimensions, title block</a>
+<a class="sub" href="#l17-do" data-s="l17">Follow along</a>
+<a class="sub" href="#l17-self" data-s="l17">On your own</a>
+<a class="sub" href="#l17-quiz" data-s="l17">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">18</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -271,9 +279,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l11">Lesson 11</a></td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l12">Lesson 12</a></td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the head (reverse-engineered from the mesh)</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l13">Lesson 13</a></td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Trimming and blends on the head</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l14">Lesson 14</a></td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>The head shell hollowed into a casting</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l15">Lesson 15</a></td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Needle-bar mechanism (slider-crank)</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l16">Lesson 16</a></td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Needle-bar mechanism through one turn; stroke</td><td>Online</td></tr><tr><td>6 Drawings</td><td>Lesson 17</td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>In progress</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l11">Lesson 11</a></td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l12">Lesson 12</a></td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the head (reverse-engineered from the mesh)</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l13">Lesson 13</a></td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Trimming and blends on the head</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l14">Lesson 14</a></td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>The head shell hollowed into a casting</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l15">Lesson 15</a></td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Needle-bar mechanism (slider-crank)</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l16">Lesson 16</a></td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Needle-bar mechanism through one turn; stroke</td><td>Online</td></tr><tr><td>6 Drawings</td><td><a href="#l17">Lesson 17</a></td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>Online</td></tr><tr><td>6 Drawings</td><td>Lesson 18</td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Take-up assembly drawing</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 19</td><td>FEM with CalculiX</td><td>Crank stress at 5000 r/min</td><td>In progress</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
 
-<p>Lessons 1–16 are online now; the others follow module by module.</p>
+<p>Lessons 1–17 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
 <p>Every recording is the real software at work: FreeCAD 1.1.4 on a cloud computer with the WenQuest CAD branding and the same AI workbench, English interface. Where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. The only difference from WenQuest CAD on your computer is the 27 kernel fixes, which do not change the interface; “Check geometry” and “Unfold face” give different results, so those are not recorded and are taught with the book's verified data instead.</p>
 <p>The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.</p></section>
@@ -1676,7 +1684,70 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">Formula 2*pi*time, 1 s of simulation: how far does the crank turn?</p><div class="opts"><button type="button" data-k="a">A. 2 degrees</button><button type="button" data-k="b">B. 1 turn</button><button type="button" data-k="c">C. 2 turns</button><button type="button" data-k="d">D. π turns</button></div><p class="why" hidden>Angles are in radians; 2π radians = 1 turn.</p></div>
 <div class="quiz" data-ok="b"><p class="q">An in-line slider-crank with crank radius 15.5 has a stroke of?</p><div class="opts"><button type="button" data-k="a">A. 15.5</button><button type="button" data-k="b">B. 31</button><button type="button" data-k="c">C. 55</button><button type="button" data-k="d">D. Depends on rod length</button></div><p class="why" hidden>Stroke = 2 × crank radius; the rod length affects the motion law and position, not the stroke.</p></div>
 <div class="quiz" data-ok="b"><p class="q">How do you check two parts for interference?</p><div class="opts"><button type="button" data-k="a">A. Look at the colours</button><button type="button" data-k="b">B. Take their Common and see whether the volume is 0</button><button type="button" data-k="c">C. Fuse them</button><button type="button" data-k="d">D. Measure a distance</button></div><p class="why" hidden>Common is their overlap; zero volume means no interference. Check moving parts at several positions.</p></div></section>
-<section id="appA"><h2><span class="n">17</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l17"><h2><span class="n">17</span>Lesson 17 Drawings: templates, views, details, dimensions, title block</h2><p class="lead">You will be able to insert a drawing frame in the TechDraw workbench, project a view from a 3D part and position it; add linear and diameter dimensions; make a detail view; fill in the title block. You draw the WQ-LS needle bar (drawing LS-201). About 1.5 hours.</p><h3 id="l17-goal">What you will be able to do</h3>
+<ul>
+<li>A sheet = frame template + views + annotations. Views are projected from the 3D model; change the model and the drawing follows.</li>
+<li>Choose the projection direction when inserting a view; lay long shafts horizontal (Rotate clockwise).</li>
+<li>Dimensions: select edges in the view (Ctrl for more), click a dimension tool; position the dimension with its X and Y properties.</li>
+<li>Detail views: centre, radius, scale; dimensions on a detail show true size.</li>
+<li>Title block: click a field in the frame and type.</li>
+</ul>
+
+<h3 id="l17-template">Frame templates</h3>
+<p>Frames that come with WenQuest CAD (chosen when inserting a page from a template):</p>
+<table>
+<thead>
+<tr>
+<th>Frame</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>A4_Landscape_ISO5457_minimal.svg</code> and the ISO series</td>
+<td>international standard; the English version of this lesson</td>
+</tr>
+<tr>
+<td><code>A4_Landscape_CN_CLIP.svg</code> and the CN series</td>
+<td>Chinese GB standard; the Chinese version</td>
+</tr>
+<tr>
+<td>ASME series</td>
+<td>US standard</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l17-view">The view and first dimensions</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l17a-en.jpg"><source src="../media/wqcad-l17a-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l17a-en.vtt"></video><figcaption>▶ Recording: A4 frame → insert view, rotate clockwise to horizontal → move it → length 180, ⌀8 → detail view (oil grooves, radius 4, 5:1) (about 140 s)</figcaption></figure>
+<ul>
+<li>A view's position (X, Y) is measured from the sheet's lower-left corner, in millimetres.</li>
+<li>Diameter: TechDraw's Diameter dimension needs a circle; a shaft seen from the side is two lines, so measure 8 with a Vertical dimension and then Insert ⌀ prefix.</li>
+<li>The detail centre is relative to the main view's centre (the bar's centre is at 90 mm and the first groove at 39.25–39.75, so X ≈ 39.5 − 90 = −50.5; −49.5 takes in both grooves).</li>
+</ul>
+<h3 id="l17-dims">Groove dimensions, title block</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l17b-en.jpg"><source src="../media/wqcad-l17b-en.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l17b-en.vtt"></video><figcaption>▶ Recording: 0.5, 1.5, 0.2 on the detail → 39.25 on the main view → title, material, drawing number, scale (about 120 s)</figcaption></figure>
+<p>Compared with the machine's own LS-201 needle-bar drawing (generated from the 3D model in round 138): ⌀8, material GCr15 (AISI 52100) and scale 1:1 agree. LS-201 gives the length as 179 — measured over the cylindrical part between the 0.5 chamfers; this lesson measures between the end faces, 180. LS-201 doesn't dimension the two oil grooves (0.5 wide, 1.5 apart, 0.2 deep, 39.25 from the lower end); this lesson adds them. LS-201 also has ⌀8 h5, Ra 0.2 and technical notes — next lesson.</p>
+<h3 id="l17-do">Follow along</h3>
+<ol class="steps">
+<li>Open the needle bar (or lesson 9's two-groove bar), TechDraw workbench, Insert page using template: A4 landscape.</li>
+<li>Select the bar, Insert view, Rotate clockwise, OK. Properties X = 125, Y = 140.</li>
+<li>Both end lines → Horizontal dimension 180; top and bottom outlines → Vertical dimension 8 → Insert ⌀ prefix.</li>
+<li>Select the view → Detail view: X = −49.5, Y = 3.5, radius 4, custom scale 5. Properties X = 235, Y = 92.</li>
+<li>On the detail: groove bottom → 0.5; land between grooves → 1.5; outer line + groove bottom → Vertical 0.2. Main view: left end + first groove's left side → 39.25.</li>
+<li>Click the title-block fields: title, material, drawing number, scale.</li>
+</ol>
+
+<h3 id="l17-self">On your own</h3>
+<ol>
+<li>Add a left view (tick Left in the projection group when inserting) and look at the chamfer circles at the end.</li>
+<li>Make a Section view through a groove and look at its profile.</li>
+<li>Change the detail to 10:1. Do the dimensions change? (No: they show true size.)</li>
+</ol>
+<h3 id="l17-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">The 3D model&#x27;s size changes. What happens to the drawing?</p><div class="opts"><button type="button" data-k="a">A. It must be redrawn</button><button type="button" data-k="b">B. Views and dimensions update</button><button type="button" data-k="c">C. Only the views update</button><button type="button" data-k="d">D. It errors</button></div><p class="why" hidden>Views are projections of the model and dimensions are attached to view edges; a recompute updates both.</p></div>
+<div class="quiz" data-ok="b"><p class="q">Detail at 5:1, groove width 0.5. What does the dimension on the detail show?</p><div class="opts"><button type="button" data-k="a">A. 2.5</button><button type="button" data-k="b">B. 0.5</button><button type="button" data-k="c">C. 0.1</button><button type="button" data-k="d">D. 5</button></div><p class="why" hidden>Dimensions show the part&#x27;s true size, independent of view scale.</p></div>
+<div class="quiz" data-ok="b"><p class="q">How do you dimension a shaft&#x27;s diameter seen from the side?</p><div class="opts"><button type="button" data-k="a">A. Diameter dimension on one line</button><button type="button" data-k="b">B. A vertical (or horizontal) dimension between the two outlines, plus the ⌀ prefix</button><button type="button" data-k="c">C. Radius dimension</button><button type="button" data-k="d">D. You don&#x27;t</button></div><p class="why" hidden>From the side the diameter is two parallel lines; measure their distance and add ⌀ to show it&#x27;s a diameter.</p></div></section>
+<section id="appA"><h2><span class="n">18</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">
