@@ -12,17 +12,33 @@ from l17b import field
 PARTS = [L("机架", "Frame"), L("上轴曲柄", "ShaftCrank"), L("连杆", "Rod"), L("针杆组件", "NeedleBarAssy")]
 
 
+# 每个零件的序号指到哪：(第几个实体, 取哪一头)；圆圈放在哪（相对视图中心，毫米）
+AIM = [(2, "+x", (55, -60)),      # 1 机架：下导套右边
+       (1, "+x", (65, 75)),       # 2 上轴曲柄：平衡块最右
+       (0, "-x", (-60, 45)),      # 3 连杆：最左
+       (0, "-y", (-45, -90))]     # 4 针杆组件：针杆下端
+
+
 def part_pts(v, links):
-    """每个零件在视图里找一个“只属于它”的点（图纸毫米）：零件的顶点、边中点投到视图里，挑离别的零件最远的那个"""
-    P = {}
+    """零件上的点投到视图里，换成视图里的坐标（视图以投影后的外框中心为原点）"""
+    samp = {}
     for name, link in links.items():
-        pts = [x.Point for x in link.Shape.Vertexes] + [e.valueAt((e.FirstParameter + e.LastParameter) / 2) for e in link.Shape.Edges]
-        P[name] = [(q.x, q.y) for q in (v.projectPoint(p) for p in pts)]
+        samp[name] = []
+        for so in link.Shape.Solids:
+            pts = []
+            for e in so.Edges:
+                pts += [e.valueAt(e.FirstParameter + (e.LastParameter - e.FirstParameter) * t / 8) for t in range(9)]
+            samp[name].append([(q.x, q.y) for q in (v.projectPoint(p) for p in pts)])
+    allp = [q for ss in samp.values() for qs in ss for q in qs]
+    vis = [x.Point for e in v.getVisibleEdges() for x in e.Vertexes]
+    cx = (min(q[0] for q in allp) + max(q[0] for q in allp)) / 2 - (min(p.x for p in vis) + max(p.x for p in vis)) / 2
+    cy = (min(q[1] for q in allp) + max(q[1] for q in allp)) / 2 - (min(p.y for p in vis) + max(p.y for p in vis)) / 2
     out = {}
-    for name, pts in P.items():
-        others = [q for n, qs in P.items() if n != name for q in qs]
-        best = max(pts, key=lambda a: min((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 for b in others))
-        out[name] = (v.X.Value + best[0], v.Y.Value + best[1])
+    for (name, ss), (i, how, _) in zip(samp.items(), AIM):
+        qs = ss[min(i, len(ss) - 1)]
+        k = {"+x": lambda q: q[0], "-x": lambda q: -q[0], "-y": lambda q: -q[1]}[how]
+        q = max(qs, key=k)
+        out[name] = (q[0] - cx, q[1] - cy)
     return out
 
 
@@ -142,7 +158,7 @@ def script(d):
         log("scale fallback", v.ScaleType, v.Scale); v.ScaleType = "Custom"; v.Scale = 1.0
     doc.recompute(); yield 1500
 
-    yield d.say("明细表：选中材料清单，菜单“工程图 → 插入表格视图”，放到标题栏上面")
+    yield d.say("明细表：选中材料清单，菜单“工程图 → 来自其他工作台的视图 → 电子表格视图”，放到标题栏上面")
     Gui.Selection.clearSelection()
     p = d.tree_item(bom.Label)
     yield d.move(p, 800)
@@ -165,8 +181,9 @@ def script(d):
 
     yield d.say("零件序号：选中视图，点“气球”，在零件上点一下，序号的圆圈拉到旁边；按明细表的顺序 1–4")
     PP = part_pts(v, {n: links[n] for n in PARTS})
+    log("pp", {n: (round(x, 1), round(y, 1)) for n, (x, y) in PP.items()})
     for k, name in enumerate(PARTS, 1):
-        x, y = PP[name]
+        x, y = v.X.Value + PP[name][0], v.Y.Value + PP[name][1]
         Gui.Selection.clearSelection()
         Gui.Selection.addSelection(doc.Name, v.Name)
         yield d.tool("TechDraw_Balloon") if d.action_widget("TechDraw_Balloon") else d.tool("TechDraw_CompAnnotation", "TechDraw_Balloon")
@@ -181,8 +198,9 @@ def script(d):
             b = bl[-1]
             if str(b.Text) != str(k):
                 b.Text = str(k)
-            b.X = 55 if x > v.X.Value else -55       # 圆圈摆到左右两边，排齐
-            b.Y = (y - v.Y.Value) + 10
+            b.OriginX, b.OriginY = PP[name]      # 点击位置有吸附偏差：引线起点放准
+            b.X, b.Y = AIM[k - 1][2]
+            log("bubble at", k, (round(b.X.Value, 1), round(b.Y.Value, 1)))
             doc.recompute()
         yield 1000
 
@@ -192,7 +210,7 @@ def script(d):
           ("MATERIALMARK", 338, 255, "见明细表"))
          if not L(0, 1) else
          (("title", 231, 260.2, "Slider-crank mechanism"), ("document_type", 231, 272.2, "Assembly Drawing"), ("drawing_number", 231, 284.2, "LS-200"),
-          ("scale", 360, 248.2, "1:1"), ("part_material", 231, 248.2, "see BOM"), ("creator", 311, 260.2, "WenQuest"), ("approval_person", 311, 272.2, "-")))
+          ("scale", 360, 248.2, "1:1"), ("part_material", 231, 248.2, "see BOM"), ("creator", 316, 260.2, "WenQuest"), ("approval_person", 316, 272.2, "-")))
     for key, x, y, text in F:              # 图框 SVG 里可编辑字段的位置（毫米，左上角为原点）
         yield from field(d, x, 297 - y + 1.2, text)
         log("field", key, page.Template.EditableTexts.get(key))

@@ -1,0 +1,34 @@
+WEBVTT
+
+00:00:09.888 --> 00:00:18.068
+Assembly drawing = views + parts list + item balloons. Make the parts list in the assembly first: click “Bill of Materials”
+
+00:00:18.068 --> 00:00:25.334
+Index, Name and Quantity are enough. Select the “Description” and “File Name” columns and press Delete
+
+00:00:25.334 --> 00:00:37.334
+The BOM is a spreadsheet; double-click to see it: items 1–4, names, quantities. Change the parts and it updates on recompute
+
+00:00:37.971 --> 00:00:48.748
+Drawing: A3 landscape frame (the mechanism is 190 mm tall, fits at 1:1)
+
+00:00:48.748 --> 00:00:58.174
+Select the whole assembly, insert a view; click “Rotate right” to look from the side, where crank, rod and needle bar share one plane; OK
+
+00:00:58.174 --> 00:01:08.681
+Scale 1:1, position X = 130, Y = 160
+
+00:01:08.681 --> 00:01:20.681
+Parts list: select the BOM, menu “TechDraw → Views from other workbenches → Spreadsheet view”, place it above the title block
+
+00:01:27.293 --> 00:01:39.293
+Item balloons: select the view, click “Balloon”, click on a part, move the circle aside; numbered 1–4 as in the parts list
+
+00:01:50.268 --> 00:02:02.268
+Title block: “Slider-crank mechanism”, drawing LS-200 (practice), scale 1:1
+
+00:02:27.399 --> 00:02:38.268
+Export PDF: File → Export PDF, LS-200
+
+00:02:38.268 --> 00:02:49.040
+An assembly drawing shows how the parts fit together, what each is and how many. Change a part and the view and parts list follow on recompute

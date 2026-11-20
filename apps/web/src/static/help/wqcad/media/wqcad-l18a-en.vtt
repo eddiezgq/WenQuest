@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00:17.248 --> 00:00:21.293
+Tolerance: double-click the ⌀8 dimension to open its settings
+
+00:00:21.293 --> 00:00:33.293
+Format ⌀%.0f h5; tick “Arbitrary tolerances”, upper 0, lower −0.006 (ISO 286: ⌀8 h5)
+
+00:00:37.787 --> 00:00:46.034
+Notes: click “Insert Annotation”, and write one line per entry in the “Text” property
+
+00:00:46.034 --> 00:00:58.034
+Export: menu “File → Export PDF”, file name LS-201
+
+00:01:14.319 --> 00:01:23.040
+Send the PDF to the shop or a supplier; for another CAD system, export DXF with the toolbar's DXF button

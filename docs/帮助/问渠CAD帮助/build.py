@@ -44,7 +44,7 @@ LESSONS = [
     ("五 装配", 15, "装配工作台：插入零件、固定、关节、自由度", "针杆机构（曲柄滑块）", "l15"),
     ("五 装配", 16, "运动与检查：驱动关节、测距离、干涉、爆炸视图", "针杆机构转一圈、量行程", "l16"),
     ("六 工程图", 17, "TechDraw：图框、投影、剖视、局部放大、尺寸", "针杆零件图", "l17"),
-    ("六 工程图", 18, "公差与技术要求、物料清单、导出 PDF / DXF", "挑线机构装配图", None),
+    ("六 工程图", 18, "公差与技术要求、物料清单、导出 PDF / DXF", "针杆零件图加公差；针杆机构装配图", "l18"),
     ("七 进阶", 19, "有限元（FEM + CalculiX）", "曲柄 5000 r/min 下的应力", None),
     ("七 进阶", 20, "问渠 CAD 的不同：27 个补丁修了什么", "补丁前后对比", None),
     ("八 AI", 21, "AI 工作台：零件选型与校验、企业零件库、AI 设计零件", "选一个轴承；上轴设计回放", None),
@@ -69,15 +69,15 @@ LESSONS_EN = [
     ("5 Assembly", "Assembly workbench: insert parts, ground, joints, degrees of freedom", "Needle-bar mechanism (slider-crank)"),
     ("5 Assembly", "Motion and checks: drive joints, measure, interference, exploded views", "Needle-bar mechanism through one turn; stroke"),
     ("6 Drawings", "TechDraw: templates, projections, sections, details, dimensions", "Needle-bar part drawing"),
-    ("6 Drawings", "Tolerances and notes, bill of materials, PDF / DXF export", "Take-up assembly drawing"),
+    ("6 Drawings", "Tolerances and notes, bill of materials, PDF / DXF export", "Tolerances on the needle-bar drawing; needle-bar mechanism assembly drawing"),
     ("7 Advanced", "FEM with CalculiX", "Crank stress at 5000 r/min"),
     ("7 Advanced", "What is different in WenQuest CAD: the 27 patches", "Before/after the patches"),
     ("8 AI", "AI workbench: part selection and checks, company parts library, AI part design", "Pick a bearing; replay the upper-shaft design"),
 ]
 
-FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10", "l11", "l12", "l13", "l14", "l15", "l16", "l17", "appA-install"]
-EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–17 课）", other=("English", "en/"), files=FILES)
-EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–17)",
+FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10", "l11", "l12", "l13", "l14", "l15", "l16", "l17", "l18", "appA-install"]
+EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–18 课）", other=("English", "en/"), files=FILES)
+EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–18)",
                   other=("中文", "../"), files=FILES)
 
 

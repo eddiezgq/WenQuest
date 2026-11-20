@@ -41,7 +41,10 @@ for WQ_LANG in ${LANGS:-zh en}; do
   cp "$FC"/usr/share/Mod/TechDraw/Templates/ISO/A4_Landscape_ISO5457_minimal.svg "$WQ_REC/" 2>/dev/null
   LC_ALL=C.UTF-8 "$FC/usr/bin/freecadcmd" "$H/prep_needle_drawing.py"   # 第 17 课的针杆（两种语言的文件都重做）
   for c in l17a l17b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done
-  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c l10a l10b l11a l12a l12b l12c l13a l13b l13c l14a l15a l15b l16a l17a l17b; do
+  cp "$FC"/usr/share/Mod/TechDraw/Templates/ISO/localized/zh-CN/landscape/A3_Landscape_CN_CLIP.svg "$WQ_REC/" 2>/dev/null
+  cp "$FC"/usr/share/Mod/TechDraw/Templates/ISO/A3_Landscape_ISO5457_minimal.svg "$WQ_REC/" 2>/dev/null
+  for c in l18a l18b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done     # 18a 接 17b 存的针杆图；18b 接第 16 课存的曲柄滑块
+  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c l10a l10b l11a l12a l12b l12c l13a l13b l13c l14a l15a l15b l16a l17a l17b l18a l18b; do
     ffmpeg -loglevel error -y -i "$WQ_REC/$c$sfx.mp4" -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart -an "$OUT/wqcad-$c$sfx.mp4"
     ffmpeg -loglevel error -y -sseof -2 -i "$WQ_REC/$c$sfx.mp4" -frames:v 1 -vf scale=960:-1 -q:v 4 "$OUT/wqcad-$c$sfx.jpg"
     cp "$WQ_REC/$c$sfx.vtt" "$OUT/wqcad-$c$sfx.vtt"

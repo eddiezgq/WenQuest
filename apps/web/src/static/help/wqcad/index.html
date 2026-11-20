@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ 目录</button>
 <aside>
-  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–17 课）</small></div>
+  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–18 课）</small></div>
   <input class="find" placeholder="搜索帮助…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>课程怎么学</a>
 <a class="sub" href="#course-1" data-s="course">这套课程</a>
@@ -258,7 +258,14 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l17-do" data-s="l17">跟着做</a>
 <a class="sub" href="#l17-self" data-s="l17">自己做</a>
 <a class="sub" href="#l17-quiz" data-s="l17">小测</a>
-<a href="#appA" data-s="appA"><span class="n">18</span>附录 A 安装问渠 CAD</a>
+<a href="#l18" data-s="l18"><span class="n">18</span>第 18 课 工程图：公差与技术要求、装配图与明细表、导出 PDF</a>
+<a class="sub" href="#l18-goal" data-s="l18">学完能做什么</a>
+<a class="sub" href="#l18-tol" data-s="l18">公差、技术要求、导出 PDF</a>
+<a class="sub" href="#l18-asm" data-s="l18">装配图：明细表、视图、零件序号</a>
+<a class="sub" href="#l18-do" data-s="l18">跟着做</a>
+<a class="sub" href="#l18-self" data-s="l18">自己做</a>
+<a class="sub" href="#l18-quiz" data-s="l18">小测</a>
+<a href="#appA" data-s="appA"><span class="n">19</span>附录 A 安装问渠 CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">下载和授权</a>
 <a class="sub" href="#appA-install" data-s="appA">安装</a>
 <a class="sub" href="#appA-fix" data-s="appA">排错</a></nav>
@@ -279,7 +286,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">课程表</h3>
-<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l12">第 12 课</a></td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机头外形的特征曲线（照网格逆向）</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l13">第 13 课</a></td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的修剪和过渡曲面</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l14">第 14 课</a></td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>机头外壳抽壳成铸件</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l15">第 15 课</a></td><td>装配工作台：插入零件、固定、关节、自由度</td><td>针杆机构（曲柄滑块）</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l16">第 16 课</a></td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>针杆机构转一圈、量行程</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l17">第 17 课</a></td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>已上线</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l12">第 12 课</a></td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机头外形的特征曲线（照网格逆向）</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l13">第 13 课</a></td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的修剪和过渡曲面</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l14">第 14 课</a></td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>机头外壳抽壳成铸件</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l15">第 15 课</a></td><td>装配工作台：插入零件、固定、关节、自由度</td><td>针杆机构（曲柄滑块）</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l16">第 16 课</a></td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>针杆机构转一圈、量行程</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l17">第 17 课</a></td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l18">第 18 课</a></td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>针杆零件图加公差；针杆机构装配图</td><td>已上线</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
 
 <p>现在上线的是第 1–17 课，其余各课按模块陆续上线。</p>
 <h3 id="course-3">录屏是怎么录的</h3>
@@ -1747,7 +1754,54 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">三维模型改了尺寸，工程图会怎样？</p><div class="opts"><button type="button" data-k="a">A. 要重画</button><button type="button" data-k="b">B. 视图和尺寸跟着更新</button><button type="button" data-k="c">C. 只有视图更新</button><button type="button" data-k="d">D. 报错</button></div><p class="why" hidden>视图是从模型投影出来的，尺寸关联在视图的边上，重算后一起更新。</p></div>
 <div class="quiz" data-ok="b"><p class="q">局部视图比例 5:1，槽宽 0.5，放大图上的尺寸显示多少？</p><div class="opts"><button type="button" data-k="a">A. 2.5</button><button type="button" data-k="b">B. 0.5</button><button type="button" data-k="c">C. 0.1</button><button type="button" data-k="d">D. 5</button></div><p class="why" hidden>尺寸标的是零件的真实大小，和视图比例无关。</p></div>
 <div class="quiz" data-ok="b"><p class="q">轴类零件从侧面看，直径怎么标？</p><div class="opts"><button type="button" data-k="a">A. 直径尺寸点那条线</button><button type="button" data-k="b">B. 两条轮廓线之间的竖直（或水平）尺寸，再加 ⌀ 前缀</button><button type="button" data-k="c">C. 半径尺寸</button><button type="button" data-k="d">D. 不用标</button></div><p class="why" hidden>侧面上直径是两条平行线，量它们的距离，再加 ⌀ 表示是直径。</p></div></section>
-<section id="appA"><h2><span class="n">18</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
+<section id="l18"><h2><span class="n">18</span>第 18 课 工程图：公差与技术要求、装配图与明细表、导出 PDF</h2><p class="lead">学完能做：给尺寸加公差带，写技术要求，把图纸导出 PDF；在装配里生成材料清单（明细表），出一张装配图——视图、明细表、零件序号、标题栏。接着第 17 课的针杆零件图（LS-201），再画第 15–16 课的针杆机构装配图。约 1.5 小时。</p><h3 id="l18-goal">学完能做什么</h3>
+<ul>
+<li>公差：双击尺寸打开设置，格式里写公差带代号（如 h5），勾“任意公差”填上、下偏差。</li>
+<li>技术要求：插入注释，在属性“文本”里一行写一条。</li>
+<li>导出：文件 → 导出 PDF（给车间、外协）；工具栏的 DXF 按钮导出 DXF（给别的 CAD）。</li>
+<li>明细表：装配工作台的“材料清单”，序号、名称、数量自动生成，零件变了重算跟着变。</li>
+<li>装配图：插入整个装配的视图，放上明细表，用“气球”给零件编序号，填标题栏。</li>
+</ul>
+
+<h3 id="l18-tol">公差、技术要求、导出 PDF</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l18a.jpg"><source src="media/wqcad-l18a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l18a.vtt"></video><figcaption>▶ 录屏：⌀8 改成 ⌀8 h5（上偏差 0、下偏差 −0.006）→ 插入注释写技术要求 → 导出 PDF LS-201（约 80 秒）</figcaption></figure>
+<ul>
+<li>⌀8 h5 的偏差：查 GB/T 1800.2（ISO 286-2），6～10 mm 段 IT5 = 6 µm，h 的上偏差为 0，所以是 0 / −0.006。</li>
+<li>尺寸设置里，“格式”管主数字（<code>⌀%.0f h5</code> 显示成 ⌀8 h5）；“任意公差”勾上后，上、下偏差框里写什么就显示什么。</li>
+<li>技术要求照整机自带的 LS-201 针杆图写：淬火、回火 58–62 HRC，外圆镀硬铬 5–8 µm 后抛光；外圆 Ra 0.2，直线度 0.005/100；未注尺寸公差 GB/T 1804-f。倒角写的是本课模型的 0.5×45°（LS-201 写的是未注倒角 C0.3）。</li>
+<li>导出 PDF 时如果同名文件已存在，会问“替换吗”。</li>
+</ul>
+<h3 id="l18-asm">装配图：明细表、视图、零件序号</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l18b.jpg"><source src="media/wqcad-l18b.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l18b.vtt"></video><figcaption>▶ 录屏：装配里“材料清单”删掉“说明”“文件名”两列 → A3 图框 → 插入装配视图、向右旋转 → 插入电子表格视图放明细表 → 气球 1–4 → 填标题栏 → 导出 PDF LS-200（约 150 秒）</figcaption></figure>
+<ul>
+<li>材料清单要在装配“激活”时做（双击模型树里的装配），出来的是 4 行：机架、上轴曲柄、连杆、针杆组件，各 1 件。</li>
+<li>明细表不在工具栏上：菜单“工程图 → 来自其他工作台的视图 → 电子表格视图”。表格太小可以在属性里把比例调大。</li>
+<li>侧视图（向右旋转一次）上曲柄、连杆、针杆都在一个平面里，比主视图看得清。机构高 190 mm，A3 横图框 1:1 放得下。</li>
+<li>气球：选中视图，点“气球”，在零件上点一下；圆圈的位置在属性 X、Y 里调，序号按明细表的顺序。</li>
+<li>图号 LS-200 是本课练习用的，整机的图纸清单里没有这个号。</li>
+</ul>
+<h3 id="l18-do">跟着做</h3>
+<ol class="steps">
+<li>打开第 17 课的针杆零件图，双击 ⌀8 尺寸：格式 <code>⌀%.0f h5</code>，取消“相等公差”，勾“任意公差”，上偏差 0、下偏差 −0.006，确定。</li>
+<li>插入注释，属性“文本”写四行技术要求；位置 X = 100、Y = 84，字号 4。</li>
+<li>文件 → 导出 PDF，文件名 LS-201。</li>
+<li>打开第 16 课的曲柄滑块，双击装配激活，点“材料清单”，删掉“说明”“文件名”两列，确定。</li>
+<li>工程图工作台，插入 A3 横图框；选中装配，插入视图，向右旋转，确定；比例 1:1，X = 130、Y = 160。</li>
+<li>选中材料清单，菜单插入电子表格视图；属性：结束单元格 C5、比例 1.5、X = 335、Y = 95。</li>
+<li>选中视图，用“气球”给四个零件编号 1–4；填标题栏（名称、图号、比例、材料“见明细表”）；导出 PDF。</li>
+</ol>
+
+<h3 id="l18-self">自己做</h3>
+<ol>
+<li>把 ⌀8 的公差带改成 h6，自己查表填偏差（答案：0 / −0.009）。</li>
+<li>在明细表里加一列“材料”（材料清单任务里“添加列”），手填 GCr15、45 钢等，再看图上的明细表。</li>
+<li>用 DXF 按钮把零件图导出成 DXF，用别的 CAD 软件打开看看。</li>
+</ol>
+<h3 id="l18-quiz">小测</h3>
+<div class="quiz" data-ok="b"><p class="q">⌀8 h5 的上、下偏差是多少？</p><div class="opts"><button type="button" data-k="a">A. +0.006 / 0</button><button type="button" data-k="b">B. 0 / −0.006</button><button type="button" data-k="c">C. ±0.003</button><button type="button" data-k="d">D. 0 / −0.009</button></div><p class="why" hidden>h 的上偏差为 0；6～10 mm 的 IT5 是 6 µm，所以下偏差 −0.006。</p></div>
+<div class="quiz" data-ok="b"><p class="q">装配里的零件换了一个，装配图上的明细表会怎样？</p><div class="opts"><button type="button" data-k="a">A. 要手工改</button><button type="button" data-k="b">B. 重算后跟着变</button><button type="button" data-k="c">C. 不会变</button><button type="button" data-k="d">D. 要重新插入</button></div><p class="why" hidden>明细表由材料清单自动生成，序号、名称、数量随装配更新。</p></div>
+<div class="quiz" data-ok="b"><p class="q">给车间发图，一般导出什么格式？</p><div class="opts"><button type="button" data-k="a">A. FCStd</button><button type="button" data-k="b">B. PDF</button><button type="button" data-k="c">C. STL</button><button type="button" data-k="d">D. STEP</button></div><p class="why" hidden>PDF 谁都能打开、能打印；DXF 给别的 CAD 用；STEP 是三维模型。</p></div></section>
+<section id="appA"><h2><span class="n">19</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
 <p>官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1.4 GB）。</p>
 <h3 id="appA-install">安装</h3>
 <ol class="steps">

@@ -7,6 +7,7 @@ import FreeCAD as App, FreeCADGui as Gui
 from director import Director, boot, log, Qt, QtCore, QtWidgets, L, model_file, menu_path
 import steps
 from l17a import page_view, page_pt, place
+from l17b import field
 
 
 def script(d):
@@ -61,10 +62,12 @@ def script(d):
     if list(a.Text) != lines:
         a.Text = lines
     a.TextSize = 4.0
-    a.X, a.Y = 100, 84
+    a.X, a.Y = L(100, 112), 84
     doc.recompute()
     yield 1500
     yield d.say("导出：菜单“文件 → 导出 PDF”，文件名 LS-201")
+    if L(0, 1):        # 英文图框自带“General tolerances: ISO 2768-m”，改成和技术要求一致
+        yield from field(d, 192, 210 - 161.2 + 1.2, "ISO 2768-f")
     old = os.path.join(os.environ.get("WQ_REC", "."), "LS-201.pdf")
     if os.path.exists(old):
         os.remove(old)      # 免得弹“已存在，替换吗”
@@ -78,10 +81,10 @@ def script(d):
     doc.save()
 
 
-NOTES = L(["技术要求", "1. 淬火、回火 58–62 HRC；外圆镀硬铬后抛光。", "2. 外圆 Ra 0.2；直线度 0.005/100。",
-           "3. 两端倒角 0.5×45°；未注公差 GB/T 1804-m。"],
-          ["Technical notes", "1. Harden and temper 58–62 HRC; hard chrome plate and polish.", "2. Outside diameter Ra 0.2 µm; straightness 0.005/100.",
-           "3. Chamfer both ends 0.5 × 45°; general tolerances ISO 2768-m."])
+NOTES = L(["技术要求", "1. 淬火、回火 58–62 HRC；外圆镀硬铬 5–8 µm 后抛光。", "2. 外圆 Ra 0.2；直线度 0.005/100。",
+           "3. 两端倒角 0.5×45°；未注尺寸公差 GB/T 1804-f。"],
+          ["Technical notes", "1. Harden and temper 58–62 HRC; hard-chrome plate 5–8 µm and polish.", "2. Outside diameter Ra 0.2 µm; straightness 0.005/100.",
+           "3. Chamfer both ends 0.5 × 45°; general tolerances ISO 2768-f."])     # 照整机的 LS-201（tools/wqls/g7_drawings.py）
 
 
 def check(d, name, on):

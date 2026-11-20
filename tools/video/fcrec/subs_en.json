@@ -225,5 +225,15 @@
  "格式改成 ⌀%.0f h5；勾“任意公差”，上偏差 0、下偏差 −0.006（查 GB/T 1800：⌀8 h5）": "Format ⌀%.0f h5; tick “Arbitrary tolerances”, upper 0, lower −0.006 (ISO 286: ⌀8 h5)",
  "技术要求：点“插入注释”，在属性“文本”里一行一行写": "Notes: click “Insert Annotation”, and write one line per entry in the “Text” property",
  "导出：菜单“文件 → 导出 PDF”，文件名 LS-201": "Export: menu “File → Export PDF”, file name LS-201",
- "PDF 发给车间、外协；要给别的 CAD 用，点工具栏的 DXF 按钮导出 DXF": "Send the PDF to the shop or a supplier; for another CAD system, export DXF with the toolbar's DXF button"
+ "PDF 发给车间、外协；要给别的 CAD 用，点工具栏的 DXF 按钮导出 DXF": "Send the PDF to the shop or a supplier; for another CAD system, export DXF with the toolbar's DXF button",
+ "装配图 = 视图 + 明细表 + 零件序号。明细表先在装配里做：点“材料清单”": "Assembly drawing = views + parts list + item balloons. Make the parts list in the assembly first: click “Bill of Materials”",
+ "列：序号、名称、数量够用。“说明”“文件名”两列选中按 Delete 删掉": "Index, Name and Quantity are enough. Select the “Description” and “File Name” columns and press Delete",
+ "明细表是一张表格，双击能打开看：序号 1–4、名称、数量；零件变了，重算后跟着变": "The BOM is a spreadsheet; double-click to see it: items 1–4, names, quantities. Change the parts and it updates on recompute",
+ "出图：A3 横图框（机构有 190 高，1:1 放得下）": "Drawing: A3 landscape frame (the mechanism is 190 mm tall, fits at 1:1)",
+ "选中整个装配，插入视图；点“向右旋转”，从侧面看，曲柄、连杆、针杆都在这个平面里，确定": "Select the whole assembly, insert a view; click “Rotate right” to look from the side, where crank, rod and needle bar share one plane; OK",
+ "比例 1:1，位置 X = 130、Y = 160": "Scale 1:1, position X = 130, Y = 160",
+ "明细表：选中材料清单，菜单“工程图 → 来自其他工作台的视图 → 电子表格视图”，放到标题栏上面": "Parts list: select the BOM, menu “TechDraw → Views from other workbenches → Spreadsheet view”, place it above the title block",
+ "零件序号：选中视图，点“气球”，在零件上点一下，序号的圆圈拉到旁边；按明细表的顺序 1–4": "Item balloons: select the view, click “Balloon”, click on a part, move the circle aside; numbered 1–4 as in the parts list",
+ "导出 PDF：文件 → 导出 PDF，LS-200": "Export PDF: File → Export PDF, LS-200",
+ "一张装配图：看得出零件怎么装在一起、各是什么、有几个。零件改了，视图和明细表重算后跟着变": "An assembly drawing shows how the parts fit together, what each is and how many. Change a part and the view and parts list follow on recompute"
 }
