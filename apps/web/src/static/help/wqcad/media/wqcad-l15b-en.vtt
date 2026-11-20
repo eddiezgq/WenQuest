@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00:07.540 --> 00:00:15.238
+After reopening the file, double-click Assembly in the tree to activate it—only then are the joint buttons available
+
+00:00:15.238 --> 00:00:24.538
+Joints tell FreeCAD how parts connect. For each joint: click the joint button, pick one element (circular edge, face) on each of two parts, OK
+
+00:00:24.538 --> 00:00:34.739
+Revolute: the bearing bore edge on the frame, then the matching edge on the shaft—the shaft can only turn about its axis
+
+00:00:34.739 --> 00:00:44.938
+Revolute: the end edge of the crank pin, the big-end bore edge of the rod—the rod rides on the crank pin
+
+00:00:44.938 --> 00:00:55.339
+Revolute: the rod's small-end bore and the pin on the needle-bar link
+
+00:00:55.339 --> 00:01:05.539
+Slider: the bush bore edge and a needle-bar edge—the bar can only slide along its axis
+
+00:01:05.539 --> 00:01:17.539
+With four joints the parts are all in place. Count: the crank can turn (1 DOF) and the rod and needle bar follow—the whole mechanism has 1 degree of freedom

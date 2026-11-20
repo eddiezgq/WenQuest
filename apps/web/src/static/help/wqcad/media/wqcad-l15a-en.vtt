@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00:02.459 --> 00:00:14.459
+Assembly: the needle-bar mechanism is a slider-crank—the shaft turns the crank, the rod drives the needle bar up and down. The four part files are open and the assembly file is saved
+
+00:00:14.658 --> 00:00:20.252
+Click Create assembly, then Insert component
+
+00:00:20.252 --> 00:00:32.058
+Click a part in the list to insert it. Start with the frame—it asks whether to ground it: Yes, the frame is the fixed reference
+
+00:00:32.058 --> 00:00:39.658
+Later parts are offset a little so they don't overlap; their position doesn't matter—joints will put them in place
+
+00:00:39.658 --> 00:00:49.920
+In the tree, the frame now has a Grounded entry. The other three parts each have 6 degrees of freedom—3 translations, 3 rotations

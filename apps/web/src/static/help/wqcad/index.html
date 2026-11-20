@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ 目录</button>
 <aside>
-  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–14 课）</small></div>
+  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–16 课）</small></div>
   <input class="find" placeholder="搜索帮助…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>课程怎么学</a>
 <a class="sub" href="#course-1" data-s="course">这套课程</a>
@@ -235,7 +235,22 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l14-do" data-s="l14">跟着做</a>
 <a class="sub" href="#l14-self" data-s="l14">自己做</a>
 <a class="sub" href="#l14-quiz" data-s="l14">小测</a>
-<a href="#appA" data-s="appA"><span class="n">15</span>附录 A 安装问渠 CAD</a>
+<a href="#l15" data-s="l15"><span class="n">15</span>第 15 课 装配：插入零件、固定、关节、自由度</a>
+<a class="sub" href="#l15-goal" data-s="l15">学完能做什么</a>
+<a class="sub" href="#l15-mech" data-s="l15">针杆机构是个曲柄滑块</a>
+<a class="sub" href="#l15-insert" data-s="l15">插入零件、固定</a>
+<a class="sub" href="#l15-joints" data-s="l15">加关节</a>
+<a class="sub" href="#l15-do" data-s="l15">跟着做</a>
+<a class="sub" href="#l15-self" data-s="l15">自己做</a>
+<a class="sub" href="#l15-quiz" data-s="l15">小测</a>
+<a href="#l16" data-s="l16"><span class="n">16</span>第 16 课 运动与检查：驱动关节、行程、测量、干涉、爆炸视图</a>
+<a class="sub" href="#l16-goal" data-s="l16">学完能做什么</a>
+<a class="sub" href="#l16-sim" data-s="l16">让机构转起来</a>
+<a class="sub" href="#l16-check" data-s="l16">测量、干涉、爆炸视图</a>
+<a class="sub" href="#l16-do" data-s="l16">跟着做</a>
+<a class="sub" href="#l16-self" data-s="l16">自己做</a>
+<a class="sub" href="#l16-quiz" data-s="l16">小测</a>
+<a href="#appA" data-s="appA"><span class="n">17</span>附录 A 安装问渠 CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">下载和授权</a>
 <a class="sub" href="#appA-install" data-s="appA">安装</a>
 <a class="sub" href="#appA-fix" data-s="appA">排错</a></nav>
@@ -256,9 +271,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">课程表</h3>
-<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l12">第 12 课</a></td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机头外形的特征曲线（照网格逆向）</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l13">第 13 课</a></td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的修剪和过渡曲面</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l14">第 14 课</a></td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>机头外壳抽壳成铸件</td><td>已上线</td></tr><tr><td>五 装配</td><td>第 15 课</td><td>装配工作台：插入零件、固定、关节、自由度</td><td>曲柄滑块</td><td>制作中</td></tr><tr><td>五 装配</td><td>第 16 课</td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>挑线四连杆转一圈</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 17 课</td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l12">第 12 课</a></td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机头外形的特征曲线（照网格逆向）</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l13">第 13 课</a></td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的修剪和过渡曲面</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l14">第 14 课</a></td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>机头外壳抽壳成铸件</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l15">第 15 课</a></td><td>装配工作台：插入零件、固定、关节、自由度</td><td>针杆机构（曲柄滑块）</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l16">第 16 课</a></td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>针杆机构转一圈、量行程</td><td>已上线</td></tr><tr><td>六 工程图</td><td>第 17 课</td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>制作中</td></tr><tr><td>六 工程图</td><td>第 18 课</td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>挑线机构装配图</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 19 课</td><td>有限元（FEM + CalculiX）</td><td>曲柄 5000 r/min 下的应力</td><td>制作中</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
 
-<p>现在上线的是第 1–14 课，其余各课按模块陆续上线。</p>
+<p>现在上线的是第 1–16 课，其余各课按模块陆续上线。</p>
 <h3 id="course-3">录屏是怎么录的</h3>
 <p>录屏都是真软件在操作：云端电脑上装的 FreeCAD 1.1.4、问渠 CAD 的品牌和同一版 AI 工作台，中文界面；鼠标点哪里、键盘输什么，软件就真的执行（画草图、加约束、凸台都是软件自己算的）。和你电脑上的问渠 CAD 只差 27 个内核补丁——补丁不改界面；“检查几何”“展开面”两处结果不同，这两处不录屏，用书里的验收数据讲。</p>
 <p>录屏暂时没有配音，看字幕（视频右下角可以开关）。讲解配音以后补上。</p></section>
@@ -1488,7 +1503,180 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">几张曲面要变成实体，前提是？</p><div class="opts"><button type="button" data-k="a">A. 面越多越好</button><button type="button" data-k="b">B. 它们缝成的壳是封闭的</button><button type="button" data-k="c">C. 都是平面</button><button type="button" data-k="d">D. 都在一个草图里</button></div><p class="why" hidden>只有封闭的壳才围得出体积；有缝要先补上或缝合。</p></div>
 <div class="quiz" data-ok="b"><p class="q">抽壳厚度填 −4 mm 是什么意思？</p><div class="opts"><button type="button" data-k="a">A. 向外长 4 mm</button><button type="button" data-k="b">B. 向里长 4 mm，外形不变</button><button type="button" data-k="c">C. 删除 4 mm</button><button type="button" data-k="d">D. 报错</button></div><p class="why" hidden>负值向里，外形尺寸保持；正值向外，外形变大。</p></div>
 <div class="quiz" data-ok="b"><p class="q">一张开口的曲面（比如外观件的面板）要变成 2 mm 厚的零件，用？</p><div class="opts"><button type="button" data-k="a">A. 抽壳</button><button type="button" data-k="b">B. 加厚（偏移 → 加厚）</button><button type="button" data-k="c">C. 交集</button><button type="button" data-k="d">D. 旋转</button></div><p class="why" hidden>抽壳要从实体开始；单张曲面用“加厚”。</p></div></section>
-<section id="appA"><h2><span class="n">15</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
+<section id="l15"><h2><span class="n">15</span>第 15 课 装配：插入零件、固定、关节、自由度</h2><p class="lead">学完能做：新建装配，把别的文件里的零件插进来；固定一个零件当基准；用旋转、滑动等关节把零件连起来；数清机构还剩几个自由度。装出 WQ-LS 的针杆机构（曲柄滑块）。约 1.5 小时。</p><h3 id="l15-goal">学完能做什么</h3>
+<ul>
+<li>装配文件里放的是零件的“链接”，零件本身还在自己的文件里；改零件，装配跟着变。</li>
+<li>每个装配至少固定一个零件（“固定”），其余零件靠关节定位。</li>
+<li>关节 = 在两个零件上各选一个几何元素（圆边、平面、点），软件把两处对齐，只留下这种关节允许的运动。</li>
+<li>自由度：空间里一个零件 6 个；旋转关节留 1 个（转），滑动关节留 1 个（移）。</li>
+</ul>
+
+<h3 id="l15-mech">针杆机构是个曲柄滑块</h3>
+<p>上轴带着曲柄转，曲柄销推连杆，连杆小头推着针杆接头，针杆在针杆套里上下走。本课用 4 个零件（文件里都按整机 STEP 的位置）：</p>
+<table>
+<thead>
+<tr>
+<th>零件</th>
+<th>里面有什么</th>
+<th>在机构里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>机架</td>
+<td>前轴承 + 针杆套（机头里不动的两件）</td>
+<td>固定</td>
+</tr>
+<tr>
+<td>上轴曲柄</td>
+<td>上轴（截到 x = 60 的一段）+ 曲柄 + 曲柄销</td>
+<td>转（曲柄半径 15.5）</td>
+</tr>
+<tr>
+<td>连杆</td>
+<td>连杆</td>
+<td>摆动（两孔中心距 55）</td>
+</tr>
+<tr>
+<td>针杆组件</td>
+<td>针杆 + 针杆接头</td>
+<td>上下滑</td>
+</tr>
+</tbody>
+</table>
+<p>上轴、曲柄、曲柄销在整机里用螺钉连成一体，这里先合成一个零件，少几个固定关节。</p>
+<h3 id="l15-insert">插入零件、固定</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l15a.jpg"><source src="media/wqcad-l15a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l15a.vtt"></video><figcaption>▶ 录屏：创建装配 → 插入组件：机架（固定）、上轴曲柄、连杆、针杆组件（约 60 秒）</figcaption></figure>
+<ul>
+<li>插入别的文件里的零件前，装配文件要先存盘（零件文件也要存过）。</li>
+<li>插入的第一个零件，软件会问要不要固定——选“是”。</li>
+<li>后插入的零件会错开一点，免得叠在一起；它们的位置不重要，关节会把它们拉到位。</li>
+</ul>
+<h3 id="l15-joints">加关节</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l15b.jpg"><source src="media/wqcad-l15b.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l15b.vtt"></video><figcaption>▶ 录屏：激活装配 → 旋转 ×3（上轴/轴承、曲柄销/连杆大头、接头销/连杆小头）→ 滑动（针杆/针杆套）（约 85 秒）</figcaption></figure>
+<table>
+<thead>
+<tr>
+<th>关节</th>
+<th>选什么</th>
+<th>留下的运动</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>固定 Fixed</td>
+<td>任意两处</td>
+<td>没有</td>
+</tr>
+<tr>
+<td>旋转 Revolute</td>
+<td>两个圆边（同轴）</td>
+<td>绕轴转</td>
+</tr>
+<tr>
+<td>圆柱 Cylindrical</td>
+<td>两个圆边</td>
+<td>绕轴转 + 沿轴移</td>
+</tr>
+<tr>
+<td>滑动 Slider</td>
+<td>两个圆边或平面</td>
+<td>沿轴移</td>
+</tr>
+<tr>
+<td>球 Ball</td>
+<td>两个点</td>
+<td>绕点转</td>
+</tr>
+<tr>
+<td>距离、平行、垂直、角度</td>
+<td>面、边</td>
+<td>约束一个量</td>
+</tr>
+</tbody>
+</table>
+<p>数自由度：3 个活动零件 × 6 = 18；3 个旋转关节各去掉 5、滑动去掉 5，一共去掉 20——比 18 还多，是因为平面机构里有的约束是重复的（冗余），求解器会处理。看效果：机构只剩曲柄转这 1 个自由度，转多少，连杆、针杆的位置就定了。</p>
+<h3 id="l15-do">跟着做</h3>
+<ol class="steps">
+<li>打开 4 个零件文件；新建文件并存盘。</li>
+<li>装配工作台：创建装配，插入组件：机架（固定选“是”）、上轴曲柄、连杆、针杆组件。</li>
+<li>旋转关节：机架轴承孔在 x = 51 处的圆边 + 上轴同一处的圆边。</li>
+<li>旋转关节：曲柄销端头圆边 + 连杆大头孔圆边；连杆小头孔 + 接头销。</li>
+<li>滑动关节：针杆套的孔边 + 针杆上任一圆边。</li>
+</ol>
+
+<h3 id="l15-self">自己做</h3>
+<ol>
+<li>把滑动关节换成圆柱关节，再拖针杆试试：针杆能转了——实际上是针夹的方向定住它，所以要用滑动。</li>
+<li>不合并零件：把上轴、曲柄、曲柄销分开插入，用两个固定关节连起来。</li>
+<li>拖曲柄（装配激活时直接拖零件），看连杆、针杆怎么跟着走。</li>
+</ol>
+<h3 id="l15-quiz">小测</h3>
+<div class="quiz" data-ok="c"><p class="q">空间里一个没约束的零件有几个自由度？</p><div class="opts"><button type="button" data-k="a">A. 3</button><button type="button" data-k="b">B. 4</button><button type="button" data-k="c">C. 6</button><button type="button" data-k="d">D. 12</button></div><p class="why" hidden>沿 X、Y、Z 移动 3 个，绕 X、Y、Z 转动 3 个。</p></div>
+<div class="quiz" data-ok="b"><p class="q">旋转关节留下几个自由度？</p><div class="opts"><button type="button" data-k="a">A. 0</button><button type="button" data-k="b">B. 1</button><button type="button" data-k="c">C. 2</button><button type="button" data-k="d">D. 5</button></div><p class="why" hidden>只能绕轴转，去掉了其余 5 个。</p></div>
+<div class="quiz" data-ok="b"><p class="q">针杆在针杆套里，为什么用滑动关节而不是圆柱关节？</p><div class="opts"><button type="button" data-k="a">A. 滑动更快</button><button type="button" data-k="b">B. 针杆不能自己转（针的方向要对着送布）</button><button type="button" data-k="c">C. 圆柱关节不存在</button><button type="button" data-k="d">D. 一样的</button></div><p class="why" hidden>圆柱关节还允许绕轴转；针的朝向是定的，所以用只允许移动的滑动关节。</p></div></section>
+<section id="l16"><h2><span class="n">16</span>第 16 课 运动与检查：驱动关节、行程、测量、干涉、爆炸视图</h2><p class="lead">学完能做：给关节加运动，让装配动起来；拖时间条找上下止点、量行程；测距离、查干涉；做爆炸视图。让第 15 课的针杆机构转一圈。约 1 小时。</p><h3 id="l16-goal">学完能做什么</h3>
+<ul>
+<li>仿真：给一个旋转（或滑动）关节写运动公式，算运动学，播放。</li>
+<li>拖时间条看任一时刻的位置，量出行程。</li>
+<li>测量工具：两点、两面的距离和角度。</li>
+<li>干涉：两个零件有没有重叠的体积。</li>
+<li>爆炸视图：把零件沿方向拉开，看装配关系、出装配图。</li>
+</ul>
+
+<h3 id="l16-sim">让机构转起来</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l16a.jpg"><source src="media/wqcad-l16a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l16a.vtt"></video><figcaption>▶ 录屏：创建仿真 → 添加运动：上轴旋转关节，2*pi*time → 运行运动学 → 播放 → 时间条到 0 s、0.5 s（约 65 秒）</figcaption></figure>
+<ul>
+<li>角度用弧度：<code>2*pi*time</code> 是 1 秒一圈；仿真设置里开始 0、结束 1 s、步长 0.01 s，就是 101 帧。</li>
+<li>公式还可以写匀加速、正弦摆动、阶跃（运动框里点“帮助”看例子）。</li>
+<li>针杆行程：程序把 101 帧的针杆位置都读出来，最高、最低差约 31 mm（帧不一定正好落在止点上，几次录屏读出来在 30.94–31.00 之间）= 2 × 曲柄半径 15.5。针杆轴线正对着曲柄轴心（没有偏置），所以行程正好是两倍曲柄半径。</li>
+</ul>
+<h3 id="l16-check">测量、干涉、爆炸视图</h3>
+<table>
+<thead>
+<tr>
+<th>要做的</th>
+<th>怎么做</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>量距离、角度</td>
+<td>工具栏“测量”：点两个点、两条边或两个面，结果显示在视图里，可以留在模型里</td>
+</tr>
+<tr>
+<td>查干涉</td>
+<td>选两个零件，Part 工作台“交集”：结果体积为 0 就不干涉；不是 0，那块就是重叠的地方。在几个时刻（时间条拖到不同位置）各查一次</td>
+</tr>
+<tr>
+<td>爆炸视图</td>
+<td>装配工作台“创建视图”：选零件，沿一个方向拖开；可以分几步，最后出 TechDraw 装配图（第 18 课）</td>
+</tr>
+<tr>
+<td>物料清单</td>
+<td>装配工作台“创建物料清单”：列出零件、数量，导出表格（第 18 课）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l16-do">跟着做</h3>
+<ol class="steps">
+<li>打开第 15 课的装配，双击 Assembly 激活。</li>
+<li>创建仿真，添加运动：关节选上轴的旋转关节，公式 <code>2*pi*time</code>。</li>
+<li>运行运动学，播放；时间条拖到 0 s 和 0.5 s，看针杆的上下止点。</li>
+<li>用测量工具量针杆接头在两个时刻的高度差，应是 31 mm。</li>
+</ol>
+
+<h3 id="l16-self">自己做</h3>
+<ol>
+<li>公式改成 <code>pi/2*sin(2*pi*time)</code>：曲柄来回摆 ±90°，针杆怎么动？</li>
+<li>把连杆长度（两孔中心距）想象改成 45：行程变不变？针杆最低点变不变？（提示：行程只和曲柄半径有关。）</li>
+<li>在 0.25 s 那一帧，用交集查连杆和曲柄有没有干涉。</li>
+</ol>
+<h3 id="l16-quiz">小测</h3>
+<div class="quiz" data-ok="b"><p class="q">运动公式写 2*pi*time，仿真 1 秒，曲柄转了多少？</p><div class="opts"><button type="button" data-k="a">A. 2 度</button><button type="button" data-k="b">B. 1 圈</button><button type="button" data-k="c">C. 2 圈</button><button type="button" data-k="d">D. π 圈</button></div><p class="why" hidden>角度按弧度，2π 弧度 = 1 圈。</p></div>
+<div class="quiz" data-ok="b"><p class="q">曲柄半径 15.5、无偏置的曲柄滑块，滑块行程是？</p><div class="opts"><button type="button" data-k="a">A. 15.5</button><button type="button" data-k="b">B. 31</button><button type="button" data-k="c">C. 55</button><button type="button" data-k="d">D. 和连杆长度有关</button></div><p class="why" hidden>行程 = 2 × 曲柄半径；连杆长度只影响滑块的运动规律和位置，不影响行程。</p></div>
+<div class="quiz" data-ok="b"><p class="q">怎样查两个零件有没有干涉？</p><div class="opts"><button type="button" data-k="a">A. 看颜色</button><button type="button" data-k="b">B. 求交集，看体积是不是 0</button><button type="button" data-k="c">C. 求并集</button><button type="button" data-k="d">D. 测距离</button></div><p class="why" hidden>交集就是两者重叠的部分；体积为 0 说明不干涉。运动件要在几个位置分别查。</p></div></section>
+<section id="appA"><h2><span class="n">17</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
 <p>官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1.4 GB）。</p>
 <h3 id="appA-install">安装</h3>
 <ol class="steps">

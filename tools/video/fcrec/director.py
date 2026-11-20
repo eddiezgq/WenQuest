@@ -45,6 +45,8 @@ def subtitle(text):
     if _SUBS_EN is None:
         import json
         _SUBS_EN = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "subs_en.json"), encoding="utf-8"))
+    if text not in _SUBS_EN and not any("\u4e00" <= ch <= "\u9fff" for ch in text):
+        return text                        # 剧本里已经是英文（L(中, 英) 选好的）
     if text not in _SUBS_EN:
         raise KeyError("subs_en.json 缺译文：" + text)
     return _SUBS_EN[text]

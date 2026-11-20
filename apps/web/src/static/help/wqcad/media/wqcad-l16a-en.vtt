@@ -1,0 +1,19 @@
+WEBVTT
+
+00:00:10.265 --> 00:00:18.794
+Motion: the slider-crank from the last lesson has 1 DOF left. Give the shaft's revolute joint a motion and the whole mechanism moves
+
+00:00:18.794 --> 00:00:23.251
+Click Create simulation, then Add a motion
+
+00:00:23.251 --> 00:00:29.693
+Pick the shaft's revolute joint and enter 2*pi*time: the angle is in radians, one turn per second
+
+00:00:29.693 --> 00:00:41.693
+Click Run kinematics, then Play forward
+
+00:00:43.194 --> 00:00:53.314
+Move the time slider: with the crank pin at the top the needle bar is at top dead centre; half a turn later, bottom dead centre—one stroke
+
+00:00:53.314 --> 00:01:04.080
+Needle-bar stroke 31 mm = 2 × the 15.5 crank radius: when the slider is in line with the crank axis, the stroke is twice the crank radius
