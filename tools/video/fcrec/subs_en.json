@@ -220,5 +220,10 @@
  "两道槽之间那段：1.5；槽深：外圆那条线 + 槽底那条线，“竖直尺寸”——0.2": "The land between the grooves: 1.5; depth: the outer line + the groove bottom, Vertical dimension—0.2",
  "主视图上标槽的位置：左端线 + 第一道槽的左边线——39.25": "On the main view, the groove position: left end + the first groove's left side—39.25",
  "最后填标题栏：点图框上的字段，输入。零件名称“针杆”、材料“GCr15”、图号“LS-201”、比例“1:1”": "Finally the title block: click a field and type. Title “Needle bar”, material “GCr15 (AISI 52100)”, drawing number “LS-201”, scale “1:1”",
- "一张能看懂的零件图：视图、尺寸、放大图、标题栏。下一课加公差、粗糙度和技术要求，再导出 PDF": "A readable part drawing: view, dimensions, detail, title block. Next lesson adds tolerances, surface finish and notes, and exports a PDF"
+ "一张能看懂的零件图：视图、尺寸、放大图、标题栏。下一课加公差、粗糙度和技术要求，再导出 PDF": "A readable part drawing: view, dimensions, detail, title block. Next lesson adds tolerances, surface finish and notes, and exports a PDF",
+ "公差：双击 ⌀8 的尺寸，打开尺寸设置": "Tolerance: double-click the ⌀8 dimension to open its settings",
+ "格式改成 ⌀%.0f h5；勾“任意公差”，上偏差 0、下偏差 −0.006（查 GB/T 1800：⌀8 h5）": "Format ⌀%.0f h5; tick “Arbitrary tolerances”, upper 0, lower −0.006 (ISO 286: ⌀8 h5)",
+ "技术要求：点“插入注释”，在属性“文本”里一行一行写": "Notes: click “Insert Annotation”, and write one line per entry in the “Text” property",
+ "导出：菜单“文件 → 导出 PDF”，文件名 LS-201": "Export: menu “File → Export PDF”, file name LS-201",
+ "PDF 发给车间、外协；要给别的 CAD 用，点工具栏的 DXF 按钮导出 DXF": "Send the PDF to the shop or a supplier; for another CAD system, export DXF with the toolbar's DXF button"
 }

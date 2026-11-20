@@ -5,8 +5,10 @@ import FreeCAD as App, FreeCADGui as Gui
 from director import Director, boot, log, Qt, QtCore, QtWidgets, L, model_file
 import steps
 import builtins  # noqa: E402
+_prev = getattr(builtins, "_WQ_IMPORT_ONLY", False)
 builtins._WQ_IMPORT_ONLY = True
-from l17a import page_view, page_pt, view_edges, pick_edge, place
+from l17a import page_view, page_pt, view_edges, pick_edge, place  # noqa: E402
+builtins._WQ_IMPORT_ONLY = _prev
 
 
 def script(d):
@@ -119,4 +121,6 @@ def main():
     d.run(script(d))
 
 
-boot(main)
+import builtins  # noqa: E402
+if not getattr(builtins, "_WQ_IMPORT_ONLY", False):     # l18b 只借用这里的函数
+    boot(main)

@@ -342,8 +342,10 @@ def menu_path(d, *names):
     yield 700
     for name in names[1:]:
         menus = [m for m in QtWidgets.QApplication.topLevelWidgets() if isinstance(m, QtWidgets.QMenu) and m.isVisible()]
-        m = menus[-1]
-        a = [a for a in m.actions() if norm(a.text()).startswith(name)][0]
+        hit = [(m, a) for m in reversed(menus) for a in m.actions() if norm(a.text()).startswith(name)]   # 子菜单：哪个弹出菜单里有这一项
+        if not hit:
+            log("menu miss", name, [[norm(a.text()) for a in m.actions()] for m in menus])
+        m, a = hit[0]
         p = m.mapToGlobal(m.actionGeometry(a).center())
         yield d.move(p, 600)
         if name == names[-1]:
