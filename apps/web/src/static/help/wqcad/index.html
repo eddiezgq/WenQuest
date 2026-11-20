@@ -243,9 +243,10 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l15-do" data-s="l15">跟着做</a>
 <a class="sub" href="#l15-self" data-s="l15">自己做</a>
 <a class="sub" href="#l15-quiz" data-s="l15">小测</a>
-<a href="#l16" data-s="l16"><span class="n">16</span>第 16 课 运动与检查：驱动关节、行程、测量、干涉、爆炸视图</a>
+<a href="#l16" data-s="l16"><span class="n">16</span>第 16 课 运动与检查：驱动关节、行程、受力（问渠多体动力学）、测量、干涉、爆炸视图</a>
 <a class="sub" href="#l16-goal" data-s="l16">学完能做什么</a>
 <a class="sub" href="#l16-sim" data-s="l16">让机构转起来</a>
+<a class="sub" href="#l16-mbd" data-s="l16">要多大力：问渠多体动力学</a>
 <a class="sub" href="#l16-check" data-s="l16">测量、干涉、爆炸视图</a>
 <a class="sub" href="#l16-do" data-s="l16">跟着做</a>
 <a class="sub" href="#l16-self" data-s="l16">自己做</a>
@@ -1630,10 +1631,11 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="c"><p class="q">空间里一个没约束的零件有几个自由度？</p><div class="opts"><button type="button" data-k="a">A. 3</button><button type="button" data-k="b">B. 4</button><button type="button" data-k="c">C. 6</button><button type="button" data-k="d">D. 12</button></div><p class="why" hidden>沿 X、Y、Z 移动 3 个，绕 X、Y、Z 转动 3 个。</p></div>
 <div class="quiz" data-ok="b"><p class="q">旋转关节留下几个自由度？</p><div class="opts"><button type="button" data-k="a">A. 0</button><button type="button" data-k="b">B. 1</button><button type="button" data-k="c">C. 2</button><button type="button" data-k="d">D. 5</button></div><p class="why" hidden>只能绕轴转，去掉了其余 5 个。</p></div>
 <div class="quiz" data-ok="b"><p class="q">针杆在针杆套里，为什么用滑动关节而不是圆柱关节？</p><div class="opts"><button type="button" data-k="a">A. 滑动更快</button><button type="button" data-k="b">B. 针杆不能自己转（针的方向要对着送布）</button><button type="button" data-k="c">C. 圆柱关节不存在</button><button type="button" data-k="d">D. 一样的</button></div><p class="why" hidden>圆柱关节还允许绕轴转；针的朝向是定的，所以用只允许移动的滑动关节。</p></div></section>
-<section id="l16"><h2><span class="n">16</span>第 16 课 运动与检查：驱动关节、行程、测量、干涉、爆炸视图</h2><p class="lead">学完能做：给关节加运动，让装配动起来；拖时间条找上下止点、量行程；测距离、查干涉；做爆炸视图。让第 15 课的针杆机构转一圈。约 1 小时。</p><h3 id="l16-goal">学完能做什么</h3>
+<section id="l16"><h2><span class="n">16</span>第 16 课 运动与检查：驱动关节、行程、受力（问渠多体动力学）、测量、干涉、爆炸视图</h2><p class="lead">学完能做：给关节加运动，让装配动起来；拖时间条找上下止点、量行程；测距离、查干涉；做爆炸视图。让第 15 课的针杆机构转一圈，再用问渠多体动力学算出 5000 r/min 时要多大力矩、各处受多大力。约 1.5 小时。</p><h3 id="l16-goal">学完能做什么</h3>
 <ul>
 <li>仿真：给一个旋转（或滑动）关节写运动公式，算运动学，播放。</li>
 <li>拖时间条看任一时刻的位置，量出行程。</li>
+<li>问渠多体动力学：给零件材料，按真实转速反算驱动力矩、运动副受力，先看核查再看结果。</li>
 <li>测量工具：两点、两面的距离和角度。</li>
 <li>干涉：两个零件有没有重叠的体积。</li>
 <li>爆炸视图：把零件沿方向拉开，看装配关系、出装配图。</li>
@@ -1645,6 +1647,16 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>角度用弧度：<code>2*pi*time</code> 是 1 秒一圈；仿真设置里开始 0、结束 1 s、步长 0.01 s，就是 101 帧。</li>
 <li>公式还可以写匀加速、正弦摆动、阶跃（运动框里点“帮助”看例子）。</li>
 <li>针杆行程：程序把 101 帧的针杆位置都读出来，最高、最低差约 31 mm（帧不一定正好落在止点上，几次录屏读出来在 30.94–31.00 之间）= 2 × 曲柄半径 15.5。针杆轴线正对着曲柄轴心（没有偏置），所以行程正好是两倍曲柄半径。</li>
+</ul>
+<h3 id="l16-mbd">要多大力：问渠多体动力学</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l16b.jpg"><source src="media/wqcad-l16b.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l16b.vtt"></video><figcaption>▶ 录屏：AI Parts → 装配体多体动力学 → 提示零件没有材料 → 视图 → 材质，4 个零件都选 Steel-1C45 → 读装配体 → 上轴转动副匀速 5000 r/min → 运动学、0.012 秒 120 步 → 计算 → 看核查、驱动力矩、曲柄销受力 → 播放（约 150 秒）</figcaption></figure>
+<ul>
+<li>FreeCAD 自带的仿真只管“怎么动”。问渠多体动力学（AI Parts 工作台，菜单“AI Parts → 装配体多体动力学”）直接读装配体的零件和关节，算“要多大力”。</li>
+<li>质量、惯量由实体和材料密度算，没有材料就不算、明说缺什么，不替你估。本课 4 个零件都用 45 钢：上轴曲柄 0.202 kg、连杆 0.058 kg（整机物料清单里的针杆连杆是 58.2 g）、针杆组件 0.088 kg。</li>
+<li>“运动学”分析：运动给定（5000 r/min 匀速），反算每一时刻的驱动力矩和各运动副的反力。5000 r/min 一圈 0.012 秒。</li>
+<li>先看核查：约束残差 4e-15（限值 1e-8）、自由度 0，都通过，结果才可信。程序还会说删掉了几条冗余约束（滑动副和转动副一起把针杆约束多了），这些方向的反力分量不唯一，报告里标“不完整”。</li>
+<li>结果：上轴驱动力矩峰值约 4.82 N·m，和整机设计计算书 G2 里刺布机构的 4.70 N·m 很接近（计算书的模型零件更全，数不会完全一样）。曲柄销（Joint001）受力峰值约 753 N——第 19 课拿它算曲柄的应力。</li>
+<li>“写计算报告…”出 Word 报告（结论、模型、核查、曲线）；装了 LibreOffice 的电脑另出 PDF。</li>
 </ul>
 <h3 id="l16-check">测量、干涉、爆炸视图</h3>
 <table>
@@ -1679,6 +1691,8 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>创建仿真，添加运动：关节选上轴的旋转关节，公式 <code>2*pi*time</code>。</li>
 <li>运行运动学，播放；时间条拖到 0 s 和 0.5 s，看针杆的上下止点。</li>
 <li>用测量工具量针杆接头在两个时刻的高度差，应是 31 mm。</li>
+<li>换 AI Parts 工作台，打开“装配体多体动力学”；4 个零件都设材料 Steel-1C45；读装配体；上轴转动副匀速 5000，运动学，时长 0.012、输出点数 120，计算。</li>
+<li>核查通过后，看驱动力矩和曲柄销反力两条曲线，记下峰值。</li>
 </ol>
 
 <h3 id="l16-self">自己做</h3>
@@ -1686,11 +1700,13 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>公式改成 <code>pi/2*sin(2*pi*time)</code>：曲柄来回摆 ±90°，针杆怎么动？</li>
 <li>把连杆长度（两孔中心距）想象改成 45：行程变不变？针杆最低点变不变？（提示：行程只和曲柄半径有关。）</li>
 <li>在 0.25 s 那一帧，用交集查连杆和曲柄有没有干涉。</li>
+<li>转速改成 2500 r/min 再算：驱动力矩峰值变成多少？（惯性力和转速的平方成正比，应接近原来的 1/4。）</li>
 </ol>
 <h3 id="l16-quiz">小测</h3>
 <div class="quiz" data-ok="b"><p class="q">运动公式写 2*pi*time，仿真 1 秒，曲柄转了多少？</p><div class="opts"><button type="button" data-k="a">A. 2 度</button><button type="button" data-k="b">B. 1 圈</button><button type="button" data-k="c">C. 2 圈</button><button type="button" data-k="d">D. π 圈</button></div><p class="why" hidden>角度按弧度，2π 弧度 = 1 圈。</p></div>
 <div class="quiz" data-ok="b"><p class="q">曲柄半径 15.5、无偏置的曲柄滑块，滑块行程是？</p><div class="opts"><button type="button" data-k="a">A. 15.5</button><button type="button" data-k="b">B. 31</button><button type="button" data-k="c">C. 55</button><button type="button" data-k="d">D. 和连杆长度有关</button></div><p class="why" hidden>行程 = 2 × 曲柄半径；连杆长度只影响滑块的运动规律和位置，不影响行程。</p></div>
-<div class="quiz" data-ok="b"><p class="q">怎样查两个零件有没有干涉？</p><div class="opts"><button type="button" data-k="a">A. 看颜色</button><button type="button" data-k="b">B. 求交集，看体积是不是 0</button><button type="button" data-k="c">C. 求并集</button><button type="button" data-k="d">D. 测距离</button></div><p class="why" hidden>交集就是两者重叠的部分；体积为 0 说明不干涉。运动件要在几个位置分别查。</p></div></section>
+<div class="quiz" data-ok="b"><p class="q">怎样查两个零件有没有干涉？</p><div class="opts"><button type="button" data-k="a">A. 看颜色</button><button type="button" data-k="b">B. 求交集，看体积是不是 0</button><button type="button" data-k="c">C. 求并集</button><button type="button" data-k="d">D. 测距离</button></div><p class="why" hidden>交集就是两者重叠的部分；体积为 0 说明不干涉。运动件要在几个位置分别查。</p></div>
+<div class="quiz" data-ok="b"><p class="q">问渠多体动力学提示“零件没有设材料”，该怎么办？</p><div class="opts"><button type="button" data-k="a">A. 随便填个质量</button><button type="button" data-k="b">B. 给零件指定材料，程序按实体和密度算质量</button><button type="button" data-k="c">C. 忽略，照样算</button><button type="button" data-k="d">D. 改用运动学仿真</button></div><p class="why" hidden>质量和惯量要由密度算；程序不替你估，缺什么就明说。</p></div></section>
 <section id="l17"><h2><span class="n">17</span>第 17 课 工程图：图框、视图、局部放大、尺寸、标题栏</h2><p class="lead">学完能做：在 TechDraw 工作台插入图框，从三维零件投影出视图并摆好位置；标线性尺寸、直径；做局部放大图；填标题栏。画出 WQ-LS 针杆的零件图（图号 LS-201）。约 1.5 小时。</p><h3 id="l17-goal">学完能做什么</h3>
 <ul>
 <li>图纸 = 图框模板 + 视图 + 标注。视图是从三维模型投影出来的，模型改了，图跟着变。</li>

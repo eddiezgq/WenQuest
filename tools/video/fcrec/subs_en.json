@@ -235,5 +235,15 @@
  "明细表：选中材料清单，菜单“工程图 → 来自其他工作台的视图 → 电子表格视图”，放到标题栏上面": "Parts list: select the BOM, menu “TechDraw → Views from other workbenches → Spreadsheet view”, place it above the title block",
  "零件序号：选中视图，点“气球”，在零件上点一下，序号的圆圈拉到旁边；按明细表的顺序 1–4": "Item balloons: select the view, click “Balloon”, click on a part, move the circle aside; numbered 1–4 as in the parts list",
  "导出 PDF：文件 → 导出 PDF，LS-200": "Export PDF: File → Export PDF, LS-200",
- "一张装配图：看得出零件怎么装在一起、各是什么、有几个。零件改了，视图和明细表重算后跟着变": "An assembly drawing shows how the parts fit together, what each is and how many. Change a part and the view and parts list follow on recompute"
+ "一张装配图：看得出零件怎么装在一起、各是什么、有几个。零件改了，视图和明细表重算后跟着变": "An assembly drawing shows how the parts fit together, what each is and how many. Change a part and the view and parts list follow on recompute",
+ "上一段看的是“怎么动”。要知道“要多大力”，用问渠多体动力学：AI Parts 工作台，菜单“AI Parts → 装配体多体动力学”": "Part A showed how it moves. To know how much force it takes, use WenQuest MBD: AI Parts workbench, menu “AI Parts → 装配体多体动力学” (assembly multibody dynamics)",
+ "第一次进 AI 工作台会问 AI 密钥；这一课不用 AI，点“以后再说”": "The first time, the AI workbench asks for an AI key; this lesson doesn't use AI, so click “Later”",
+ "先读装配体：它说零件没有材料——算质量、惯量要密度，程序不替你估": "It reads the assembly first and says the parts have no material — mass and inertia need a density, and the program won't guess one",
+ "给 4 个零件都指定材料：选中零件，菜单“视图 → 材质”，下拉里选 Steel-1C45（45 钢），关闭": "Give all four parts a material: select the part, menu “View → Material”, pick Steel-1C45 (C45 steel) in the drop-down, Close",
+ "再点“用当前文档的装配体”：3 个运动零件、4 个运动副，零件质量按实体和密度算": "Click “Use the assembly in this document” again: 3 moving parts, 4 joints, masses from the solids and densities",
+ "分析选“运动学”：运动给定，反算每一时刻要多大驱动力矩、各运动副受多大力。一圈 0.012 秒，分 120 步": "Analysis: kinematic — the motion is given, and it works back the drive torque and the joint forces at every instant. One turn is 0.012 s, in 120 steps",
+ "点“计算”": "Click “Compute”",
+ "先看核查：约束残差、自由度都通过——结果才有意义": "Check first: constraint residual and degrees of freedom both pass — only then do the results mean anything",
+ "点“播放”，机构按算出的运动动一圈": "Click “Play”: the mechanism runs one turn of the computed motion",
+ "要留档就点“写计算报告…”：Word 报告，有结论、模型、核查和曲线": "For the record, click “Write report…”: a Word report with conclusions, model, checks and curves"
 }

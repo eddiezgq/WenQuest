@@ -1,0 +1,37 @@
+WEBVTT
+
+00:00:03.189 --> 00:00:15.189
+Part A showed how it moves. To know how much force it takes, use WenQuest MBD: AI Parts workbench, menu “AI Parts → 装配体多体动力学” (assembly multibody dynamics)
+
+00:00:17.030 --> 00:00:25.687
+It reads the assembly first and says the parts have no material — mass and inertia need a density, and the program won't guess one
+
+00:00:25.687 --> 00:00:37.687
+Give all four parts a material: select the part, menu “View → Material”, pick Steel-1C45 (C45 steel) in the drop-down, Close
+
+00:01:20.487 --> 00:01:27.862
+Click “Use the assembly in this document” again: 3 moving parts, 4 joints, masses from the solids and densities
+
+00:01:27.862 --> 00:01:36.070
+Drive: the upper-shaft revolute joint (Joint), constant speed, 5000 rpm
+
+00:01:36.070 --> 00:01:46.038
+Analysis: kinematic — the motion is given, and it works back the drive torque and the joint forces at every instant. One turn is 0.012 s, in 120 steps
+
+00:01:46.038 --> 00:01:50.191
+Click “Compute”
+
+00:01:50.191 --> 00:01:57.237
+Check first: constraint residual and degrees of freedom both pass — only then do the results mean anything
+
+00:01:57.237 --> 00:02:05.688
+Curve: drive torque on the upper shaft, peak about 4.82 N·m (design calculation G2, needle mechanism: 4.70 N·m)
+
+00:02:05.688 --> 00:02:14.539
+Crank-pin force (Joint001), peak about 753 N — lesson 19 uses it for the crank stress
+
+00:02:14.539 --> 00:02:21.561
+Click “Play”: the mechanism runs one turn of the computed motion
+
+00:02:21.561 --> 00:02:29.480
+For the record, click “Write report…”: a Word report with conclusions, model, checks and curves

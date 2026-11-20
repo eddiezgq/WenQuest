@@ -503,3 +503,22 @@ def prop_bool(d, obj, prop, value, *path):
         setattr(obj, prop, value)
     d.key(QtCore.Qt.Key_Return, w) if w is not None else None
     yield 600
+
+
+def menu_find(d, cmd):
+    """菜单栏里找命令所在的路径（菜单文字）"""
+    norm = lambda t: t.replace("&", "").replace("…", "").replace("...", "").strip()
+
+    def walk(m, path):
+        for a in m.actions():
+            if a.objectName() == cmd or a.data() == cmd:
+                return path + [norm(a.text())]
+            if a.menu():
+                r = walk(a.menu(), path + [norm(a.text())])
+                if r:
+                    return r
+    for a in d.mw.menuBar().actions():
+        if a.menu():
+            r = walk(a.menu(), [norm(a.text()).split("(")[0]])
+            if r:
+                return r
