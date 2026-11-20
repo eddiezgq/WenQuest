@@ -1,0 +1,73 @@
+# 第 175 轮：国内下载——问渠 CAD 安装包从 GitHub 发布版搬到阿里云 OSS（国内服务器带宽小，1.4 GB 放 OSS），
+# 核对 SHA-256、公网能下、大小一致后，把国内地址写进 site/download/versions.json 的 url_cn 并提交。
+# 密钥：Secrets CN_OSS_KEY_ID、CN_OSS_KEY_SECRET、CN_OSS_BUCKET、CN_OSS_ENDPOINT（Eddie 11-19 存）。手动运行。
+name: CN OSS upload
+on:
+  workflow_dispatch:
+    inputs:
+      product:
+        description: versions.json 里的产品键
+        default: wqcad
+permissions:
+  contents: write
+concurrency: cn-oss
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read versions.json
+        id: src
+        run: |
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json
+          it = json.load(open("site/download/versions.json"))["${{ inputs.product }}"]
+          print("url=" + it["url"]); print("sha=" + it["sha256"].lower()); print("size=" + str(it["size"]))
+          print("name=" + it["url"].rsplit("/", 1)[1])
+          EOF
+      - name: Fetch package
+        run: |
+          curl -sSL --retry 3 -o pkg.bin "${{ steps.src.outputs.url }}"
+          echo "${{ steps.src.outputs.sha }}  pkg.bin" | sha256sum -c -
+          ls -l pkg.bin
+      - name: Upload to OSS
+        env:
+          KID: ${{ secrets.CN_OSS_KEY_ID }}
+          KSEC: ${{ secrets.CN_OSS_KEY_SECRET }}
+          BUCKET: ${{ secrets.CN_OSS_BUCKET }}
+          ENDPOINT: ${{ secrets.CN_OSS_ENDPOINT }}
+          NAME: ${{ steps.src.outputs.name }}
+        run: |
+          test -n "$KID" && test -n "$KSEC" && test -n "$BUCKET" && test -n "$ENDPOINT" || { echo "::error::四个 CN_OSS_* 密钥没取到"; exit 1; }
+          pip install -q oss2
+          python3 - <<'EOF'
+          import os, oss2
+          ep = os.environ["ENDPOINT"].strip().removeprefix("https://").removeprefix("http://").strip("/")
+          b = oss2.Bucket(oss2.Auth(os.environ["KID"].strip(), os.environ["KSEC"].strip()), "https://" + ep, os.environ["BUCKET"].strip())
+          key = "wqcad/" + os.environ["NAME"]
+          oss2.resumable_upload(b, key, "pkg.bin", part_size=64 * 1024 * 1024, num_threads=4,
+                                headers={"Content-Type": "application/octet-stream",
+                                         "Content-Disposition": 'attachment; filename="%s"' % os.environ["NAME"]})
+          print("uploaded", key, b.head_object(key).content_length)
+          url = "https://%s.%s/%s" % (os.environ["BUCKET"].strip(), ep, key)
+          open("cn_url.txt", "w").write(url)
+          EOF
+      - name: Check public download and record url_cn
+        env:
+          SIZE: ${{ steps.src.outputs.size }}
+        run: |
+          U=$(cat cn_url.txt)
+          code=$(curl -s -o /dev/null -w '%{http_code}' -r 0-1023 "$U"); echo "range GET: $code"
+          test "$code" = 206 -o "$code" = 200 || { echo "::error::公网下载不通（$code）：Bucket 要设成“公共读”，并关掉“阻止公共访问”"; exit 1; }
+          len=$(curl -sI "$U" | tr -d '\r' | awk 'tolower($1)=="content-length:"{print $2}'); echo "size $len / $SIZE"
+          test "$len" = "$SIZE" || { echo "::error::大小不一致"; exit 1; }
+          python3 - <<'EOF'
+          import json
+          p = "site/download/versions.json"; v = json.load(open(p, encoding="utf-8"))
+          v["${{ inputs.product }}"]["url_cn"] = open("cn_url.txt").read().strip()
+          open(p, "w", encoding="utf-8").write(json.dumps(v, ensure_ascii=False, indent=1) + "\n")
+          EOF
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add site/download/versions.json
+          git diff --cached --quiet && echo "url_cn unchanged" || { git commit -q -m "Round 175: China download address for ${{ inputs.product }} (OSS)"; git pull -q --rebase origin main; git push -q origin HEAD:main; }

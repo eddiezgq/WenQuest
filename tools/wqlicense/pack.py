@@ -121,8 +121,11 @@ def main():
         print(fn, round(len(data) / 1024), "KB", st)
     if a.wqcad:
         ver, url, mb, sha = a.wqcad
+        prev = versions.get("wqcad", {})
         versions["wqcad"] = {"version": ver, "url": url, "size": int(float(mb) * 1024 * 1024), "sha256": sha, "name": ["问渠 CAD", "WenQuest CAD"],
                              "date": dt.date.today().isoformat()}
+        if prev.get("url_cn") and prev.get("sha256") == sha:      # 国内地址（cn-oss.yml 写）同一个包才留
+            versions["wqcad"]["url_cn"] = prev["url_cn"]
     vf.write_text(json.dumps(versions, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 
