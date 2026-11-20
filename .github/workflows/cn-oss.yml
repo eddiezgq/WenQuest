@@ -44,7 +44,16 @@ jobs:
           python3 - <<'EOF'
           import os, oss2
           ep = os.environ["ENDPOINT"].strip().removeprefix("https://").removeprefix("http://").strip("/")
-          b = oss2.Bucket(oss2.Auth(os.environ["KID"].strip(), os.environ["KSEC"].strip()), "https://" + ep, os.environ["BUCKET"].strip())
+          auth = oss2.Auth(os.environ["KID"].strip(), os.environ["KSEC"].strip())
+          want = os.environ["BUCKET"].strip()
+          sp = lambda t: " ".join(t)          # 逐字隔开，日志不被遮成 ***（桶名、地域不是密钥）
+          print("endpoint:", sp(ep), "| bucket secret:", sp(want))
+          try:                                 # 诊断：这个账号能看到哪些桶
+              for x in oss2.BucketIterator(oss2.Service(auth, "https://" + ep)):
+                  print("visible bucket:", sp(x.name), sp(x.location), "MATCH" if x.name == want else "")
+          except Exception as e:
+              print("list buckets failed:", type(e).__name__, getattr(e, "code", ""), getattr(e, "ec", ""))
+          b = oss2.Bucket(auth, "https://" + ep, want)
           key = "wqcad/" + os.environ["NAME"]
           oss2.resumable_upload(b, key, "pkg.bin", part_size=64 * 1024 * 1024, num_threads=4,
                                 headers={"Content-Type": "application/octet-stream",
