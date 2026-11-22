@@ -1,6 +1,6 @@
 # 第 175 轮（11-22 Eddie：“我如何改回上海服务器”）：国内下载改放上海服务器——阿里云 OSS 返回 UserDisable。
 # 从 GitHub 发布版下安装包 → 核 SHA-256 → 传到国内服务器 /opt/wenquest/site/download/files/（Caddy 已在服务 site/，
-# 部署只解包覆盖、不删多出来的文件）→ 服务器上再核 SHA-256 → 公网取前 1 KB、核大小 → versions.json 的 url_cn 改成
+# 部署只解包覆盖、不删多出来的文件）→ 服务器上再核 SHA-256 → 公网取前 1 KB、核大小 → versions.json 的 url_cn_backup 记成（11-22 起 OSS 为主）
 # /download/files/文件名（国内站内地址）并提交。手动运行；先看磁盘，剩余不到 4 GB 不传。
 name: CN server file
 on:
@@ -75,7 +75,7 @@ jobs:
           python3 - <<'EOF'
           import json, os
           p = "site/download/versions.json"; v = json.load(open(p, encoding="utf-8"))
-          v["${{ inputs.product }}"]["url_cn"] = "/download/files/" + os.environ["NAME"]
+          v["${{ inputs.product }}"]["url_cn_backup"] = "/download/files/" + os.environ["NAME"]   # 11-22：OSS 为主，上海服务器备用
           open(p, "w", encoding="utf-8").write(json.dumps(v, ensure_ascii=False, indent=1) + "\n")
           EOF
           git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"

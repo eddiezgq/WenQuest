@@ -47,5 +47,27 @@
   "date": "2026-11-19",
   "url_cn": "https://wenquest-download.oss-cn-hangzhou.aliyuncs.com/wqcad/WenQuestCAD-0.3.0-beta-Setup.exe",
   "url_cn_backup": "/download/files/WenQuestCAD-0.3.0-beta-Setup.exe"
+ },
+ "wqfea": {
+  "version": "0.0.1-beta",
+  "url": "https://github.com/eddiezgq/wenquest-cad/releases/download/fea-v0.0.1-beta/WenQuest-FEA-Setup-0.0.1.exe",
+  "size": 502899618,
+  "sha256": "047d23928086cb1f868104c29d320b00ccfd9cc68a2fef8d6a3cc12c00d5502d",
+  "name": [
+   "问渠有限元",
+   "WenQuest FEA"
+  ],
+  "date": "2026-11-22"
+ },
+ "wqmbd": {
+  "version": "0.0.1-beta",
+  "url": "https://github.com/eddiezgq/wenquest-cad/releases/download/mbd-v0.0.1-beta/WenQuest-MBD-Setup-0.0.1.exe",
+  "size": 541380957,
+  "sha256": "d8ab1a89f0d6c487eb27812c38e8eff0414e7e9a6100ce3f76e05f5856b5b109",
+  "name": [
+   "问渠多体动力学",
+   "WenQuest MBD"
+  ],
+  "date": "2026-11-22"
  }
 }

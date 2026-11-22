@@ -54,7 +54,7 @@ jobs:
           except Exception as e:
               print("list buckets failed:", type(e).__name__, getattr(e, "code", ""), getattr(e, "ec", ""))
           b = oss2.Bucket(auth, "https://" + ep, want)
-          key = "wqcad/" + os.environ["NAME"]
+          key = "${{ inputs.product }}/" + os.environ["NAME"]
           oss2.resumable_upload(b, key, "pkg.bin", part_size=64 * 1024 * 1024, num_threads=4,
                                 headers={"Content-Type": "application/octet-stream",
                                          "Content-Disposition": 'attachment; filename="%s"' % os.environ["NAME"]})
