@@ -313,7 +313,8 @@ def crank(half_deg):
     body = body.cut(Part.makeCylinder(8.5, t + 2, V(x0 - 1, 0, ZU), V(1, 0, 0)))          # 轴孔 Ø17（F 版）
     body = body.cut(hole(*C0, PIN_R, x0, t))                                               # 销孔 Ø10 压配
     for p_, u_ in CRANK_SCREWS:                                                            # 紧定螺钉 SMS 15/64-28 × 8 ×2（G8.0 第 7 步，原 M5）
-        body = body.cut(tap("15/64-28", p_ - u_ * (X["R_cw"] - 16.5 + 1.0), u_, X["R_cw"] - 8.5 + 1.0))   # 螺孔从平衡块外圆通到轴孔，扳手从外面伸进去
+        body = body.cut(tap("15/64-28", p_ - u_ * (X["R_cw"] - 16.5 + 1.0), u_, X["R_cw"] - 8.5 + 4.0))   # 螺孔从平衡块外圆通到轴孔，扳手从外面伸进去
+        # 第 178 轮：原来孔底正好停在轴孔圆柱面上（只相切一条线），留下零厚度的薄边，有限元划出坏单元；多钻 3 mm 进轴孔，真正打通
     # 曲柄销固定（第 7 项）：SML 9/64-40 × 8 左旋，从曲柄背面沿销轴线拧进销端；背面沉孔 Ø7.5 × 2.5、通孔 Ø3.9
     yc, zc = W(*C0)
     body = body.cut(Part.makeCylinder(3.75, 3.0, V(x1 - 2.5, yc, zc), V(1, 0, 0))).cut(Part.makeCylinder(1.95, 10, V(x0, yc, zc), V(1, 0, 0)))
