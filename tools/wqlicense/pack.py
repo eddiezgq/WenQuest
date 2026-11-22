@@ -103,14 +103,17 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--version", default=dt.date.today().strftime("%Y.%m.%d"))
     ap.add_argument("--wqcad", nargs=4, metavar=("VERSION", "URL", "SIZE_MB", "SHA256"))
+    ap.add_argument("--installer", nargs=5, metavar=("KEY", "VERSION", "URL", "SIZE_MB", "SHA256"),
+                    help="第 177 轮：问渠有限元（wqfea）、问渠多体动力学（wqmbd）等单独的 Windows 安装包")
     a = ap.parse_args()
     files = OUT / "files"
     files.mkdir(parents=True, exist_ok=True)
     vf = OUT / "versions.json"
     versions = json.loads(vf.read_text(encoding="utf-8")) if vf.exists() else {}
-    for old in files.glob("*-freecad-*.zip*"):
+    only_reg = bool(a.wqcad or a.installer)          # 只登记安装包时不重打工作台
+    for old in ([] if only_reg else files.glob("*-freecad-*.zip*")):
         old.unlink()
-    for key, (zh, en, raw) in sources().items():
+    for key, (zh, en, raw) in ({} if only_reg else sources()).items():
         data, st = protect(raw, zh)
         fn = f"wenquest-{key}-freecad-{a.version}.zip"
         (files / fn).write_bytes(data)
@@ -124,8 +127,18 @@ def main():
         prev = versions.get("wqcad", {})
         versions["wqcad"] = {"version": ver, "url": url, "size": int(float(mb) * 1024 * 1024), "sha256": sha, "name": ["问渠 CAD", "WenQuest CAD"],
                              "date": dt.date.today().isoformat()}
-        if prev.get("url_cn") and prev.get("sha256") == sha:      # 国内地址（cn-oss.yml 写）同一个包才留
-            versions["wqcad"]["url_cn"] = prev["url_cn"]
+        for k in ("url_cn", "url_cn_backup"):                   # 国内地址（cn-oss.yml / cn-server-file.yml 写）同一个包才留
+            if prev.get(k) and prev.get("sha256") == sha:
+                versions["wqcad"][k] = prev[k]
+    if a.installer:
+        key, ver, url, mb, sha = a.installer
+        names = {"wqfea": ["问渠有限元", "WenQuest FEA"], "wqmbd": ["问渠多体动力学", "WenQuest MBD"]}
+        prev = versions.get(key, {})
+        versions[key] = {"version": ver, "url": url, "size": int(float(mb) * 1024 * 1024), "sha256": sha,
+                         "name": names.get(key, [key, key]), "date": dt.date.today().isoformat()}
+        for k in ("url_cn", "url_cn_backup"):
+            if prev.get(k) and prev.get("sha256") == sha:
+                versions[key][k] = prev[k]
     vf.write_text(json.dumps(versions, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 

@@ -113,7 +113,8 @@ def render(region: str = "us", footer: str = "", head: str = "") -> str:
     learn = 'https://learn.{{env "SITE_DOMAIN"}}' if cn else "https://learn.wenquestrobotics.com"   # 国内页走 Caddy 模板，和国内官网其他页一样
     course_btn = (f'<a class="btn" href="{learn}/static/help/wqcad/">培训课程</a>' if cn else
                   f'<a class="btn" data-zh href="{learn}/static/help/wqcad/">培训课程</a><a class="btn" data-en href="{learn}/static/help/wqcad/en/">Training course</a>')
-    cad_note = (T("· 国内下载地址开通后放在这里", "· download link for China coming soon") if cn else "")
+    cad_note = ""
+    online = lambda path: f"{learn}{path}"
     return f"""<!doctype html>
 <html lang="{'zh-CN' if cn else 'en'}">
 <head>
@@ -163,6 +164,24 @@ def render(region: str = "us", footer: str = "", head: str = "") -> str:
 <p>{T("盘形、圆柱凸轮设计校核，加工程序，测量与补偿，凸轮系统。", "Disc and cylindrical cam design and checks, machining programs, measurement and compensation, cam systems.")}</p>
 <div class="meta" data-meta></div><div class="sha" data-sha></div>
 <div class="row"><a class="btn pri" data-dl hidden>{T("下载", "Download")}</a><a class="btn" href="#tut-wb">{T("安装教程", "Install guide")}</a></div></div>
+<div class="card" data-key="wqfea"><h3>{T("问渠有限元", "WenQuest FEA")} <span class="tag">Windows 10/11 64 位</span></h3>
+<p>{T("零件静力分析：建算例、Gmsh 划网格、CalculiX 求解，自动做网格收敛、反力平衡、奇异点三项核查，通过了才给安全系数；带验证手册和入门例子。免费版不用授权码；出报告、AI 一句话起草等专业版功能暂不开放。",
+      "Static analysis of parts: set up the case, Gmsh mesh, CalculiX solve, then automatic checks (mesh convergence, reaction balance, singularities) before a safety factor is given; verification manual and examples included. The free edition needs no licence code; Pro features (reports, AI drafting) are not open yet.")}</p>
+<div class="meta" data-meta>{T("安装包准备中", "Installer being built")}</div><div class="sha" data-sha></div>
+<div class="row"><a class="btn pri" data-dl hidden>{T("下载", "Download")}</a><a class="btn" href="#tut-cad">{T("安装教程", "Install guide")}</a></div></div>
+<div class="card" data-key="wqmbd"><h3>{T("问渠多体动力学", "WenQuest MBD")} <span class="tag">Windows 10/11 64 位</span></h3>
+<p>{T("机构运动学与动力学：直接读装配体的零件和关节，给驱动，算驱动力矩、运动副受力、速度加速度，先核查约束残差、自由度、能量再给结果。免费版不用授权码；专业版功能暂不开放。",
+      "Kinematics and dynamics of mechanisms: reads the assembly's parts and joints, add drives, get drive torques, joint forces, velocities and accelerations, with checks (constraint residual, degrees of freedom, energy) before results. The free edition needs no licence code; Pro features are not open yet.")}</p>
+<div class="meta" data-meta>{T("安装包准备中", "Installer being built")}</div><div class="sha" data-sha></div>
+<div class="row"><a class="btn pri" data-dl hidden>{T("下载", "Download")}</a><a class="btn" href="#tut-cad">{T("安装教程", "Install guide")}</a></div></div>
+<div class="card"><h3>{T("白板课", "Whiteboard lessons")} <span class="tag">{T("在线使用", "Online")}</span></h3>
+<p>{T("输入题目或上传录音，AI 画出会动的白板讲解，出网页和视频；老师在平台上编辑、发给学生。不用下载，登录学习平台就能用。",
+      "Type a topic or upload a recording and AI draws an animated whiteboard explanation, as a web page and a video; teachers edit and share it on the platform. Nothing to download; sign in to the learning platform.")}</p>
+<div class="row"><a class="btn pri" href="{online('/pages/whiteboard/whiteboard')}">{T("打开", "Open")}</a></div></div>
+<div class="card"><h3>{T("三维仿真视频", "3-D simulation videos")} <span class="tag">{T("在线使用", "Online")}</span></h3>
+<p>{T("机构、零件、工作场景的三维讲解视频，在平台上做、在平台上看。不用下载，登录学习平台就能用。",
+      "3-D explainer videos of mechanisms, parts and work scenes, made and watched on the platform. Nothing to download; sign in to the learning platform.")}</p>
+<div class="row"><a class="btn pri" href="{online('/pages/video3d/video3d')}">{T("打开", "Open")}</a></div></div>
 </div>
 <p class="note">{T("问渠轴承和问渠凸轮装在同一个“问渠”工作台里，两个都装时后装的覆盖先装的，功能都在。", "Bearing and Cam share one “WenQuest” workbench; installing both is fine.")}</p>
 {tutorials(region)}
