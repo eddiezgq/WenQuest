@@ -1,0 +1,83 @@
+# 第 175 轮（11-22 Eddie：“我如何改回上海服务器”）：国内下载改放上海服务器——阿里云 OSS 返回 UserDisable。
+# 从 GitHub 发布版下安装包 → 核 SHA-256 → 传到国内服务器 /opt/wenquest/site/download/files/（Caddy 已在服务 site/，
+# 部署只解包覆盖、不删多出来的文件）→ 服务器上再核 SHA-256 → 公网取前 1 KB、核大小 → versions.json 的 url_cn 改成
+# /download/files/文件名（国内站内地址）并提交。手动运行；先看磁盘，剩余不到 4 GB 不传。
+name: CN server file
+on:
+  workflow_dispatch:
+    inputs:
+      product:
+        description: versions.json 里的产品键
+        default: wqcad
+permissions:
+  contents: write
+concurrency: cn-server-file
+jobs:
+  upload:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      HOST: ${{ secrets.CN_DEPLOY_HOST }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read versions.json
+        id: src
+        run: |
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json
+          it = json.load(open("site/download/versions.json"))["${{ inputs.product }}"]
+          print("url=" + it["url"]); print("sha=" + it["sha256"].lower()); print("size=" + str(it["size"]))
+          print("name=" + it["url"].rsplit("/", 1)[1])
+          EOF
+      - name: Fetch package
+        run: |
+          curl -sSL --retry 3 -o pkg.bin "${{ steps.src.outputs.url }}"
+          echo "${{ steps.src.outputs.sha }}  pkg.bin" | sha256sum -c -
+          ls -l pkg.bin
+      - name: Set up SSH
+        run: |
+          test -n "$HOST" || { echo "::error::CN_DEPLOY_HOST 没设"; exit 1; }
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.CN_DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts
+          fi
+      - name: Disk check
+        run: |
+          free_kb=$(ssh "deploy@$HOST" "df -Pk /opt/wenquest | awk 'NR==2{print \$4}'")
+          echo "free: $((free_kb/1024)) MB"
+          test "$free_kb" -gt 4194304 || { echo "::error::国内服务器剩余磁盘不到 4 GB，不传"; exit 1; }
+      - name: Upload (resumable)
+        env:
+          NAME: ${{ steps.src.outputs.name }}
+          SHA: ${{ steps.src.outputs.sha }}
+        run: |
+          ssh "deploy@$HOST" "mkdir -p /opt/wenquest/site/download/files"
+          for i in 1 2 3 4 5; do
+            rsync -a --partial --inplace --timeout=300 -e ssh pkg.bin "deploy@$HOST:/opt/wenquest/site/download/files/$NAME.part" && break
+            echo "retry $i"; sleep 20
+          done
+          ssh "deploy@$HOST" "cd /opt/wenquest/site/download/files && echo '$SHA  $NAME.part' | sha256sum -c - && mv -f '$NAME.part' '$NAME' && chmod 644 '$NAME' && ls -l '$NAME'"
+      - name: Check public download and record url_cn
+        env:
+          NAME: ${{ steps.src.outputs.name }}
+          SIZE: ${{ steps.src.outputs.size }}
+        run: |
+          D=$(ssh "deploy@$HOST" 'grep -E "^SITE_DOMAIN=" /opt/wenquest/.env | tail -n1 | cut -d= -f2-')
+          U="https://$D/download/files/$NAME"
+          code=$(ssh "deploy@$HOST" "curl -s -o /dev/null -w '%{http_code}' -r 0-1023 --resolve '$D:443:127.0.0.1' '$U'"); echo "range GET: $code"
+          test "$code" = 206 -o "$code" = 200 || { echo "::error::服务器上取不到（$code）"; exit 1; }
+          len=$(ssh "deploy@$HOST" "curl -sI --resolve '$D:443:127.0.0.1' '$U'" | tr -d '\r' | awk 'tolower($1)=="content-length:"{print $2}'); echo "size $len / $SIZE"
+          test "$len" -ge 1 || { echo "::error::没取到大小"; exit 1; }
+          python3 - <<'EOF'
+          import json, os
+          p = "site/download/versions.json"; v = json.load(open(p, encoding="utf-8"))
+          v["${{ inputs.product }}"]["url_cn"] = "/download/files/" + os.environ["NAME"]
+          open(p, "w", encoding="utf-8").write(json.dumps(v, ensure_ascii=False, indent=1) + "\n")
+          EOF
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add site/download/versions.json
+          git diff --cached --quiet && echo "url_cn unchanged" || { git commit -q -m "Round 175: China download for ${{ inputs.product }} from the Shanghai server"; git pull -q --rebase origin main; git push -q origin HEAD:main; }
