@@ -54,7 +54,7 @@ def tutorials(region: str) -> str:
               T("AI 功能要一个模型密钥：在美国设 <kbd>ANTHROPIC_API_KEY</kbd>，在国内设 <kbd>DEEPSEEK_API_KEY</kbd>（软件按地区自动切换）。",
                 "AI features need a model key: <kbd>ANTHROPIC_API_KEY</kbd> in the US, <kbd>DEEPSEEK_API_KEY</kbd> in China (switched automatically by region)."))
     return f"""
-<h2 id="tut-cad">{T("安装教程 · 问渠 CAD（Windows）", "Install guide · WenQuest CAD (Windows)")}</h2>
+<h2 id="tut-cad">{T("安装教程 · 问渠 CAD、问渠有限元、问渠多体动力学（Windows）", "Install guide · WenQuest CAD, FEA, MBD (Windows)")}</h2>
 <div class="tut">
 <h3>{T("电脑要求", "Requirements")}</h3>
 <p>{T("Windows 10 / 11（64 位）；内存 8 GB 以上（16 GB 更好）；硬盘留 8 GB；首次打开 AI 功能要联网。",
@@ -62,13 +62,30 @@ def tutorials(region: str) -> str:
 <h3>{T("安装", "Install")}</h3>
 <ol>
 <li>{T("下载 <b>WenQuestCAD-…-Setup.exe</b>（约 1.4 GB）。可以用页面上的校验码核对文件是否完整。", "Download <b>WenQuestCAD-…-Setup.exe</b> (about 1.4 GB); you can check it against the SHA-256 shown.")}</li>
-<li>{T("双击运行。Windows 可能提示“已保护你的电脑 / 未知发布者”（测试版没有购买代码签名证书）：点<b>更多信息 → 仍要运行</b>。",
-      "Run it. Windows may say “Windows protected your PC / unknown publisher” (the beta has no code-signing certificate): click <b>More info → Run anyway</b>.")}</li>
+<li>{T("双击运行。测试版没有买代码签名证书，Windows 多半会拦一下——照下面“<a href=\"#unblock\">Windows 不让装怎么办</a>”一步步做，几分钟就能装上。",
+      "Run it. The beta has no code-signing certificate, so Windows will probably stop it once — follow “<a href=\"#unblock\">Windows won't let me install</a>” below; it takes a few minutes.")}</li>
 <li>{T("选语言 → 同意使用说明与许可 → 选安装位置（默认即可）→ 安装，约 3–5 分钟。", "Pick a language → accept the terms → choose a folder (the default is fine) → Install, about 3–5 minutes.")}</li>
 <li>{T("装完桌面上有<b>问渠 CAD</b>，双击打开；窗口标题是 “WenQuest CAD 1.1.4”。", "A <b>WenQuest CAD</b> shortcut appears on the desktop; the window title reads “WenQuest CAD 1.1.4”.")}</li>
-<li>{T("如果双击后没反应：可能是 Windows 的“智能应用控制”拦下了（Windows 安全中心 → 应用和浏览器控制 → 智能应用控制）。公司电脑请联系管理员。",
-      "If nothing happens on double-click, Windows Smart App Control may be blocking it (Windows Security → App &amp; browser control → Smart App Control); on a managed PC ask your administrator.")}</li>
 </ol>
+<h3 id="unblock">{T("Windows 不让装怎么办（按你看到的提示找）", "Windows won't let me install (find the message you see)")}</h3>
+<ol>
+<li><b>{T("浏览器下载完就提示“通常不会下载此文件 / 可能有害”", "The browser says the file “isn't commonly downloaded / might be harmful”")}</b><br>
+{T("Edge：在下载列表里这个文件右边点 <b>…</b> → <b>保留</b> → 再点 <b>显示详细信息</b> → <b>仍然保留</b>。Chrome：点 <b>保留</b>。",
+   "Edge: in the downloads list click <b>…</b> next to the file → <b>Keep</b> → <b>Show more</b> → <b>Keep anyway</b>. Chrome: click <b>Keep</b>.")}</li>
+<li><b>{T("双击后蓝色框“Windows 已保护你的电脑”", "Blue box “Windows protected your PC”")}</b><br>
+{T("先点框里的小字 <b>更多信息</b>，下面才会出现 <b>仍要运行</b> 按钮，点它。", "Click the small <b>More info</b> link first; a <b>Run anyway</b> button appears — click it.")}</li>
+<li><b>{T("框里只有“不运行 / 确定”，没有“仍要运行”", "Only “Don't run / OK”, no “Run anyway”")}</b><br>
+{T("在下载文件夹里<b>右键</b>安装包 → <b>属性</b> → “常规”页最下面勾上 <b>解除锁定</b> → <b>确定</b>，再双击。",
+   "In the downloads folder <b>right-click</b> the installer → <b>Properties</b> → at the bottom of the General tab tick <b>Unblock</b> → <b>OK</b>, then double-click again.")}</li>
+<li><b>{T("提示“智能应用控制已阻止此应用”，或者双击没有任何反应", "“Smart App Control blocked this app”, or nothing happens")}</b><br>
+{T("这是 Windows 11 的“智能应用控制”，它只放行有签名的软件。打开 <b>Windows 安全中心</b> → <b>应用和浏览器控制</b> → <b>智能应用控制设置</b> → 选 <b>关闭</b>，再装。注意：在不少 Windows 11 版本上，关掉后不能自己再打开（要重装系统才能恢复）；介意的话先别关，等有签名的正式版。",
+   "This is Windows 11 Smart App Control, which only allows signed software. Open <b>Windows Security</b> → <b>App &amp; browser control</b> → <b>Smart App Control settings</b> → <b>Off</b>, then install. Note: on many Windows 11 versions it cannot be turned back on without reinstalling Windows; if that matters to you, wait for the signed release.")}</li>
+<li><b>{T("杀毒软件报毒，或者安装包不见了", "The antivirus flags it, or the installer disappears")}</b><br>
+{T("Windows 自带的：<b>Windows 安全中心</b> → <b>病毒和威胁防护</b> → <b>保护历史记录</b> → 点这条记录 → <b>操作</b> → <b>还原</b>（或“允许”）。别的杀毒软件在它的“隔离区 / 信任区”里恢复并信任。可以先用页面上的 SHA-256 核对文件没被改过（PowerShell：<kbd>Get-FileHash 文件名</kbd>）。",
+   "Windows Defender: <b>Windows Security</b> → <b>Virus &amp; threat protection</b> → <b>Protection history</b> → open the entry → <b>Actions</b> → <b>Restore</b> (or Allow). Other antivirus: restore it from quarantine and trust it. You can first check the file against the SHA-256 on this page (PowerShell: <kbd>Get-FileHash file</kbd>).")}</li>
+<li><b>{T("公司或学校的电脑", "Company or school computer")}</b><br>{T("这类电脑常常不准装没签名的软件，请找管理员。", "These often block unsigned software; ask your administrator.")}</li>
+</ol>
+<p class="note">{T("问渠有限元、问渠多体动力学的安装包也一样，照上面做。", "The same applies to the WenQuest FEA and WenQuest MBD installers.")}</p>
 <h3>{T("输入授权码", "Enter the licence code")}</h3>
 <ol>
 <li>{T("在本页“领取一年测试授权”里复制授权码。", "Copy your code from “Get a one-year beta licence” on this page.")}</li>
