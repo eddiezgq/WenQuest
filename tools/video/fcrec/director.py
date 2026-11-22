@@ -66,7 +66,7 @@ class Director:
         self.mw = Gui.getMainWindow()
         self.pos = QtCore.QPoint(800, 450)
         QtGui.QCursor.setPos(self.pos)
-        for f in ("clicks.txt", "subs.txt"):
+        for f in ("clicks.txt", "subs.txt", "skips.txt"):
             p = os.path.join(REC, f)
             if os.path.exists(p):
                 os.remove(p)
@@ -298,6 +298,12 @@ class Director:
             put()
         return int(wait * 1000)
 
+    def skip(self, on):
+        """录像里跳过一段（等计算这类干等）：skip(True) 开始，skip(False) 结束；rings.py 剪掉这段，字幕、点击时间跟着前移"""
+        with open(os.path.join(REC, "skips.txt"), "a") as f:
+            f.write(f"{'start' if on else 'end'}\t{time.time():.3f}\n")
+        return 0
+
     def read_out(self):
         """剧本结尾：yield d.read_out()，等最后一条字幕显示够"""
         return int(max(0.0, getattr(self, "_say_until", 0.0) - time.time()) * 1000) + 300
@@ -340,6 +346,10 @@ def menu_path(d, *names):
     yield d.move(p, 800)
     d.click(p)
     yield 700
+    if not [m for m in QtWidgets.QApplication.topLevelWidgets() if isinstance(m, QtWidgets.QMenu) and m.isVisible()]:
+        log("menu retry", names[0])          # 菜单没弹出来（刚关掉任务面板时偶尔这样）：再点一次
+        d.click(p)
+        yield 700
     for name in names[1:]:
         menus = [m for m in QtWidgets.QApplication.topLevelWidgets() if isinstance(m, QtWidgets.QMenu) and m.isVisible()]
         hit = [(m, a) for m in reversed(menus) for a in m.actions() if norm(a.text()).startswith(name)]   # 子菜单：哪个弹出菜单里有这一项

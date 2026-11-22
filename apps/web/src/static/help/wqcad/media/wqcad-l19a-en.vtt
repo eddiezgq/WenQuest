@@ -1,0 +1,46 @@
+WEBVTT
+
+00:00:02.778 --> 00:00:11.702
+Lesson 16 found: at 5000 rpm the crank-pin force peaks at about 752 N. Now WenQuest FEA checks whether the needle-bar crank can take it
+
+00:00:11.702 --> 00:00:20.701
+The part is the needle-bar crank; ForceDirection and SpinAxis are helper lines: pin centre to shaft centre, and the upper-shaft axis
+
+00:00:20.701 --> 00:00:32.284
+Switch to the FEM workbench and create an Analysis
+
+00:00:32.284 --> 00:00:44.284
+Constraint 1: fix the shaft bore. Fixed boundary condition, Add, click the bore surface, OK
+
+00:00:45.802 --> 00:00:57.802
+Load 1: the crank-pin force. Force load, add the pin-hole face, 752.5 N; direction: select the ForceDirection line, click Direction
+
+00:01:11.502 --> 00:01:23.502
+Load 2: centrifugal. Centrifugal load, mode Solid, add the crank; axis: the SpinAxis line; 83.333 Hz (5000 rpm)
+
+00:01:37.152 --> 00:01:47.702
+No need to set up mesh or solver. Click Compute and check: for a hand-built analysis, pick the material first — library values have sources, listed in the report
+
+00:01:47.702 --> 00:01:54.201
+Pick 45-QT: steel 45, quenched and tempered, yield strength 355 MPa
+
+00:01:54.201 --> 00:02:03.376
+It meshes by itself, refines level by level to see if results converge, and checks that reactions balance the loads. Takes a minute or two
+
+00:02:03.376 --> 00:02:10.702
+If a check fails, no safety factor is given — better to say “unknown” than report a number that may be wrong
+
+00:02:10.702 --> 00:02:14.200
+(About 1 min on this computer — skipped in the video)
+
+00:02:14.200 --> 00:02:22.625
+Done: overall trust verdict “pass”
+
+00:02:22.625 --> 00:02:27.626
+Stress (von Mises): max about 8.4 MPa
+
+00:02:27.626 --> 00:02:34.725
+Safety factor = yield 355 ÷ 8.4 ≈ 42: plenty of margin. To lighten it or switch to aluminium, compute again
+
+00:02:34.725 --> 00:02:46.725
+All four checks pass: reaction balance, mesh quality, convergence of max stress and displacement (levels within 0.2%). Details go into the report: next part

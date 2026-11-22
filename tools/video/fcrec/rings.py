@@ -29,6 +29,37 @@ clicks and subprocess.run(["ffmpeg", "-loglevel", "error", "-y", *inputs, "-filt
                 "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", out], check=True)
 print("rings", len(clicks))
 
+# 跳过的段（skips.txt：start / end 各一行，epoch 秒）：剪掉，后面的字幕时间前移
+skf = R / "skips.txt"
+cuts = []
+if skf.exists():
+    rows = [l.split("\t") for l in skf.read_text().splitlines() if l.strip()]
+    st = None
+    for k, t in rows:
+        if k == "start":
+            st = float(t) - t0
+        elif st is not None:
+            cuts.append((st, float(t) - t0))
+            st = None
+if cuts:
+    keep = "*".join(f"not(between(t,{a:.2f},{b:.2f}))" for a, b in cuts)
+    tmp = str(Path(out).with_suffix(".cut.mp4"))
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", out, "-vf", f"select='{keep}',setpts=N/FRAME_RATE/TB", "-an",
+                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", tmp], check=True)
+    os.replace(tmp, out)
+    print("cuts", [(round(a, 1), round(b, 1)) for a, b in cuts])
+
+
+def shift(x):
+    """原录像时间 → 剪过以后的时间"""
+    d = 0.0
+    for a, b in cuts:
+        if x >= b:
+            d += b - a
+        elif x > a:
+            d += x - a
+    return x - d
+
 # 字幕：subs.txt（时间\t文字）→ 与成片同名的 .vtt；每条显示到下一条开始（最长 6 秒），文字为空表示收起
 subs = R / "subs.txt"
 if subs.exists():
@@ -41,8 +72,8 @@ if subs.exists():
         return f"{int(x // 3600):02d}:{int(x % 3600 // 60):02d}:{x % 60:06.3f}"
     cues = []
     for i, (t, txt) in enumerate(rows):
-        a = float(t) - t0
-        b = float(rows[i + 1][0]) - t0 if i + 1 < len(rows) else dur
+        a = shift(float(t) - t0)
+        b = shift(float(rows[i + 1][0]) - t0) if i + 1 < len(rows) else dur
         b = min(b, a + 12.0, dur)
         if txt.strip() and b > a:
             cues.append(f"{ts(a)} --> {ts(b)}\n{txt.strip()}")

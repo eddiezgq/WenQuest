@@ -1,0 +1,40 @@
+WEBVTT
+
+00:00:09.051 --> 00:00:15.283
+The analysis is done and the checks pass. To keep a record or have it reviewed, write a report
+
+00:00:15.283 --> 00:00:19.432
+Select the Analysis, menu Solve → Report (parts library)
+
+00:00:19.432 --> 00:00:25.536
+Report language: Chinese or English (same numbers, different text)
+
+00:00:25.536 --> 00:00:31.583
+The report number comes from your quality system and may be left empty; here we fill one in
+
+00:00:31.583 --> 00:00:38.133
+Revision A, reason “first issue”: keep the defaults, OK
+
+00:00:38.133 --> 00:00:48.633
+It asks whether AI should write “interpretation and advice”: the numbers are filled in by the program and AI never decides pass/fail. No AI in this lesson: No
+
+00:00:48.633 --> 00:00:55.811
+The report is written: a Word file, plus a PDF because LibreOffice is installed
+
+00:00:55.811 --> 00:01:03.107
+Let's open it. Page 1: summary — max stress, safety factor, trust; below, the part and material (with sources)
+
+00:01:03.107 --> 00:01:11.307
+Constraints, loads, steps; then mesh and trust checks: max stress and displacement on three mesh levels, a verdict for each
+
+00:01:11.307 --> 00:01:15.642
+Results: stress and displacement plots
+
+00:01:15.642 --> 00:01:23.632
+No AI explanation, so that section is empty; then limitations and a review checklist — check item by item before signing
+
+00:01:23.632 --> 00:01:28.632
+Finally traceability: program versions, file fingerprints, revision history
+
+00:01:28.632 --> 00:01:35.600
+Reports are a Pro feature; the free edition computes and shows results and checks

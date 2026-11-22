@@ -12,7 +12,7 @@ for i in $(seq 1 300); do [ -f $WQ_REC/ready.flag ] && break; sleep 0.2; done
 date +%s.%N > $WQ_REC/t0.txt
 ffmpeg -loglevel error -y -f x11grab -draw_mouse 1 -framerate 25 -video_size 1600x900 -i $DISPLAY -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p "${2%.mp4}_raw.mp4" &
 FF=$!
-for i in $(seq 1 1500); do [ -f $WQ_REC/end.flag ] && break; sleep 0.2; done
+for i in $(seq 1 4500); do [ -f $WQ_REC/end.flag ] && break; sleep 0.2; done
 sleep 1.2; kill -INT $FF; wait $FF; kill -9 $FCPID 2>/dev/null; pkill -9 -f squashfs-root/usr/bin/freecad
 cat $WQ_REC/director.log
 python3 "$H/rings.py" "${2%.mp4}_raw.mp4" "$2"
