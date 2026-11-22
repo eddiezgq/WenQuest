@@ -270,6 +270,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l19-goal" data-s="l19">What you will be able to do</a>
 <a class="sub" href="#l19-run" data-s="l19">Hand-built analysis, compute and check</a>
 <a class="sub" href="#l19-report" data-s="l19">Report</a>
+<a class="sub" href="#l19-ai" data-s="l19">Draft from one sentence (AI)</a>
 <a class="sub" href="#l19-do" data-s="l19">Follow along</a>
 <a class="sub" href="#l19-self" data-s="l19">On your own</a>
 <a class="sub" href="#l19-quiz" data-s="l19">Quiz</a>
@@ -1825,7 +1826,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">What are the deviations of ⌀8 h5?</p><div class="opts"><button type="button" data-k="a">A. +0.006 / 0</button><button type="button" data-k="b">B. 0 / −0.006</button><button type="button" data-k="c">C. ±0.003</button><button type="button" data-k="d">D. 0 / −0.009</button></div><p class="why" hidden>The upper deviation of h is 0; IT5 for 6–10 mm is 6 µm, so the lower deviation is −0.006.</p></div>
 <div class="quiz" data-ok="b"><p class="q">A part in the assembly is replaced. What happens to the parts list on the drawing?</p><div class="opts"><button type="button" data-k="a">A. Edit it by hand</button><button type="button" data-k="b">B. It updates on recompute</button><button type="button" data-k="c">C. Nothing</button><button type="button" data-k="d">D. Insert it again</button></div><p class="why" hidden>The parts list comes from the Bill of Materials, which follows the assembly.</p></div>
 <div class="quiz" data-ok="b"><p class="q">Which format do you usually send to the shop?</p><div class="opts"><button type="button" data-k="a">A. FCStd</button><button type="button" data-k="b">B. PDF</button><button type="button" data-k="c">C. STL</button><button type="button" data-k="d">D. STEP</button></div><p class="why" hidden>Anyone can open and print a PDF; DXF is for other CAD systems; STEP is the 3D model.</p></div></section>
-<section id="l19"><h2><span class="n">19</span>Lesson 19 FEA: WenQuest FEA — hand-built analysis, compute and check, report</h2><p class="lead">You will be able to add fixed, force and centrifugal loads to a part in the FEM workbench; run WenQuest FEA's Compute and check — pick a library material, and the program meshes by itself, refines to test convergence and checks that reactions balance the loads, giving a safety factor only when every check passes; read the stress plot; and write a Word / PDF calculation report. Using the crank-pin force from lesson 16 (WenQuest MBD), you compute the stress in the needle-bar crank at 5000 rpm. About 1.5 hours.</p><h3 id="l19-goal">What you will be able to do</h3>
+<section id="l19"><h2><span class="n">19</span>Lesson 19 FEA: WenQuest FEA — hand-built analysis, compute and check, report</h2><p class="lead">You will be able to add fixed, force and centrifugal loads to a part in the FEM workbench; run WenQuest FEA's Compute and check — pick a library material, and the program meshes by itself, refines to test convergence and checks that reactions balance the loads, giving a safety factor only when every check passes; read the stress plot; and write a Word / PDF calculation report; and draft a study from one sentence with AI, computed only after a person reads the questions and confirms. Using the crank-pin force from lesson 16 (WenQuest MBD), you compute the stress in the needle-bar crank at 5000 rpm. About 1.5 hours.</p><h3 id="l19-goal">What you will be able to do</h3>
 <ul>
 <li>Create an analysis: FEM workbench, Model → New Analysis.</li>
 <li>Constraints and loads: fixed (faces), force (faces, magnitude and direction), centrifugal (solid, axis and speed).</li>
@@ -1853,6 +1854,14 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>If you change constraints or loads after computing, the report is refused: run Compute and check again first.</li>
 <li>Reports are a Pro feature; the free edition computes and shows results and checks.</li>
 </ul>
+<h3 id="l19-ai">Draft from one sentence (AI)</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l19c.jpg"><source src="../media/wqcad-l19c.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l19c.vtt"></video><figcaption>▶ Screen recording: WenQuest FEA example 02, shoulder hollow shaft RJ-201 → Draft from one sentence (AI, recorded replay) → read the questions, confirm the study → Compute and check: max stress does not converge, overall “fail”, no safety factor (about 2 min; the computing wait is cut)</figcaption></figure>
+<ul>
+<li>The sentence must give the part, material, how it is held and the loads (numbers and units). AI turns it into FEM constraints, loads and material; the program checks each item (faces found, units, material in the library). What the AI is unsure of is listed as questions; what the program rejects is listed as not adopted.</li>
+<li>A person reads the questions, fixes things in FEM or decides they are not needed, ticks “questions handled”, enters a name and clicks Confirm study. An unconfirmed AI draft cannot be computed.</li>
+<li>In the recording the AI reply is a recorded replay of a real model call (the panel says “replay”); the sentence is in Chinese because that is what was recorded. To use it yourself you need an AI key (Claude in the US, DeepSeek in China). Drafting from one sentence is a Pro feature.</li>
+<li>Result of this example: reaction balance, mesh quality and displacement convergence pass, but max stress keeps rising with refinement — a suspected singularity at the sharp corner of the step — so the overall verdict is “fail” and no safety factor is given. That is correct: a peak at a sharp corner is not a design basis; add a fillet or read the stress away from the corner.</li>
+</ul>
 <h3 id="l19-do">Follow along</h3>
 <ol class="steps">
 <li>Open the course file NeedleBarCrank, switch to the FEM workbench, Model → New Analysis.</li>
@@ -1862,6 +1871,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>Solve → Compute and check (parts library), pick 45-QT, wait; read the overall trust verdict in the message.</li>
 <li>Look at the stress plot and compare: max about 8.4 MPa, safety factor about 42.</li>
 <li>Select the analysis, Solve → Report (parts library), enter a number, no AI, open the Word / PDF.</li>
+<li>(With an AI key) new file, import a part, select it, Solve → Draft from one sentence (AI), write a sentence like the one in the video, read the questions, confirm, compute.</li>
 </ol>
 
 <h3 id="l19-self">On your own</h3>
@@ -1873,6 +1883,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <h3 id="l19-quiz">Quiz</h3>
 <div class="quiz" data-ok="b"><p class="q">What rotation frequency is 5000 rpm for the centrifugal load?</p><div class="opts"><button type="button" data-k="a">A. 5000 Hz</button><button type="button" data-k="b">B. 83.333 Hz</button><button type="button" data-k="c">C. 523.6 Hz</button><button type="button" data-k="d">D. 13.9 Hz</button></div><p class="why" hidden>Frequency is revolutions per second: 5000 ÷ 60 = 83.333 Hz. 523.6 is the angular speed in rad/s.</p></div>
 <div class="quiz" data-ok="b"><p class="q">What happens if the mesh-convergence check fails?</p><div class="opts"><button type="button" data-k="a">A. A safety factor is still given</button><button type="button" data-k="b">B. No safety factor; the overall verdict is not “pass”</button><button type="button" data-k="c">C. The material is changed automatically</button><button type="button" data-k="d">D. The load is increased automatically</button></div><p class="why" hidden>If a check fails it will not report a number that may be wrong: better to say “unknown”.</p></div>
+<div class="quiz" data-ok="b"><p class="q">When can an AI-drafted study be computed?</p><div class="opts"><button type="button" data-k="a">A. As soon as AI drafts it</button><button type="button" data-k="b">B. After an engineer reads the questions and confirms</button><button type="button" data-k="c">C. As soon as the program&#x27;s checks pass</button><button type="button" data-k="d">D. Any time</button></div><p class="why" hidden>AI only drafts; it can be computed only after a person confirms (name and time recorded).</p></div>
 <div class="quiz" data-ok="b"><p class="q">Why pick the material from the library for a hand-built analysis?</p><div class="opts"><button type="button" data-k="a">A. FEM material cards cannot be computed</button><button type="button" data-k="b">B. Library values have sources, listed in the report</button><button type="button" data-k="c">C. It computes faster</button><button type="button" data-k="d">D. No difference</button></div><p class="why" hidden>Strength and modulus decide the conclusion; they must be traceable to a source.</p></div></section>
 <section id="appA"><h2><span class="n">20</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>

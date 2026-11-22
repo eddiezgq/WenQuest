@@ -270,6 +270,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l19-goal" data-s="l19">学完能做什么</a>
 <a class="sub" href="#l19-run" data-s="l19">手建分析、计算并核查</a>
 <a class="sub" href="#l19-report" data-s="l19">出报告</a>
+<a class="sub" href="#l19-ai" data-s="l19">一句话起草（AI）</a>
 <a class="sub" href="#l19-do" data-s="l19">跟着做</a>
 <a class="sub" href="#l19-self" data-s="l19">自己做</a>
 <a class="sub" href="#l19-quiz" data-s="l19">小测</a>
@@ -1824,7 +1825,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">⌀8 h5 的上、下偏差是多少？</p><div class="opts"><button type="button" data-k="a">A. +0.006 / 0</button><button type="button" data-k="b">B. 0 / −0.006</button><button type="button" data-k="c">C. ±0.003</button><button type="button" data-k="d">D. 0 / −0.009</button></div><p class="why" hidden>h 的上偏差为 0；6～10 mm 的 IT5 是 6 µm，所以下偏差 −0.006。</p></div>
 <div class="quiz" data-ok="b"><p class="q">装配里的零件换了一个，装配图上的明细表会怎样？</p><div class="opts"><button type="button" data-k="a">A. 要手工改</button><button type="button" data-k="b">B. 重算后跟着变</button><button type="button" data-k="c">C. 不会变</button><button type="button" data-k="d">D. 要重新插入</button></div><p class="why" hidden>明细表由材料清单自动生成，序号、名称、数量随装配更新。</p></div>
 <div class="quiz" data-ok="b"><p class="q">给车间发图，一般导出什么格式？</p><div class="opts"><button type="button" data-k="a">A. FCStd</button><button type="button" data-k="b">B. PDF</button><button type="button" data-k="c">C. STL</button><button type="button" data-k="d">D. STEP</button></div><p class="why" hidden>PDF 谁都能打开、能打印；DXF 给别的 CAD 用；STEP 是三维模型。</p></div></section>
-<section id="l19"><h2><span class="n">19</span>第 19 课 有限元：问渠有限元——手建分析、计算并核查、出报告</h2><p class="lead">学完能做：在 FEM 工作台给零件加固定、力、离心载荷；用问渠有限元“计算并核查”——选材料库的材料，程序自己划网格、逐层加密看收敛、核对反力平衡，核查都通过才给安全系数；看应力云图；出 Word / PDF 计算报告。用第 16 课问渠多体动力学算出的曲柄销受力，算针杆曲柄在 5000 r/min 下的应力。约 1.5 小时。</p><h3 id="l19-goal">学完能做什么</h3>
+<section id="l19"><h2><span class="n">19</span>第 19 课 有限元：问渠有限元——手建分析、计算并核查、出报告</h2><p class="lead">学完能做：在 FEM 工作台给零件加固定、力、离心载荷；用问渠有限元“计算并核查”——选材料库的材料，程序自己划网格、逐层加密看收敛、核对反力平衡，核查都通过才给安全系数；看应力云图；出 Word / PDF 计算报告；用 AI 一句话起草算例，人看追问、确认后才能算。用第 16 课问渠多体动力学算出的曲柄销受力，算针杆曲柄在 5000 r/min 下的应力。约 1.5 小时。</p><h3 id="l19-goal">学完能做什么</h3>
 <ul>
 <li>建分析：FEM 工作台“模型 → 新建分析”。</li>
 <li>约束与载荷：固定（选面）、力（选面，给大小和方向）、离心（选实体，给转轴和转速）。</li>
@@ -1852,6 +1853,14 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>算完以后又改了约束或载荷，出报告会拒绝：先重新“计算并核查”。</li>
 <li>报告是专业版功能；免费版能算、能看结果和核查。</li>
 </ul>
+<h3 id="l19-ai">一句话起草（AI）</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l19c.jpg"><source src="media/wqcad-l19c.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l19c.vtt"></video><figcaption>▶ 录屏：问渠有限元入门例子 02 肩关节空心轴 RJ-201 → 一句话起草（AI，录制回放）→ 看追问、确认算例 → 计算并核查：最大应力网格不收敛、整体“不通过”、不给安全系数（约 2 分钟，计算那一段跳过）</figcaption></figure>
+<ul>
+<li>一句话要说清：零件、材料、怎么固定、受什么载荷（数和单位）。AI 把它变成 FEM 里的约束、载荷和材料，程序逐项核对（面找不找得到、单位对不对、材料在不在库里）；AI 拿不准的列成“追问”，程序不采用的列成“未采用”。</li>
+<li>人要看追问、在 FEM 里补好或判断不需要，勾“追问都已处理”、写确认人，点“确认算例”。没确认的 AI 草稿不能算。</li>
+<li>录屏里 AI 的回复是真实模型的录制回放（面板上标“回放”）；自己用要有 AI 密钥（美国用 Claude、国内用 DeepSeek）。一句话起草是专业版功能。</li>
+<li>这个例子的结果：反力平衡、网格质量、位移收敛都通过，但最大应力越加密越大、不收敛——疑似台阶尖角处的应力奇异点，整体“不通过”，不给安全系数。这是对的：尖角处的峰值不能当设计依据，要加圆角，或看离开尖角处的应力。</li>
+</ul>
 <h3 id="l19-do">跟着做</h3>
 <ol class="steps">
 <li>打开课程文件“针杆曲柄”，切到 FEM 工作台，“模型 → 新建分析”。</li>
@@ -1861,6 +1870,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>“求解 → 计算并核查（零件库）”，材料选 45-QT，等算完；看提示框里的整体可信度。</li>
 <li>看应力云图，对照：最大约 8.4 MPa、安全系数约 42。</li>
 <li>选中分析，“求解 → 出报告（零件库）”，填编号，不用 AI，打开 Word / PDF 看看。</li>
+<li>（有 AI 密钥时）新建文件，导入一个零件，选中它，“求解 → 一句话起草（AI）”，照录屏写一句话，看追问、确认、计算。</li>
 </ol>
 
 <h3 id="l19-self">自己做</h3>
@@ -1872,6 +1882,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <h3 id="l19-quiz">小测</h3>
 <div class="quiz" data-ok="b"><p class="q">5000 r/min 换成离心载荷的旋转频率是多少？</p><div class="opts"><button type="button" data-k="a">A. 5000 Hz</button><button type="button" data-k="b">B. 83.333 Hz</button><button type="button" data-k="c">C. 523.6 Hz</button><button type="button" data-k="d">D. 13.9 Hz</button></div><p class="why" hidden>频率是每秒转数：5000 ÷ 60 = 83.333 Hz。523.6 是角速度（rad/s）。</p></div>
 <div class="quiz" data-ok="b"><p class="q">网格收敛核查没通过，会怎样？</p><div class="opts"><button type="button" data-k="a">A. 照样给安全系数</button><button type="button" data-k="b">B. 不给安全系数，整体可信度不是“通过”</button><button type="button" data-k="c">C. 自动换材料</button><button type="button" data-k="d">D. 自动加大载荷</button></div><p class="why" hidden>核查不过就不报一个可能错的数：宁可说“不知道”。</p></div>
+<div class="quiz" data-ok="b"><p class="q">AI 起草的算例，什么时候能算？</p><div class="opts"><button type="button" data-k="a">A. AI 一起草完就能算</button><button type="button" data-k="b">B. 工程师看过追问、确认以后</button><button type="button" data-k="c">C. 程序核对通过就能算</button><button type="button" data-k="d">D. 任何时候</button></div><p class="why" hidden>AI 只起草；人确认（记确认人和时间）以后才能计算。</p></div>
 <div class="quiz" data-ok="b"><p class="q">手建的分析，材料为什么要从材料库选？</p><div class="opts"><button type="button" data-k="a">A. FEM 的材料卡不能算</button><button type="button" data-k="b">B. 材料库的数值有出处，报告里列明</button><button type="button" data-k="c">C. 材料库算得快</button><button type="button" data-k="d">D. 没有区别</button></div><p class="why" hidden>强度、弹性模量这些数决定结论，要能追到来源。</p></div></section>
 <section id="appA"><h2><span class="n">20</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
 <p>官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1.4 GB）。</p>

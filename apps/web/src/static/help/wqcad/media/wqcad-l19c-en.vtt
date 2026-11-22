@@ -1,0 +1,40 @@
+WEBVTT
+
+00:00:02.838 --> 00:00:14.673
+Finally, how AI helps: one sentence giving material, supports and loads, and AI drafts the study. A different part — the robot shoulder hollow shaft from the WenQuest FEA examples
+
+00:00:14.673 --> 00:00:18.674
+Select the part, menu Solve → Draft from one sentence (AI)
+
+00:00:18.674 --> 00:00:26.924
+Write one sentence: part, material, how it is held, what load (in Chinese here — the recorded AI reply is for this sentence)
+
+00:00:26.924 --> 00:00:33.374
+Click Draft. Here the AI reply is a recorded replay of a real model call; the panel says “replay”
+
+00:00:33.374 --> 00:00:44.673
+AI drafts, the program checks each item: fixed end face, torque on the spline section, steel 45 Q&T — all placed in the Analysis in the tree and visible in the 3D view
+
+00:00:44.673 --> 00:00:53.249
+What the AI is unsure of is listed as questions (1 this time): the engineer reads each, fixes it in FEM or decides it is not needed
+
+00:00:53.249 --> 00:01:03.249
+The torque direction does not change the size of linear-elastic stress, so that's fine. Tick “questions handled”, enter your name, click Confirm study
+
+00:01:03.249 --> 00:01:11.098
+Who confirmed and when go into the study; an unconfirmed AI draft cannot be computed — the program never signs for you
+
+00:01:11.098 --> 00:01:14.674
+Then, as before: Compute and check
+
+00:01:14.674 --> 00:01:23.933
+(About 2 min on this computer — skipped in the video)
+
+00:01:23.933 --> 00:01:30.099
+This time the overall trust is not “pass”: a check did not pass, so no safety factor is given
+
+00:01:30.099 --> 00:01:42.099
+The program's reason: max stress keeps rising as the mesh is refined — a suspected singularity (sharp corner), so that value is not a design basis. The plot is still there: add a fillet at the step, or read the stress away from the corner, and compute again
+
+00:01:46.874 --> 00:01:57.160
+That is the division of work in WenQuest FEA: AI only drafts; the program checks, computes and verifies; people confirm and sign

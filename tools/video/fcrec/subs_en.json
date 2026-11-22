@@ -263,5 +263,13 @@
  "问要不要让 AI 写“解释与建议”：数字都由程序填，AI 不判定合不合格。这一课不用 AI，点“否”": "It asks whether AI should write “interpretation and advice”: the numbers are filled in by the program and AI never decides pass/fail. No AI in this lesson: No",
  "报告出来了：Word 一份；本机装了 LibreOffice，同时转出 PDF": "The report is written: a Word file, plus a PDF because LibreOffice is installed",
  "打开看看。第一页：结论摘要——最大应力、安全系数、可信度；下面是零件和材料（带出处）": "Let's open it. Page 1: summary — max stress, safety factor, trust; below, the part and material (with sources)",
- "报告是专业版功能；免费版能算、能看结果和核查": "Reports are a Pro feature; the free edition computes and shows results and checks"
+ "报告是专业版功能；免费版能算、能看结果和核查": "Reports are a Pro feature; the free edition computes and shows results and checks",
+ "最后看 AI 怎么帮忙：一句话说清材料、支承、载荷，AI 起草算例。换一个零件——问渠有限元入门例子里的机器人肩关节空心轴": "Finally, how AI helps: one sentence giving material, supports and loads, and AI drafts the study. A different part — the robot shoulder hollow shaft from the WenQuest FEA examples",
+ "选中零件，菜单“求解 → 一句话起草（AI）”": "Select the part, menu Solve → Draft from one sentence (AI)",
+ "点“起草”。这一段 AI 的回复是真实模型的录制回放，面板上会标明“回放”": "Click Draft. Here the AI reply is a recorded replay of a real model call; the panel says “replay”",
+ "AI 起草、程序逐项核对：端面固定、花键段加扭矩、材料 45 钢调质，都放进了模型树的“分析”，三维视图里能看到": "AI drafts, the program checks each item: fixed end face, torque on the spline section, steel 45 Q&T — all placed in the Analysis in the tree and visible in the 3D view",
+ "扭矩的转向对线弹性应力的大小没有影响，可以。勾“追问都已处理”，写确认人，点“确认算例”": "The torque direction does not change the size of linear-elastic stress, so that's fine. Tick “questions handled”, enter your name, click Confirm study",
+ "确认人和时间记进算例；没确认的 AI 草稿不能算——程序不替人签字": "Who confirmed and when go into the study; an unconfirmed AI draft cannot be computed — the program never signs for you",
+ "接着和前面一样：计算并核查": "Then, as before: Compute and check",
+ "这就是问渠有限元的分工：AI 只起草，程序核对、计算、核查，人确认、签字": "That is the division of work in WenQuest FEA: AI only drafts; the program checks, computes and verifies; people confirm and sign"
 }

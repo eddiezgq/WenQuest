@@ -46,7 +46,11 @@ for WQ_LANG in ${LANGS:-zh en}; do
   for c in l18a l18b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done     # 18a 接 17b 存的针杆图；18b 接第 16 课存的曲柄滑块
   WQ_CRANK="$WQ_REC/crank_r178.step" LC_ALL=C.UTF-8 "$FC/usr/bin/freecadcmd" "$H/prep_crank_fea.py"   # 第 19 课的针杆曲柄 + 两条辅助线（第 178 轮的曲柄）
   for c in l19a l19b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done     # 19b 接 19a 存的分析
-  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c l10a l10b l11a l12a l12b l12c l13a l13b l13c l14a l15a l15b l16a l16b l17a l17b l18a l18b l19a l19b; do
+  FAPR=${FAP_REPO:-/home/claude/freecad-ai-parts}                               # 19c：问渠有限元入门例子 02 的零件和 AI 回复录制（回放）
+  mkdir -p "$WQ_REC/rj201"; cp "$FAPR/examples/wenquest-fea/02-rj201-shaft-sentence/RJ-201.step" "$WQ_REC/rj201/"
+  rm -rf "$WQ_REC/fea_draft_rec"; cp -r "$FAPR/tests/recordings/fea_draft" "$WQ_REC/fea_draft_rec"
+  FAP_LLM_REPLAY="$WQ_REC/fea_draft_rec" FAP_AI_PROVIDER=claude "$H/rec.sh" "$H/l19c.py" "$WQ_REC/l19c$sfx.mp4"
+  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c l10a l10b l11a l12a l12b l12c l13a l13b l13c l14a l15a l15b l16a l16b l17a l17b l18a l18b l19a l19b l19c; do
     ffmpeg -loglevel error -y -i "$WQ_REC/$c$sfx.mp4" -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart -an "$OUT/wqcad-$c$sfx.mp4"
     ffmpeg -loglevel error -y -sseof -2 -i "$WQ_REC/$c$sfx.mp4" -frames:v 1 -vf scale=960:-1 -q:v 4 "$OUT/wqcad-$c$sfx.jpg"
     cp "$WQ_REC/$c$sfx.vtt" "$OUT/wqcad-$c$sfx.vtt"
