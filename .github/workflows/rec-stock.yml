@@ -1,0 +1,52 @@
+# 课程录屏的“官方 FreeCAD”那一半（第 20 课对比用），在 GitHub 的 Ubuntu 机器上录：官方 FreeCAD 1.1.4 Linux 版（AppImage 解开），
+# 同一套剧本（tools/video/fcrec，WQ_STOCK=1），界面设置用 tools/video/fcrec/stock_home。成片存为工作流附件。手动运行。
+name: Course recording (official FreeCAD)
+on:
+  workflow_dispatch:
+    inputs:
+      scripts:
+        description: 剧本（空格分开）
+        default: "l20a"
+      langs:
+        description: 语言
+        default: "zh en"
+permissions:
+  contents: read
+jobs:
+  rec:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/video/fcrec
+      - name: 装 Xvfb、ffmpeg、中文字体；取官方 FreeCAD 1.1.4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb ffmpeg fonts-noto-cjk python3-pil libfuse2 >/dev/null
+          gh release download 1.1.4 --repo FreeCAD/FreeCAD --pattern "*Linux-x86_64*.AppImage" --dir fc
+          ls -l fc
+          cd fc && chmod +x *.AppImage && ./*.AppImage --appimage-extract >/dev/null && ls squashfs-root | head
+      - name: 录
+        run: |
+          export WQ_REC=$RUNNER_TEMP/rec FC=$GITHUB_WORKSPACE/fc/squashfs-root DISPLAY=:77
+          H=$GITHUB_WORKSPACE/tools/video/fcrec
+          mkdir -p $WQ_REC/model $WQ_REC/model_en $WQ_REC/home $WQ_REC/home_en out
+          for v in zh en; do d=$WQ_REC/home_stock$([ $v = en ] && echo _en)/.config/FreeCAD/v1-1; mkdir -p "$d"; cp $H/stock_home/$v/*.cfg "$d/"; done
+          LC_ALL=C.UTF-8 $FC/usr/bin/freecadcmd $H/prep_l20.py
+          (Xvfb :77 -screen 0 1600x900x24 -nolisten tcp &>/dev/null &)
+          sleep 2
+          for c in ${{ inputs.scripts }}; do
+            for v in ${{ inputs.langs }}; do
+              if [ $v = en ]; then L=en; else L=; fi
+              WQ_LANG=$L WQ_STOCK=1 timeout 600 $H/rec.sh $H/$c.py $GITHUB_WORKSPACE/out/$c-stock-$v.mp4 || true
+              grep -a "EXC" -A5 $WQ_REC/director.log || true
+            done
+          done
+          ls -l out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rec-stock
+          path: out/*-stock-*.*
+          retention-days: 14

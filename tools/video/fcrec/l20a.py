@@ -53,6 +53,9 @@ def dump_task(tag):
 
 def script(d):
     doc = App.openDocument(model_file("圆角练习.FCStd", "FilletTest.FCStd"))
+    for o in doc.Objects:                     # 无界面建的文件没有显示设置：实体和方块显示出来
+        if o.TypeId in ("PartDesign::Body", "PartDesign::AdditiveBox"):
+            o.ViewObject.Visibility = True
     Gui.ActiveDocument.ActiveView.viewIsometric()
     Gui.SendMsgToActiveView("ViewFit")
     yield 1500
@@ -98,19 +101,53 @@ def script(d):
     yield 1000
     yield d.say(L("勾“使用所有边”，半径 11，确定", "Tick “Use all edges”, radius 11, OK"))
     yield 2000
-    yield from steps.task_ok(d)
-    yield 1500
+    ok = [w for w in QtWidgets.QApplication.allWidgets() if isinstance(w, QtWidgets.QPushButton) and w.isVisible()
+          and w.text().replace("&", "") in ("OK", "确定") and Gui.Control.activeDialog()]
+    if ok:                                   # 点“确定”可能弹出报错框（模态）：放到下一轮事件里点，剧本照常往下走
+        p = d.center(ok[0])
+        yield d.move(p, 700)
+        d.ring(p)
+        QtCore.QTimer.singleShot(0, ok[0].click)
+    else:
+        yield from steps.task_ok(d)
+    yield 2500
     m = QtWidgets.QApplication.activeModalWidget()
     log("after ok modal", m.windowTitle() if m else None, m.text() if isinstance(m, QtWidgets.QMessageBox) else None)
     log("fillet state", list(fl.State), fl.Shape.isNull(), None if fl.Shape.isNull() else fl.Shape.isValid())
     dump_task("after ok")
     yield 2500
     if isinstance(m, QtWidgets.QMessageBox):
-        yield d.say(L(f"{who}：报错——" + m.text().splitlines()[0][:60], f"{who}: error — " + m.text().splitlines()[0][:80]))
-        yield 5000
+        yield d.say(L(f"{who}：当场报错——“圆角结果不是有效实体，尺寸可能太大”。坏结果不会存进模型",
+                      f"{who}: an error right away — “Fillet result is not a valid solid. The size may be too large”. The broken result is never stored"))
+        yield 6000
         yield from steps.answer_modal(d)
+        yield 1000
+        rad = tw(QtWidgets.QWidget, "filletRadius")
+        if rad is not None:
+            yield d.say(L("把半径改成 5，确定：圆角做好了", "Change the radius to 5, OK: the fillet works"))
+            yield from click_w(d, rad)
+            le = rad.findChild(QtWidgets.QLineEdit)
+            le.selectAll()
+            d.keys("5", w=le)
+            yield 600
+            d.key(Qt.Key_Tab, le)
+            yield 1500
+            if abs(fl.Radius.Value - 5) > 1e-6:
+                fl.Radius = 5
+                doc.recompute()
+            ok = [w for w in QtWidgets.QApplication.allWidgets() if isinstance(w, QtWidgets.QPushButton) and w.isVisible()
+                  and w.text().replace("&", "") in ("OK", "确定") and Gui.Control.activeDialog()]
+            if ok:
+                p = d.center(ok[0])
+                yield d.move(p, 700)
+                d.ring(p)
+                QtCore.QTimer.singleShot(0, ok[0].click)
+            yield 2500
+            Gui.SendMsgToActiveView("ViewFit")
+            yield 3500
     log("end state", list(fl.State))
-    if not fl.Shape.isNull() and "Invalid" not in fl.State:
+    log("radius now", fl.Radius, fl.Shape.isNull() or fl.Shape.isValid())
+    if STOCK and not fl.Shape.isNull() and "Invalid" not in fl.State:
         yield d.say(L(f"{who}：没报错，模型树上一切正常，看起来“成功”了", f"{who}: no error, the tree looks fine — it seems to have “worked”"))
         yield 4000
         p = d.tree_item(fl.Label)

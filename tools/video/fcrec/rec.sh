@@ -9,7 +9,7 @@ export WQ_REC WQ_LANG DISPLAY=${DISPLAY:-:77} LC_ALL=C.UTF-8   # 界面语言看
 rm -f $WQ_REC/ready.flag $WQ_REC/end.flag $WQ_REC/clicks.txt $WQ_REC/subs.txt
 pkill -f "$FC/bin/FreeCAD|squashfs-root/usr/bin/freecad"; sleep 1
 # $FC：官方 AppImage 解开的目录（有 AppRun），或 linux-env.yml 编的问渠 CAD 环境（bin/FreeCAD，库路径要自己设）
-if [ -x "$FC/AppRun" ]; then RUN=("$FC/AppRun"); else RUN=(env LD_LIBRARY_PATH="$FC/lib" PYTHONHOME="$FC" "$FC/bin/FreeCAD"); fi
+if [ -x "$FC/AppRun" ]; then RUN=("$FC/AppRun"); else RUN=(env LD_LIBRARY_PATH="$FC/lib" PYTHONHOME="$FC" FONTCONFIG_PATH=/etc/fonts FONTCONFIG_FILE=/etc/fonts/fonts.conf "$FC/bin/FreeCAD"); fi
 cd "$WQ_REC" && "${RUN[@]}" "$1" > $WQ_REC/run.log 2>&1 &
 FCPID=$!
 for i in $(seq 1 300); do [ -f $WQ_REC/ready.flag ] && break; sleep 0.2; done

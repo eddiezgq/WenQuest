@@ -326,6 +326,9 @@ class Director:
 
 
 def boot(script_main, delay=7000):
+    f = os.environ.get("WQ_APPFONT")          # 自己编的问渠 CAD 环境没有 AppImage 带的字体设置：界面字体指定成无衬线
+    if f:
+        QtWidgets.QApplication.setFont(QtGui.QFont(f, int(os.environ.get("WQ_APPFONT_PT", "9"))))
     """FreeCAD 启动后：最大化、关开始页上的“首次启动”、告诉录像脚本可以开录"""
     log("boot scheduled")
 
