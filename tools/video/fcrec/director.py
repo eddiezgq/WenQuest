@@ -369,7 +369,9 @@ def menu_path(d, *names):
         if name == names[-1]:
             d.ring(p)
             yield 250
-            m.close()
+            for mm in QtWidgets.QApplication.topLevelWidgets():   # 关掉这一串菜单（含上一级），免得留在画面上
+                if isinstance(mm, QtWidgets.QMenu) and mm.isVisible():
+                    mm.close()
             QtCore.QTimer.singleShot(0, a.trigger)     # 触发菜单项（模态对话框在下一轮事件里打开，剧本照常往下走）
         else:
             d.click(p)
