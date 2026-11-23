@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–19)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–20)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -274,7 +274,15 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l19-do" data-s="l19">Follow along</a>
 <a class="sub" href="#l19-self" data-s="l19">On your own</a>
 <a class="sub" href="#l19-quiz" data-s="l19">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">20</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l20" data-s="l20"><span class="n">20</span>Lesson 20 What is different in WenQuest CAD: what the 28 patches fix</a>
+<a class="sub" href="#l20-goal" data-s="l20">What you will be able to do</a>
+<a class="sub" href="#l20-fillet" data-s="l20">“Successful” modelling that is not</a>
+<a class="sub" href="#l20-recompute" data-s="l20">Changing dimensions and recomputing</a>
+<a class="sub" href="#l20-calc" data-s="l20">Calculation and export</a>
+<a class="sub" href="#l20-list" data-s="l20">The 28 patches</a>
+<a class="sub" href="#l20-self" data-s="l20">On your own</a>
+<a class="sub" href="#l20-quiz" data-s="l20">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">21</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -295,7 +303,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l11">Lesson 11</a></td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l12">Lesson 12</a></td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the head (reverse-engineered from the mesh)</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l13">Lesson 13</a></td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Trimming and blends on the head</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l14">Lesson 14</a></td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>The head shell hollowed into a casting</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l15">Lesson 15</a></td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Needle-bar mechanism (slider-crank)</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l16">Lesson 16</a></td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Needle-bar mechanism through one turn; stroke</td><td>Online</td></tr><tr><td>6 Drawings</td><td><a href="#l17">Lesson 17</a></td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>Online</td></tr><tr><td>6 Drawings</td><td><a href="#l18">Lesson 18</a></td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Tolerances on the needle-bar drawing; needle-bar mechanism assembly drawing</td><td>Online</td></tr><tr><td>7 Advanced</td><td><a href="#l19">Lesson 19</a></td><td>FEA with WenQuest FEA (hand-built FEM analysis, compute and check, report)</td><td>Needle-bar crank stress at 5000 rpm</td><td>Online</td></tr><tr><td>7 Advanced</td><td>Lesson 20</td><td>What is different in WenQuest CAD: the 27 patches</td><td>Before/after the patches</td><td>In progress</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l11">Lesson 11</a></td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l12">Lesson 12</a></td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the head (reverse-engineered from the mesh)</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l13">Lesson 13</a></td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Trimming and blends on the head</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l14">Lesson 14</a></td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>The head shell hollowed into a casting</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l15">Lesson 15</a></td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Needle-bar mechanism (slider-crank)</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l16">Lesson 16</a></td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Needle-bar mechanism through one turn; stroke</td><td>Online</td></tr><tr><td>6 Drawings</td><td><a href="#l17">Lesson 17</a></td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>Online</td></tr><tr><td>6 Drawings</td><td><a href="#l18">Lesson 18</a></td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Tolerances on the needle-bar drawing; needle-bar mechanism assembly drawing</td><td>Online</td></tr><tr><td>7 Advanced</td><td><a href="#l19">Lesson 19</a></td><td>FEA with WenQuest FEA (hand-built FEM analysis, compute and check, report)</td><td>Needle-bar crank stress at 5000 rpm</td><td>Online</td></tr><tr><td>7 Advanced</td><td><a href="#l20">Lesson 20</a></td><td>What is different in WenQuest CAD: the 28 patches</td><td>Official FreeCAD versus WenQuest CAD</td><td>Online</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Pick a bearing; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
 
 <p>Lessons 1–17 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
@@ -1885,7 +1893,197 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">What happens if the mesh-convergence check fails?</p><div class="opts"><button type="button" data-k="a">A. A safety factor is still given</button><button type="button" data-k="b">B. No safety factor; the overall verdict is not “pass”</button><button type="button" data-k="c">C. The material is changed automatically</button><button type="button" data-k="d">D. The load is increased automatically</button></div><p class="why" hidden>If a check fails it will not report a number that may be wrong: better to say “unknown”.</p></div>
 <div class="quiz" data-ok="b"><p class="q">When can an AI-drafted study be computed?</p><div class="opts"><button type="button" data-k="a">A. As soon as AI drafts it</button><button type="button" data-k="b">B. After an engineer reads the questions and confirms</button><button type="button" data-k="c">C. As soon as the program&#x27;s checks pass</button><button type="button" data-k="d">D. Any time</button></div><p class="why" hidden>AI only drafts; it can be computed only after a person confirms (name and time recorded).</p></div>
 <div class="quiz" data-ok="b"><p class="q">Why pick the material from the library for a hand-built analysis?</p><div class="opts"><button type="button" data-k="a">A. FEM material cards cannot be computed</button><button type="button" data-k="b">B. Library values have sources, listed in the report</button><button type="button" data-k="c">C. It computes faster</button><button type="button" data-k="d">D. No difference</button></div><p class="why" hidden>Strength and modulus decide the conclusion; they must be traceable to a source.</p></div></section>
-<section id="appA"><h2><span class="n">20</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l20"><h2><span class="n">20</span>Lesson 20 What is different in WenQuest CAD: what the 28 patches fix</h2><p class="lead">WenQuest CAD is FreeCAD 1.1.4 plus 28 patches. Same file, same steps, first in the official FreeCAD 1.1.4, then in WenQuest CAD: a fillet that “succeeds” but is broken, a dimension that cannot be changed, a feature shown up to date that was never recomputed, a wrong volume, duplicate parts on export. About 1 hour.</p><h3 id="l20-goal">What you will be able to do</h3>
+<ul>
+<li>Know that “no error” is not “correct”: check solids with Check geometry.</li>
+<li>Know how the official FreeCAD and WenQuest CAD behave in the cases below.</li>
+<li>Find the chapter of “FreeCAD kernel: decode, verify, correct” behind each patch.</li>
+</ul>
+
+<h3 id="l20-fillet">“Successful” modelling that is not</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l20a.jpg"><source src="../media/wqcad-l20a.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l20a.vtt"></video><figcaption>▶ Screen recording: a 20 mm cube, all edges filleted with radius 11 — official FreeCAD 1.1.4 reports success and Check geometry finds an invalid solid; WenQuest CAD reports an error at once, and radius 5 works (about 2 min)</figcaption></figure>
+<ul>
+<li>A radius above half the edge cannot be built. The official build's kernel “finishes” and hands back a broken solid (shell not closed, faces open), and FreeCAD stores it without checking. Everything built on it, and every file exported from it, is broken too.</li>
+<li>WenQuest CAD checks fillet and chamfer results and refuses broken ones (chapter 18). In scripts, a failed fillet names the radius and how many edges failed (chapter 42).</li>
+<li>Habit: after a complex feature, run Part Design → Check geometry.</li>
+</ul>
+<h3 id="l20-recompute">Changing dimensions and recomputing</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l20b.jpg"><source src="../media/wqcad-l20b.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l20b.vtt"></video><figcaption>▶ Screen recording: a sketch with a redundant dimension, width 30 changed to 40 — the official build silently snaps back to 30, WenQuest CAD takes 40; a box made too small for its fillet, recompute — the official build shows the later Cut as fine although it was never recomputed, WenQuest CAD marks it to recompute (about 2 min)</figcaption></figure>
+<ul>
+<li>Both vertical sides dimensioned 20 is a redundant constraint. The official build refuses to change any dimension while one exists, leaving only a line in the report view; WenQuest CAD makes the change and still reports the redundancy for you to delete (chapter 21).</li>
+<li>When a feature fails, the features after it cannot be recomputed. The official build shows them as up to date with the old shape — easy to use by mistake; WenQuest CAD marks them to recompute (chapter 22).</li>
+</ul>
+<h3 id="l20-calc">Calculation and export</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l20c.jpg"><source src="../media/wqcad-l20c.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l20c.vtt"></video><figcaption>▶ Screen recording: in the Python console, the volume of a cylinder in B-spline form — off by 0.86 % in the official build, exact in WenQuest CAD; two parts of an assembly exported to STEP with colours and imported back — 4 parts in the official build, 2 in WenQuest CAD (about 2 min)</figcaption></figure>
+<ul>
+<li>Parts imported from other CAD systems mostly have B-spline surfaces. The official build's integration for volume, centre of mass and inertia is inexact on them: 0.86 % for a cylinder, 0.09 % for the inertia of a sphere; mass and moments of inertia follow. WenQuest CAD uses accuracy-controlled integration there (chapter 28).</li>
+<li>Exporting an assembly with colours from a macro or script writes every part twice in the official build (chapter 33).</li>
+<li>The demos use the Python console: macros, scripts and the AI workbench all call FreeCAD this way, and the GUI uses the same functions underneath.</li>
+</ul>
+<h3 id="l20-list">The 28 patches</h3>
+<p>None of these changes is in the official FreeCAD 1.1.4. “Ch.” is the chapter of “FreeCAD kernel: decode, verify, correct”.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Ch.</th>
+<th>What it fixes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2</td>
+<td>Placement matrices: reject scaling and shear</td>
+</tr>
+<tr>
+<td>2</td>
+<td>3</td>
+<td>Point at a distance on a curve: uses a tolerance</td>
+</tr>
+<tr>
+<td>3</td>
+<td>4</td>
+<td>Face curvature: sign relative to the face normal</td>
+</tr>
+<tr>
+<td>4</td>
+<td>5</td>
+<td>Mesh flattening: reports the distortion</td>
+</tr>
+<tr>
+<td>5</td>
+<td>5</td>
+<td>Unwrap commands: relative tolerance, distortion report</td>
+</tr>
+<tr>
+<td>6</td>
+<td>7</td>
+<td>Mesh triangulation: exact predicates, no bad faces</td>
+</tr>
+<tr>
+<td>7</td>
+<td>18</td>
+<td>Invalid fillet or chamfer results are errors (first part of this lesson)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>19</td>
+<td>Offset and thickness: check the thickness first and the result after</td>
+</tr>
+<tr>
+<td>9</td>
+<td>20</td>
+<td>Helix: error when the pitch makes it intersect itself (in this lesson's check it did not trigger for a pitch–height helix; being investigated)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>21</td>
+<td>Sketch dimensions: a redundant constraint elsewhere no longer blocks the change (second part)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>22</td>
+<td>After a failed feature, later ones stay marked to recompute (second part)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>22</td>
+<td>Defeaturing reports features it did not remove</td>
+</tr>
+<tr>
+<td>13</td>
+<td>25</td>
+<td>Curvature takes the limit at points such as a sphere's pole</td>
+</tr>
+<tr>
+<td>14</td>
+<td>26</td>
+<td>Check geometry warns when planar faces meet outside the edge tolerance</td>
+</tr>
+<tr>
+<td>15</td>
+<td>27</td>
+<td>Nearest point on a curve: end points and equidistant cases</td>
+</tr>
+<tr>
+<td>16</td>
+<td>28</td>
+<td>Volume, centre of mass, inertia: accuracy-controlled on B-spline faces (third part)</td>
+</tr>
+<tr>
+<td>17</td>
+<td>29</td>
+<td>Multi-fuse: result independent of input order</td>
+</tr>
+<tr>
+<td>18</td>
+<td>30</td>
+<td>Regression tests for the book's findings</td>
+</tr>
+<tr>
+<td>19</td>
+<td>31</td>
+<td>Shapes in the document are not changed in place by tolerance edits</td>
+</tr>
+<tr>
+<td>20</td>
+<td>33</td>
+<td>Exporting an assembly with colours: no duplicate parts (third part)</td>
+</tr>
+<tr>
+<td>21</td>
+<td>34</td>
+<td>CAM area offset uses the area parameters</td>
+</tr>
+<tr>
+<td>22</td>
+<td>35</td>
+<td>Memory held by the undo stack can be queried</td>
+</tr>
+<tr>
+<td>23</td>
+<td>38</td>
+<td>Mesh degenerate-face repair: no out-of-bounds write, no endless loop</td>
+</tr>
+<tr>
+<td>24</td>
+<td>39</td>
+<td>Reverse-engineering fits: check normals, map inlier indices, distance threshold</td>
+</tr>
+<tr>
+<td>25</td>
+<td>40</td>
+<td>B-spline surface fitting: reject ragged point grids</td>
+</tr>
+<tr>
+<td>26</td>
+<td>42</td>
+<td>Error messages name the exception class and the failed fillet or chamfer</td>
+</tr>
+<tr>
+<td>27</td>
+<td>43</td>
+<td>Sewing uses its tolerance; checks report statuses in context</td>
+</tr>
+<tr>
+<td>28</td>
+<td>28</td>
+<td>Volume of an invalid solid no longer hangs (found while checking this lesson, a side effect of patch 16; fixed from 0.3.2)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l20-self">On your own</h3>
+<ol>
+<li>In WenQuest CAD, fillet all edges of a 20 mm cube with radius 9.9, 10 and 10.5; see which work and which are refused, and check the working one with Check geometry.</li>
+<li>Sketch a rectangle, add one dimension too many, see how the solver messages report the redundancy, then delete it.</li>
+<li>In the Python console, convert a sphere of radius 10 to B-spline (<code>Part.makeSphere(10).toNurbs()</code>), take its volume and compare with 4/3 π r³.</li>
+</ol>
+<h3 id="l20-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">FreeCAD shows no error and no red mark in the tree. Is the result surely correct?</p><div class="opts"><button type="button" data-k="a">A. Yes</button><button type="button" data-k="b">B. Not necessarily — check it with Check geometry</button><button type="button" data-k="c">C. Restart and it will be</button><button type="button" data-k="d">D. Export to STEP and it will be</button></div><p class="why" hidden>The official build&#x27;s fillet can “succeed” with a broken solid; Check geometry finds it.</p></div>
+<div class="quiz" data-ok="b"><p class="q">What is one dimension too many in a sketch called?</p><div class="opts"><button type="button" data-k="a">A. Under-constrained</button><button type="button" data-k="b">B. Redundant constraint</button><button type="button" data-k="c">C. Conflicting constraint</button><button type="button" data-k="d">D. Reference dimension</button></div><p class="why" hidden>An extra but consistent constraint is redundant; delete it or make it a reference dimension.</p></div>
+<div class="quiz" data-ok="b"><p class="q">How far off is the volume of a B-spline cylinder in the official FreeCAD 1.1.4?</p><div class="opts"><button type="button" data-k="a">A. 0</button><button type="button" data-k="b">B. About 0.86 %</button><button type="button" data-k="c">C. About 10 %</button><button type="button" data-k="d">D. It cannot compute it</button></div><p class="why" hidden>Its integration is inexact on rational B-spline faces; WenQuest CAD uses accuracy-controlled integration.</p></div></section>
+<section id="appA"><h2><span class="n">21</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">

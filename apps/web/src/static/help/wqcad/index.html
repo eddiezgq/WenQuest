@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ 目录</button>
 <aside>
-  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–19 课）</small></div>
+  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–20 课）</small></div>
   <input class="find" placeholder="搜索帮助…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>课程怎么学</a>
 <a class="sub" href="#course-1" data-s="course">这套课程</a>
@@ -274,7 +274,15 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l19-do" data-s="l19">跟着做</a>
 <a class="sub" href="#l19-self" data-s="l19">自己做</a>
 <a class="sub" href="#l19-quiz" data-s="l19">小测</a>
-<a href="#appA" data-s="appA"><span class="n">20</span>附录 A 安装问渠 CAD</a>
+<a href="#l20" data-s="l20"><span class="n">20</span>第 20 课 问渠 CAD 的不同：28 个补丁修了什么</a>
+<a class="sub" href="#l20-goal" data-s="l20">学完能做什么</a>
+<a class="sub" href="#l20-fillet" data-s="l20">建模时的“假成功”</a>
+<a class="sub" href="#l20-recompute" data-s="l20">改尺寸与重算</a>
+<a class="sub" href="#l20-calc" data-s="l20">计算与导出</a>
+<a class="sub" href="#l20-list" data-s="l20">28 个补丁一览</a>
+<a class="sub" href="#l20-self" data-s="l20">自己做</a>
+<a class="sub" href="#l20-quiz" data-s="l20">小测</a>
+<a href="#appA" data-s="appA"><span class="n">21</span>附录 A 安装问渠 CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">下载和授权</a>
 <a class="sub" href="#appA-install" data-s="appA">安装</a>
 <a class="sub" href="#appA-fix" data-s="appA">排错</a></nav>
@@ -295,7 +303,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">课程表</h3>
-<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l12">第 12 课</a></td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机头外形的特征曲线（照网格逆向）</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l13">第 13 课</a></td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的修剪和过渡曲面</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l14">第 14 课</a></td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>机头外壳抽壳成铸件</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l15">第 15 课</a></td><td>装配工作台：插入零件、固定、关节、自由度</td><td>针杆机构（曲柄滑块）</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l16">第 16 课</a></td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>针杆机构转一圈、量行程</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l17">第 17 课</a></td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l18">第 18 课</a></td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>针杆零件图加公差；针杆机构装配图</td><td>已上线</td></tr><tr><td>七 进阶</td><td><a href="#l19">第 19 课</a></td><td>有限元：问渠有限元（FEM 工作台手建分析 + 计算并核查 + 报告）</td><td>针杆曲柄 5000 r/min 下的应力</td><td>已上线</td></tr><tr><td>七 进阶</td><td>第 20 课</td><td>问渠 CAD 的不同：27 个补丁修了什么</td><td>补丁前后对比</td><td>制作中</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l12">第 12 课</a></td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机头外形的特征曲线（照网格逆向）</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l13">第 13 课</a></td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的修剪和过渡曲面</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l14">第 14 课</a></td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>机头外壳抽壳成铸件</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l15">第 15 课</a></td><td>装配工作台：插入零件、固定、关节、自由度</td><td>针杆机构（曲柄滑块）</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l16">第 16 课</a></td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>针杆机构转一圈、量行程</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l17">第 17 课</a></td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l18">第 18 课</a></td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>针杆零件图加公差；针杆机构装配图</td><td>已上线</td></tr><tr><td>七 进阶</td><td><a href="#l19">第 19 课</a></td><td>有限元：问渠有限元（FEM 工作台手建分析 + 计算并核查 + 报告）</td><td>针杆曲柄 5000 r/min 下的应力</td><td>已上线</td></tr><tr><td>七 进阶</td><td><a href="#l20">第 20 课</a></td><td>问渠 CAD 的不同：28 个补丁修了什么</td><td>官方 FreeCAD 与问渠 CAD 对照</td><td>已上线</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
 
 <p>现在上线的是第 1–17 课，其余各课按模块陆续上线。</p>
 <h3 id="course-3">录屏是怎么录的</h3>
@@ -1884,7 +1892,197 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">网格收敛核查没通过，会怎样？</p><div class="opts"><button type="button" data-k="a">A. 照样给安全系数</button><button type="button" data-k="b">B. 不给安全系数，整体可信度不是“通过”</button><button type="button" data-k="c">C. 自动换材料</button><button type="button" data-k="d">D. 自动加大载荷</button></div><p class="why" hidden>核查不过就不报一个可能错的数：宁可说“不知道”。</p></div>
 <div class="quiz" data-ok="b"><p class="q">AI 起草的算例，什么时候能算？</p><div class="opts"><button type="button" data-k="a">A. AI 一起草完就能算</button><button type="button" data-k="b">B. 工程师看过追问、确认以后</button><button type="button" data-k="c">C. 程序核对通过就能算</button><button type="button" data-k="d">D. 任何时候</button></div><p class="why" hidden>AI 只起草；人确认（记确认人和时间）以后才能计算。</p></div>
 <div class="quiz" data-ok="b"><p class="q">手建的分析，材料为什么要从材料库选？</p><div class="opts"><button type="button" data-k="a">A. FEM 的材料卡不能算</button><button type="button" data-k="b">B. 材料库的数值有出处，报告里列明</button><button type="button" data-k="c">C. 材料库算得快</button><button type="button" data-k="d">D. 没有区别</button></div><p class="why" hidden>强度、弹性模量这些数决定结论，要能追到来源。</p></div></section>
-<section id="appA"><h2><span class="n">20</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
+<section id="l20"><h2><span class="n">20</span>第 20 课 问渠 CAD 的不同：28 个补丁修了什么</h2><p class="lead">问渠 CAD 是 FreeCAD 1.1.4 加 28 个补丁。这一课用同一个文件、同样的操作，先在官方 FreeCAD 1.1.4 上做，再在问渠 CAD 上做，看差别：假成功的圆角、改不了的尺寸、没重算却显示正常的特征、算错的体积、导出重复的零件。约 1 小时。</p><h3 id="l20-goal">学完能做什么</h3>
+<ul>
+<li>知道软件“没报错”不等于结果对：用“检查几何”核对实体。</li>
+<li>碰到下面这些情况，知道官方 FreeCAD 会怎样、问渠 CAD 会怎样。</li>
+<li>知道每个补丁对应《FreeCAD 内核解密》哪一章，想深究可以去读。</li>
+</ul>
+
+<h3 id="l20-fillet">建模时的“假成功”</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l20a.jpg"><source src="media/wqcad-l20a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l20a.vtt"></video><figcaption>▶ 录屏：20 mm 方块，所有边圆角半径 11——官方 FreeCAD 1.1.4 显示成功，“检查几何”报实体无效；问渠 CAD 当场报错，改成 5 就好（约 2 分钟）</figcaption></figure>
+<ul>
+<li>半径超过边长的一半，圆角本来做不出来。官方版的建模内核“做完了”，交回一个坏实体：壳没连上、面不封闭；FreeCAD 没检查就存进了模型。后面再建的特征都建在坏实体上，导出给别人也是坏的。</li>
+<li>问渠 CAD 在圆角、倒角做完后检查结果，坏的就报错，不存（第 18 章）。用脚本做圆角失败时，错误信息写明半径、几条边没做成（第 42 章）。</li>
+<li>习惯：做完复杂特征，点“零件设计 → 检查几何”看一眼。</li>
+</ul>
+<h3 id="l20-recompute">改尺寸与重算</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l20b.jpg"><source src="media/wqcad-l20b.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l20b.vtt"></video><figcaption>▶ 录屏：草图里有一个多余的尺寸，把宽度 30 改成 40——官方版没有提示就退回 30，问渠 CAD 改成 40；方块改小到圆角做不出来、重算——官方版后面的“挖孔”显示正常其实没重算，问渠 CAD 标成“要重算”（约 2 分钟）</figcaption></figure>
+<ul>
+<li>草图里多标了一个尺寸（左右两条竖边都标了 20），这是“冗余约束”。官方版遇到冗余就拒绝改任何尺寸，只在报告视图里留一行英文；问渠 CAD 照改，冗余照样标出来提醒你删（第 21 章）。</li>
+<li>前面一个特征失败，后面的特征没法重算。官方版把它们显示成“已更新”，三维视图里还是旧形状，很容易拿去用；问渠 CAD 把它们标成“要重算”（第 22 章）。</li>
+</ul>
+<h3 id="l20-calc">计算与导出</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l20c.jpg"><source src="media/wqcad-l20c.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l20c.vtt"></video><figcaption>▶ 录屏：Python 控制台里，B 样条表示的圆柱求体积——官方版差 0.86%，问渠 CAD 准；装配里两个零件带颜色导出 STEP 再导回——官方版变成 4 个，问渠 CAD 是 2 个（约 2 分钟）</figcaption></figure>
+<ul>
+<li>从别的 CAD 导进来的零件，曲面多是 B 样条。官方版求体积、质心、惯量用的积分在 B 样条面上不准，圆柱差 0.86%，球的惯量差 0.09%；质量、转动惯量跟着错。问渠 CAD 在这类面上用控制精度的积分（第 28 章）。</li>
+<li>宏、脚本带颜色导出装配时，官方版把每个零件写了两遍（第 33 章）。</li>
+<li>演示在 Python 控制台里做：宏、脚本、AI 工作台都是这样调用 FreeCAD 的，界面上的操作背后也是这些函数。</li>
+</ul>
+<h3 id="l20-list">28 个补丁一览</h3>
+<p>官方 FreeCAD 1.1.4 里还没有这些修改。“章”指《FreeCAD 内核解密》的章节。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>章</th>
+<th>修了什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2</td>
+<td>定位用的变换矩阵：拒绝带缩放、剪切的矩阵</td>
+</tr>
+<tr>
+<td>2</td>
+<td>3</td>
+<td>曲线上按距离取点：用容差</td>
+</tr>
+<tr>
+<td>3</td>
+<td>4</td>
+<td>面的曲率：符号按面的法向</td>
+</tr>
+<tr>
+<td>4</td>
+<td>5</td>
+<td>网格展平：报告变形有多大</td>
+</tr>
+<tr>
+<td>5</td>
+<td>5</td>
+<td>展开命令：相对容差，报告变形</td>
+</tr>
+<tr>
+<td>6</td>
+<td>7</td>
+<td>网格三角化：精确判定，不再出错面</td>
+</tr>
+<tr>
+<td>7</td>
+<td>18</td>
+<td>圆角、倒角的结果无效就报错（本课第一段）</td>
+</tr>
+<tr>
+<td>8</td>
+<td>19</td>
+<td>偏移、抽壳：先检查厚度，后检查结果</td>
+</tr>
+<tr>
+<td>9</td>
+<td>20</td>
+<td>螺旋：节距小到会自交时报错（本课核对时，按“节距—高度”方式建的这个例子没起作用，另查）</td>
+</tr>
+<tr>
+<td>10</td>
+<td>21</td>
+<td>草图改尺寸：别处有冗余约束不再退回（本课第二段）</td>
+</tr>
+<tr>
+<td>11</td>
+<td>22</td>
+<td>前面的特征失败，后面的保持“要重算”（本课第二段）</td>
+</tr>
+<tr>
+<td>12</td>
+<td>22</td>
+<td>去除特征：没去掉的要报告</td>
+</tr>
+<tr>
+<td>13</td>
+<td>25</td>
+<td>曲率在球的极点这类点上取极限</td>
+</tr>
+<tr>
+<td>14</td>
+<td>26</td>
+<td>检查几何：平面相交超出边的公差时警告</td>
+</tr>
+<tr>
+<td>15</td>
+<td>27</td>
+<td>曲线上的最近点：端点、等距的情况</td>
+</tr>
+<tr>
+<td>16</td>
+<td>28</td>
+<td>体积、质心、惯量：B 样条面上控制精度（本课第三段）</td>
+</tr>
+<tr>
+<td>17</td>
+<td>29</td>
+<td>多个实体合并：结果与输入顺序无关</td>
+</tr>
+<tr>
+<td>18</td>
+<td>30</td>
+<td>书中发现的回归测试</td>
+</tr>
+<tr>
+<td>19</td>
+<td>31</td>
+<td>文档里的形状不被就地改公差</td>
+</tr>
+<tr>
+<td>20</td>
+<td>33</td>
+<td>装配里带颜色导出，零件不重复（本课第三段）</td>
+</tr>
+<tr>
+<td>21</td>
+<td>34</td>
+<td>CAM 区域偏移用上区域参数</td>
+</tr>
+<tr>
+<td>22</td>
+<td>35</td>
+<td>撤销记录占用的内存可查</td>
+</tr>
+<tr>
+<td>23</td>
+<td>38</td>
+<td>网格修复退化面：不越界、不死循环</td>
+</tr>
+<tr>
+<td>24</td>
+<td>39</td>
+<td>逆向工程拟合：检查法向、内点编号、距离阈值</td>
+</tr>
+<tr>
+<td>25</td>
+<td>40</td>
+<td>B 样条曲面拟合：拒绝不规则点阵</td>
+</tr>
+<tr>
+<td>26</td>
+<td>42</td>
+<td>错误信息写明异常类别和哪个圆角、倒角失败</td>
+</tr>
+<tr>
+<td>27</td>
+<td>43</td>
+<td>缝合用给定的容差，检查结果带上下文</td>
+</tr>
+<tr>
+<td>28</td>
+<td>28</td>
+<td>坏实体求体积不再卡住（本课核对时发现补丁 16 带来的问题，0.3.2 起修好）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l20-self">自己做</h3>
+<ol>
+<li>在问渠 CAD 里，把一个 20 mm 方块的所有边倒圆角 9.9、10、10.5，看哪个能做、哪个报错，用“检查几何”核对能做的那个。</li>
+<li>画一个矩形草图，故意多标一个尺寸，看“求解器信息”里怎么提示冗余；删掉多余的那个。</li>
+<li>在 Python 控制台里，把半径 10 的球转成 B 样条（<code>Part.makeSphere(10).toNurbs()</code>），求体积，和 4/3 π r³ 比。</li>
+</ol>
+<h3 id="l20-quiz">小测</h3>
+<div class="quiz" data-ok="b"><p class="q">FreeCAD 没报错，模型树上也没有红叉，说明结果一定对吗？</p><div class="opts"><button type="button" data-k="a">A. 一定对</button><button type="button" data-k="b">B. 不一定，要用“检查几何”核对</button><button type="button" data-k="c">C. 重启软件就对了</button><button type="button" data-k="d">D. 导出成 STEP 就对了</button></div><p class="why" hidden>官方版的圆角可以“成功”交回一个坏实体；检查几何能查出来。</p></div>
+<div class="quiz" data-ok="b"><p class="q">草图里多标了一个尺寸，叫什么？</p><div class="opts"><button type="button" data-k="a">A. 欠约束</button><button type="button" data-k="b">B. 冗余约束</button><button type="button" data-k="c">C. 冲突约束</button><button type="button" data-k="d">D. 参考尺寸</button></div><p class="why" hidden>多余但不矛盾的约束叫冗余约束；删掉它，或者改成参考尺寸。</p></div>
+<div class="quiz" data-ok="b"><p class="q">B 样条表示的圆柱，官方 FreeCAD 1.1.4 算体积差多少？</p><div class="opts"><button type="button" data-k="a">A. 0</button><button type="button" data-k="b">B. 约 0.86%</button><button type="button" data-k="c">C. 约 10%</button><button type="button" data-k="d">D. 算不出来</button></div><p class="why" hidden>它用的积分在有理 B 样条面上不精确；问渠 CAD 改成控制精度的积分。</p></div></section>
+<section id="appA"><h2><span class="n">21</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
 <p>官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1.4 GB）。</p>
 <h3 id="appA-install">安装</h3>
 <ol class="steps">

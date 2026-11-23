@@ -1,0 +1,43 @@
+WEBVTT
+
+00:00:01.833 --> 00:00:09.645
+Official FreeCAD 1.1.4: a sketch, a 30 × 20 rectangle; both vertical sides are dimensioned 20 — one of them is redundant
+
+00:00:09.645 --> 00:00:18.146
+Change the width 30 to 40: double-click the dimension, type 40, OK
+
+00:00:18.146 --> 00:00:29.646
+No message at all; the width snaps back to 30 (only one line in the report view: Datum 40 mm … is invalid) — another dimension is redundant, yet the width cannot be changed
+
+00:00:29.646 --> 00:00:35.645
+Second: a 20 mm box, fillet 2, then a hole cut (Part workbench; tree: Box → Fillet → Cut)
+
+00:00:35.645 --> 00:00:47.645
+Make the box 4 mm: a fillet of 2 is half the edge, impossible
+
+00:00:52.989 --> 00:00:57.146
+Recompute: the fillet fails and gets a red mark in the tree
+
+00:00:57.146 --> 00:01:07.120
+Official FreeCAD 1.1.4: the Cut after it looks fine, and the 3D view still shows the old 20 mm shape — it was never recomputed
+
+00:01:08.810 --> 00:01:16.118
+WenQuest CAD: a sketch, a 30 × 20 rectangle; both vertical sides are dimensioned 20 — one of them is redundant
+
+00:01:16.118 --> 00:01:24.743
+Change the width 30 to 40: double-click the dimension, type 40, OK
+
+00:01:24.743 --> 00:01:32.943
+The width is now 40; the redundant dimension is still reported so you can delete it, but it does not block other changes
+
+00:01:32.943 --> 00:01:38.843
+Second: a 20 mm box, fillet 2, then a hole cut (Part workbench; tree: Box → Fillet → Cut)
+
+00:01:38.843 --> 00:01:50.843
+Make the box 4 mm: a fillet of 2 is half the edge, impossible
+
+00:01:56.094 --> 00:02:00.243
+Recompute: the fillet fails and gets a red mark in the tree
+
+00:02:00.243 --> 00:02:10.120
+WenQuest CAD: the Cut after it is marked “needs recompute” (blue mark) — it still holds the old shape, and you are told so

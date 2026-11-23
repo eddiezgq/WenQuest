@@ -1,0 +1,31 @@
+WEBVTT
+
+00:00:02.606 --> 00:00:11.050
+Official FreeCAD 1.1.4: open the Python console (View → Panels). Macros, scripts and the AI workbench all call FreeCAD this way
+
+00:00:11.050 --> 00:00:23.050
+① A cylinder r 3, h 10 converted to B-spline (common in STEP files): its volume versus π r² h
+
+00:00:33.723 --> 00:00:42.601
+Official FreeCAD 1.1.4: off by 0.86% — the same cylinder, a different representation, a wrong volume; mass and inertia are wrong too
+
+00:00:42.601 --> 00:00:54.601
+② Two boxes in an assembly, export to STEP with colours, import back and count the parts
+
+00:02:02.571 --> 00:02:10.560
+Official FreeCAD 1.1.4: 4 — each part was written twice, so the file you send has duplicate parts
+
+00:02:13.188 --> 00:02:20.959
+WenQuest CAD: open the Python console (View → Panels). Macros, scripts and the AI workbench all call FreeCAD this way
+
+00:02:20.959 --> 00:02:32.959
+① A cylinder r 3, h 10 converted to B-spline (common in STEP files): its volume versus π r² h
+
+00:02:43.709 --> 00:02:50.009
+WenQuest CAD: relative error 2e-15, the same as the formula
+
+00:02:50.009 --> 00:03:02.009
+② Two boxes in an assembly, export to STEP with colours, import back and count the parts
+
+00:04:09.659 --> 00:04:15.960
+WenQuest CAD: 2, correct

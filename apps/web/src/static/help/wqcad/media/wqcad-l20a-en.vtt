@@ -1,0 +1,31 @@
+WEBVTT
+
+00:00:03.203 --> 00:00:10.102
+First the official FreeCAD 1.1.4 (the title bar says FreeCAD): a 20 mm cube, fillet all edges, radius 11
+
+00:00:10.102 --> 00:00:22.102
+The radius is more than half the edge, so this fillet cannot exist — let's see what the software says
+
+00:00:31.356 --> 00:00:41.724
+Tick “Use all edges”, radius 11, OK
+
+00:00:41.724 --> 00:00:47.305
+Official FreeCAD 1.1.4: no error, the tree looks fine — it seems to have “worked”
+
+00:00:47.305 --> 00:00:59.305
+Check it with Check geometry
+
+00:01:01.614 --> 00:01:13.614
+Check geometry: the solid is “invalid” — shell not closed, faces open, bad curves on edges; the 3D view shows the mess too. This “successful” fillet is broken, and everything built on it inherits that
+
+00:01:19.174 --> 00:01:31.174
+Same file, same steps, now in WenQuest CAD
+
+00:01:40.314 --> 00:01:48.173
+Tick “Use all edges”, radius 11, OK
+
+00:01:48.173 --> 00:01:57.319
+WenQuest CAD: an error right away — “Fillet result is not a valid solid. The size may be too large”. The broken result is never stored
+
+00:01:57.319 --> 00:02:09.319
+Change the radius to 5, OK: the fillet works
