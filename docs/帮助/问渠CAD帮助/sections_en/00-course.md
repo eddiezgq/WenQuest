@@ -6,7 +6,7 @@ lead: Written for people who have never used FreeCAD. It starts with the window 
 
 ### This course
 
-WenQuest CAD is built on the open-source FreeCAD 1.1.4: the window, menus and workflow are the same as FreeCAD, plus 28 kernel fixes and the WenQuest AI workbench. So most of this course teaches FreeCAD — what you learn works in standard FreeCAD too.
+WenQuest CAD is built on the open-source FreeCAD 1.1.4: the window, menus and workflow are the same as FreeCAD, plus 29 kernel fixes and the WenQuest AI workbench. So most of this course teaches FreeCAD — what you learn works in standard FreeCAD too.
 
 <ul>
 <li><b>8 modules, 21 lessons + appendix</b>: Getting started, Sketching, Part modelling, Curves and surfaces, Assembly, Drawings, Advanced, AI. About 25–30 hours.</li>
@@ -23,6 +23,6 @@ Lessons 1–17 are online now; the others follow module by module.
 
 ### How the recordings are made
 
-Every recording is the real software at work, English interface: where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. Lessons 1–19 were recorded with the official FreeCAD 1.1.4 on a cloud computer, with the WenQuest CAD branding and the same AI workbench; the only difference from WenQuest CAD on your computer is the kernel patches, which do not change the interface and are not touched by what those lessons do. From lesson 20 the recordings use WenQuest CAD with all 28 patches (Linux build); lesson 20 compares the two.
+Every recording is the real software at work, English interface: where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. Lessons 1–19 were recorded with the official FreeCAD 1.1.4 on a cloud computer, with the WenQuest CAD branding and the same AI workbench; the only difference from WenQuest CAD on your computer is the kernel patches, which do not change the interface and are not touched by what those lessons do. From lesson 20 the recordings use WenQuest CAD with its kernel patches (Linux build); lesson 20 compares the two.
 
 The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.

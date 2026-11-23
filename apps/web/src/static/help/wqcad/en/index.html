@@ -274,12 +274,12 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l19-do" data-s="l19">Follow along</a>
 <a class="sub" href="#l19-self" data-s="l19">On your own</a>
 <a class="sub" href="#l19-quiz" data-s="l19">Quiz</a>
-<a href="#l20" data-s="l20"><span class="n">20</span>Lesson 20 What is different in WenQuest CAD: what the 28 patches fix</a>
+<a href="#l20" data-s="l20"><span class="n">20</span>Lesson 20 What is different in WenQuest CAD: what the 29 patches fix</a>
 <a class="sub" href="#l20-goal" data-s="l20">What you will be able to do</a>
 <a class="sub" href="#l20-fillet" data-s="l20">“Successful” modelling that is not</a>
 <a class="sub" href="#l20-recompute" data-s="l20">Changing dimensions and recomputing</a>
 <a class="sub" href="#l20-calc" data-s="l20">Calculation and export</a>
-<a class="sub" href="#l20-list" data-s="l20">The 28 patches</a>
+<a class="sub" href="#l20-list" data-s="l20">The 29 patches</a>
 <a class="sub" href="#l20-self" data-s="l20">On your own</a>
 <a class="sub" href="#l20-quiz" data-s="l20">Quiz</a>
 <a href="#appA" data-s="appA"><span class="n">21</span>Appendix A Installing WenQuest CAD</a>
@@ -294,7 +294,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </aside>
 <main>
 <section id="course"><h2><span class="n">00</span>How to use this course</h2><p class="lead">Written for people who have never used FreeCAD. It starts with the window and the mouse, and lesson by lesson you build real parts of the WQ-LS lockstitch sewing machine — ending with an assembled take-up mechanism and its drawings.</p><h3 id="course-1">This course</h3>
-<p>WenQuest CAD is built on the open-source FreeCAD 1.1.4: the window, menus and workflow are the same as FreeCAD, plus 28 kernel fixes and the WenQuest AI workbench. So most of this course teaches FreeCAD — what you learn works in standard FreeCAD too.</p>
+<p>WenQuest CAD is built on the open-source FreeCAD 1.1.4: the window, menus and workflow are the same as FreeCAD, plus 29 kernel fixes and the WenQuest AI workbench. So most of this course teaches FreeCAD — what you learn works in standard FreeCAD too.</p>
 <ul>
 <li><b>8 modules, 21 lessons + appendix</b>: Getting started, Sketching, Part modelling, Curves and surfaces, Assembly, Drawings, Advanced, AI. About 25–30 hours.</li>
 <li><b>One running project</b>: each lesson makes a real part of the WQ-LS lockstitch machine, with dimensions taken from the WQ-LS design, so your result can be checked against the real one; every lesson comes with an answer model.</li>
@@ -307,7 +307,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 
 <p>Lessons 1–17 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
-<p>Every recording is the real software at work, English interface: where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. Lessons 1–19 were recorded with the official FreeCAD 1.1.4 on a cloud computer, with the WenQuest CAD branding and the same AI workbench; the only difference from WenQuest CAD on your computer is the kernel patches, which do not change the interface and are not touched by what those lessons do. From lesson 20 the recordings use WenQuest CAD with all 28 patches (Linux build); lesson 20 compares the two.</p>
+<p>Every recording is the real software at work, English interface: where the mouse clicks and what is typed, the software really does — sketches, constraints and pads are all computed by FreeCAD itself. Lessons 1–19 were recorded with the official FreeCAD 1.1.4 on a cloud computer, with the WenQuest CAD branding and the same AI workbench; the only difference from WenQuest CAD on your computer is the kernel patches, which do not change the interface and are not touched by what those lessons do. From lesson 20 the recordings use WenQuest CAD with its kernel patches (Linux build); lesson 20 compares the two.</p>
 <p>The recordings have English subtitles (toggle them at the bottom right of the video). Narration will be added later.</p></section>
 <section id="l01"><h2><span class="n">01</span>Lesson 1 The FreeCAD window</h2><p class="lead">You will be able to name every part of the window, rotate, pan and zoom a model with the mouse, switch standard views, select a part and read its properties, and find where units and navigation style are set. About 1 hour.</p><h3 id="l01-goal">What you will be able to do</h3>
 <ul>
@@ -1893,7 +1893,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">What happens if the mesh-convergence check fails?</p><div class="opts"><button type="button" data-k="a">A. A safety factor is still given</button><button type="button" data-k="b">B. No safety factor; the overall verdict is not “pass”</button><button type="button" data-k="c">C. The material is changed automatically</button><button type="button" data-k="d">D. The load is increased automatically</button></div><p class="why" hidden>If a check fails it will not report a number that may be wrong: better to say “unknown”.</p></div>
 <div class="quiz" data-ok="b"><p class="q">When can an AI-drafted study be computed?</p><div class="opts"><button type="button" data-k="a">A. As soon as AI drafts it</button><button type="button" data-k="b">B. After an engineer reads the questions and confirms</button><button type="button" data-k="c">C. As soon as the program&#x27;s checks pass</button><button type="button" data-k="d">D. Any time</button></div><p class="why" hidden>AI only drafts; it can be computed only after a person confirms (name and time recorded).</p></div>
 <div class="quiz" data-ok="b"><p class="q">Why pick the material from the library for a hand-built analysis?</p><div class="opts"><button type="button" data-k="a">A. FEM material cards cannot be computed</button><button type="button" data-k="b">B. Library values have sources, listed in the report</button><button type="button" data-k="c">C. It computes faster</button><button type="button" data-k="d">D. No difference</button></div><p class="why" hidden>Strength and modulus decide the conclusion; they must be traceable to a source.</p></div></section>
-<section id="l20"><h2><span class="n">20</span>Lesson 20 What is different in WenQuest CAD: what the 28 patches fix</h2><p class="lead">WenQuest CAD is FreeCAD 1.1.4 plus 28 patches. Same file, same steps, first in the official FreeCAD 1.1.4, then in WenQuest CAD: a fillet that “succeeds” but is broken, a dimension that cannot be changed, a feature shown up to date that was never recomputed, a wrong volume, duplicate parts on export. About 1 hour.</p><h3 id="l20-goal">What you will be able to do</h3>
+<section id="l20"><h2><span class="n">20</span>Lesson 20 What is different in WenQuest CAD: what the 29 patches fix</h2><p class="lead">WenQuest CAD is FreeCAD 1.1.4 plus 29 patches. Same file, same steps, first in the official FreeCAD 1.1.4, then in WenQuest CAD: a fillet that “succeeds” but is broken, a dimension that cannot be changed, a feature shown up to date that was never recomputed, a wrong volume, duplicate parts on export. About 1 hour.</p><h3 id="l20-goal">What you will be able to do</h3>
 <ul>
 <li>Know that “no error” is not “correct”: check solids with Check geometry.</li>
 <li>Know how the official FreeCAD and WenQuest CAD behave in the cases below.</li>
@@ -1920,7 +1920,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>Exporting an assembly with colours from a macro or script writes every part twice in the official build (chapter 33).</li>
 <li>The demos use the Python console: macros, scripts and the AI workbench all call FreeCAD this way, and the GUI uses the same functions underneath.</li>
 </ul>
-<h3 id="l20-list">The 28 patches</h3>
+<h3 id="l20-list">The 29 patches</h3>
 <p>None of these changes is in the official FreeCAD 1.1.4. “Ch.” is the chapter of “FreeCAD kernel: decode, verify, correct”.</p>
 <table>
 <thead>
@@ -1974,7 +1974,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <tr>
 <td>9</td>
 <td>20</td>
-<td>Helix: error when the pitch makes it intersect itself (in this lesson's check it did not trigger for a pitch–height helix; being investigated)</td>
+<td>Helix: error when the pitch makes it intersect itself (for a pitch–height helix this needs patch 29, from 0.3.3)</td>
 </tr>
 <tr>
 <td>10</td>
@@ -2070,6 +2070,11 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <td>28</td>
 <td>28</td>
 <td>Volume of an invalid solid no longer hangs (found while checking this lesson, a side effect of patch 16; fixed from 0.3.2)</td>
+</tr>
+<tr>
+<td>29</td>
+<td>20</td>
+<td>Helix built by pitch and height: the axis is set before the pitch check, so patch 9 takes effect (found while checking this lesson; fixed from 0.3.3)</td>
 </tr>
 </tbody>
 </table>
