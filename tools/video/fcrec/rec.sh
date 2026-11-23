@@ -3,6 +3,8 @@
 H=$(cd "$(dirname "$0")" && pwd)
 # WQ_LANG=en：英文界面（$WQ_REC/home_en 里的设置 Language=English）、英文字幕
 if [ "$WQ_LANG" = en ]; then export HOME=$WQ_REC/home_en LANG=en_US.UTF-8; else export HOME=$WQ_REC/home LANG=zh_CN.UTF-8; fi
+# WQ_STOCK=1：官方 FreeCAD（第 20 课对比用）——去掉问渠品牌（branding.xml 暂时移开），用单独的设置目录（没有 AI 工作台）
+if [ "$WQ_STOCK" = 1 ]; then export HOME=$HOME/../home_stock${WQ_LANG:+_$WQ_LANG}; HOME=$(cd "$HOME" && pwd); mv "$FC/usr/bin/branding.xml" "$FC/usr/bin/branding.xml.off" 2>/dev/null; trap 'mv "$FC/usr/bin/branding.xml.off" "$FC/usr/bin/branding.xml" 2>/dev/null' EXIT; fi
 export WQ_REC WQ_LANG DISPLAY=${DISPLAY:-:77} LC_ALL=C.UTF-8   # 界面语言看 user.cfg；这里只让 Python 用 UTF-8 认中文文件名
 rm -f $WQ_REC/ready.flag $WQ_REC/end.flag $WQ_REC/clicks.txt $WQ_REC/subs.txt
 pkill -f squashfs-root/usr/bin/freecad; sleep 1

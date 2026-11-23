@@ -271,5 +271,6 @@
  "扭矩的转向对线弹性应力的大小没有影响，可以。勾“追问都已处理”，写确认人，点“确认算例”": "The torque direction does not change the size of linear-elastic stress, so that's fine. Tick “questions handled”, enter your name, click Confirm study",
  "确认人和时间记进算例；没确认的 AI 草稿不能算——程序不替人签字": "Who confirmed and when go into the study; an unconfirmed AI draft cannot be computed — the program never signs for you",
  "接着和前面一样：计算并核查": "Then, as before: Compute and check",
- "这就是问渠有限元的分工：AI 只起草，程序核对、计算、核查，人确认、签字": "That is the division of work in WenQuest FEA: AI only drafts; the program checks, computes and verifies; people confirm and sign"
+ "这就是问渠有限元的分工：AI 只起草，程序核对、计算、核查，人确认、签字": "That is the division of work in WenQuest FEA: AI only drafts; the program checks, computes and verifies; people confirm and sign",
+ "半径超过边长的一半，这个圆角本来就做不出来——看软件怎么说": "The radius is more than half the edge, so this fillet cannot exist — let's see what the software says"
 }
