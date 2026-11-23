@@ -1,12 +1,14 @@
 ---
 id: course
 title: How to use this course
-lead: Written for people who have never used FreeCAD. It starts with the window and the mouse, and lesson by lesson you build real parts of the WQ-LS lockstitch sewing machine — ending with an assembled take-up mechanism and its drawings.
+lead: Written for people who have never used FreeCAD. It starts with the window and the mouse, and lesson by lesson you build real parts of the WQ-LS lockstitch sewing machine — ending with an assembled needle-bar mechanism (crank–slider) and its drawings.
 ---
 
 ### This course
 
 WenQuest CAD is built on the open-source FreeCAD 1.1.4: the window, menus and workflow are the same as FreeCAD, plus 29 kernel fixes and the WenQuest AI workbench. So most of this course teaches FreeCAD — what you learn works in standard FreeCAD too.
+
+::video{src=wqcad-intro-en title="Overview: a piece of lessons 1 to 21 — the window, sketch constraints, patterns, surfaces, multibody dynamics, drawings, FEA, AI part design (about 3.5 minutes, subtitles only)"}
 
 <ul>
 <li><b>8 modules, 21 lessons + appendix</b>: Getting started, Sketching, Part modelling, Curves and surfaces, Assembly, Drawings, Advanced, AI. About 25–30 hours.</li>
