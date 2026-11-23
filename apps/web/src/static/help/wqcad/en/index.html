@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ Contents</button>
 <aside>
-  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–20)</small></div>
+  <div class="brand"><b>WenQuest CAD</b><small>Help and training course (online: lessons 1–21)</small></div>
   <input class="find" placeholder="Search help…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>How to use this course</a>
 <a class="sub" href="#course-1" data-s="course">This course</a>
@@ -282,7 +282,16 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l20-list" data-s="l20">The 29 patches</a>
 <a class="sub" href="#l20-self" data-s="l20">On your own</a>
 <a class="sub" href="#l20-quiz" data-s="l20">Quiz</a>
-<a href="#appA" data-s="appA"><span class="n">21</span>Appendix A Installing WenQuest CAD</a>
+<a href="#l21" data-s="l21"><span class="n">21</span>Lesson 21 The AI workbench: choosing parts, the parts library, AI part design</a>
+<a class="sub" href="#l21-goal" data-s="l21">What you will be able to do</a>
+<a class="sub" href="#l21-rules" data-s="l21">Three rules first</a>
+<a class="sub" href="#l21-select" data-s="l21">Choosing parts and checking them</a>
+<a class="sub" href="#l21-library" data-s="l21">The parts library and the company library</a>
+<a class="sub" href="#l21-design" data-s="l21">AI part design</a>
+<a class="sub" href="#l21-all" data-s="l21">Everything in the AI workbench</a>
+<a class="sub" href="#l21-self" data-s="l21">Try it yourself</a>
+<a class="sub" href="#l21-quiz" data-s="l21">Quiz</a>
+<a href="#appA" data-s="appA"><span class="n">22</span>Appendix A Installing WenQuest CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">Download and licence</a>
 <a class="sub" href="#appA-install" data-s="appA">Install</a>
 <a class="sub" href="#appA-fix" data-s="appA">Troubleshooting</a></nav>
@@ -303,7 +312,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">Lessons</h3>
-<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l11">Lesson 11</a></td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l12">Lesson 12</a></td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the head (reverse-engineered from the mesh)</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l13">Lesson 13</a></td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Trimming and blends on the head</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l14">Lesson 14</a></td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>The head shell hollowed into a casting</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l15">Lesson 15</a></td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Needle-bar mechanism (slider-crank)</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l16">Lesson 16</a></td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Needle-bar mechanism through one turn; stroke</td><td>Online</td></tr><tr><td>6 Drawings</td><td><a href="#l17">Lesson 17</a></td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>Online</td></tr><tr><td>6 Drawings</td><td><a href="#l18">Lesson 18</a></td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Tolerances on the needle-bar drawing; needle-bar mechanism assembly drawing</td><td>Online</td></tr><tr><td>7 Advanced</td><td><a href="#l19">Lesson 19</a></td><td>FEA with WenQuest FEA (hand-built FEM analysis, compute and check, report)</td><td>Needle-bar crank stress at 5000 rpm</td><td>Online</td></tr><tr><td>7 Advanced</td><td><a href="#l20">Lesson 20</a></td><td>What is different in WenQuest CAD: the 29 patches</td><td>Official FreeCAD versus WenQuest CAD</td><td>Online</td></tr><tr><td>8 AI</td><td>Lesson 21</td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Joint selection and checks; demo company library; replay the upper-shaft design</td><td>In progress</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>Module</th><th>Lesson</th><th>Contents</th><th>What you make (WQ-LS part)</th><th>Status</th></tr></thead><tbody><tr><td>1 Getting started</td><td><a href="#l01">Lesson 1</a></td><td>The window: workbenches, model tree, properties, report view; mouse navigation; views and selection; preferences and units</td><td>Open the WQ-LS machine and look around</td><td>Online</td></tr><tr><td>1 Getting started</td><td><a href="#l02">Lesson 2</a></td><td>Files and data: new, save, undo; import/export STEP / STL / DXF; objects and dependencies</td><td>Export a part for someone else</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l03">Lesson 3</a></td><td>Sketching basics: line, circle, arc, rectangle, polyline; construction geometry</td><td>Presser-bar collar; needle-clamp outline</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l04">Lesson 4</a></td><td>Constraints: geometric, dimensional, fully constrained, finding over-constraints</td><td>Needle clamp (fully constrained)</td><td>Online</td></tr><tr><td>2 Sketching</td><td><a href="#l05">Lesson 5</a></td><td>Sketch techniques: mirror, array, trim/extend, external geometry, expressions; spreadsheet-driven sizes</td><td>Crank outline (spreadsheet driven)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l06">Lesson 6</a></td><td>Pad, pocket, revolve, groove, hole (threaded holes)</td><td>Needle bar, crank pin</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l07">Lesson 7</a></td><td>Chamfer, fillet, draft, thickness</td><td>Needle-bar chamfers; bobbin case (thickness)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l08">Lesson 8</a></td><td>Sweep, loft, helix</td><td>Presser spring (helix), check spring (sweep)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l09">Lesson 9</a></td><td>Patterns, mirror, multi-transform</td><td>Handwheel (holes, grip grooves); needle-bar groove</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l10">Lesson 10</a></td><td>Datum planes and axes, attachment; parametric design</td><td>Needle-bar link (change one, all follow)</td><td>Online</td></tr><tr><td>3 Part modelling</td><td><a href="#l11">Lesson 11</a></td><td>Part workbench: primitives, Booleans, offset, sections</td><td>Feed eccentric</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l12">Lesson 12</a></td><td>Curves: B-splines, helices, projection, intersections</td><td>Characteristic curves of the head (reverse-engineered from the mesh)</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l13">Lesson 13</a></td><td>Surfaces: filling, sweep, loft, extend, trim; G0/G1/G2 continuity</td><td>Trimming and blends on the head</td><td>Online</td></tr><tr><td>4 Curves & surfaces</td><td><a href="#l14">Lesson 14</a></td><td>Surfaces to solids: sew, make solid, thicken; check geometry</td><td>The head shell hollowed into a casting</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l15">Lesson 15</a></td><td>Assembly workbench: insert parts, ground, joints, degrees of freedom</td><td>Needle-bar mechanism (slider-crank)</td><td>Online</td></tr><tr><td>5 Assembly</td><td><a href="#l16">Lesson 16</a></td><td>Motion and checks: drive joints, measure, interference, exploded views</td><td>Needle-bar mechanism through one turn; stroke</td><td>Online</td></tr><tr><td>6 Drawings</td><td><a href="#l17">Lesson 17</a></td><td>TechDraw: templates, projections, sections, details, dimensions</td><td>Needle-bar part drawing</td><td>Online</td></tr><tr><td>6 Drawings</td><td><a href="#l18">Lesson 18</a></td><td>Tolerances and notes, bill of materials, PDF / DXF export</td><td>Tolerances on the needle-bar drawing; needle-bar mechanism assembly drawing</td><td>Online</td></tr><tr><td>7 Advanced</td><td><a href="#l19">Lesson 19</a></td><td>FEA with WenQuest FEA (hand-built FEM analysis, compute and check, report)</td><td>Needle-bar crank stress at 5000 rpm</td><td>Online</td></tr><tr><td>7 Advanced</td><td><a href="#l20">Lesson 20</a></td><td>What is different in WenQuest CAD: the 29 patches</td><td>Official FreeCAD versus WenQuest CAD</td><td>Online</td></tr><tr><td>8 AI</td><td><a href="#l21">Lesson 21</a></td><td>AI workbench: part selection and checks, company parts library, AI part design</td><td>Joint selection and checks; demo company library; replay the upper-shaft design</td><td>Online</td></tr></tbody></table>
 
 <p>Lessons 1–17 are online now; the others follow module by module.</p>
 <h3 id="course-3">How the recordings are made</h3>
@@ -2088,7 +2097,154 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">FreeCAD shows no error and no red mark in the tree. Is the result surely correct?</p><div class="opts"><button type="button" data-k="a">A. Yes</button><button type="button" data-k="b">B. Not necessarily — check it with Check geometry</button><button type="button" data-k="c">C. Restart and it will be</button><button type="button" data-k="d">D. Export to STEP and it will be</button></div><p class="why" hidden>The official build&#x27;s fillet can “succeed” with a broken solid; Check geometry finds it.</p></div>
 <div class="quiz" data-ok="b"><p class="q">What is one dimension too many in a sketch called?</p><div class="opts"><button type="button" data-k="a">A. Under-constrained</button><button type="button" data-k="b">B. Redundant constraint</button><button type="button" data-k="c">C. Conflicting constraint</button><button type="button" data-k="d">D. Reference dimension</button></div><p class="why" hidden>An extra but consistent constraint is redundant; delete it or make it a reference dimension.</p></div>
 <div class="quiz" data-ok="b"><p class="q">How far off is the volume of a B-spline cylinder in the official FreeCAD 1.1.4?</p><div class="opts"><button type="button" data-k="a">A. 0</button><button type="button" data-k="b">B. About 0.86 %</button><button type="button" data-k="c">C. About 10 %</button><button type="button" data-k="d">D. It cannot compute it</button></div><p class="why" hidden>Its integration is inexact on rational B-spline faces; WenQuest CAD uses accuracy-controlled integration.</p></div></section>
-<section id="appA"><h2><span class="n">21</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
+<section id="l21"><h2><span class="n">21</span>Lesson 21 The AI workbench: choosing parts, the parts library, AI part design</h2><p class="lead">The AI workbench that comes with WenQuest CAD (menu “AI Parts”). This lesson covers three things: choosing parts from a one-sentence requirement with every check listed, the parts library and the company library, and AI part design. Multibody dynamics was covered in lesson 16 and FEA in lesson 19. About 1 hour.</p><h3 id="l21-goal">What you will be able to do</h3>
+<ul>
+<li>Explain how the work is split: AI drafts, code checks, a person confirms.</li>
+<li>Use the “Selection” window to find designs from a one-sentence requirement, read “pass / fail / to be confirmed”, and know that “to be confirmed” is not a pass.</li>
+<li>Look up which datasheet and page a value in the library came from and whether it was reviewed; set a company library and see what data its parts lack.</li>
+<li>Replay an upper-shaft design in “AI part design” and read the checks of every round.</li>
+</ul>
+
+<h3 id="l21-rules">Three rules first</h3>
+<ul>
+<li><strong>AI only drafts</strong>: it turns words into a form, proposes designs, asks questions. Changing the model or writing to the company library needs a person to confirm in the window.</li>
+<li><strong>Code decides whether it works</strong>: torque, speed, fits, strength, life… are all deterministic calculations, not AI. There are three results: pass, fail and <strong>to be confirmed</strong>. Missing data means to be confirmed, <strong>never pass</strong>.</li>
+<li><strong>Every AI run is logged</strong>. You can learn without an AI key: the AI replies in these recordings are recordings of a real model, and the panels say “replayed”.</li>
+</ul>
+<h3 id="l21-select">Choosing parts and checking them</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l21a.jpg"><source src="../media/wqcad-l21a.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l21a.vtt"></video><figcaption>▶ Recording: one-sentence requirement (arm joint 2, 25 N·m, 30 rpm) → AI fills the form and shows the words each value came from → search the real vendor library: nothing for 220 V single-phase; change to three-phase 200 V and include designs to be confirmed: 2 designs, both to be confirmed (flange data missing) → place in the layout → checks C1–C11 → BOM (about 3 minutes)</figcaption></figure>
+<ul>
+<li>Menu “AI Parts → Selection”. Write one sentence at the top and click “Parse”: AI only fills the form below, and each value shows the words in the sentence it came from; what the sentence does not say (the safety factor) takes the default, and says so. <strong>A person checks the form</strong>, then clicks “Find designs”. (In the recording the sentence is in Chinese, because the recorded AI reply is for that sentence.)</li>
+<li>Searching and checking are done by code. The public library holds real vendor parts: Yaskawa motors and drives, Harmonic Drive reducers, NSK bearings, ROBOTIS smart actuators, with parameters taken from the vendors' published datasheets.</li>
+<li>Nothing is found for 220 V single-phase: the library data for these drives says three-phase input. <strong>If nothing fits, it says so</strong> and does not make do with something close.</li>
+<li>With three-phase 200 V there is still nothing without “Include designs to be confirmed”; with it ticked there are 2 designs, both <strong>to be confirmed</strong>: for the flange between motor and reducer the library lacks the bolt circle, hole count and so on, so code cannot tell whether they fit. Everything else (torque, speed, supply, fieldbus…) passes.</li>
+<li>“Place in layout” joins the motor, reducer and drive at their ports in a document (FapLayout). The “Checks” window lists C1–C11, each with the numbers used and what they were compared with; for missing data use “Add data” or “Import datasheet”, and every extracted value needs a person's review. The “BOM” window: vendor, model, mass, data sources; export CSV / JSON.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>What it looks at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td>Interface type: can the two ports connect</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>Shaft–bore fit: diameters, tolerances, key</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>Flange fit: bolt circle, hole count, hole type, pilot</td>
+</tr>
+<tr>
+<td>C4, C5</td>
+<td>Continuous and peak torque (referred to the motor, with the efficiency curve)</td>
+</tr>
+<tr>
+<td>C6</td>
+<td>Reducer overload protection</td>
+</tr>
+<tr>
+<td>C7</td>
+<td>Speed</td>
+</tr>
+<tr>
+<td>C8</td>
+<td>Inertia ratio (only when a load inertia is given)</td>
+</tr>
+<tr>
+<td>C9</td>
+<td>Supply: AC/DC, voltage, phases, current</td>
+</tr>
+<tr>
+<td>C10</td>
+<td>Encoder and fieldbus</td>
+</tr>
+<tr>
+<td>C11</td>
+<td>Bearing and envelope (only with a bearing or an outer diameter limit)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l21-library">The parts library and the company library</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l21b.jpg"><source src="../media/wqcad-l21b.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l21b.vtt"></video><figcaption>▶ Recording: in the parts library, where each value of the Harmonic Drive CSF-25 comes from and whether it was reviewed → menu “Company library”, choose the folder (a demo sewing-machine company, fictional) → after a restart two made-in-house parts appear → the data of upper shaft LS-101 and what it lacks → export the completeness report → place it in the model (about 2 minutes)</figcaption></figure>
+<ul>
+<li>Menu “AI Parts → Parts library”: search by category, model or parameter range. For a part, every value shows the datasheet and page it came from, the condition, and whether a person reviewed it.</li>
+<li>The <strong>company library</strong> holds a company's own parts — made-in-house parts and bought-in parts that are not in the public library — in one folder; the data stays with the company and is layered over the public library. Choose the folder in “AI Parts → Company library” (an empty folder creates a new library); it takes effect after FreeCAD restarts.</li>
+<li>The demo company's two made-in-house parts were entered with AI's help: AI read the company's parts list (41 rows) and proposed each part's type, an engineer confirmed; sizes and mass were measured by code from the 3D models. Measured values are marked “not reviewed”. (Building a company library from a parts list with AI is a script in the AI workbench tutorial, not part of the CAD window.)</li>
+<li>“Completeness report…”: for every part in the library, what data is missing, which checks it leaves to be confirmed, and what to fill first, exported to Excel. In the recording: 67 parts (65 public, 2 company), 52 with complete data.</li>
+</ul>
+<h3 id="l21-design">AI part design</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/wqcad-l21c.jpg"><source src="../media/wqcad-l21c.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" default src="../media/wqcad-l21c.vtt"></video><figcaption>▶ Recording: AI part design — load the example “Sewing machine upper shaft” and start the design (replayed): conditions, AI&#x27;s questions, the checks of every round; round 1 passes at Ø46 and 3.55 kg, weight is reduced until round 4 passes at 0.28 kg; the 3D model and drawing are made and read back; a replayed example does not go into the company library (about 2.5 minutes)</figcaption></figure>
+<ul>
+<li>Menu “AI Parts → AI part design…”. Choose the part type (stepped shaft) and write the requirement: speeds, motor, where each part sits and what it weighs, material, the required safety factor and bearing life; the bearing model can be left open. The example uses illustrative data.</li>
+<li>The split: <strong>AI lists the conditions and proposes designs; bearing seats, shoulders, the safety factor at every step, critical speed and bearing life are all checked by code</strong>. Failed items go back to AI, up to 4 rounds; after a pass it goes back to AI to lose weight, up to 3 rounds, and the lightest passing round is used.</li>
+<li>“Conditions”: each number AI read from the text, next to the original words. “AI questions”: where the text is unclear, AI asks instead of guessing (for example whether bearing life is at 5000 or 5500 r/min). “Rounds”: the sizes of each design and the result of every check.</li>
+<li>After it passes, the 3D model and drawing are made, then the sizes are read back from the model and compared with the design segment by segment; the drawing comes out only if they match.</li>
+<li>In real use the engineer fills in the drawing number and their name and clicks “Confirm into enterprise library”; a replayed example cannot go in.</li>
+</ul>
+<h3 id="l21-all">Everything in the AI workbench</h3>
+<table>
+<thead>
+<tr>
+<th>In the “AI Parts” menu</th>
+<th>What it is</th>
+<th>Lesson</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Selection, Checks, BOM</td>
+<td>Choose parts from a one-sentence requirement, every check listed, bill of materials</td>
+<td>this one</td>
+</tr>
+<tr>
+<td>Parts library, Company library, New part</td>
+<td>Look up parts and sources; the company's own library; make a new part from a datasheet (AI extracts, a person confirms each value)</td>
+<td>this one</td>
+</tr>
+<tr>
+<td>AI part design</td>
+<td>Stepped shafts and similar parts: AI proposes, code checks</td>
+<td>this one</td>
+</tr>
+<tr>
+<td>AI chat panel</td>
+<td>Selection, layout and clearing interferences by chat; every step uses the same tools</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Multibody dynamics, Assembly multibody dynamics</td>
+<td>WenQuest MBD</td>
+<td>16</td>
+</tr>
+<tr>
+<td>FEA (three buttons in the FEM workbench “Solve” menu)</td>
+<td>WenQuest FEA: one-sentence draft, compute and check, report</td>
+<td>19</td>
+</tr>
+<tr>
+<td>Design optimization, Topology optimization, Thermal · fatigue, CNC programming, Flow analysis, Digital twin</td>
+<td>Other analysis and manufacturing modules</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l21-self">Try it yourself</h3>
+<ol>
+<li>Fill in the “Selection” form directly (no AI): 10 N·m continuous, 20 N·m peak, 30 rpm, 200 V, 3 phases; search and see the verdicts and which checks are to be confirmed.</li>
+<li>Find the NSK 6201 bearing in the parts library and see which datasheet page its dynamic load rating comes from.</li>
+<li>In “AI part design”, load the example and start the design; in “Rounds”, find the critical speed ratio of round 4.</li>
+</ol>
+<h3 id="l21-quiz">Quiz</h3>
+<div class="quiz" data-ok="b"><p class="q">A check says “to be confirmed”. Can you treat it as a pass?</p><div class="opts"><button type="button" data-k="a">A. Yes, close enough</button><button type="button" data-k="b">B. No: data is missing; fill it in and check again</button><button type="button" data-k="c">C. Yes, AI has looked at it</button><button type="button" data-k="d">D. Only for C3</button></div><p class="why" hidden>To be confirmed means data is missing and code cannot decide; fill in and review the data, then check again.</p></div>
+<div class="quiz" data-ok="b"><p class="q">In the AI workbench, who decides whether the torque is enough?</p><div class="opts"><button type="button" data-k="a">A. AI</button><button type="button" data-k="b">B. Code, from the data and formulas</button><button type="button" data-k="c">C. The vendor</button><button type="button" data-k="d">D. Chance</button></div><p class="why" hidden>AI only turns words into a form and proposes; whether it works is decided by deterministic code.</p></div>
+<div class="quiz" data-ok="b"><p class="q">How does a part designed by AI get into the company library?</p><div class="opts"><button type="button" data-k="a">A. Automatically</button><button type="button" data-k="b">B. An engineer fills in the drawing number and their name and clicks “Confirm into enterprise library”</button><button type="button" data-k="c">C. By exporting STEP</button><button type="button" data-k="d">D. It cannot</button></div><p class="why" hidden>AI only drafts; writing to the company library needs a person to confirm in the window.</p></div></section>
+<section id="appA"><h2><span class="n">22</span>Appendix A Installing WenQuest CAD</h2><p class="lead">One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).</p><h3 id="appA-dl">Download and licence</h3>
 <p>On the website's Downloads page (wenquestrobotics.com/download): sign in, click “Get a one-year beta licence” and copy the code; download the WenQuest CAD installer (about 1.4 GB).</p>
 <h3 id="appA-install">Install</h3>
 <ol class="steps">

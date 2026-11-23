@@ -1,0 +1,40 @@
+WEBVTT
+
+00:00:01.571 --> 00:00:12.149
+Where do the parts come from? Menu “AI Parts → Parts library”
+
+00:00:12.149 --> 00:00:24.149
+The public library holds real vendor parts: Yaskawa motors and drives, Harmonic Drive reducers, NSK bearings, ROBOTIS smart actuators. Parameters are taken from the vendors' published datasheets
+
+00:00:25.045 --> 00:00:35.245
+Pick a reducer: every value shows which datasheet and page it came from, and whether a person reviewed it. Values without a source do not go in
+
+00:00:35.245 --> 00:00:45.744
+A company's own parts — made-in-house parts, bought-in parts not in the public library — go in the company library: one folder, and the data stays with the company
+
+00:00:45.744 --> 00:00:57.319
+Menu “AI Parts → Company library”, choose the folder (here a demo sewing-machine company, fictional)
+
+00:00:57.319 --> 00:01:04.920
+It takes effect after FreeCAD restarts
+
+00:01:06.396 --> 00:01:17.055
+After restarting, open the parts library again
+
+00:01:17.055 --> 00:01:27.361
+The header says: company library, 2 components, layered over the public library's 65
+
+00:01:27.361 --> 00:01:39.361
+Upper shaft LS-101 of the sewing machine, made in house. AI helped the company enter these two parts: AI read the parts list and proposed each part's type, a person confirmed; the five diameters and lengths were measured by code from the 3D model
+
+00:01:43.561 --> 00:01:48.461
+Measured values are “not reviewed” — a person has to look at them first
+
+00:01:48.461 --> 00:01:55.461
+At the bottom, “Missing data”: this part has everything the checks need; anything missing would be listed
+
+00:01:55.461 --> 00:02:05.861
+For the whole library: click “Completeness report…” to export Excel — what each part lacks, which checks it leaves “to be confirmed”, and what to fill first
+
+00:02:05.861 --> 00:02:14.640
+Put the shaft into the model: click “Place in layout”

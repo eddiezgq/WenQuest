@@ -303,7 +303,7 @@
  "把上轴放进模型：点“放入布局”": "Put the shaft into the model: click “Place in layout”",
  "最后一样：AI 设计零件。菜单“AI Parts → AI 设计零件…”": "The last one: AI part design. Menu “AI Parts → AI part design…”",
  "先选零件类型（阶梯轴），再写需求原话：转速、电机、机构参数、轴向位置、材料……轴承型号可以不指定": "Choose the part type (stepped shaft), then write the requirement: speed, motor, mechanism data, axial positions, material… the bearing model can be left open",
- "点“载入示例：平缝机上轴”：一段写好的需求（示意数据）": "Click “Load example: Sewing machine upper shaft”: a ready-written requirement (illustrative data)",
+ "点“载入示例：平缝机上轴”：一段写好的需求（示意数据）": "Click “Load example: Sewing machine upper shaft”: a ready-written requirement (illustrative data; in Chinese, because the recorded AI replies are for this text)",
  "要求：最高 5000 r/min、要能提到 5500；两个轴承中心在 27 和 252 mm；曲柄、凸轮、偏心轮、带轮、手轮各在哪、多重；45 钢调质，安全系数 1.5，轴承寿命 2 万小时": "It asks for: 5000 r/min, able to go to 5500; bearing centres at 27 and 252 mm; where the crank, cam, eccentric, pulley and handwheel sit and what they weigh; steel 45 quenched and tempered, safety factor 1.5, bearing life 20,000 hours",
  "点“开始设计”。AI 的回答是真实模型的录制回放，面板上会标明": "Click “Start design”. The AI replies are recordings of a real model; the panel says so",
  "结论：全部通过，4 轮。怎么来的？分工是：AI 列条件、提方案；能不能用全由代码算": "Result: all passed, 4 rounds. How? AI lists the conditions and proposes designs; whether they work is computed by code",

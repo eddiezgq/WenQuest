@@ -76,9 +76,9 @@ LESSONS_EN = [
 ]
 
 FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10", "l11", "l12", "l13", "l14", "l15", "l16", "l17", "l18", "l19", "l20", "l21", "appA-install"]
-FILES_EN = [f for f in FILES if f != "l21"]   # 第 21 课英文版：录屏放进 media 后再打开（11-23）
+FILES_EN = FILES   # 第 21 课英文版 11-23 录好（AI 工作台 59aa749）
 EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–21 课）", other=("English", "en/"), files=FILES)
-EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–20)",
+EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–21)",
                   other=("中文", "../"), files=FILES_EN)
 
 

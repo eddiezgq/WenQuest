@@ -1,0 +1,52 @@
+WEBVTT
+
+00:00:01.684 --> 00:00:13.684
+The last lesson: the WenQuest AI workbench. Three rules first. AI only drafts: changing the model or the company library needs a person to confirm. Whether something works is checked by code: pass, fail or to be confirmed — missing data means to be confirmed, never pass. Every AI run is logged
+
+00:00:21.257 --> 00:00:26.061
+Menu “AI Parts → Selection”
+
+00:00:26.061 --> 00:00:38.061
+Write the requirement in one sentence (in Chinese here — the recorded AI reply is for this sentence): arm joint 2, 25 N·m continuous, 50 N·m peak, 30 rpm, 220 V single-phase, EtherCAT
+
+00:00:38.233 --> 00:00:43.307
+Click “Parse”. The AI reply here is a recording of a real model (no network)
+
+00:00:43.307 --> 00:00:55.307
+AI does one thing: it puts the numbers from the sentence into the form, each with the words it came from; what the sentence does not say (the safety factor) takes the default, and says so
+
+00:00:55.658 --> 00:01:03.057
+A person checks the form. Then click “Find designs” — searching and checking are done by code, not by AI
+
+00:01:03.057 --> 00:01:15.057
+No design. The library holds real vendor parts (Yaskawa motors and drives, Harmonic Drive reducers, NSK bearings); these drives' datasheets specify three-phase input, so 220 V single-phase will not do
+
+00:01:16.658 --> 00:01:25.657
+If nothing fits, it says so — it does not make do. Suppose the shop has three-phase 200 V: change two fields and search again
+
+00:01:25.657 --> 00:01:32.657
+Still nothing confirmed usable. Tick “Include designs to be confirmed” and search again
+
+00:01:32.657 --> 00:01:35.657
+2 designs, all “to be confirmed”
+
+00:01:35.657 --> 00:01:47.657
+Read the explanation: for the flange between motor and reducer, the library lacks the bolt circle, hole count and so on, so code cannot tell whether they fit — “to be confirmed”, not a pass
+
+00:01:48.232 --> 00:01:56.100
+Put design 1 into the model: click “Place in layout”
+
+00:01:56.100 --> 00:02:01.132
+Motor, reducer and drive are joined at their ports. Menu “AI Parts → Checks”
+
+00:02:01.132 --> 00:02:11.132
+C1 to C11, one by one: interfaces, shaft–bore fit, torque, speed, supply, fieldbus… each says which numbers were used and what they were compared with
+
+00:02:11.132 --> 00:02:23.132
+C3 flange fit is to be confirmed. Where does the data come from? “Add data” and “Import datasheet”: values are taken from vendor datasheets, and each one counts only after a person reviews it
+
+00:02:23.882 --> 00:02:32.657
+Menu “AI Parts → BOM”: the bill of materials — vendor, model, mass and data source of every part; export to CSV
+
+00:02:32.657 --> 00:02:42.880
+AI only turns words into a form; what to choose and whether it works is decided by code from data, and a person has the final say

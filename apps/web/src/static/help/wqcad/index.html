@@ -2114,7 +2114,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l21a.jpg"><source src="media/wqcad-l21a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l21a.vtt"></video><figcaption>▶ 录屏：一句话需求（机械臂第 2 关节，25 N·m、30 rpm）→ AI 填表、注明原话依据 → 在真实厂商库里查：单相 220 V 没有方案；改三相 200 V，勾上“包含待确认”，2 个方案都是待确认（法兰缺数据）→ 放入布局 → 校验 C1–C11 → BOM（约 3 分钟）</figcaption></figure>
 <ul>
 <li>菜单“AI Parts → 选型”。上面写一句话，点“解析”：AI 只把数填进下面的表，每一项后面写着原话里的依据；原话没说的（安全系数）按默认值，也写出来。<strong>表是人核对的</strong>，核对完再点“查找方案”。</li>
-<li>查找和校验全是代码做的。公共库里是真实厂商的零件：安川电机和驱动器、哈默纳科减速器、NSK 轴承，参数取自厂商公开的规格书。</li>
+<li>查找和校验全是代码做的。公共库里是真实厂商的零件：安川电机和驱动器、哈默纳科减速器、NSK 轴承、ROBOTIS 智能舵机，参数取自厂商公开的规格书。</li>
 <li>单相 220 V 查不到：库里这几款驱动器的数据是三相输入。<strong>找不到就说找不到</strong>，不拿差不多的凑。</li>
 <li>改成三相 200 V 后，不勾“包含待确认的方案”仍然没有；勾上后有 2 个方案，结论都是<strong>待确认</strong>：电机和减速器之间的法兰，库里缺分度圆直径、孔数这些数据，代码判不了能不能装。其余各项（扭矩、转速、供电、总线……）通过。</li>
 <li>“放入布局”：电机、减速器、驱动器按端口装进一个文档（FapLayout）。“校验”窗口列出 C1–C11 每一条用了什么数、和什么比；缺数据的零件用“补数据”“导入规格书”补，抽出来的值要人复核。“BOM”窗口：厂商、型号、质量、数据来源，导出 CSV / JSON。</li>
@@ -2175,7 +2175,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>菜单“AI Parts → 零件库”：按品类、型号、参数范围查。选一个零件，每个值后面写着出自哪份规格书第几页、工况、有没有人复核过。</li>
 <li><strong>企业库</strong>是企业自己的零件——自制件、公共库里没有的外购件——放在一个文件夹里，数据只存在企业自己那边，叠加在公共库上。菜单“AI Parts → 企业库”选文件夹（空文件夹就新建），重启 FreeCAD 后生效。</li>
 <li>示范企业的两个自制件是 AI 帮着建的：AI 读企业的物料表（41 行）、提议每个零件是什么类型，工程师确认；尺寸、质量由代码从三维模型量出来。量出来的值标着“未复核”。（用 AI 从物料表建企业库，是 AI 工作台教程里的一个脚本，不在 CAD 界面里。）</li>
-<li>“完整度报告…”：全库每个零件缺哪些数据、缺了哪些校验会待确认、先补哪个，导出 Excel。录屏里是 36 个零件、21 个数据齐全。</li>
+<li>“完整度报告…”：全库每个零件缺哪些数据、缺了哪些校验会待确认、先补哪个，导出 Excel。录屏里是 67 个零件（公共库 65 个、企业库 2 个），52 个数据齐全。</li>
 </ul>
 <h3 id="l21-design">AI 设计零件</h3>
 <figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l21c.jpg"><source src="media/wqcad-l21c.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l21c.vtt"></video><figcaption>▶ 录屏：AI 设计零件——载入示例“平缝机上轴”，开始设计（回放）：条件、AI 的问题、每一轮的校核；第 1 轮 Ø46、3.55 kg 通过，减重到第 4 轮 0.28 kg 仍通过；生成三维模型和工程图，回读核对；回放示例不入企业库（约 2.5 分钟）</figcaption></figure>
