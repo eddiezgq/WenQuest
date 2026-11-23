@@ -3,9 +3,10 @@
 # 环境同 rec.sh；成片放到 $OUT（默认学习平台帮助的 media 目录）。只录一种语言：LANGS=en ./make_all.sh
 set -e
 H=$(cd "$(dirname "$0")" && pwd)
+fccmd() { if [ -x "$FC/usr/bin/freecadcmd" ]; then "$FC/usr/bin/freecadcmd" "$@"; else LD_LIBRARY_PATH="$FC/lib" PYTHONHOME="$FC" "$FC/bin/FreeCADCmd" "$@"; fi; }   # 官方 AppImage 或问渠 CAD 的 Linux 环境
 OUT=${OUT:-$H/../../../apps/web/src/static/help/wqcad/media}
 mkdir -p "$OUT" "$WQ_REC/model" "$WQ_REC/model_en"
-LC_ALL=C.UTF-8 "$FC/usr/bin/freecadcmd" "$H/prep_slider.py"            # 第 15、16 课的零件
+LC_ALL=C.UTF-8 fccmd "$H/prep_slider.py"            # 第 15、16 课的零件
 for WQ_LANG in ${LANGS:-zh en}; do
   export WQ_LANG
   if [ $WQ_LANG = en ]; then sfx=-en; M=$WQ_REC/model_en; F=NeedleClampSketch; else sfx=; M=$WQ_REC/model; F=针夹草图; fi
@@ -39,12 +40,12 @@ for WQ_LANG in ${LANGS:-zh en}; do
   for c in l15a l15b l16a l16b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done
   cp "$FC"/usr/share/Mod/TechDraw/Templates/ISO/localized/zh-CN/landscape/A4_Landscape_CN_CLIP.svg "$WQ_REC/" 2>/dev/null
   cp "$FC"/usr/share/Mod/TechDraw/Templates/ISO/A4_Landscape_ISO5457_minimal.svg "$WQ_REC/" 2>/dev/null
-  LC_ALL=C.UTF-8 "$FC/usr/bin/freecadcmd" "$H/prep_needle_drawing.py"   # 第 17 课的针杆（两种语言的文件都重做）
+  LC_ALL=C.UTF-8 fccmd "$H/prep_needle_drawing.py"   # 第 17 课的针杆（两种语言的文件都重做）
   for c in l17a l17b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done
   cp "$FC"/usr/share/Mod/TechDraw/Templates/ISO/localized/zh-CN/landscape/A3_Landscape_CN_CLIP.svg "$WQ_REC/" 2>/dev/null
   cp "$FC"/usr/share/Mod/TechDraw/Templates/ISO/A3_Landscape_ISO5457_minimal.svg "$WQ_REC/" 2>/dev/null
   for c in l18a l18b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done     # 18a 接 17b 存的针杆图；18b 接第 16 课存的曲柄滑块
-  WQ_CRANK="$WQ_REC/crank_r178.step" LC_ALL=C.UTF-8 "$FC/usr/bin/freecadcmd" "$H/prep_crank_fea.py"   # 第 19 课的针杆曲柄 + 两条辅助线（第 178 轮的曲柄）
+  WQ_CRANK="$WQ_REC/crank_r178.step" LC_ALL=C.UTF-8 fccmd "$H/prep_crank_fea.py"   # 第 19 课的针杆曲柄 + 两条辅助线（第 178 轮的曲柄）
   for c in l19a l19b; do "$H/rec.sh" "$H/$c.py" "$WQ_REC/$c$sfx.mp4"; done     # 19b 接 19a 存的分析
   FAPR=${FAP_REPO:-/home/claude/freecad-ai-parts}                               # 19c：问渠有限元入门例子 02 的零件和 AI 回复录制（回放）
   mkdir -p "$WQ_REC/rj201"; cp "$FAPR/examples/wenquest-fea/02-rj201-shaft-sentence/RJ-201.step" "$WQ_REC/rj201/"
