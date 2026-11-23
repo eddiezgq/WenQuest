@@ -1,5 +1,6 @@
 ---
 id: appA
+num: A
 title: Appendix A Installing WenQuest CAD
 lead: One installer for Windows 10 / 11 (64-bit); ready to use when it finishes. The beta needs a one-year beta licence code (free for registered users).
 ---

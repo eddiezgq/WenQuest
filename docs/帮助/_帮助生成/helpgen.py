@@ -101,7 +101,7 @@ def sections(src_dir, files, ed, vals, media_prefix, try_url):
             subs.append((hid, t))
             return f'<h3 id="{hid}">{mm.group(2)}</h3>'
         h = re.sub(r'<h3(?: id="([^"]*)")?>(.*?)</h3>', h3, h)
-        num = f"{i:02d}"
+        num = meta.get("num") or f"{i:02d}"
         out.append(f'<section id="{sid}"><h2><span class="n">{num}</span>{html.escape(meta["title"])}</h2>'
                    f'<p class="lead">{meta.get("lead", "")}</p>{h}</section>')
         nav.append((sid, num, meta["title"], subs))
