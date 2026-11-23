@@ -165,8 +165,8 @@ def render(region: str = "us", footer: str = "", head: str = "") -> str:
 <h2>{T("下载", "Downloads")}</h2>
 <div class="cards">
 <div class="card" data-key="wqcad"><h3>{T("问渠 CAD", "WenQuest CAD")} <span class="tag">Windows 10/11 64 位</span></h3>
-<p>{T("基于 FreeCAD 1.1.4 + 27 处内核修正 + 问渠 AI 工作台（AI 选零件、企业零件库、AI 设计零件）。一个安装包，装完就能用，不用装别的。",
-      "FreeCAD 1.1.4 + 27 kernel fixes + the WenQuest AI workbench (AI part selection, enterprise parts library, AI part design). One installer, nothing else to install.")}</p>
+<p>{T("基于 FreeCAD 1.1.4 + 28 处内核修正 + 问渠 AI 工作台（AI 选零件、企业零件库、AI 设计零件）。一个安装包，装完就能用，不用装别的。",
+      "FreeCAD 1.1.4 + 28 kernel fixes + the WenQuest AI workbench (AI part selection, enterprise parts library, AI part design). One installer, nothing else to install.")}</p>
 <div class="meta" data-meta>{T("安装包准备中", "Installer being built")} {cad_note}</div><div class="sha" data-sha></div>
 <div class="row"><a class="btn pri" data-dl hidden>{T("下载", "Download")}</a><a class="btn" href="#tut-cad">{T("安装教程", "Install guide")}</a>{course_btn}</div></div>
 <div class="card" data-key="sewing-freecad"><h3>{T("问渠缝纫机", "WenQuest Sewing")} <span class="tag">{T("FreeCAD 工作台", "FreeCAD workbench")}</span></h3>
