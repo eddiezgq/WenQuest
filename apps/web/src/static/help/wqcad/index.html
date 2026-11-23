@@ -112,7 +112,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <body>
 <button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ 目录</button>
 <aside>
-  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–20 课）</small></div>
+  <div class="brand"><b>问渠 CAD</b><small>帮助与培训课程（已上线：第 1–21 课）</small></div>
   <input class="find" placeholder="搜索帮助…" oninput="findIn(this.value)">
   <nav><a href="#course" data-s="course"><span class="n">00</span>课程怎么学</a>
 <a class="sub" href="#course-1" data-s="course">这套课程</a>
@@ -282,7 +282,16 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#l20-list" data-s="l20">29 个补丁一览</a>
 <a class="sub" href="#l20-self" data-s="l20">自己做</a>
 <a class="sub" href="#l20-quiz" data-s="l20">小测</a>
-<a href="#appA" data-s="appA"><span class="n">21</span>附录 A 安装问渠 CAD</a>
+<a href="#l21" data-s="l21"><span class="n">21</span>第 21 课 AI 工作台：选零件、零件库、AI 设计零件</a>
+<a class="sub" href="#l21-goal" data-s="l21">学完能做什么</a>
+<a class="sub" href="#l21-rules" data-s="l21">先说三条规矩</a>
+<a class="sub" href="#l21-select" data-s="l21">AI 选零件与校验</a>
+<a class="sub" href="#l21-library" data-s="l21">零件库和企业库</a>
+<a class="sub" href="#l21-design" data-s="l21">AI 设计零件</a>
+<a class="sub" href="#l21-all" data-s="l21">AI 工作台的全部功能</a>
+<a class="sub" href="#l21-self" data-s="l21">自己做</a>
+<a class="sub" href="#l21-quiz" data-s="l21">小测</a>
+<a href="#appA" data-s="appA"><span class="n">22</span>附录 A 安装问渠 CAD</a>
 <a class="sub" href="#appA-dl" data-s="appA">下载和授权</a>
 <a class="sub" href="#appA-install" data-s="appA">安装</a>
 <a class="sub" href="#appA-fix" data-s="appA">排错</a></nav>
@@ -303,7 +312,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 
 <h3 id="course-2">课程表</h3>
-<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l12">第 12 课</a></td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机头外形的特征曲线（照网格逆向）</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l13">第 13 课</a></td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的修剪和过渡曲面</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l14">第 14 课</a></td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>机头外壳抽壳成铸件</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l15">第 15 课</a></td><td>装配工作台：插入零件、固定、关节、自由度</td><td>针杆机构（曲柄滑块）</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l16">第 16 课</a></td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>针杆机构转一圈、量行程</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l17">第 17 课</a></td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l18">第 18 课</a></td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>针杆零件图加公差；针杆机构装配图</td><td>已上线</td></tr><tr><td>七 进阶</td><td><a href="#l19">第 19 课</a></td><td>有限元：问渠有限元（FEM 工作台手建分析 + 计算并核查 + 报告）</td><td>针杆曲柄 5000 r/min 下的应力</td><td>已上线</td></tr><tr><td>七 进阶</td><td><a href="#l20">第 20 课</a></td><td>问渠 CAD 的不同：28 个补丁修了什么</td><td>官方 FreeCAD 与问渠 CAD 对照</td><td>已上线</td></tr><tr><td>八 AI</td><td>第 21 课</td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>选一个轴承；上轴设计回放</td><td>制作中</td></tr></tbody></table>
+<table class="plan"><thead><tr><th>模块</th><th>课</th><th>内容</th><th>做出什么（WQ-LS 零件）</th><th>状态</th></tr></thead><tbody><tr><td>一 入门</td><td><a href="#l01">第 1 课</a></td><td>认识界面：工作台、模型树、属性、报告视图；鼠标导航；视图、选择；首选项、单位</td><td>打开 WQ-LS 整机，转着看</td><td>已上线</td></tr><tr><td>一 入门</td><td><a href="#l02">第 2 课</a></td><td>文件与数据：新建、保存、撤销；导入导出 STEP / STL / DXF；对象和依赖关系</td><td>导出一个零件给别人</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l03">第 3 课</a></td><td>草图入门：直线、圆、圆弧、矩形、多段线；构造线</td><td>压脚杆套环；针夹轮廓</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l04">第 4 课</a></td><td>约束：几何约束、尺寸约束、完全约束、过约束怎么查</td><td>针夹（完全约束）</td><td>已上线</td></tr><tr><td>二 草图</td><td><a href="#l05">第 5 课</a></td><td>草图技巧：镜像、阵列、修剪延伸、外部几何、表达式；电子表格驱动尺寸</td><td>曲柄轮廓（表格驱动）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l06">第 6 课</a></td><td>凸台、凹槽、旋转、挖槽旋转、孔（螺纹孔）</td><td>针杆、曲柄销</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l07">第 7 课</a></td><td>倒角、圆角、拔模、抽壳、加厚</td><td>针杆倒角；梭壳（抽壳）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l08">第 8 课</a></td><td>扫掠、放样、螺旋</td><td>压脚簧（螺旋）、挑线簧（扫掠）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l09">第 9 课</a></td><td>阵列、镜像、多重变换</td><td>手轮（减重孔、防滑槽）；针杆第二圈油槽</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l10">第 10 课</a></td><td>基准面、基准轴、附着方式；参数化设计</td><td>针杆接头（改一个全跟着变）</td><td>已上线</td></tr><tr><td>三 零件建模</td><td><a href="#l11">第 11 课</a></td><td>Part 工作台：基本体、布尔运算、偏移、截面</td><td>送布偏心轮</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l12">第 12 课</a></td><td>曲线：B 样条、螺旋线、投影、相交线</td><td>机头外形的特征曲线（照网格逆向）</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l13">第 13 课</a></td><td>曲面：填充、扫掠、放样、延伸、修剪；连续性 G0/G1/G2</td><td>机头的修剪和过渡曲面</td><td>已上线</td></tr><tr><td>四 曲线与曲面</td><td><a href="#l14">第 14 课</a></td><td>曲面到实体：缝合、成实体、加厚；检查几何</td><td>机头外壳抽壳成铸件</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l15">第 15 课</a></td><td>装配工作台：插入零件、固定、关节、自由度</td><td>针杆机构（曲柄滑块）</td><td>已上线</td></tr><tr><td>五 装配</td><td><a href="#l16">第 16 课</a></td><td>运动与检查：驱动关节、测距离、干涉、爆炸视图</td><td>针杆机构转一圈、量行程</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l17">第 17 课</a></td><td>TechDraw：图框、投影、剖视、局部放大、尺寸</td><td>针杆零件图</td><td>已上线</td></tr><tr><td>六 工程图</td><td><a href="#l18">第 18 课</a></td><td>公差与技术要求、物料清单、导出 PDF / DXF</td><td>针杆零件图加公差；针杆机构装配图</td><td>已上线</td></tr><tr><td>七 进阶</td><td><a href="#l19">第 19 课</a></td><td>有限元：问渠有限元（FEM 工作台手建分析 + 计算并核查 + 报告）</td><td>针杆曲柄 5000 r/min 下的应力</td><td>已上线</td></tr><tr><td>七 进阶</td><td><a href="#l20">第 20 课</a></td><td>问渠 CAD 的不同：29 个补丁修了什么</td><td>官方 FreeCAD 与问渠 CAD 对照</td><td>已上线</td></tr><tr><td>八 AI</td><td><a href="#l21">第 21 课</a></td><td>AI 工作台：零件选型与校验、企业零件库、AI 设计零件</td><td>关节选型与校验；示范企业库；上轴设计回放</td><td>已上线</td></tr></tbody></table>
 
 <p>现在上线的是第 1–17 课，其余各课按模块陆续上线。</p>
 <h3 id="course-3">录屏是怎么录的</h3>
@@ -2087,7 +2096,154 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="quiz" data-ok="b"><p class="q">FreeCAD 没报错，模型树上也没有红叉，说明结果一定对吗？</p><div class="opts"><button type="button" data-k="a">A. 一定对</button><button type="button" data-k="b">B. 不一定，要用“检查几何”核对</button><button type="button" data-k="c">C. 重启软件就对了</button><button type="button" data-k="d">D. 导出成 STEP 就对了</button></div><p class="why" hidden>官方版的圆角可以“成功”交回一个坏实体；检查几何能查出来。</p></div>
 <div class="quiz" data-ok="b"><p class="q">草图里多标了一个尺寸，叫什么？</p><div class="opts"><button type="button" data-k="a">A. 欠约束</button><button type="button" data-k="b">B. 冗余约束</button><button type="button" data-k="c">C. 冲突约束</button><button type="button" data-k="d">D. 参考尺寸</button></div><p class="why" hidden>多余但不矛盾的约束叫冗余约束；删掉它，或者改成参考尺寸。</p></div>
 <div class="quiz" data-ok="b"><p class="q">B 样条表示的圆柱，官方 FreeCAD 1.1.4 算体积差多少？</p><div class="opts"><button type="button" data-k="a">A. 0</button><button type="button" data-k="b">B. 约 0.86%</button><button type="button" data-k="c">C. 约 10%</button><button type="button" data-k="d">D. 算不出来</button></div><p class="why" hidden>它用的积分在有理 B 样条面上不精确；问渠 CAD 改成控制精度的积分。</p></div></section>
-<section id="appA"><h2><span class="n">21</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
+<section id="l21"><h2><span class="n">21</span>第 21 课 AI 工作台：选零件、零件库、AI 设计零件</h2><p class="lead">问渠 CAD 带的 AI 工作台（菜单“AI Parts”）。这一课讲三样：一句话需求选零件并逐条校验、零件库和企业库、AI 设计零件。多体动力学在第 16 课、有限元在第 19 课已经讲过。约 1 小时。</p><h3 id="l21-goal">学完能做什么</h3>
+<ul>
+<li>说清 AI 工作台的分工：AI 只起草，代码校验，人确认。</li>
+<li>用“选型”窗口从一句话需求查方案，看懂“通过 / 不通过 / 待确认”，知道“待确认”不算通过。</li>
+<li>在零件库里查一个值出自哪份规格书、复核过没有；设企业库，看自制件缺什么数据。</li>
+<li>用“AI 设计零件”回放一次上轴设计，看懂每一轮的校核结果。</li>
+</ul>
+
+<h3 id="l21-rules">先说三条规矩</h3>
+<ul>
+<li><strong>AI 只起草</strong>：把话变成表、提方案、提问题。改模型、写进企业库，都要人在界面上点确认。</li>
+<li><strong>能不能用由代码判</strong>：扭矩、转速、配合、强度、寿命……全是确定的计算，不经过 AI。结果分三种：通过、不通过、<strong>待确认</strong>。数据缺了就是待确认，<strong>不算通过</strong>。</li>
+<li><strong>每次 AI 运行都留记录</strong>。没有 AI 密钥也能学：本课录屏里 AI 的回答都是真实模型的录制回放，面板上标着“回放”。</li>
+</ul>
+<h3 id="l21-select">AI 选零件与校验</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l21a.jpg"><source src="media/wqcad-l21a.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l21a.vtt"></video><figcaption>▶ 录屏：一句话需求（机械臂第 2 关节，25 N·m、30 rpm）→ AI 填表、注明原话依据 → 在真实厂商库里查：单相 220 V 没有方案；改三相 200 V，勾上“包含待确认”，2 个方案都是待确认（法兰缺数据）→ 放入布局 → 校验 C1–C11 → BOM（约 3 分钟）</figcaption></figure>
+<ul>
+<li>菜单“AI Parts → 选型”。上面写一句话，点“解析”：AI 只把数填进下面的表，每一项后面写着原话里的依据；原话没说的（安全系数）按默认值，也写出来。<strong>表是人核对的</strong>，核对完再点“查找方案”。</li>
+<li>查找和校验全是代码做的。公共库里是真实厂商的零件：安川电机和驱动器、哈默纳科减速器、NSK 轴承，参数取自厂商公开的规格书。</li>
+<li>单相 220 V 查不到：库里这几款驱动器的数据是三相输入。<strong>找不到就说找不到</strong>，不拿差不多的凑。</li>
+<li>改成三相 200 V 后，不勾“包含待确认的方案”仍然没有；勾上后有 2 个方案，结论都是<strong>待确认</strong>：电机和减速器之间的法兰，库里缺分度圆直径、孔数这些数据，代码判不了能不能装。其余各项（扭矩、转速、供电、总线……）通过。</li>
+<li>“放入布局”：电机、减速器、驱动器按端口装进一个文档（FapLayout）。“校验”窗口列出 C1–C11 每一条用了什么数、和什么比；缺数据的零件用“补数据”“导入规格书”补，抽出来的值要人复核。“BOM”窗口：厂商、型号、质量、数据来源，导出 CSV / JSON。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>校验</th>
+<th>查什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td>接口类型：两个端口能不能接</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>圆柱配合：轴孔直径、公差、键</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>法兰配合：分度圆、孔数、孔的形式、止口</td>
+</tr>
+<tr>
+<td>C4、C5</td>
+<td>连续扭矩、峰值扭矩（折算到电机侧，按效率曲线）</td>
+</tr>
+<tr>
+<td>C6</td>
+<td>减速器过载保护</td>
+</tr>
+<tr>
+<td>C7</td>
+<td>转速</td>
+</tr>
+<tr>
+<td>C8</td>
+<td>惯量比（给了负载惯量才查）</td>
+</tr>
+<tr>
+<td>C9</td>
+<td>供电：交直流、电压、相数、电流</td>
+</tr>
+<tr>
+<td>C10</td>
+<td>编码器与总线</td>
+</tr>
+<tr>
+<td>C11</td>
+<td>轴承与包络（有轴承或外径限值才查）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l21-library">零件库和企业库</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l21b.jpg"><source src="media/wqcad-l21b.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l21b.vtt"></video><figcaption>▶ 录屏：零件库里看哈默纳科 CSF-25 每个值的出处和复核状态 → 菜单“企业库”选文件夹（示范缝纫机企业，虚构）→ 重启后多了两个自制件 → 上轴 LS-101 的数据、缺的数据 → 导出完整度报告 → 放入模型（约 2 分钟）</figcaption></figure>
+<ul>
+<li>菜单“AI Parts → 零件库”：按品类、型号、参数范围查。选一个零件，每个值后面写着出自哪份规格书第几页、工况、有没有人复核过。</li>
+<li><strong>企业库</strong>是企业自己的零件——自制件、公共库里没有的外购件——放在一个文件夹里，数据只存在企业自己那边，叠加在公共库上。菜单“AI Parts → 企业库”选文件夹（空文件夹就新建），重启 FreeCAD 后生效。</li>
+<li>示范企业的两个自制件是 AI 帮着建的：AI 读企业的物料表（41 行）、提议每个零件是什么类型，工程师确认；尺寸、质量由代码从三维模型量出来。量出来的值标着“未复核”。（用 AI 从物料表建企业库，是 AI 工作台教程里的一个脚本，不在 CAD 界面里。）</li>
+<li>“完整度报告…”：全库每个零件缺哪些数据、缺了哪些校验会待确认、先补哪个，导出 Excel。录屏里是 36 个零件、21 个数据齐全。</li>
+</ul>
+<h3 id="l21-design">AI 设计零件</h3>
+<figure class="vid"><video controls preload="none" playsinline poster="media/wqcad-l21c.jpg"><source src="media/wqcad-l21c.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/wqcad-l21c.vtt"></video><figcaption>▶ 录屏：AI 设计零件——载入示例“平缝机上轴”，开始设计（回放）：条件、AI 的问题、每一轮的校核；第 1 轮 Ø46、3.55 kg 通过，减重到第 4 轮 0.28 kg 仍通过；生成三维模型和工程图，回读核对；回放示例不入企业库（约 2.5 分钟）</figcaption></figure>
+<ul>
+<li>菜单“AI Parts → AI 设计零件…”。选零件类型（阶梯轴），写需求原话：转速、电机、各零件装在哪、多重、材料、要求的安全系数和轴承寿命；轴承型号可以不指定。示例用的是示意数据。</li>
+<li>分工：<strong>AI 列条件、提方案；轴承位、轴肩、每个台阶的安全系数、临界转速、轴承寿命全由代码校核</strong>。不合格的项交回 AI 改，最多 4 轮；合格后交回 AI 减重，最多 3 轮，采用通过且最轻的一轮。</li>
+<li>“条件”页：AI 从原话里读出的每个数，旁边是原话。“AI 的问题”页：原话没说清的，AI 不猜，列出来问人（比如轴承寿命按 5000 还是 5500 r/min 算）。“每一轮”页：每个方案的尺寸和每一项校核结果。</li>
+<li>合格后生成三维模型和工程图，再从模型回读尺寸、和设计逐段核对，一致才出图。</li>
+<li>真用时，工程师填图号、确认人，点“确认入企业库”才入库；录制回放的示例不入库。</li>
+</ul>
+<h3 id="l21-all">AI 工作台的全部功能</h3>
+<table>
+<thead>
+<tr>
+<th>菜单“AI Parts”里</th>
+<th>是什么</th>
+<th>哪一课</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>选型、校验、BOM</td>
+<td>一句话需求选零件，逐条校验，物料表</td>
+<td>本课</td>
+</tr>
+<tr>
+<td>零件库、企业库、新建零件</td>
+<td>查零件和出处；企业自己的库；从规格书建新零件（AI 抽取、人逐项确认）</td>
+<td>本课</td>
+</tr>
+<tr>
+<td>AI 设计零件</td>
+<td>阶梯轴等零件：AI 提方案，代码校核</td>
+<td>本课</td>
+</tr>
+<tr>
+<td>AI 对话面板</td>
+<td>用对话做选型、布局、消干涉，每一步调的是同样的工具</td>
+<td>—</td>
+</tr>
+<tr>
+<td>多体动力学、装配体多体动力学</td>
+<td>问渠多体动力学</td>
+<td>第 16 课</td>
+</tr>
+<tr>
+<td>有限元（FEM 工作台“求解”菜单里的三个按钮）</td>
+<td>问渠有限元：一句话起草、计算并核查、出报告</td>
+<td>第 19 课</td>
+</tr>
+<tr>
+<td>设计优化、拓扑优化、热分析·疲劳、数控编程、流体分析、数字孪生</td>
+<td>其他分析与制造模块</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="l21-self">自己做</h3>
+<ol>
+<li>在“选型”窗口直接填表（不用 AI）：连续 10 N·m、峰值 20 N·m、30 rpm、200 V、3 相，查方案，看结论和哪几条待确认。</li>
+<li>在零件库里找 NSK 6201 轴承，看额定动载荷出自规格书第几页。</li>
+<li>“AI 设计零件”载入示例、开始设计，在“每一轮”里找第 4 轮的临界转速比。</li>
+</ol>
+<h3 id="l21-quiz">小测</h3>
+<div class="quiz" data-ok="b"><p class="q">校验结果是“待确认”，能当作通过吗？</p><div class="opts"><button type="button" data-k="a">A. 能，差不多</button><button type="button" data-k="b">B. 不能，缺数据，要补齐再判</button><button type="button" data-k="c">C. 能，AI 已经看过</button><button type="button" data-k="d">D. 只有 C3 可以</button></div><p class="why" hidden>待确认是因为缺数据，代码判不了；补齐、复核后再校验。</p></div>
+<div class="quiz" data-ok="b"><p class="q">在 AI 工作台里，“扭矩够不够”是谁判的？</p><div class="opts"><button type="button" data-k="a">A. AI</button><button type="button" data-k="b">B. 代码按数据和公式算</button><button type="button" data-k="c">C. 厂商</button><button type="button" data-k="d">D. 随机</button></div><p class="why" hidden>AI 只把话变成表、提方案；能不能用全由确定的代码校验。</p></div>
+<div class="quiz" data-ok="b"><p class="q">AI 设计出的零件怎样进企业库？</p><div class="opts"><button type="button" data-k="a">A. 自动进</button><button type="button" data-k="b">B. 工程师填图号、确认人，点“确认入企业库”</button><button type="button" data-k="c">C. 导出 STEP 就进了</button><button type="button" data-k="d">D. 不能进</button></div><p class="why" hidden>AI 只起草，写进企业库要人在界面上确认。</p></div></section>
+<section id="appA"><h2><span class="n">22</span>附录 A 安装问渠 CAD</h2><p class="lead">Windows 10 / 11（64 位）一个安装包，装完就能用。测试版需要一年测试授权码（注册用户免费领）。</p><h3 id="appA-dl">下载和授权</h3>
 <p>官网“软件下载”页（美国 wenquestrobotics.com/download，国内 wenquestech.online/download）：登录后点“领取一年测试授权”，复制授权码；下载问渠 CAD 安装包（约 1.4 GB）。</p>
 <h3 id="appA-install">安装</h3>
 <ol class="steps">
