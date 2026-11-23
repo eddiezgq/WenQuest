@@ -124,6 +124,8 @@ def script(d):
 
     # ② 前面失败，后面的特征
     doc = App.openDocument(model_file("失败重算.FCStd", "RecomputeAfterFail.FCStd"))
+    for o in doc.Objects:                     # 无界面建的文件没有显示设置：只显示最后的“挖孔”
+        o.ViewObject.Visibility = o.Name == "Cut"
     Gui.ActiveDocument.ActiveView.viewIsometric()
     Gui.SendMsgToActiveView("ViewFit")
     yield 1200

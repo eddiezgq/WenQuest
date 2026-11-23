@@ -46,7 +46,7 @@ LESSONS = [
     ("六 工程图", 17, "TechDraw：图框、投影、剖视、局部放大、尺寸", "针杆零件图", "l17"),
     ("六 工程图", 18, "公差与技术要求、物料清单、导出 PDF / DXF", "针杆零件图加公差；针杆机构装配图", "l18"),
     ("七 进阶", 19, "有限元：问渠有限元（FEM 工作台手建分析 + 计算并核查 + 报告）", "针杆曲柄 5000 r/min 下的应力", "l19"),
-    ("七 进阶", 20, "问渠 CAD 的不同：27 个补丁修了什么", "补丁前后对比", None),
+    ("七 进阶", 20, "问渠 CAD 的不同：28 个补丁修了什么", "官方 FreeCAD 与问渠 CAD 对照", "l20"),
     ("八 AI", 21, "AI 工作台：零件选型与校验、企业零件库、AI 设计零件", "选一个轴承；上轴设计回放", None),
 ]
 
@@ -71,13 +71,13 @@ LESSONS_EN = [
     ("6 Drawings", "TechDraw: templates, projections, sections, details, dimensions", "Needle-bar part drawing"),
     ("6 Drawings", "Tolerances and notes, bill of materials, PDF / DXF export", "Tolerances on the needle-bar drawing; needle-bar mechanism assembly drawing"),
     ("7 Advanced", "FEA with WenQuest FEA (hand-built FEM analysis, compute and check, report)", "Needle-bar crank stress at 5000 rpm"),
-    ("7 Advanced", "What is different in WenQuest CAD: the 27 patches", "Before/after the patches"),
+    ("7 Advanced", "What is different in WenQuest CAD: the 28 patches", "Official FreeCAD versus WenQuest CAD"),
     ("8 AI", "AI workbench: part selection and checks, company parts library, AI part design", "Pick a bearing; replay the upper-shaft design"),
 ]
 
-FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10", "l11", "l12", "l13", "l14", "l15", "l16", "l17", "l18", "l19", "appA-install"]
-EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–19 课）", other=("English", "en/"), files=FILES)
-EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–19)",
+FILES = ["00-course", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10", "l11", "l12", "l13", "l14", "l15", "l16", "l17", "l18", "l19", "l20", "appA-install"]
+EDITION = dict(title="问渠 CAD · 帮助与培训课程", short="帮助与培训课程（已上线：第 1–20 课）", other=("English", "en/"), files=FILES)
+EDITION_EN = dict(title="WenQuest CAD · Help and training course", short="Help and training course (online: lessons 1–20)",
                   other=("中文", "../"), files=FILES)
 
 
