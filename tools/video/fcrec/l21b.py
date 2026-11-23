@@ -151,6 +151,11 @@ def part2(d):
     yield from scroll(d, br.detail, 1.0, 2500)
     yield 4000
     yield d.say("全库一起看：点“完整度报告…”，导出 Excel——每个零件缺什么、缺了哪些校验会“待确认”、先补哪个")
+    for f in ("零件库完整度.xlsx", "library-completeness.xlsx"):      # 上次录的留着会弹“已存在，替换吗”
+        try:
+            os.remove(os.path.join(os.environ.get("WQ_REC", "."), f))
+        except OSError:
+            pass
     b = br.report_button
     p = d.center(b)
     yield d.move(p, 700)
