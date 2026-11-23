@@ -33,7 +33,7 @@ jobs:
           export WQ_REC=$RUNNER_TEMP/rec FC=$GITHUB_WORKSPACE/fc/squashfs-root DISPLAY=:77
           H=$GITHUB_WORKSPACE/tools/video/fcrec
           mkdir -p $WQ_REC/model $WQ_REC/model_en $WQ_REC/home $WQ_REC/home_en out
-          for v in zh en; do d=$WQ_REC/home_stock$([ $v = en ] && echo _en)/.config/FreeCAD/v1-1; mkdir -p "$d"; cp $H/stock_home/$v/*.cfg "$d/"; done
+          for v in zh en; do sfx=""; if [ $v = en ]; then sfx=_en; fi; d=$WQ_REC/home_stock$sfx/.config/FreeCAD/v1-1; mkdir -p "$d"; cp $H/stock_home/$v/*.cfg "$d/"; done
           set -x
           LC_ALL=C.UTF-8 $FC/usr/bin/freecadcmd $H/prep_l20.py 2>&1 | tail -20 || true
           ls $WQ_REC/model $WQ_REC/model_en
