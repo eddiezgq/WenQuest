@@ -30,6 +30,7 @@ jobs:
           cd fc && chmod +x *.AppImage && ./*.AppImage --appimage-extract >/dev/null && ls squashfs-root | head
       - name: 录
         run: |
+          unset XDG_CONFIG_HOME XDG_DATA_HOME XDG_CACHE_HOME     # 机器上设了这几个，FreeCAD 会去那里找设置
           export WQ_REC=$RUNNER_TEMP/rec FC=$GITHUB_WORKSPACE/fc/squashfs-root DISPLAY=:77
           H=$GITHUB_WORKSPACE/tools/video/fcrec
           mkdir -p $WQ_REC/model $WQ_REC/model_en $WQ_REC/home $WQ_REC/home_en out
