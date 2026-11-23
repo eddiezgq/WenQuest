@@ -116,7 +116,7 @@ def script(d):
     yield from click_w(d, sp.include_unknown)
     sp.include_unknown.setChecked(True)
     yield from find(d, sp)
-    yield d.say(f"{len(sp.rows)} 个方案，结论都是“待确认”")
+    yield d.say(L(f"{len(sp.rows)} 个方案，结论都是“待确认”", f"{len(sp.rows)} designs, all “to be confirmed”"))
     yield 3000
     sb = sp.detail.verticalScrollBar()
     yield d.say("看说明：电机和减速器之间的法兰，库里缺分度圆直径、孔数这些数据，代码判不了能不能装——判“待确认”，不算通过")

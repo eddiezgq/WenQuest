@@ -51,20 +51,20 @@ for WQ_LANG in ${LANGS:-zh en}; do
   mkdir -p "$WQ_REC/rj201"; cp "$FAPR/examples/wenquest-fea/02-rj201-shaft-sentence/RJ-201.step" "$WQ_REC/rj201/"
   rm -rf "$WQ_REC/fea_draft_rec"; cp -r "$FAPR/tests/recordings/fea_draft" "$WQ_REC/fea_draft_rec"
   FAP_LLM_REPLAY="$WQ_REC/fea_draft_rec" FAP_AI_PROVIDER=claude "$H/rec.sh" "$H/l19c.py" "$WQ_REC/l19c$sfx.mp4"
-  L21=
-  if [ $WQ_LANG = zh ]; then                     # 第 21 课 AI 工作台：先只录中文；英文版等 AI 工作台四个面板做出英文（0.3.4）再录（11-23 Eddie 定）
-    export WQ_ENT="/srv/wq/示范缝纫机企业库"; rm -rf "$WQ_ENT"; mkdir -p "$(dirname "$WQ_ENT")"
+  # 第 21 课 AI 工作台（AI 工作台 59aa749 = 问渠 CAD 0.3.4：四个面板有英文，11-23）
+  if true; then
+    if [ $WQ_LANG = en ]; then export WQ_ENT=/srv/wq/demo-sewing-company; else export WQ_ENT="/srv/wq/示范缝纫机企业库"; fi
+    rm -rf "$WQ_ENT"; mkdir -p "$(dirname "$WQ_ENT")"
     cp -r "$FAPR/examples/enterprise-lockstitch/library" "$WQ_ENT"            # 示范缝纫机企业（虚构）的企业库
-    HS="$WQ_REC/home/.freecad-ai-parts/settings.json"; mkdir -p "$(dirname "$HS")"
+    HS="$WQ_REC/home${sfx/-/_}/.freecad-ai-parts/settings.json"; mkdir -p "$(dirname "$HS")"
     echo '{"first_run_done": true}' > "$HS"                                   # 21b 第一段在界面里选企业库
-    "$H/rec.sh" "$H/l21a.py" "$WQ_REC/l21a.mp4"
-    WQ_PART=1 "$H/rec.sh" "$H/l21b.py" "$WQ_REC/l21b1.mp4"
-    WQ_PART=2 "$H/rec.sh" "$H/l21b.py" "$WQ_REC/l21b2.mp4"                     # 重启后企业库生效
-    python3 "$H/cat_rec.py" "$WQ_REC/l21b.mp4" "$WQ_REC/l21b1.mp4" "$WQ_REC/l21b2.mp4"
-    "$H/rec.sh" "$H/l21c.py" "$WQ_REC/l21c.mp4"
-    L21="l21a l21b l21c"
+    "$H/rec.sh" "$H/l21a.py" "$WQ_REC/l21a$sfx.mp4"
+    WQ_PART=1 "$H/rec.sh" "$H/l21b.py" "$WQ_REC/l21b1$sfx.mp4"
+    WQ_PART=2 "$H/rec.sh" "$H/l21b.py" "$WQ_REC/l21b2$sfx.mp4"                 # 重启后企业库生效
+    python3 "$H/cat_rec.py" "$WQ_REC/l21b$sfx.mp4" "$WQ_REC/l21b1$sfx.mp4" "$WQ_REC/l21b2$sfx.mp4"
+    "$H/rec.sh" "$H/l21c.py" "$WQ_REC/l21c$sfx.mp4"
   fi
-  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c l10a l10b l11a l12a l12b l12c l13a l13b l13c l14a l15a l15b l16a l16b l17a l17b l18a l18b l19a l19b l19c $L21; do
+  for c in l01a l01b l01c l02a l02b l02c l03a l03b l04a l04b l04c l05a l05b l06a l06b l07a l07b l08a l08b l09a l09b l09c l10a l10b l11a l12a l12b l12c l13a l13b l13c l14a l15a l15b l16a l16b l17a l17b l18a l18b l19a l19b l19c l21a l21b l21c; do
     ffmpeg -loglevel error -y -i "$WQ_REC/$c$sfx.mp4" -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart -an "$OUT/wqcad-$c$sfx.mp4"
     ffmpeg -loglevel error -y -sseof -2 -i "$WQ_REC/$c$sfx.mp4" -frames:v 1 -vf scale=960:-1 -q:v 4 "$OUT/wqcad-$c$sfx.jpg"
     cp "$WQ_REC/$c$sfx.vtt" "$OUT/wqcad-$c$sfx.vtt"

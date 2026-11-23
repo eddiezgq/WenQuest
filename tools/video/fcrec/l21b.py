@@ -83,7 +83,7 @@ def part1(d):
     yield 800
     yield d.say("零件从哪来？菜单“AI Parts → 零件库”")
     br = yield from open_browser(d)
-    yield d.say("公共库里是真实厂商的零件：安川电机和驱动器、哈默纳科减速器、NSK 轴承。参数从厂商公开的规格书里抽出来")
+    yield d.say("公共库里是真实厂商的零件：安川电机和驱动器、哈默纳科减速器、NSK 轴承、ROBOTIS 智能舵机。参数从厂商公开的规格书里抽出来")
     yield 5000
     yield from steps.combo_pick(d, br.category, br.category.itemText([k for k in range(br.category.count()) if br.category.itemData(k) == "reducer"][0]))
     yield 1000
@@ -129,7 +129,13 @@ def part2(d):
     yield d.say("重启以后，再打开零件库")
     br = yield from open_browser(d)
     log("header", br.header.text())
-    yield d.say("顶上写着：企业库 2 个组件，叠加在公共库 34 个组件上面")
+    import re
+    h = br.header.text()
+    n_ent = re.search(r"(\d+) (?:个组件|components)", h).group(1)
+    mp = re.search(r"真实厂商组件 (\d+) 个|(\d+) real vendor components", h)
+    n_pub = (mp.group(1) or mp.group(2)) if mp else "?"
+    yield d.say(L(f"顶上写着：企业库 {n_ent} 个组件，叠加在公共库 {n_pub} 个组件上面",
+                  f"The header says: company library, {n_ent} components, layered over the public library's {n_pub}"))
     yield 4500
     yield from click_w(d, br.text)
     d.keys("LS", w=br.text)
