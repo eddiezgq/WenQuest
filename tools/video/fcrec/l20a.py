@@ -181,8 +181,8 @@ def script(d):
                         log("tree", w.objectName(), rows[:40])
             except RuntimeError:
                 pass
-        yield d.say(L("检查几何：实体“无效”——壳没连上、面不封闭、边上的曲线不对；三维视图里也显示不出来。这个“成功”的圆角其实是坏的，后面再建什么都建在坏实体上",
-                      "Check geometry: the solid is “invalid” — shell not closed, faces open, bad curves on edges; the 3D view cannot even show it. This “successful” fillet is broken, and everything built on it inherits that"))
+        yield d.say(L("检查几何：实体“无效”——壳没连上、面不封闭、边上的曲线不对；三维视图里一看也是乱的。这个“成功”的圆角其实是坏的，后面再建什么都建在坏实体上",
+                      "Check geometry: the solid is “invalid” — shell not closed, faces open, bad curves on edges; the 3D view shows the mess too. This “successful” fillet is broken, and everything built on it inherits that"))
         yield 7000
 
 

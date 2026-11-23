@@ -349,7 +349,12 @@ def menu_path(d, *names):
     yield d.move(p, 800)
     d.click(p)
     yield 700
-    if not [m for m in QtWidgets.QApplication.topLevelWidgets() if isinstance(m, QtWidgets.QMenu) and m.isVisible()]:
+    vis = lambda: [m for m in QtWidgets.QApplication.topLevelWidgets() if isinstance(m, QtWidgets.QMenu) and m.isVisible()]
+    for _ in range(10):                      # 慢一点的机器上菜单要多等一会儿才出来
+        if vis():
+            break
+        yield 150
+    if not vis():
         log("menu retry", names[0])          # 菜单没弹出来（刚关掉任务面板时偶尔这样）：再点一次
         d.click(p)
         yield 700
