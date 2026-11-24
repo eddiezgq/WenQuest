@@ -44,6 +44,7 @@
         </div>
         <div v-if="step.tools.length" class="tools small">{{ $t('打开软件：') }}
           <router-link v-for="t in step.tools" :key="t.route" :to="t.route" class="btn">{{ en ? t.label_en : t.label }}</router-link></div>
+        <div v-if="lead" class="md" v-html="lead"></div>
         <figure v-for="f in step.figs" :key="f.file" class="fig">
           <a :href="url(f.file)" target="_blank" rel="noopener"><img :src="url(f.file)" :alt="f.caption" loading="lazy"></a>
           <figcaption class="small muted">{{ en ? f.caption_en : f.caption }}</figcaption>
@@ -85,6 +86,7 @@ const c = ref(null);
 const err = ref('');
 const cur = ref(0);
 const html = ref('');
+const lead = ref('');   // 第 181 轮：正文开头的“主入口”引用块（> **[链接](…)**）提到图的上面，进这一步就看得见
 const LEVELS = { A: ['简单', 'Simple'], B: ['中等', 'Intermediate'], C: ['完整', 'Complete'] };   // i18n-ok 中英对照
 const levelName = (k) => (en.value ? LEVELS[k][1] : LEVELS[k][0]);
 const cards = computed(() => ['A', 'B', 'C'].map((k) => ({ id: k, ...(list.value?.cases.find((x) => x.id === k) || {}), ready: !!list.value?.cases.find((x) => x.id === k) })));
@@ -95,13 +97,17 @@ const badStep = (k) => c.value?.checks.some((x) => x.step === k && !x.ok);
 function go(i) { router.replace({ query: { ...route.query, s: String(i + 1) } }); }
 
 async function loadMd() {
-  html.value = '';
+  html.value = ''; lead.value = '';
   const s = step.value;
   if (!s?.md) return;
   try {
     const r = await fetch(url(s.md));
     const text = await r.text();
-    if (step.value === s) html.value = md.render(text.replace(/^# .+\n/, ''));   // 标题已在卡片上
+    if (step.value !== s) return;
+    const body = text.replace(/^# .+\n/, '').replace(/^\s+/, '');   // 标题已在卡片上
+    const m = /^(> \*\*\[[^\n]*(?:\n>[^\n]*)*)\n?/.exec(body);
+    lead.value = m ? md.render(m[1]) : '';
+    html.value = md.render(m ? body.slice(m[0].length) : body);
   } catch (e) { err.value = e.message; }
 }
 
@@ -157,6 +163,9 @@ a.cs:hover { box-shadow: 0 1px 6px rgba(0, 0, 0, .1); }
 .md :deep(th), .md :deep(td), .tbl th, .tbl td { border: 1px solid var(--line); padding: 3px 8px; text-align: left; vertical-align: top; }
 .md :deep(h2) { font-size: 16px; margin-top: 18px; }
 .md :deep(code) { background: var(--surface-2); padding: 0 3px; border-radius: 3px; }
+/* 第 181 轮：以加粗链接开头的引用块是“主入口”框（如 WQ-LS 设计说明书）；第一个链接显示成按钮 */
+.md :deep(blockquote:has(> p:first-child > strong:first-child > a)) { margin: 8px 0 16px; padding: 10px 14px; border-left: 4px solid var(--accent); background: var(--surface-2); border-radius: 6px; }
+.md :deep(blockquote > p:first-child > strong:first-child > a) { display: inline-block; padding: 6px 14px; border-radius: 6px; background: var(--accent); color: #fff; text-decoration: none; }
 .files { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 12px; border-top: 1px solid var(--line); padding-top: 8px; }
 .nav { display: flex; margin-top: 16px; gap: 8px; }
 </style>

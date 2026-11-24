@@ -38,6 +38,17 @@
         </form>
       </section>
 
+      <!-- 第 181 轮：本厂产品资料（只在有资料的厂显示，现在只有缝纫机厂） -->
+      <section v-if="docs.length" class="card prod-docs" :aria-label="t('本厂产品资料')">
+        <h2>{{ t('本厂产品资料') }}</h2>
+        <div v-for="d in docs" :key="d.name" class="prod-doc">
+          <b>{{ t(d.name) }}</b>
+          <a :href="d.spec" target="_blank" rel="noopener" class="btn-doc">{{ t('设计说明书') }} ↗</a>
+          <a :href="d.model" target="_blank" rel="noopener">{{ t('三维整机') }} ↗</a>
+          <router-link :to="d.case">{{ t('看设计案例') }} →</router-link>
+        </div>
+      </section>
+
       <!-- 关键指标 -->
       <section class="kpis" data-help="home-kpis" :aria-label="t('关键指标')">
         <div v-for="k in ov.kpis" :key="k.key" class="card kpi" :class="{ focus: focus.kpis.includes(k.key) }">
@@ -185,6 +196,11 @@ const { ov, error, load, machines } = useOverview();
 const q = ref('');
 const pid = ref(null);
 const teach = computed(() => session.user.mode === 'teach');
+// 第 181 轮：厂 id → 本厂产品资料（设计说明书、三维整机、设计案例）；别的厂有了产品说明书再加一行，不改界面
+const PRODUCT_DOCS = {
+  'wenquest-sewing': [{ name: tk('WQ-LS 工业直驱平缝机'), spec: '/wqls/spec/', model: '/wqls/index.html?opt=TED', case: '/cases/C' }],
+};
+const docs = computed(() => PRODUCT_DOCS[session.config?.plant?.id] || []);
 const brief = computed(() => ov.value?.briefing?.data);
 const briefTime = computed(() => (ov.value?.briefing ? timeOf(ov.value.briefing.ts).slice(-5) : '—'));
 const chips = computed(() => (teach.value ? [tk('MRP 是什么？'), tk('安全库存怎么定？'), tk('我下一步做什么？')]
@@ -264,6 +280,10 @@ function act(x) {
 <style scoped>
 .demo { background: var(--accent-bg); color: var(--accent); border-radius: 8px; padding: 8px 12px; }
 .brief { display: flex; gap: 20px; }
+.prod-docs { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.prod-docs h2 { font-size: 15px; margin: 0; }
+.prod-doc { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 14px; }
+.prod-doc .btn-doc { padding: 4px 12px; border-radius: 6px; background: var(--accent); color: #fff; text-decoration: none; }
 .brief-main { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
 .brief-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .link { border: 0; background: none; color: var(--accent); cursor: pointer; padding: 0; }
