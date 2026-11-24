@@ -15,7 +15,7 @@
 - 下次定时上线后：URL check + Help check 核两站 0.3.5 与课程页
 
 ## 卡点 / 跨仓库需求 / 规则反馈
-- 国内数字工厂 11-24 部署：ERPNext 数据库容器不健康（内存紧），erp.wenquestech.online 外网取不到；工作台已是新版。等 Eddie 定是否处理
+- 国内服务器硬盘满（99 GB 用到 100%，11-24）：ERP 数据库起不来、erp.wenquestech.online 卡住。已清旧镜像空出 2.6 GB、重跑国内部署，ERP 恢复（200）。长期：扩盘到 200 GB（推荐）或给历史库设保留期，等 Eddie 定
 
 ## 本会话模型
 - 问渠 CAD 帮助与培训窗口：Claude Opus 5.5
