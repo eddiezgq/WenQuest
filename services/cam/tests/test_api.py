@@ -11,7 +11,7 @@ c = client = TestClient(app)
 def test_examples_and_laws():
     ex = c.get("/api/examples").json()
     assert {e["id"] for e in ex} == {"packaging-plate", "sewing-feed", "sewing-takeup-groove", "atc-globoidal",
-                                     "barrel-feed", "barrel-fork"}
+                                     "barrel-feed", "barrel-fork", "sewing-feed-outline"}
     assert {e["id"]: e["kind"] for e in ex}["atc-globoidal"] == "system"
     assert ex[0]["title"]["zh"].startswith("示例")
     assert c.get("/api/examples/../app").status_code == 404
@@ -96,7 +96,8 @@ def test_freecad_pack():
     z = zipfile.ZipFile(io.BytesIO(r.content))
     names = set(z.namelist())
     root = "wenquest-cam-freecad/Mod/WenQuest/"
-    for f in ("InitGui.py", "wq_workbench.py", "wq_cam.py", "wq_cam_drawing.py", "camkit/globoid_solid.py",
+    for f in ("InitGui.py", "wq_workbench.py", "wq_cam.py", "wq_cam_drawing.py", "wq_cam_outline.py",
+              "camkit/inverse.py", "camkit/globoid_solid.py",
               "camkit/__init__.py", "examples/atc-globoidal.wqcam.json",
               "camkit/cyl_solid.py", "camkit/cylindrical.py", "examples/barrel-fork.wqcam.json"):  # step 8d
         assert root + f in names, f

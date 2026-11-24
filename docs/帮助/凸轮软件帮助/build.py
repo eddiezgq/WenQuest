@@ -43,11 +43,11 @@ BRAND = "问渠凸轮"
 
 EDITIONS = {
     "web": dict(title="问渠凸轮 · 网页版帮助", short="网页版帮助", other=("FreeCAD 版帮助", "freecad/index.html"),
-                files=["web/00-intro", "web/01-start", "common/cases", "common/case-takeup", "common/case-atc", "common/methods",
+                files=["web/00-intro", "web/01-start", "common/outline", "common/cases", "common/case-takeup", "common/case-atc", "common/methods",
                        "web/02-modes", "common/mfg", "common/cloud-ai", "web/03-export", "common/kernel", "common/arch",
                        "common/limits", "common/faq"]),
     "freecad": dict(title="问渠凸轮 · FreeCAD 工作台帮助", short="FreeCAD 版帮助", other=("网页版帮助", ONLINE + "help/index.html"),
-                    files=["freecad/00-intro", "freecad/01-install", "freecad/02-use", "common/cases", "common/case-takeup",
+                    files=["freecad/00-intro", "freecad/01-install", "freecad/02-use", "common/outline", "common/cases", "common/case-takeup",
                            "common/case-atc", "freecad/03-console", "common/methods", "common/mfg", "common/kernel", "common/arch",
                            "common/limits", "common/faq"]),
 }
@@ -117,6 +117,22 @@ def numbers():
     st = cae["arm"]["job"]["stats"]
     v["atc"].update(vm=f(st["vm_max_mpa"], 1), sf=f(st["safety_factor"], 1), el=st["elements"], f1=f(cae["modal"]["freqs"][0]["hz"], 0),
                     cae_date=cae["computed_at"])
+    # ---- 导入廓线（第 179 轮）：只有廓线图的送布抬牙凸轮
+    from camkit import inverse as IV  # noqa: PLC0415
+
+    eo = ex("sewing-feed-outline")
+    o = eo["outline"]
+    rep = IV.import_outline({"mechanism": eo["mechanism"], "outline": {
+        "format": o["format"], "data": o["data"], "center": [o["cx"], o["cy"]], "zero": o["zero"],
+        "smooth": o["smooth"]}})["report"]
+    src = ex("sewing-feed")
+    sh = rep["shift_deg"] - 360 if rep["shift_deg"] > 180 else rep["shift_deg"]
+    from camkit.program import Program  # noqa: PLC0415
+
+    a_true = float(np.abs(Program.from_dict(src["program"]).eval(np.linspace(0, 2 * np.pi, 3600,
+                                                                               endpoint=False))[2]).max())
+    v["ol"] = {"rb": f(rep["rb"], 3), "lift": f(rep["lift"], 3), "shift": f(sh, 1), "dev": f(rep["check"]["max_dev"] * 1000, 2),
+               "raw": f(rep["acc"]["raw_peak"], 2), "sm": f(rep["acc"]["smooth_peak"], 3), "true": f(a_true, 3)}
     return v
 
 

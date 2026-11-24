@@ -99,6 +99,13 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 .card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 18px}
 .tag{display:inline-block;font:600 12px/1 var(--mono);padding:4px 7px;border-radius:4px;background:var(--soft);color:var(--muted);vertical-align:middle}
 .top-other{font-size:13px}
+.quiz{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:14px 18px;margin:16px 0}
+.quiz .q{margin:0 0 10px;font-weight:600}
+.quiz .opts{display:grid;gap:8px}
+.quiz button{text-align:left;font:15px/1.6 var(--font);background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer}
+.quiz button.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--paper))}
+.quiz button.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--paper))}
+.quiz .why{margin:10px 0 0;color:var(--muted);font-size:14.5px}
 @media print{aside,.hamb,.try,.anim .bar,.calc{display:none}main{margin:0}section{padding:20px 0;break-inside:avoid-page}figure.vid{display:none}}
 </style>
 </head>
@@ -110,35 +117,42 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
   <nav><a href="#intro" data-s="intro"><span class="n">00</span>这是什么</a>
 <a href="#install" data-s="install"><span class="n">01</span>安装</a>
 <a href="#use" data-s="use"><span class="n">02</span>使用</a>
-<a href="#cases" data-s="cases"><span class="n">03</span>典型案例</a>
-<a href="#case-takeup" data-s="case-takeup"><span class="n">04</span>案例一：平缝机挑线槽凸轮，从设计到磨削与补偿</a>
+<a href="#outline" data-s="outline"><span class="n">03</span>只有廓线图：导入廓线，反求从动件运动</a>
+<a class="sub" href="#outline-1" data-s="outline">什么时候用</a>
+<a class="sub" href="#outline-2" data-s="outline">网页版怎么用</a>
+<a class="sub" href="#outline-3" data-s="outline">软件怎么算</a>
+<a class="sub" href="#outline-4" data-s="outline">示例里的数</a>
+<a class="sub" href="#outline-5" data-s="outline">对不上时看这里</a>
+<a class="sub" href="#outline-6" data-s="outline">FreeCAD 里</a>
+<a href="#cases" data-s="cases"><span class="n">04</span>典型案例</a>
+<a href="#case-takeup" data-s="case-takeup"><span class="n">05</span>案例一：平缝机挑线槽凸轮，从设计到磨削与补偿</a>
 <a class="sub" href="#case-takeup-1" data-s="case-takeup">问题</a>
 <a class="sub" href="#case-takeup-2" data-s="case-takeup">第一步：校核</a>
 <a class="sub" href="#case-takeup-3" data-s="case-takeup">第二步：磨削程序</a>
 <a class="sub" href="#case-takeup-4" data-s="case-takeup">第三步：测量与补偿</a>
-<a href="#case-atc" data-s="case-atc"><span class="n">05</span>案例二：加工中心凸轮式换刀机构</a>
+<a href="#case-atc" data-s="case-atc"><span class="n">06</span>案例二：加工中心凸轮式换刀机构</a>
 <a class="sub" href="#case-atc-1" data-s="case-atc">问题</a>
 <a class="sub" href="#case-atc-2" data-s="case-atc">第一步：时序与联锁</a>
 <a class="sub" href="#case-atc-3" data-s="case-atc">第二步：电机与振动</a>
 <a class="sub" href="#case-atc-4" data-s="case-atc">第三步：设计搜索——换运动规律</a>
 <a class="sub" href="#case-atc-5" data-s="case-atc">第四步：CAE</a>
-<a href="#console" data-s="console"><span class="n">06</span>不开界面：控制台命令</a>
-<a href="#methods" data-s="methods"><span class="n">07</span>怎么算：运动规律、压力角、曲率、接触与跳离</a>
+<a href="#console" data-s="console"><span class="n">07</span>不开界面：控制台命令</a>
+<a href="#methods" data-s="methods"><span class="n">08</span>怎么算：运动规律、压力角、曲率、接触与跳离</a>
 <a class="sub" href="#methods-1" data-s="methods">运动程序与运动规律</a>
 <a class="sub" href="#methods-2" data-s="methods">压力角、根切与曲率</a>
 <a class="sub" href="#methods-3" data-s="methods">接触应力、跳离与转矩</a>
 <a class="sub" href="#methods-4" data-s="methods">凸轮系统</a>
 <a class="sub" href="#methods-5" data-s="methods">圆柱凸轮</a>
-<a href="#mfg" data-s="mfg"><span class="n">08</span>制造、测量与补偿</a>
+<a href="#mfg" data-s="mfg"><span class="n">09</span>制造、测量与补偿</a>
 <a class="sub" href="#mfg-1" data-s="mfg">制造</a>
 <a class="sub" href="#mfg-2" data-s="mfg">测量与补偿（盘形凸轮）</a>
-<a href="#kernel" data-s="kernel"><span class="n">09</span>内核：开源软件与参考书</a>
+<a href="#kernel" data-s="kernel"><span class="n">10</span>内核：开源软件与参考书</a>
 <a class="sub" href="#kernel-1" data-s="kernel">用到的开源软件</a>
 <a class="sub" href="#kernel-2" data-s="kernel">参考书</a>
 <a class="sub" href="#kernel-3" data-s="kernel">我们自己做的</a>
-<a href="#arch" data-s="arch"><span class="n">10</span>系统设计</a>
-<a href="#limits" data-s="limits"><span class="n">11</span>简化与限制</a>
-<a href="#faq" data-s="faq"><span class="n">12</span>常见问题</a></nav>
+<a href="#arch" data-s="arch"><span class="n">11</span>系统设计</a>
+<a href="#limits" data-s="limits"><span class="n">12</span>简化与限制</a>
+<a href="#faq" data-s="faq"><span class="n">13</span>常见问题</a></nav>
   <div class="tools">
     <a href="https://wenquestrobotics.com/cam/help/index.html" class="top-other">看网页版帮助</a>
     <button onclick="toggleTheme()">◐ 深浅色</button>
@@ -187,7 +201,37 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ol>
 
 <figure class="vid"><video controls preload="none" playsinline poster="media/fc-02-cam-system.jpg"><source src="media/fc-02-cam-system.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="data:text/vtt;base64,V0VCVlRUCgowMDowMDowMC42MDAgLS0+IDAwOjAwOjA4LjA3Mwrlh7jova7ns7vnu5/vvJrmiZPlvIDliqDlt6XkuK3lv4PmjaLliIDmnLrmnoTnmoTnpLrkvovjgILlvKfpnaLliIbluqblh7jova7mjInliqDlt6Xmlrnms5Xlu7rnsr7noa7lrp7kvZPvvIzlpKfnuqbkuIDliIbpkp/jgIIKCjAwOjAwOjEwLjAyNCAtLT4gMDA6MDA6MTcuMjg0CuW7uuWlveS6hu+8muW8p+mdouWIhuW6puWHuOi9ruOAgei9rOWhlOS4jua7muWtkOOAgeanveWHuOi9ruWSjOaNouWIgOiHgu+8jOaMiee9kemhteeJiOS4iee7tOmHjOeahOS9jee9ruijhemFjeOAggoKMDA6MDA6MTguOTE0IC0tPiAwMDowMDoyNS4zNDgK5Zyo5qih5Z6L5qCR6YeM6YCJ5Ye46L2u57O757uf77yM5pS55bGe5oCnIEFuZ2xl77yM6L2s5aGU5ZKM5o2i5YiA6IeC5oyJ5pe25bqP6L2s5Yqo44CB5LiK5LiL5ouU5o+S44CCCgowMDowMDoyOC4wMjQgLS0+IDAwOjAwOjM3Ljc2MQrlr7zlh7rnlKjmjqfliLblj7DnmoTkuIDooYzlkb3ku6TvvJrlh7jova7lkozmjaLliIDoh4LlkITnu5kgU1RFUCDlkowgQTMg5bel5L2c5Zu+77yM5byn6Z2i5YiG5bqm5Ye46L2u5Y+m57uZ5Zub6L205Yqg5bel56iL5bqP77yb5oqA5pyv6KaB5rGC55WZ57uZ5bel56iL5biI5aGr44CCCg=="></video><figcaption>▶ 录像：凸轮系统装配与转动</figcaption></figure></section>
-<section id="cases"><h2><span class="n">03</span>典型案例</h2><p class="lead">两个从实际问题出发的案例，每个数都是软件当场算的；示例参数都是虚构的。</p><table>
+<section id="outline"><h2><span class="n">03</span>只有廓线图：导入廓线，反求从动件运动</h2><p class="lead">凸轮是照图画的、没有运动规律？把廓线导进来（DXF、x, y 点表，或 FreeCAD 草图），软件按从动件求出运动，后面的校核和加工照常用。</p><h3 id="outline-1">什么时候用</h3>
+<p>手里只有凸轮的廓线（CAD 图、测绘的点、老图纸重描），或者设计时没有严格按行程和运动规律来，用“点表（转角, 位移）”又量不准——就用导入廓线。软件不需要你量任何转角和位移。</p>
+<h3 id="outline-2">网页版怎么用</h3>
+<ol class="steps">
+<li><b>机构</b>页先设从动件：直动 / 摆动，滚子 / 平底 / 尖顶，滚子半径、偏距（摆动：中心距、摆杆长），凸轮转向。基圆半径不用填，由廓线求出。</li>
+<li><b>运动程序</b>页点 <b>导入廓线</b>，选文件（.dxf，或 .csv / .txt 的 x, y 点表；本软件“制造”里导出的点表也认），或者直接粘贴 x, y。</li>
+<li>填 <b>回转中心</b>（图上的坐标，默认原点）；<b>零位</b>选“升程开始处为 0°”或“按图上方位”（从动件在图的 +y 方向）。</li>
+<li>点 <b>求运动</b>。中间的凸轮、右边的校核、下面的曲线随即按求出的运动更新；“制造”“测量与补偿”也用它。</li>
+</ol>
+
+<a class="try" href="https://wenquestrobotics.com/cam/?example=sewing-feed-outline" target="_blank" rel="noopener">▶ 试一试：打开“只有廓线图”的示例</a>
+<h3 id="outline-3">软件怎么算</h3>
+<ul>
+<li><strong>取廓线</strong>：DXF 里的直线、圆弧、圆、多段线（含凸度圆弧）、样条、椭圆首尾相接拼成封闭线，取面积最大的一条当凸轮（轴孔、键槽这些小的封闭线不算；单独的直线当中心线，不算）。全是短直线的多段线当作曲线上的点，用光滑曲线穿过；有圆弧、样条的按图原样。</li>
+<li><strong>反求</strong>：凸轮每转 0.1° 算一次从动件贴住廓线的位置。滚子：把廓线向外长出一个滚子半径，滚子中心就在这条线上；平底：廓线凸包在从动件方向上最远的点；摆动的换成绕摆动中心转的角度。最低位置就是基圆。</li>
+<li><strong>平滑</strong>：位移本身准到廓线的精度，但求两次导数会把廓线上百分之一微米的起伏放大成很大的假加速度。软件用平滑样条去掉这些起伏，平滑程度“自动”按廓线本身的精度定（广义交叉验证），而且位移最多只改 1 µm；“未平滑”“平滑后”两条加速度曲线都画出来。</li>
+<li><strong>反求校验</strong>：用求出的运动按正常设计的算法把廓线重新生成一遍，和导入的廓线比，两边互相量最大距离；超过 5 µm 就提示对不上。</li>
+</ul>
+<h3 id="outline-4">示例里的数</h3>
+<p>示例“只有廓线图的送布抬牙凸轮”是一张 DXF：廓线是穿过 720 个点的样条，图上转了 30°，另有轴孔、两条中心线和一行字。导入后：基圆半径 14.000 mm，行程 4.000 mm，零位相对图上转过 -29.5°，反求校验 0.06 µm；加速度峰值未平滑 10.30、平滑后 2.861 mm/rad²（按原来的运动规律是 2.853）。</p>
+<h3 id="outline-5">对不上时看这里</h3>
+<ul>
+<li>回转中心不在廓线里面：中心坐标填错了。</li>
+<li>反求校验不合格：多半是滚子半径、偏距、中心距填错；或者滚子比廓线凹处还大、平底盖住了凹处，那一段从动件根本碰不到（提示里给出大约在哪个角度）。</li>
+<li>廓线没有封闭：提示断开的位置，回 CAD 里接上。</li>
+<li>改了“机构”页的从动件以后，导入页会提示，点 <strong>重新求</strong>。</li>
+</ul>
+<h3 id="outline-6">FreeCAD 里</h3>
+<p>先在模型树里选中凸轮廓线的草图（或任何带封闭轮廓的对象），再点“凸轮”，回答“是”，填从动件参数。软件在草图自己的平面里取廓线（面积最大的封闭线，回转中心默认是草图原点），用同一个内核反求，存成网页版能打开的项目文件，并照常重算校核、建实体。</p>
+<p>本版只做盘形凸轮外廓；槽凸轮、圆柱凸轮以后再说。</p></section>
+<section id="cases"><h2><span class="n">04</span>典型案例</h2><p class="lead">两个从实际问题出发的案例，每个数都是软件当场算的；示例参数都是虚构的。</p><table>
 <thead>
 <tr>
 <th>案例</th>
@@ -209,7 +253,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </tbody>
 </table>
 <p>每个案例的数都由 <code>docs/帮助/凸轮软件帮助/build.py</code> 生成帮助时调计算核心重算；改了计算核心，重新生成，帮助里的数跟着变。</p></section>
-<section id="case-takeup"><h2><span class="n">04</span>案例一：平缝机挑线槽凸轮，从设计到磨削与补偿</h2><p class="lead">一个槽凸轮从“够不够”一直做到“磨出来差多少、怎么补”。</p><h3 id="case-takeup-1">问题</h3>
+<section id="case-takeup"><h2><span class="n">05</span>案例一：平缝机挑线槽凸轮，从设计到磨削与补偿</h2><p class="lead">一个槽凸轮从“够不够”一直做到“磨出来差多少、怎么补”。</p><h3 id="case-takeup-1">问题</h3>
 <p>平缝机挑线槽凸轮（示例，虚构）：摆动从动件、滚子半径 4 mm、基圆半径 22 mm、中心距 45 mm、摆杆长 38 mm，5000 r/min。运动程序：升（修正正弦）—停—回（4-5-6-7 次多项式）—停。</p>
 <a class="try" href="https://wenquestrobotics.com/cam/?example=sewing-takeup-groove" target="_blank" rel="noopener">▶ 试一试：打开这个示例</a>
 <h3 id="case-takeup-2">第一步：校核</h3>
@@ -264,7 +308,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <div class="anim" data-anim="comp"></div>
 <a class="try" href="https://wenquestrobotics.com/cam/?example=sewing-takeup-groove&amp;mode=measure" target="_blank" rel="noopener">▶ 试一试：打开测量与补偿</a>
 <figure class="vid"><video controls preload="none" playsinline poster="https://wenquestrobotics.com/cam/help/media/web-03-measure.jpg"><source src="https://wenquestrobotics.com/cam/help/media/web-03-measure.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="https://wenquestrobotics.com/cam/help/media/web-03-measure.vtt"></video><figcaption>▶ 案例一录像：测量、谐波分析与补偿</figcaption></figure></section>
-<section id="case-atc"><h2><span class="n">05</span>案例二：加工中心凸轮式换刀机构</h2><p class="lead">一根凸轮轴上两个凸轮：弧面分度凸轮转换刀臂，槽凸轮让换刀臂拔刀、插刀；动作要错开，电机要够，停下来不能晃太大。</p><h3 id="case-atc-1">问题</h3>
+<section id="case-atc"><h2><span class="n">06</span>案例二：加工中心凸轮式换刀机构</h2><p class="lead">一根凸轮轴上两个凸轮：弧面分度凸轮转换刀臂，槽凸轮让换刀臂拔刀、插刀；动作要错开，电机要够，停下来不能晃太大。</p><h3 id="case-atc-1">问题</h3>
 <p>加工中心凸轮式换刀机构（示例，虚构）：凸轮轴 60 r/min，经 30:1 减速由电机带动。弧面分度凸轮：停—转 65°—停—转 180°—停—回 65°；槽凸轮 + 摆杆：在换刀臂停着时下拔、上插。</p>
 <a class="try" href="https://wenquestrobotics.com/cam/?example=atc-globoidal" target="_blank" rel="noopener">▶ 试一试：打开这个示例</a>
 <h3 id="case-atc-2">第一步：时序与联锁</h3>
@@ -351,7 +395,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p>“CAE 分析”页：换刀臂有限元（55724 个单元）最大应力 31.9 MPa、安全系数 16.9；换刀臂本身（孔固定）一阶固有频率 791 Hz；还有疲劳寿命和整机多体动力学（MuJoCo）与解析结果的对照。示例结果是 2026-10-18 用数字工厂计算服务同一套程序算的；提交新计算要企业账号。</p>
 <a class="try" href="https://wenquestrobotics.com/cam/?example=atc-globoidal&amp;mode=cae" target="_blank" rel="noopener">▶ 试一试：打开 CAE 页</a>
 <figure class="vid"><video controls preload="none" playsinline poster="https://wenquestrobotics.com/cam/help/media/web-05-3d-cae.jpg"><source src="https://wenquestrobotics.com/cam/help/media/web-05-3d-cae.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="https://wenquestrobotics.com/cam/help/media/web-05-3d-cae.vtt"></video><figcaption>▶ 案例二录像：三维与 CAE</figcaption></figure></section>
-<section id="console"><h2><span class="n">06</span>不开界面：控制台命令</h2><p class="lead">在 FreeCAD 的 Python 控制台里一行跑完：校核、建模、导出。</p><pre><code class="language-python">import wq_cam
+<section id="console"><h2><span class="n">07</span>不开界面：控制台命令</h2><p class="lead">在 FreeCAD 的 Python 控制台里一行跑完：校核、建模、导出。</p><pre><code class="language-python">import wq_cam
 wq_cam.run_headless(&quot;项目.wqcam.json&quot;, &quot;输出文件夹&quot;)
 </code></pre>
 <p>批量处理一批凸轮：</p>
@@ -359,7 +403,7 @@ wq_cam.run_headless(&quot;项目.wqcam.json&quot;, &quot;输出文件夹&quot;)
 for f in glob.glob(&quot;凸轮/*.wqcam.json&quot;):
     wq_cam.run_headless(f, os.path.join(&quot;输出&quot;, os.path.basename(f)[:-11]))
 </code></pre></section>
-<section id="methods"><h2><span class="n">07</span>怎么算：运动规律、压力角、曲率、接触与跳离</h2><p class="lead">每一项校核出自哪个公式；方法出自公开的教材和专著，每个模块带标准题。</p><h3 id="methods-1">运动程序与运动规律</h3>
+<section id="methods"><h2><span class="n">08</span>怎么算：运动规律、压力角、曲率、接触与跳离</h2><p class="lead">每一项校核出自哪个公式；方法出自公开的教材和专著，每个模块带标准题。</p><h3 id="methods-1">运动程序与运动规律</h3>
 <p>一圈由升、停、回拼成，每段选一种运动规律：等速、等加速等减速、简谐（余弦加速度）、摆线（正弦加速度）、修正梯形、修正正弦、3-4-5 次多项式、4-5-6-7 次多项式。段与段接头处速度不连续是<strong>刚性冲击</strong>，加速度不连续是<strong>柔性冲击</strong>，软件逐个接头查。也可以用点表（至少 8 个点，按周期三次样条连起来）。</p>
 <div class="calc" data-calc="laws"></div>
 <h3 id="methods-2">压力角、根切与曲率</h3>
@@ -380,7 +424,7 @@ for f in glob.glob(&quot;凸轮/*.wqcam.json&quot;):
 <h3 id="methods-5">圆柱凸轮</h3>
 <p>槽侧面由啮合条件闭式求出；压力角沿槽深变化，槽底处最大，按槽底给结论；锥形滚子的锥顶在凸轮轴线上，停歇时纯滚动。</p>
 <figure class="vid"><video controls preload="none" playsinline poster="https://wenquestrobotics.com/cam/help/media/web-06-cyl.jpg"><source src="https://wenquestrobotics.com/cam/help/media/web-06-cyl.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="https://wenquestrobotics.com/cam/help/media/web-06-cyl.vtt"></video><figcaption>▶ 录像：圆柱凸轮</figcaption></figure></section>
-<section id="mfg"><h2><span class="n">08</span>制造、测量与补偿</h2><p class="lead">出程序、读回仿真；测出误差、分阶次、算加速度误差、反向补偿出新程序。机床参数都是示例值，按本厂设备改。</p><h3 id="mfg-1">制造</h3>
+<section id="mfg"><h2><span class="n">09</span>制造、测量与补偿</h2><p class="lead">出程序、读回仿真；测出误差、分阶次、算加速度误差、反向补偿出新程序。机床参数都是示例值，按本厂设备改。</p><h3 id="mfg-1">制造</h3>
 <ul>
 <li>加工方式：<strong>磨削 X–C</strong>（凸轮随 C 轴转、砂轮沿 X 进退）、<strong>铣削 XY</strong>、<strong>慢走丝</strong>（只出 DXF 和点表）。填刀具半径和弦高公差；槽凸轮刀具不能大于滚子，等于时一刀磨出两侧。</li>
 <li>校核：<strong>不过切</strong>（凹处曲率半径大于刀具半径）；<strong>X–C 能走</strong>（刀心轨迹对凸轮中心是“星形”）；<strong>程序仿真偏差</strong>（程序读回来让刀具扫过毛坯，和设计廓线比，不超过弦高公差 + 0.1 µm 为合格——说明程序没问题，零件公差由企业定）。</li>
@@ -396,7 +440,7 @@ for f in glob.glob(&quot;凸轮/*.wqcam.json&quot;):
 <li><strong>补偿</strong>：选要修的阶次，软件把这些阶次的误差反向加到运动程序上，按“制造”里的刀具和机床重新出程序，并预测剩下的误差。</li>
 </ul>
 <div class="anim" data-anim="comp"></div></section>
-<section id="kernel"><h2><span class="n">09</span>内核：开源软件与参考书</h2><p class="lead">数值、几何和网页交给成熟的开源软件；公式和判据出自公开的教材和专著，每个模块带标准题。</p><h3 id="kernel-1">用到的开源软件</h3>
+<section id="kernel"><h2><span class="n">10</span>内核：开源软件与参考书</h2><p class="lead">数值、几何和网页交给成熟的开源软件；公式和判据出自公开的教材和专著，每个模块带标准题。</p><h3 id="kernel-1">用到的开源软件</h3>
 <table>
 <thead>
 <tr>
@@ -455,7 +499,7 @@ for f in glob.glob(&quot;凸轮/*.wqcam.json&quot;):
 <p>R. L. Norton, <em>Cam Design and Manufacturing Handbook</em>（运动规律、压力角、曲率、动力学与残余振动）；H. A. Rothbart, <em>Cam Design Handbook</em>（滚子齿轮凸轮 / 弧面凸轮）；J. Angeles, C. López-Cajún, <em>Optimization of Cam Mechanisms</em>（最小基圆）；孙桓《机械原理》（廓线曲率）。另外和开源的 <code>mechanism</code> 包做过交叉对照。</p>
 <h3 id="kernel-3">我们自己做的</h3>
 <p>计算核心 <code>services/cam/camkit/</code>（纯 Python）：运动程序、盘形与圆柱与弧面凸轮、制造程序与读回仿真、测量与补偿、凸轮系统与设计搜索、STEP 写出；标准题与闭式解对照（<code>services/cam/tests/</code>）。判定全由程序做，不经 AI；没填的数据结果为“未知”。</p></section>
-<section id="arch"><h2><span class="n">10</span>系统设计</h2><p class="lead">运动程序 → 计算核心 → 校核 → 制造程序 → 测量 → 补偿，绕成一个闭环；凸轮系统再接 CAE。</p><div class="anim" data-anim="arch"></div>
+<section id="arch"><h2><span class="n">11</span>系统设计</h2><p class="lead">运动程序 → 计算核心 → 校核 → 制造程序 → 测量 → 补偿，绕成一个闭环；凸轮系统再接 CAE。</p><div class="anim" data-anim="arch"></div>
 <table>
 <thead>
 <tr>
@@ -493,7 +537,7 @@ for f in glob.glob(&quot;凸轮/*.wqcam.json&quot;):
 </tbody>
 </table>
 <p>规矩：判定只由程序做；许用值、机床参数、电机额定值由企业填，不编；示例一律标“虚构”。</p></section>
-<section id="limits"><h2><span class="n">11</span>简化与限制</h2><p class="lead">照实写：哪些是简化，哪些还没有。</p><ul>
+<section id="limits"><h2><span class="n">12</span>简化与限制</h2><p class="lead">照实写：哪些是简化，哪些还没有。</p><ul>
 <li>接触应力按赫兹线接触，不计边缘效应和润滑。</li>
 <li>停歇残余振动按单自由度模型，弹性频率和阻尼比由企业填；系统振动用的是含传动链的整体频率，与 CAE 里换刀臂本身（孔固定）的固有频率不同。</li>
 <li>弧面凸轮的槽底按刀具端面直径扫出，比平底刀实际加工最多多留约 0.7 mm 的料（非工作面，偏安全）。</li>
@@ -501,7 +545,7 @@ for f in glob.glob(&quot;凸轮/*.wqcam.json&quot;):
 <li>测量与补偿只对盘形凸轮开放；“自动对相位”会把一部分像“错开一点角度”的误差当成相位差。</li>
 <li>机床设置、电机参数、许用值都是示例或要企业填；不填的结果为“未知”。</li>
 </ul></section>
-<section id="faq"><h2><span class="n">12</span>常见问题</h2><p class="lead"></p><p><strong>为什么接触应力是“未知”？</strong> 没填许用接触应力。软件不替你编许用值，“未知”不算合格。</p>
+<section id="faq"><h2><span class="n">13</span>常见问题</h2><p class="lead"></p><p><strong>为什么接触应力是“未知”？</strong> 没填许用接触应力。软件不替你编许用值，“未知”不算合格。</p>
 <p><strong>合计不是 360° 怎么办？</strong> 运动程序各段转角加起来必须是 360°，右下角“合计”变绿才算对；停歇段补齐即可。</p>
 <p><strong>网页版和 FreeCAD 版结果会不一样吗？</strong> 不会，同一个计算核心；FreeCAD 打开网页版存的项目，校核逐项相同。</p>
 <p><strong>槽凸轮为什么没有“跳离”？</strong> 槽凸轮是形封闭，不会跳离；改看滚子换侧次数，每次换侧都在槽间隙里有冲击。</p>
@@ -556,6 +600,13 @@ document.querySelectorAll("pre").forEach(p => {
   b.onclick = () => { navigator.clipboard.writeText(p.innerText.replace(/复制$|已复制$/, "").trim()).then(() => { b.textContent = "已复制"; b.classList.add("done"); setTimeout(() => { b.textContent = "复制"; b.classList.remove("done"); }, 1500); }); };
   p.appendChild(b);
 });
+// 小测：点一个选项，标对错、给原因
+document.querySelectorAll(".quiz").forEach(qz => qz.querySelectorAll("button").forEach(b => b.onclick = () => {
+  const ok = qz.dataset.ok;
+  qz.querySelectorAll("button").forEach(x => { x.classList.remove("right", "wrong"); if (x.dataset.k === ok) x.classList.add("right"); });
+  if (b.dataset.k !== ok) b.classList.add("wrong");
+  const w = qz.querySelector(".why"); w.hidden = false; w.textContent = (b.dataset.k === ok ? "✓ 对。" : "✗ 不对。") + w.textContent.replace(/^[✓✗] [^。]*。/, "");
+}));
 spy();
 </script>
 <script>

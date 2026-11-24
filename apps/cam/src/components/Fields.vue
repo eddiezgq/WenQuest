@@ -42,7 +42,7 @@ const num = (v) => (v === '' || v === null ? null : Number(v))
       <span class="lab">{{ t('contact') }}</span>
       <button v-for="c in ['roller', 'flat', 'knife']" :key="c" type="button" :class="{ on: m.contact === c }" @click="m.contact = c; if (c !== 'roller') m.groove = false">{{ t(c) }}</button>
     </div>
-    <label>{{ t('rb') }} <span class="u">mm</span><input :value="m.rb" type="number" step="any" min="0" @input="m.rb = num($event.target.value)"></label>
+    <label>{{ t('rb') }} <span class="u">{{ project.outline ? t('rbFromOutline') : 'mm' }}</span><input :value="m.rb" type="number" step="any" min="0" :disabled="!!project.outline" @input="m.rb = num($event.target.value)"></label>
     <label v-if="m.contact === 'roller'">{{ t('rr') }} <span class="u">mm</span><input :value="m.rr" type="number" step="any" min="0" @input="m.rr = num($event.target.value)"></label>
     <label v-if="!osc && m.contact !== 'flat'">{{ t('e') }} <span class="u">mm</span><input :value="m.e" type="number" step="any" @input="m.e = num($event.target.value)"></label>
     <label v-if="osc">{{ t('a') }} <span class="u">mm</span><input :value="m.a" type="number" step="any" min="0" @input="m.a = num($event.target.value)"></label>
@@ -52,9 +52,10 @@ const num = (v) => (v === '' || v === null ? null : Number(v))
       <button type="button" :class="{ on: m.sigma === 1 }" @click="m.sigma = 1">↺ {{ t('ccw') }}</button>
       <button type="button" :class="{ on: m.sigma === -1 }" @click="m.sigma = -1">↻ {{ t('cw') }}</button>
     </div>
-    <label v-if="m.contact === 'roller'" class="check"><input v-model="m.groove" type="checkbox"> {{ t('groove') }}</label>
+    <label v-if="m.contact === 'roller' && !project.outline" class="check"><input v-model="m.groove" type="checkbox"> {{ t('groove') }}</label>
     <label>{{ t('width') }} <span class="u">mm</span><input :value="m.width" type="number" step="any" min="0" @input="m.width = num($event.target.value)"></label>
-    <div class="row"><button type="button" class="ghost" :disabled="searching" @click="findRb">{{ t('findRb') }}</button></div>
+    <p v-if="project.outline" class="note">{{ t('mechOutlineNote') }}</p>
+    <div v-if="!project.outline" class="row"><button type="button" class="ghost" :disabled="searching" @click="findRb">{{ t('findRb') }}</button></div>
     <p v-if="searchMsg" class="note">{{ searchMsg }}</p>
   </div>
 

@@ -6,7 +6,8 @@
 导出 STEP、加工程序和校核摘要。camkit 放在本文件旁边（工作台文件夹里），离线可用，不连网。
 
 用法：
-  - 工作台“问渠”→“凸轮”：选项目文件，建模、装配；改文档里“凸轮系统”对象的“转角”看各零件按时序动。
+  - 工作台“问渠”→“凸轮”：选项目文件，建模、装配；先选中一张凸轮廓线的草图再点“凸轮”，则按廓线反求从动件运动
+    （wq_cam_outline.py，第 179 轮）；改文档里“凸轮系统”对象的“转角”看各零件按时序动。
   - 命令行（不开界面）：设环境变量 WQ_CAM_PROJECT=项目.wqcam.json、WQ_CAM_OUT=输出文件夹，再运行 FreeCADCmd wq_cam.py
 需要 numpy、scipy、shapely（换刀臂外形用）。FreeCAD 自带 numpy；缺 scipy 或 shapely 时会提示安装命令。
 """
@@ -495,6 +496,17 @@ def run_dialog():
         QtGui.QMessageBox.warning(None, "问渠凸轮",
                                   "缺少 Python 包：{}\n\n{}".format(", ".join(miss), install_hint(miss)))
         return
+    # a sketch (or any closed outline) selected: find the motion from it instead (round 179)
+    import wq_cam_outline
+    sel = wq_cam_outline.selected_outline()
+    if sel is not None:
+        ans = QtGui.QMessageBox.question(
+            None, "问渠凸轮",
+            "选中的“{}”里有封闭的轮廓。\n用它当凸轮廓线、反求从动件的运动吗？\n（选“否”则打开项目文件）".format(sel.Label),
+            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+        if ans == QtGui.QMessageBox.Yes:
+            wq_cam_outline.run_dialog(sel)
+            return
     path, _ = QtGui.QFileDialog.getOpenFileName(None, "打开问渠凸轮项目", os.path.expanduser("~"),
                                                 "问渠凸轮项目 (*.wqcam.json *.json)")
     if not path:

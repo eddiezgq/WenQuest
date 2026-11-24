@@ -1,17 +1,21 @@
 <script setup>
 // The motion program: rises, dwells and returns adding up to 360°, or a table of points (round 39).
 import { computed, ref, watch } from 'vue'
-import { project, laws } from '../store'
+import { project, laws, blankOutline } from '../store'
 import { t, lang } from '../i18n'
 import AiDraft from './AiDraft.vue'
+import OutlineImport from './OutlineImport.vue'
 
 const props = defineProps({ program: { type: Object, default: null }, indexing: Boolean, camId: { type: String, default: '' } })
 const prog = computed(() => props.program || project.program)
 const rad = computed(() => prog.value.unit === 'rad')
 const liftKey = computed(() => (rad.value ? 'h_deg' : 'h'))
 const total = computed(() => (prog.value.segments || []).reduce((a, s) => a + (Number(s.deg) || 0), 0))
-const useTable = ref(!!prog.value.table)
-const tableText = ref('')
+const canOutline = computed(() => !props.program && project.type !== 'cylindrical')
+// how the motion is given: motion laws, a point table, or an imported outline (round 179)
+const how = ref(canOutline.value && project.outline ? 'outline' : prog.value.table ? 'table' : 'law')
+const useTable = computed(() => how.value === 'table')
+const tableText = ref('')  // filled below once tableToText is defined
 
 function tableToText() {
   const tb = prog.value.table
@@ -19,14 +23,23 @@ function tableToText() {
   const s = rad.value ? tb.s_deg : tb.s
   return tb.deg.map((d, i) => `${d}, ${s?.[i] ?? ''}`).join('\n')
 }
-watch(useTable, (on) => {
-  if (on) {
+tableText.value = tableToText()
+watch(how, (h, before) => {
+  if (h === 'outline') { if (!project.outline) project.outline = blankOutline(); return }
+  if (before === 'outline') project.outline = null
+  if (h === 'table') {
     tableText.value = tableToText() || '0, 0\n45, 2\n90, 8\n135, 14\n180, 16\n225, 14\n270, 8\n315, 2'
     applyTable()
-  } else {
+  } else if (prog.value.table || !prog.value.segments?.length) {
     delete prog.value.table
     if (!prog.value.segments?.length) prog.value.segments = [{ kind: 'rise', deg: 180, [liftKey.value]: 10, law: 'cycloidal' }, { kind: 'return', deg: 180, [liftKey.value]: 10, law: 'cycloidal' }]
   }
+})
+// another project opened (an example, a file): follow its way of giving the motion
+watch(() => project.outline, (v) => {
+  if (!canOutline.value) return
+  if (v && how.value !== 'outline') how.value = 'outline'
+  else if (!v && how.value === 'outline') how.value = prog.value.table ? 'table' : 'law'
 })
 function applyTable() {
   const pts = tableText.value.split(/\n/).map((l) => l.split(/[,\s\t]+/).filter(Boolean).map(Number)).filter((p) => p.length >= 2 && p.every(Number.isFinite))
@@ -49,9 +62,14 @@ const lawName = (l) => (lang.value === 'zh' ? l.zh : l.en)
 
 <template>
   <div class="prog">
-    <AiDraft v-if="!useTable" :program="prog" :cam-id="camId" />
-    <label class="check"><input v-model="useTable" type="checkbox"> {{ t('useTable') }}</label>
-    <template v-if="!useTable">
+    <div class="how">
+      <button type="button" :class="{ on: how === 'law' }" @click="how = 'law'">{{ t('howLaw') }}</button>
+      <button type="button" :class="{ on: how === 'table' }" @click="how = 'table'">{{ t('howTable') }}</button>
+      <button v-if="canOutline" type="button" :class="{ on: how === 'outline' }" @click="how = 'outline'">{{ t('howOutline') }}</button>
+    </div>
+    <OutlineImport v-if="how === 'outline' && project.outline" />
+    <AiDraft v-if="how === 'law'" :program="prog" :cam-id="camId" />
+    <template v-if="how === 'law'">
       <table class="segs">
         <thead><tr><th>{{ t('kind') }}</th><th>{{ t('angle') }}</th><th>{{ t('lift') }} ({{ rad ? '°' : 'mm' }})</th><th>{{ t('law') }}</th><th /></tr></thead>
         <tbody>
@@ -69,7 +87,7 @@ const lawName = (l) => (lang.value === 'zh' ? l.zh : l.en)
         <span :class="['tot', Math.abs(total - 360) > 1e-6 && 'bad']">{{ t('total') }} {{ +total.toFixed(4) }}° / 360°</span></div>
       <label v-if="indexing" class="adv">{{ t('advance') }} <input v-model.number="prog.advance_deg" type="number" step="any" class="num"> °</label>
     </template>
-    <template v-else>
+    <template v-else-if="how === 'table'">
       <p class="hint">{{ t('tableHint') }}</p>
       <textarea v-model="tableText" rows="12" class="mono" @change="applyTable" />
     </template>
@@ -88,6 +106,11 @@ const lawName = (l) => (lang.value === 'zh' ? l.zh : l.en)
 .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
 .tot { font: 500 13px/1 var(--mono); color: var(--ok); }
 .tot.bad { color: var(--bad); }
+.how { display: flex; gap: 0; margin-bottom: 10px; flex-wrap: wrap; }
+.how button { border: 1px solid var(--line); background: var(--surface); padding: 5px 10px; cursor: pointer; font: inherit; font-size: 13px; color: var(--ink); margin-right: -1px; }
+.how button:first-child { border-radius: 6px 0 0 6px; }
+.how button:last-child { border-radius: 0 6px 6px 0; }
+.how button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .check { display: flex; gap: 6px; align-items: center; font-size: 13px; margin-bottom: 10px; color: var(--muted); }
 .adv { display: flex; gap: 6px; align-items: center; font-size: 13px; margin-top: 8px; }
 .adv .num { width: 80px; }

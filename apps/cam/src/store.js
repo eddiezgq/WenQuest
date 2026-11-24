@@ -1,5 +1,5 @@
 // The project being edited, kept in this browser (round 39: no sign-in yet), and the latest analysis.
-import { reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { api } from './api'
 
 const KEY = 'wqcam-project'
@@ -57,6 +57,10 @@ export function blankMfg() {
     blank: { radius: null, plate: null },
   }
 }
+// An imported outline (round 179): the drawing, its settings and the last result; the program is made from it.
+export function blankOutline() {
+  return { format: 'dxf', name: '', data: '', cx: 0, cy: 0, zero: 'rise', smooth: 1, report: null, used: '' }
+}
 export function blankMeasure() {
   return { format: 'lift', align: true, data: '', rpm: null, a_allow: null, kmax: 60, low_hi: 6, comp: { lo: 1, hi: 6 }, records: [] }
 }
@@ -79,6 +83,8 @@ export function normalise(p) {
   for (const k of ['grind', 'mill', 'blank']) out.mfg[k] = { ...b.mfg[k], ...((p.mfg || {})[k] || {}) }
   out.measure.comp = { ...b.measure.comp, ...((p.measure || {}).comp || {}) }
   if (!Array.isArray(out.measure.records)) out.measure.records = []
+  out.outline = p.outline ? { ...blankOutline(), ...p.outline } : null
+  if (out.outline?.report && !out.outline.used) out.outline.used = followerKey(out.mechanism)
   out.program = p.program || b.program
   if (p.type === 'cylindrical') out.cylindrical = { ...blankCylFields(), ...(p.cylindrical || {}) }
   else { delete out.type; delete out.cylindrical }
@@ -140,9 +146,28 @@ export function analyseSoon(delay = 250) {
   }, delay)
 }
 
+// what of the follower the motion found from an outline depends on (the base circle comes from the outline)
+export function followerKey(m) {
+  const osc = m.follower === 'oscillating'
+  const k = { follower: m.follower, contact: m.contact, sigma: Number(m.sigma) }
+  if (m.contact === 'roller') k.rr = Number(m.rr)
+  if (!osc && m.contact !== 'flat') k.e = Number(m.e) || 0
+  if (osc) { k.a = Number(m.a); if (m.contact !== 'flat') k.L = Number(m.L) }
+  return JSON.stringify(k)
+}
+// the follower was changed after the outline was solved: the motion no longer belongs to it
+export const outlineStale = computed(() => {
+  const o = project.outline
+  return !!(o?.report && o.used && followerKey(project.mechanism) !== o.used)
+})
+
 let lastDesign = ''
 watch(project, () => {
-  try { localStorage.setItem(KEY, JSON.stringify(project)) } catch { /* private mode: not saved */ }
+  try {
+    let text = JSON.stringify(project)
+    if (text.length > 3e6 && project.outline) text = JSON.stringify({ ...project, outline: { ...project.outline, data: '' } })  // a big drawing is not kept in the browser
+    localStorage.setItem(KEY, text)
+  } catch { /* private mode: not saved */ }
   const d = JSON.stringify(payload())
   if (d !== lastDesign) { lastDesign = d; analyseSoon() }   // manufacturing settings do not change the design
 }, { deep: true })

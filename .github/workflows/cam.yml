@@ -27,3 +27,28 @@ jobs:
         # failing test names go to the run's annotations, readable without the log
         run: |
           python -m pytest -q -rf 2>&1 | tee "$RUNNER_TEMP/cam.txt" || { grep -E "^(FAILED|ERROR)" "$RUNNER_TEMP/cam.txt" | sed 's/^/::error::/'; exit 1; }
+
+  # 第 179 轮：FreeCAD 里“用草图当凸轮廓线、反求运动”在官方 FreeCAD 1.1.4 里实际跑一遍（建草图、反求、建实体）
+  freecad:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: 取官方 FreeCAD 1.1.4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download 1.1.4 --repo FreeCAD/FreeCAD --pattern "*Linux-x86_64*.AppImage" --dir fc
+          cd fc && chmod +x *.AppImage && ./*.AppImage --appimage-extract >/dev/null
+          PY=$(ls $PWD/squashfs-root/usr/bin/python3 $PWD/squashfs-root/usr/bin/python 2>/dev/null | head -1)
+          echo "FreeCAD 的 Python：$PY"
+          "$PY" -c "import scipy" 2>/dev/null || "$PY" -m pip install -q scipy
+          "$PY" -c "import shapely" 2>/dev/null || "$PY" -m pip install -q shapely
+          "$PY" -c "import numpy, scipy, shapely; print(numpy.__version__, scipy.__version__, shapely.__version__)"
+      - name: 草图当廓线：反求、建实体、核对
+        working-directory: services/cam
+        run: |
+          unset XDG_CONFIG_HOME XDG_DATA_HOME XDG_CACHE_HOME
+          export WQ_OUT=$RUNNER_TEMP/outline
+          LC_ALL=C.UTF-8 $GITHUB_WORKSPACE/fc/squashfs-root/usr/bin/freecadcmd tools/check_freecad_outline.py 2>&1 | tee $RUNNER_TEMP/fc.txt
+          grep -q "ALL OK" $RUNNER_TEMP/fc.txt || { echo "::error::FreeCAD 草图反求没有通过（见日志）"; exit 1; }

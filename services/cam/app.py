@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from camkit import analyse, min_base_radius
+from camkit import inverse as IV
 from camkit import measure as ME
 from camkit import mfg as MF
 from camkit import step as ST
@@ -26,7 +27,7 @@ from camkit.program import ProgramError
 HERE = Path(__file__).parent
 EXAMPLES = HERE / "examples"
 WEB = Path(os.environ.get("CAM_WEB_DIR", HERE / "web"))
-MAX_BODY = 4 * 1024 * 1024  # a measured point cloud can be a few MB
+MAX_BODY = 8 * 1024 * 1024  # a measured point cloud or a drawing (DXF) can be a few MB
 
 ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^segment (\d+): a (\w+) has a lift more than 0$", r"第 \1 段：升程或回程的行程要大于 0"),
@@ -106,6 +107,9 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^the cutter radius is more than 0 and not more than the roller radius$", "刀具半径要大于 0、不大于滚子半径"),
     (r"^the tool centre path is not star-shaped", "刀心轨迹对凸轮中心不是星形，X–C 磨削走不了，请改用铣削或小砂轮"),
 ]
+
+
+ERR_ZH += IV.ERR_ZH  # importing an outline (round 179): kept with the kernel so FreeCAD shows them too
 
 
 def zh(msg: str) -> str:
@@ -386,6 +390,13 @@ async def compensate_ep(request: Request):
 async def wheel_ep(request: Request):
     p = await project_of(request)
     return run(lambda: wheel_view(p))
+
+
+@app.post("/api/inverse")
+async def inverse_ep(request: Request):
+    """An outline in (DXF or x, y points), the follower motion out (round 179)."""
+    p = await project_of(request)
+    return run(lambda: IV.import_outline(p))
 
 
 @app.post("/api/synthetic")
