@@ -11,7 +11,8 @@
 命令行（不开界面）：
   import wq_cam_outline as O
   O.run_headless(FreeCAD.ActiveDocument.getObject("Sketch"), {"follower": "translating", "contact": "roller",
-                 "rr": 3, "e": 0, "sigma": 1}, "输出文件夹")
+                 "rr": 3, "e": 0, "sigma": 1, "width": 5}, "输出文件夹")
+（width 是凸轮厚度，即接触宽度，建实体要用。）
 """
 import json
 import math
@@ -160,6 +161,7 @@ def run_dialog(obj):
         return s
 
     rr, e, a, L = num(5, 0), num(0), num(100, 0), num(80, 0)
+    width = num(10, 0)
     cx, cy = num(0), num(0)
     sig = QtGui.QComboBox()
     sig.addItems(["逆时针", "顺时针"])
@@ -169,7 +171,8 @@ def run_dialog(obj):
     levels = [(1.0, "自动（按廓线精度）"), (0.3, "弱"), (3.0, "强"), (10.0, "更强"), (0.0, "不平滑")]
     sm.addItems([x[1] for x in levels])
     for label, w in (("从动件", fol), ("接触", con), ("滚子半径 mm", rr), ("偏距 mm（直动）", e),
-                     ("中心距 mm（摆动）", a), ("摆杆长 mm（摆动滚子、尖顶）", L), ("凸轮转向", sig),
+                     ("中心距 mm（摆动）", a), ("摆杆长 mm（摆动滚子、尖顶）", L),
+                     ("凸轮厚度（接触宽度）mm", width), ("凸轮转向", sig),
                      ("回转中心 x mm（草图坐标）", cx), ("回转中心 y mm", cy), ("零位", zero), ("平滑程度", sm)):
         form.addRow(label, w)
     btn = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
@@ -181,7 +184,7 @@ def run_dialog(obj):
     osc = fol.currentIndex() == 1
     contact = ["roller", "flat", "knife"][con.currentIndex()]
     mech = {"follower": "oscillating" if osc else "translating", "contact": contact,
-            "sigma": 1 if sig.currentIndex() == 0 else -1}
+            "sigma": 1 if sig.currentIndex() == 0 else -1, "width": width.value()}
     if contact == "roller":
         mech["rr"] = rr.value()
     if osc:

@@ -63,7 +63,7 @@ def main():
     for name, m, prog, lift in CASES:
         try:
             sk = sketch_of(doc, name, m, prog)
-            mech = {k: v for k, v in m.items() if k != "rb"}
+            mech = {**{k: v for k, v in m.items() if k != "rb"}, "width": 10}
             r = O.run_headless(sk, mech, os.path.join(out, name))
             rep = r["report"]
             lift_got = rep["lift"]
