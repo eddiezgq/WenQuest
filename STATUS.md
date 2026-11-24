@@ -21,4 +21,8 @@
 ## 规则反馈
 
 ## 待议
-- 问渠电子 V1 开发计划（草案，2026-11-24）：`docs/方案/问渠电子V1开发方案与计划.md`，等 Eddie 定第九节 D1–D5
+- 三份草案（2026-11-24），等 Eddie 定：
+  - `docs/方案/问渠产品系列规划.md`（S1–S5，含新列的问渠芯片）
+  - `docs/方案/问渠电子V1开发方案与计划.md`（D1–D5，已按“开源母体 + AI 原生重构”修订）
+  - `docs/方案/四专业虚拟实验室规划.md`（V1–V5）
+- 发现：WQ-ENCIF 签核结果 max_slew_violations = 204（`factory/designs/wq-encif/out/layout/result.json`），严格说还不能流片；已写进芯片线 X2
