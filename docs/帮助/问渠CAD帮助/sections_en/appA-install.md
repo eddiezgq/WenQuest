@@ -16,6 +16,7 @@ On the website's Downloads page (wenquestrobotics.com/download): sign in, click 
 <li>Choose a language → accept the licence → choose a folder (the default is fine) → Install, about 3–5 minutes.</li>
 <li>Double-click “WenQuest CAD” on the desktop. On first start a box asks for the licence code (for the WenQuest workbenches such as AI Parts); paste it and click OK — it is not asked again. Without a code FreeCAD itself still works, the WenQuest workbenches just do not load.</li>
 <li>The first start also shows a Welcome page: choose English, unit system “Standard (mm, kg, s)” and navigation style “CAD” (this course always uses CAD).</li>
+<li>This course comes with the software: switch to the AI Parts workbench and choose <b>AI Parts → Help and training</b> (from 0.3.5). Lessons, quizzes and interactive figures work offline; the recordings need the internet.</li>
 </ol>
 
 ### Troubleshooting {#appA-fix}
