@@ -51,7 +51,8 @@ jobs:
   test:
     runs-on: ubuntu-24.04
     # A stuck runner should fail, not hold the deploy queue for hours.
-    timeout-minutes: 40
+    # 75 (was 40): on 11-24 apt-get on the runner took 33 min, three deploys in a row timed out (Eddie agreed).
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
