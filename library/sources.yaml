@@ -1,0 +1,185 @@
+# 问渠图书馆 · 免费书库登记表（B0 核条款结果）
+# 2026-11-24 核对。没登记、没核过的书库不接。
+# tier: A=全文入库（甲） B=书目收割（乙） C=只给入口（丙）
+# personal: 个人版（Eddie 自用、非商业）；online: 在线版（可能收费）
+# probe: 2026-11-24 从云端实测；cloud_blocked 表示云端出口 IP 被拒，须在 Eddie 电脑上实测
+
+sources:
+  - id: gutenberg
+    name: Project Gutenberg
+    content: 公有领域电子书（以英文为主，7 万余种）
+    license: 美国公有领域；美国以外不担保版权状态；“Project Gutenberg”为注册商标
+    access: 网站禁止自动访问（会封 IP）；批量用 rsync 私有镜像（gutenberg-epub）或 robot/harvest；书目用官方目录文件（RDF/CSV）
+    tier: {personal: A, online: B}
+    online_rules:
+      - 国内站只对作者去世满 50 年的书做 A 档
+      - 收费时全文去掉 Project Gutenberg 商标页头，或只做 B 档
+    probe: cloud_blocked（www.gutenberg.org 返回 503）；Gutendex 第三方接口可用
+    refs:
+      - "https://gutenberg.org/policy/robot_access.html"
+      - "https://gutenberg.org/policy/terms_of_use.html"
+      - "https://gutenberg.org/policy/permission.html"
+
+  - id: openstax
+    name: OpenStax
+    content: 大学教材（物理、微积分、化学、统计等）
+    license: 实测 129 本：CC BY 38、CC BY-NC-SA 80、未标 11
+    access: CMS 接口 https://openstax.org/apps/cms/api/v2/pages/?type=books.Book
+    tier: {personal: A, online: "CC BY 的 A；NC 和未标的 B"}
+    probe: ok
+    refs:
+      - "https://openstax.org/apps/cms/api/v2/pages/?type=books.Book&fields=title,license_name"
+
+  - id: wikisource
+    name: 维基文库（中、英）
+    content: 公有领域原典，含中文古籍
+    license: CC BY-SA / 公有领域
+    access: MediaWiki 接口须带 User-Agent、限速；批量用 dumps.wikimedia.org 数据包
+    tier: {personal: A, online: A}
+    online_rules:
+      - "CC BY-SA 内容署名并按同协议提供"
+    probe: zh 可用；en 被限速（429）
+
+  - id: oapen
+    name: OAPEN Library
+    content: 开放获取学术专著
+    license: 多为 CC，逐本看
+    access: OAI-PMH https://library.oapen.org/oai/ ；REST /rest/search
+    tier: {personal: A, online: "CC BY/BY-SA 的 A；NC 的 B"}
+    probe: cloud_blocked（429/403）
+    refs:
+      - "https://oapen.org/article/metadata"
+
+  - id: doab
+    name: DOAB 开放获取图书目录
+    content: 开放获取学术图书总目录
+    license: 书目可收割；全文许可逐本看（多为 CC）
+    access: OAI-PMH https://directory.doabooks.org/oai/
+    tier: {personal: B, online: B}
+    probe: cloud_blocked（429）
+    refs:
+      - "https://doabooks.org/en/doab/full-faq"
+
+  - id: arxiv
+    name: arXiv
+    content: 预印本论文约 300 万篇
+    license: 描述性元数据 CC0；全文各篇许可不同
+    access: OAI-PMH（批量首选）；查询接口每 3 秒一次
+    tier: {personal: B, online: B}
+    online_rules:
+      - "产品上注明 “Thank you to arXiv for use of its open access interoperability.”"
+    probe: ok
+    refs:
+      - "https://info.arxiv.org/help/api/tou.html"
+      - "https://info.arxiv.org/help/bulk_data.html"
+
+  - id: openalex
+    name: OpenAlex
+    content: 全球学术文献元数据（几亿条）
+    license: CC0
+    access: 公开接口；不全量收割，实时调用并缓存
+    tier: {personal: B, online: B}
+    probe: ok
+
+  - id: doaj
+    name: DOAJ
+    content: 开放获取期刊与论文
+    license: 期刊级元数据 CC BY-SA 4.0；文章元数据 CC0
+    access: OAI-PMH（免费版滞后约 30 天）、数据包
+    tier: {personal: B, online: B}
+    probe: ok
+    refs:
+      - "https://doaj.org/terms"
+      - "https://doaj.org/docs/oai-pmh/"
+
+  - id: openlibrary
+    name: Open Library / Internet Archive
+    content: 书目大全、封面；公有领域全文
+    license: 书目开放；全文看各书
+    access: 接口不能当批量后台、须带 User-Agent；批量用每月数据包
+    tier: {personal: B, online: B}
+    probe: ok
+    refs:
+      - "https://openlibrary.org/developers/api"
+      - "https://openlibrary.org/developers/dumps"
+
+  - id: hathitrust
+    name: HathiTrust
+    content: 大学馆数字化图书，公有领域部分全文可读
+    license: 美国以外出版于 1901–1930 年的书只对美国 IP 开放；谷歌扫描的书非会员只能逐页下载
+    access: 书目接口
+    tier: {personal: B, online: B}
+    online_rules:
+      - "国内站按地区过滤“仅美国公有领域”的书"
+    probe: ok
+    refs:
+      - "https://cdlib.org/services/consortial-partnerships/hathitrust/hathitrust-rights-copyright-issues/"
+      - "https://hathitrust.org/access"
+
+  - id: pmc
+    name: PubMed Central
+    content: 生物医学开放论文
+    license: 逐篇
+    access: OAI-PMH
+    tier: {personal: B, online: B}
+    probe: ok
+
+  - id: open_textbook_library
+    name: Open Textbook Library
+    content: 开放教材目录
+    license: 逐本（多为 CC）
+    access: JSON 目录 https://open.umn.edu/opentextbooks/textbooks.json
+    tier: {personal: B, online: B}
+    probe: ok
+
+  - id: libretexts
+    name: LibreTexts
+    content: 大学教材（含工程、物理、化学）
+    license: 逐本（多为 CC）
+    access: 未找到公开书目接口；先用网页目录
+    tier: {personal: B, online: B}
+    probe: 接口地址返回网页，非 JSON
+
+  - id: ncpssd
+    name: 国家哲学社会科学文献中心
+    content: 中文学术期刊、外文期刊、古籍
+    license: 公益免费；个人注册后可下载全文；单位可签机构用户协议
+    access: 无公开接口；网站拒绝程序访问
+    tier: {personal: C, online: C}
+    online_rules:
+      - "合作学校可签机构用户协议，校内免登录"
+    probe: 403（拒绝程序访问）
+    refs:
+      - "https://lib.sdada.edu.cn/upload_files/article/5/1_20220929100814.pdf"
+
+  - id: nlc_guji
+    name: 国家图书馆·中华古籍资源库
+    content: 古籍影像
+    license: 公益免费在线阅读
+    access: 无公开接口
+    tier: {personal: C, online: C}
+    probe: ok（网页）
+
+  - id: paper_edu
+    name: 中国科技论文在线
+    content: 中文科技论文
+    license: 免费阅读
+    access: 无公开接口
+    tier: {personal: C, online: C}
+    probe: ok（网页）
+
+  - id: ctext
+    name: 中国哲学书电子化计划
+    content: 先秦至近代中文原典
+    license: 接口对非商业用途免费；商业用途须另行授权（以 ctext 官方条款为准）
+    access: api.ctext.org
+    tier: {personal: B, online: C}
+    online_rules:
+      - "在线版收费前与 ctext 谈授权，谈成前只给入口"
+    probe: ok
+
+excluded:
+  - {name: Z-Library, reason: 盗版}
+  - {name: Library Genesis, reason: 盗版}
+  - {name: "Anna's Archive", reason: 盗版}
+  - {name: 网盘资源, reason: 来源与授权不明}
