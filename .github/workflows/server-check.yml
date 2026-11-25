@@ -35,7 +35,7 @@ jobs:
   check:
     runs-on: ubuntu-24.04
     environment: production
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       HOST: ${{ inputs.server == 'cn' && secrets.CN_DEPLOY_HOST || secrets.DEPLOY_HOST }}
     steps:
@@ -82,6 +82,9 @@ jobs:
             docker exec "$d" sh -c "psql -U \"\$POSTGRES_USER\" -d postgres -Atc \"select datname, xact_commit, tup_inserted, tup_updated, tup_fetched, blks_read from pg_stat_database order by tup_fetched desc limit 15\"" 2>&1' 2>&1 | sed 's/^/hub: /'
       - uses: actions/checkout@v4
       - name: Try the real copy (dry) — 和部署同样的打包，解到临时目录
+        # 第 184 轮：瘦身时不试传（国内试传慢，11-24 把整个任务拖到超时，镜像仓库那步没跑上）
+        if: inputs.slim != 'yes'
+        timeout-minutes: 10
         run: |
           set -o pipefail
           # 第 184 轮：以前中断的试传会留下 .probe.* 目录（国内 11-24 发现两个），先把 10 分钟以前的清掉
