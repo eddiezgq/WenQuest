@@ -36,16 +36,15 @@
   "pyc": 26
  },
  "wqcad": {
-  "version": "0.3.6-beta",
-  "url": "https://github.com/eddiezgq/wenquest-cad/releases/download/v0.3.6-beta/WenQuestCAD-0.3.6-beta-Setup.exe",
-  "size": 1438969313,
-  "sha256": "7a2b1a226bc3ca687a5b7b2e15f1598650c550285ae1c84e882f949640ee8c14",
+  "version": "0.3.7-beta",
+  "url": "https://github.com/eddiezgq/wenquest-cad/releases/download/v0.3.7-beta/WenQuestCAD-0.3.7-beta-Setup.exe",
+  "size": 1439214994,
+  "sha256": "046bb5a3cf81ee42a72ec3794e867c7fc2b59de97cbbdbc074588e01a4699e33",
   "name": [
    "问渠 CAD",
    "WenQuest CAD"
   ],
-  "date": "2026-11-25",
-  "url_cn": "https://wenquest-download.oss-cn-hangzhou.aliyuncs.com/wqcad/WenQuestCAD-0.3.6-beta-Setup.exe"
+  "date": "2026-11-25"
  },
  "wqfea": {
   "version": "0.0.1-beta",
