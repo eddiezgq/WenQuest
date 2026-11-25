@@ -11,6 +11,7 @@
 #   caddy-reset：证书签发卡住时用（11-11 切换后 qms 的锁文件坏了）：删 Caddy 的签发锁、重启 Caddy、看证书
 #   edu-qms-stop：切换次日（第 146 轮 7.4 第 5 步，11-12 Eddie：“停”）停掉教育服务器上的旧质量 ERP——只停容器、不删数据卷，前后各看一次内存
 #   edu-qms-start：回退用，把上面停掉的旧质量 ERP 重新启动（同时要把 DNS 改回、bridge-off）
+#   deevet-stop / deevet-start：第 184 轮丙1（11-24 Eddie “按建议”）：停掉 / 重新启动企业服务器上 deevet 试点那一整套质量 ERP——只停容器、不删数据卷
 name: Enterprise server 企业服务器
 
 on:
@@ -28,7 +29,7 @@ on:
       task:
         description: "pubkey（打印部署公钥）/ check（检查企业服务器）/ bootstrap（初始化企业服务器）/ deploy（装前门 Caddy 与交接桥）"
         type: choice
-        options: [pubkey, check, bootstrap, deploy, bridge-on, bridge-off, caddy-reset, edu-qms-stop, edu-qms-start]
+        options: [pubkey, check, bootstrap, deploy, bridge-on, bridge-off, caddy-reset, edu-qms-stop, edu-qms-start, deevet-stop, deevet-start]
         default: check
       host:
         description: "企业服务器 IP（11-10 开的：161.35.185.35）"
@@ -241,4 +242,29 @@ jobs:
           echo "== 之后"; free -m | head -2
           echo "仍在运行的 qms 容器："; docker ps --format '{{.Names}} {{.Status}}' | grep -E '^qms' || echo "  （无）"
           echo "数据卷保留："; docker volume ls --format '{{.Name}}' | grep -E '^qms' | sed 's/^/  /'
+          SH
+
+  deevet:
+    if: inputs.task == 'deevet-stop' || inputs.task == 'deevet-start'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: ${{ inputs.task }}
+        env:
+          HOST: ${{ inputs.host }}
+          TASK: ${{ inputs.task }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts 2>/dev/null
+          act=stop; [ "$TASK" = deevet-start ] && act=start
+          ssh "deploy@$HOST" "act=$act bash -s" <<'SH'
+          echo "== 之前"; free -m | head -2
+          projs=$(docker ps -a --format '{{.Label "com.docker.compose.project"}}' | grep -E '^qms-deevet' | sort -u)
+          echo "项目: $projs"
+          for p in $projs; do echo "-- $act $p"; docker compose -p "$p" $act </dev/null 2>&1 | tail -n 3; done
+          sleep 20
+          echo "== 之后"; free -m | head -2
+          echo "deevet 容器："; docker ps -a --format '{{.Names}} {{.Status}}' | grep -E '^qms-deevet' || echo "  （无）"
+          echo "数据卷保留："; docker volume ls --format '{{.Name}}' | grep -E '^qms-deevet' | sed 's/^/  /'
           SH

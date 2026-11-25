@@ -19,6 +19,11 @@ on:
         type: choice
         options: ["no", "sizes", "truncate-history"]
         default: "no"
+      slim:
+        description: "yes：第 184 轮瘦身（删试传残留；us：删无人用的旧质量 ERP 卷与备份目录、部署前备份只留 3 份；cn：镜像仓库每个镜像只留最近 2 个版本；系统日志留 7 天）。不可恢复"
+        type: choice
+        options: ["no", "yes"]
+        default: "no"
       connect_edge:
         description: "yes：把网关接上 factory-edge 网络（第 125 轮：下次部署前先救急，部署后本来就会接上）"
         type: choice
@@ -79,6 +84,8 @@ jobs:
       - name: Try the real copy (dry) — 和部署同样的打包，解到临时目录
         run: |
           set -o pipefail
+          # 第 184 轮：以前中断的试传会留下 .probe.* 目录（国内 11-24 发现两个），先把 10 分钟以前的清掉
+          ssh "deploy@$HOST" "find /opt/wenquest -maxdepth 1 -name '.probe.*' -mmin +10 -exec rm -rf {} + 2>&1" || true
           tar czf - --exclude=site/vendor docker-compose.yml docker-compose.prod.yml .env.example deploy site \
             | ssh "deploy@$HOST" 'd=$(mktemp -d /opt/wenquest/.probe.XXXX 2>/dev/null || mktemp -d) && tar xzf - -C "$d" 2>&1 | tail -5; echo "exit=${PIPESTATUS[0]} dir=$d"; du -sh "$d"; rm -rf "$d"' 2>&1 \
             | sed 's/^/copy: /' | while IFS= read -r l; do echo "::notice::$l"; done
@@ -193,6 +200,74 @@ jobs:
         run: |
           ssh "deploy@$HOST" 'docker image prune -af 2>&1 | tail -1; docker builder prune -af 2>&1 | tail -1; df -h / | tail -1' \
             | sed 's/^/clean: /' | while IFS= read -r l; do echo "::notice::$l"; done
+      - name: 瘦身（第 184 轮，只在 slim=yes 时；不可恢复）
+        if: always() && inputs.slim == 'yes'
+        env:
+          SERVER: ${{ inputs.server }}
+        run: |
+          ssh "deploy@$HOST" "SERVER=$SERVER bash -s" <<'SH' 2>&1 | sed 's/^/slim: /' | while IFS= read -r l; do echo "::notice::$l"; done
+          set -u
+          cd /opt/wenquest
+          echo "之前 $(df -h / | tail -1)"
+          find /opt/wenquest -maxdepth 1 -name '.probe.*' -mmin +10 -print -exec rm -rf {} + 2>&1
+          if [ "$SERVER" = us ]; then
+            # 旧质量 ERP 11-12 已搬到企业服务器：只删没有任何容器在用的卷
+            for v in qms_erp-db-data qmsdemo_db-data; do
+              if docker volume inspect "$v" >/dev/null 2>&1; then
+                if [ -z "$(docker ps -aq --filter volume=$v)" ]; then docker volume rm "$v" >/dev/null && echo "删卷 $v"; else echo "卷 $v 有容器在用，不删"; fi
+              fi
+            done
+            if [ -d qmsdemo-backup ]; then rm -rf qmsdemo-backup && echo "删目录 qmsdemo-backup"; fi
+            # 部署前备份 10 份 → 3 份（每日备份仍留 7 份）
+            if grep -q '^BACKUP_KEEP_COUNT=' .env; then sed -i 's/^BACKUP_KEEP_COUNT=.*/BACKUP_KEEP_COUNT=3/' .env; else echo 'BACKUP_KEEP_COUNT=3' >> .env; fi
+            find backups -mindepth 1 -maxdepth 1 -type d -name '2*' ! -name '*-daily' | sort | head -n -3 | while read -r d; do rm -rf "$d" && echo "删旧备份 $d"; done
+            echo "备份目录 $(du -sh backups | cut -f1)"
+          fi
+          sudo -n journalctl --vacuum-time=7d 2>&1 | tail -1 || echo "系统日志：没有 sudo 权限，跳过"
+          echo "之后 $(df -h / | tail -1)"
+          SH
+      - name: 国内镜像仓库只留最近 2 个版本（第 184 轮，只在 slim=yes 且 server=cn 时；不可恢复）
+        if: always() && inputs.slim == 'yes' && inputs.server == 'cn'
+        run: |
+          set -o pipefail
+          ssh -fN -o ExitOnForwardFailure=yes -L 15000:127.0.0.1:5000 "deploy@$HOST"
+          # 正在用的版本一定留：各 .env 里写的、现有容器用的
+          KEEP=$(ssh "deploy@$HOST" "cat /opt/wenquest/.env /opt/wenquest/*/.env 2>/dev/null; docker ps -a --format '{{.Image}}'" | grep -oE '(127\.0\.0\.1|localhost):5000/[A-Za-z0-9._/-]+:[A-Za-z0-9._-]+' | sort -u)
+          export KEEP
+          python3 - <<'PY' 2>&1 | sed 's/^/registry: /' | while IFS= read -r l; do echo "::notice::$l"; done
+          import json, os, urllib.request as u, urllib.error
+          B = "http://127.0.0.1:15000/v2/"
+          A = ",".join(["application/vnd.oci.image.index.v1+json", "application/vnd.oci.image.manifest.v1+json",
+                        "application/vnd.docker.distribution.manifest.list.v2+json", "application/vnd.docker.distribution.manifest.v2+json"])
+          def req(url, method="GET", accept=A):
+              return u.urlopen(u.Request(url, method=method, headers={"Accept": accept}), timeout=120)
+          inuse = {}
+          for k in os.environ.get("KEEP", "").split():
+              name, _, tag = k.split("5000/", 1)[1].rpartition(":")
+              inuse.setdefault(name, set()).add(tag)
+          for repo in json.load(req(B + "_catalog?n=1000")).get("repositories", []):
+              tags = json.load(req(f"{B}{repo}/tags/list")).get("tags") or []
+              info = []
+              for t in tags:
+                  r = req(f"{B}{repo}/manifests/{t}"); dig = r.headers["Docker-Content-Digest"]; m = json.load(r)
+                  cfg = (m.get("config") or {}).get("digest")
+                  if not cfg and m.get("manifests"):
+                      cfg = json.load(req(f"{B}{repo}/manifests/{m['manifests'][0]['digest']}"))["config"]["digest"]
+                  created = json.load(req(f"{B}{repo}/blobs/{cfg}", accept="*/*")).get("created", "") if cfg else ""
+                  info.append((created, t, dig))
+              info.sort(reverse=True)
+              keep = {d for _, _, d in info[:2]} | {d for _, t, d in info if t in inuse.get(repo, set())}
+              for created, t, d in info:
+                  if d in keep:
+                      print(f"留 {repo}:{t} {created[:10]}")
+                      continue
+                  try:
+                      req(f"{B}{repo}/manifests/{d}", method="DELETE"); print(f"删 {repo}:{t} {created[:10]}")
+                  except urllib.error.HTTPError as e:
+                      print(f"跳过 {repo}:{t}（{e.code}，同一版本可能已随别的标签删掉）")
+          PY
+          ssh "deploy@$HOST" 'echo "仓库之前 $(du -sh /opt/wenquest/registry | cut -f1)"; docker exec wq-registry registry garbage-collect --delete-untagged /etc/docker/registry/config.yml >/dev/null 2>&1; echo "仓库之后 $(du -sh /opt/wenquest/registry | cut -f1)"; df -h / | tail -1' \
+            | sed 's/^/registry: /' | while IFS= read -r l; do echo "::notice::$l"; done
       - name: 数字工厂历史库（第 182 轮，只在要求时）
         if: always() && inputs.db != 'no'
         env:
