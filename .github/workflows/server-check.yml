@@ -84,7 +84,6 @@ jobs:
       - name: Try the real copy (dry) — 和部署同样的打包，解到临时目录
         # 第 184 轮：瘦身时不试传（国内试传慢，11-24 把整个任务拖到超时，镜像仓库那步没跑上）
         if: inputs.slim != 'yes'
-        timeout-minutes: 10
         run: |
           set -o pipefail
           # 第 184 轮：以前中断的试传会留下 .probe.* 目录（国内 11-24 发现两个），先把 10 分钟以前的清掉
