@@ -14,6 +14,11 @@ on:
         type: choice
         options: ["no", "yes"]
         default: "no"
+      db:
+        description: "数字工厂历史库（第 182 轮）：sizes 只读列各库各表大小；truncate-history 清空 bus_message、machine_state_log、sim_snapshot 并把保留天数设为 7（不可恢复）"
+        type: choice
+        options: ["no", "sizes", "truncate-history"]
+        default: "no"
       connect_edge:
         description: "yes：把网关接上 factory-edge 网络（第 125 轮：下次部署前先救急，部署后本来就会接上）"
         type: choice
@@ -188,6 +193,35 @@ jobs:
         run: |
           ssh "deploy@$HOST" 'docker image prune -af 2>&1 | tail -1; docker builder prune -af 2>&1 | tail -1; df -h / | tail -1' \
             | sed 's/^/clean: /' | while IFS= read -r l; do echo "::notice::$l"; done
+      - name: 数字工厂历史库（第 182 轮，只在要求时）
+        if: always() && inputs.db != 'no'
+        env:
+          MODE: ${{ inputs.db }}
+        run: |
+          ssh "deploy@$HOST" "MODE=$MODE bash -s" <<'SH' 2>&1 | sed 's/^/db: /' | while IFS= read -r l; do echo "::notice::$l"; done
+          set -u
+          C=wq-factory-db-1
+          psql() { docker exec "$C" psql -U wq -At "$@"; }
+          df -h / | tail -1
+          dbs=$(psql -d wq_factory -c "select datname from pg_database where datname like 'wq\_%' order by 1")
+          psql -d wq_factory -c "select datname || ' ' || pg_size_pretty(pg_database_size(datname)) from pg_database where datname like 'wq\_%' order by pg_database_size(datname) desc"
+          for d in $dbs; do
+            psql -d "$d" -c "select '$d ' || relname || ' ' || pg_size_pretty(pg_total_relation_size(relid)) from pg_statio_user_tables order by pg_total_relation_size(relid) desc limit 4"
+          done
+          if [ "$MODE" = truncate-history ]; then
+            for d in $dbs; do
+              for t in bus_message machine_state_log sim_snapshot; do
+                if [ "$(psql -d "$d" -c "select to_regclass('public.$t') is not null")" = t ]; then
+                  psql -d "$d" -c "truncate table $t" >/dev/null && echo "清空 $d.$t"
+                fi
+              done
+            done
+            f=/opt/wenquest/factory/.env
+            if grep -q '^WQ_HISTORY_DAYS=' "$f"; then sed -i 's/^WQ_HISTORY_DAYS=.*/WQ_HISTORY_DAYS=7/' "$f"; else echo 'WQ_HISTORY_DAYS=7' >> "$f"; fi
+            grep '^WQ_HISTORY_DAYS=' "$f"
+            df -h / | tail -1
+          fi
+          SH
       - name: 国内拉镜像报 short read 的原因（11-18：国内数字工厂更新时拉新版本断，仓库里每一层核对都没坏；逐个拉也断）
         if: always() && inputs.server == 'cn'
         run: |
