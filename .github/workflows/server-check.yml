@@ -15,7 +15,7 @@ on:
         options: ["no", "yes"]
         default: "no"
       db:
-        description: "数字工厂历史库（第 182 轮）：sizes 只读列各库各表大小；truncate-history 清空 bus_message、machine_state_log、sim_snapshot 并把保留天数设为 7（不可恢复）"
+        description: "数字工厂历史库（第 182 轮）：sizes 只读列各库各表大小；truncate-history 清空厂情中枢事件明细 ont_event（不可恢复），总线消息与事件明细都改为只留 7 天"
         type: choice
         options: ["no", "sizes", "truncate-history"]
         default: "no"
@@ -210,15 +210,17 @@ jobs:
           done
           if [ "$MODE" = truncate-history ]; then
             for d in $dbs; do
-              for t in bus_message machine_state_log sim_snapshot; do
+              for t in ont_event; do          # 第 182 轮：大头是事件明细（每厂 1–2 GB）；总线消息只有 100 MB 级，不清（清了会重置教学情景）
                 if [ "$(psql -d "$d" -c "select to_regclass('public.$t') is not null")" = t ]; then
                   psql -d "$d" -c "truncate table $t" >/dev/null && echo "清空 $d.$t"
                 fi
               done
             done
             f=/opt/wenquest/factory/.env
-            if grep -q '^WQ_HISTORY_DAYS=' "$f"; then sed -i 's/^WQ_HISTORY_DAYS=.*/WQ_HISTORY_DAYS=7/' "$f"; else echo 'WQ_HISTORY_DAYS=7' >> "$f"; fi
-            grep '^WQ_HISTORY_DAYS=' "$f"
+            for k in WQ_HISTORY_DAYS WQ_ONT_EVENT_DAYS; do
+              if grep -q "^$k=" "$f"; then sed -i "s/^$k=.*/$k=7/" "$f"; else echo "$k=7" >> "$f"; fi
+            done
+            grep -E '^WQ_(HISTORY|ONT_EVENT)_DAYS=' "$f"
             df -h / | tail -1
           fi
           SH
