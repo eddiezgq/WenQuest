@@ -27,4 +27,5 @@
   - `docs/方案/问渠电子V1开发方案与计划.md`（D1–D5，已按“开源母体 + AI 原生重构”修订）
   - `docs/方案/四专业虚拟实验室规划.md`（V0–V6）
   - `docs/方案/问渠图书馆方案.md`（B1–B5，11-24 起草）
+  - `docs/方案/问渠机器人V1开发方案与计划.md`（J1–J6，11-25 起草；排在电子 V1 之后，暂定 2027-05-10 开工）
 - 发现：WQ-ENCIF 签核结果 max_slew_violations = 204（`factory/designs/wq-encif/out/layout/result.json`），严格说还不能流片；已写进芯片线 X2
