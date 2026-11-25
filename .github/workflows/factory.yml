@@ -41,13 +41,17 @@ on:
       - "docs/设计/WQ-LS/**"
       - "tools/wqls/spec_web.py"
   workflow_dispatch:
+  # 第 183 轮（2026-11-24 Eddie “按建议”）：推送只跑检查，不上线；上线每天一次（UTC 21:13 = 北京时间 5:13、美东 16:13），
+  # 和学习平台的每日上线（UTC 19:43）错开。上次成功上线以来数字工厂没有改动就不构建、不上线。要马上上线就手动启动。
+  schedule:
+    - cron: "13 21 * * *"
 
 permissions:
   contents: read
   packages: write
 
 concurrency:
-  group: factory-deploy
+  group: ${{ github.event_name == 'push' && format('factory-check-{0}', github.ref) || 'factory-deploy' }}
   cancel-in-progress: false
 
 defaults:
@@ -55,8 +59,32 @@ defaults:
     shell: bash          # 带 pipefail：用 tee 记日志时不会吞掉出错
 
 jobs:
+  changes:
+    name: 有没有要上线的改动
+    runs-on: ubuntu-24.04
+    outputs:
+      go: ${{ steps.c.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: c
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # 推送、手动启动：照常往下走；每日定时：和上次成功的定时 / 手动上线比，数字工厂相关文件没变就跳过
+          if [ "${{ github.event_name }}" != schedule ]; then echo go=true >> "$GITHUB_OUTPUT"; exit 0; fi
+          last=$(gh api "repos/${{ github.repository }}/actions/workflows/factory.yml/runs?branch=main&status=success&per_page=30" \
+                   --jq '[.workflow_runs[] | select(.event != "push")][0].head_sha // ""')
+          if [ -z "$last" ] || ! git cat-file -e "$last" 2>/dev/null; then echo go=true >> "$GITHUB_OUTPUT"; exit 0; fi
+          paths=$(python3 -c "import yaml,sys; print(' '.join(yaml.safe_load(open('.github/workflows/factory.yml'))[True]['push']['paths']))")
+          n=$(git diff --name-only "$last" HEAD -- $paths | wc -l)
+          echo "上次上线 $last 以来改动的文件：$n 个"
+          if [ "$n" -gt 0 ]; then echo go=true >> "$GITHUB_OUTPUT"; else echo go=false >> "$GITHUB_OUTPUT"; fi
   test:
     name: 测试
+    needs: changes
+    if: needs.changes.outputs.go == 'true'
     runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     services:
       postgres:
@@ -694,6 +722,7 @@ jobs:
   build:
     name: 构建镜像
     needs: test
+    if: github.event_name != 'push'          # 第 183 轮：推送只跑检查，构建和上线在每日定时 / 手动启动时做
     runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     outputs:
       app: ${{ steps.meta.outputs.app }}

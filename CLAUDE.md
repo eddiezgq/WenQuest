@@ -35,7 +35,7 @@
 | 前端（uni-app，网页 + 微信小程序） | `apps/web/` | `npm ci && npm test && npm run build:h5` |
 | 接口网关（FastAPI） | `services/gateway/` | `pip install -r requirements-dev.txt && python -m pytest -q` |
 | Moodle 插件 | `plugins/` | — |
-| 部署 | `.github/workflows/deploy.yml`、`deploy/` | 推送 main 只跑检查、不上线；定时上线每天一次（UTC 19:43，周一由周更全量那次代替；2026-11-24 Eddie 定，原来每半小时）；Eddie 11-24：不要频繁手动上线，全部完成、核查后再上线，确需马上上线先问他；手动 `gh workflow run deploy.yml --ref main` 默认增量（没改的教材跳过），全量重建要加 `-f fresh=true`（几个小时的用量，第 116 轮） |
+| 部署 | `.github/workflows/deploy.yml`、`deploy/` | 推送 main 只跑检查、不上线；定时上线每天一次（UTC 19:43，周一由周更全量那次代替；2026-11-24 Eddie 定，原来每半小时）；Eddie 11-24：不要频繁手动上线，全部完成、核查后再上线，确需马上上线先问他；**数字工厂**（`factory.yml`）同样推送只跑检查，每天 UTC 21:13 上线一次、没改动就跳过（第 183 轮）；手动 `gh workflow run deploy.yml --ref main` 默认增量（没改的教材跳过），全量重建要加 `-f fresh=true`（几个小时的用量，第 116 轮） |
 | 本地完整环境（Moodle + 网关 + 网页端） | `tools/local/setup.sh`，说明见 `docs/帮助/本地测试环境.md` | 推送前用老师和学生账号实际走一遍 |
 
 改了 `factory/`、`library/` 里教材会读的数据（各书 `meta.yaml` 的 `program_deps` 登记了哪些），推送后要看 “Build and deploy” 推送检查里那几本书的结果，红了当场修——2026-11-14 第 167 轮给 WQ-CR5 加了一项物料，《机器人学》30.4 的图报错，推送检查红了没人管，整整一个上午什么都上不了线（第 168、170 轮）。
